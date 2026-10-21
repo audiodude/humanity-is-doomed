@@ -113,5 +113,4 @@ The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs t
 python3 scripts/metrics/space_metrics.py        # -> research/data/metrics_space.csv (about 2 minutes)
 python3 scripts/metrics/combat_metrics.py       # -> research/data/metrics_combat.csv
 python3 scripts/metrics/progression_metrics.py  # -> research/data/metrics_progression.csv; pass a slot (E1M7) to dump one map
-python3 scripts/metrics/correlate.py            # -> research/data/correlations.csv; needs the unpublished research/data/reception.csv
 ```
