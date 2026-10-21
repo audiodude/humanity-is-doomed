@@ -21,9 +21,9 @@ reached by wading in from the pump hall's intake (rocket launcher); a hinted
 panel in the tower that opens onto a pier and a lift down to the soulsphere
 island; a hinted panel in the sunken filter house (backpack).
 
-Gag: a switch on a stone block by the south-east yard's parapet sinks the
-block and drops the parapet behind it. Walk on and you fall into the canal,
-which teleports you back to where the switch was.
+Gag: a switch in a niche in the south-east yard's east wall drops the
+parapet beside it. Walk through and you fall into the canal, which
+teleports you back to the switch.
 """
 from .doom2 import *  # noqa: F403 - thing types, actions, sector specials
 from .model import SKY, Sector, Special, Thing, door, doorway, lift, rect, stairs
@@ -106,10 +106,9 @@ SECTORS = [
     Sector("river_e_lip", [rect(1600, 1024, 1792, 1216)], RIVER, SKYC, "NUKAGE1", SKY, 160, "SILVER2",
            special=DAMAGE_5),
     Sector("par_s", [rect(-384, 1008, 1008, 1024)], 32, SKYC, "FLAT5_4", SKY, 192, OUT_S, lower=OUT_S),
-    Sector("par_se", [rect(1168, 1008, 1664, 1024)], 32, SKYC, "FLAT5_4", SKY, 192, OUT_E, lower=OUT_S),
-    Sector("par_gag", [rect(1664, 1008, 1728, 1024)], 32, SKYC, "FLAT5_4", SKY, 192, OUT_E, lower=OUT_S,
+    Sector("par_se", [rect(1168, 1008, 1728, 1024)], 32, SKYC, "FLAT5_4", SKY, 192, OUT_E, lower=OUT_S),
+    Sector("par_gag", [rect(1728, 1008, 1792, 1024)], 32, SKYC, "FLAT5_4", SKY, 192, OUT_E, lower=OUT_S,
            tag=TAG_GAG),
-    Sector("par_se2", [rect(1728, 1008, 1792, 1024)], 32, SKYC, "FLAT5_4", SKY, 192, OUT_E, lower=OUT_S),
     Sector("par_nw", [rect(-384, 1408, 240, 1424)], 32, SKYC, "FLAT5_4", SKY, 192, OUT_N, lower=OUT_S),
     Sector("par_ne", [rect(688, 1408, 1008, 1424)], 32, SKYC, "FLAT5_4", SKY, 192, OUT_N, lower=OUT_S),
     Sector("par_ne2", [rect(1168, 1408, 1792, 1424)], 32, SKYC, "FLAT5_4", SKY, 192, OUT_N, lower=OUT_S),
@@ -151,13 +150,13 @@ SECTORS = [
             "STEP4"),
     *stairs("tst_e", (544, 1584, 672, 1744), "s", 5, 16, 16, 224, "FLAT4", "TLITE6_5", 144, "SILVER2",
             "STEP4"),
-    # (672, 1440)-(672, 1504) is the bridge switch, beside the east window.
-    Sector("control", [[(256, 1424), (672, 1424), (672, 1440), (672, 1584), (544, 1584), (544, 1744),
+    # (672, 1504)-(672, 1568) is the bridge switch, north of the east window.
+    Sector("control", [[(256, 1424), (672, 1424), (672, 1440), (672, 1568), (672, 1584), (544, 1584), (544, 1744),
                         (384, 1744), (384, 1584), (256, 1584)]], 96, 224, "FLAT4", "TLITE6_5", 176,
            "SILVER2"),
     Sector("window_t", [rect(544, 1408, 640, 1424)], 128, 192, "FLAT5_4", "CEIL5_1", 192, "SILVER2",
            lower="METAL"),
-    Sector("window_e", [rect(672, 1504, 688, 1568)], 128, 192, "FLAT5_4", "CEIL5_1", 192, "SILVER2",
+    Sector("window_e", [rect(672, 1440, 688, 1504)], 128, 192, "FLAT5_4", "CEIL5_1", 192, "SILVER2",
            lower="METAL"),
     door("d_pier", rect(384, 1408, 512, 1424), face="SILVER2", track="SILVER2", floor=96, light=176,
          flat="FLAT4"),
@@ -185,18 +184,18 @@ SECTORS = [
     Sector("exit_niche", [rect(1456, 2352, 1488, 2360)], 64, 136, "FLOOR0_1", "TLITE6_4", 208, "EXITSTON"),
 
     # South-east yard: sealed until the gate sinks. Red key on a glowing pedestal.
-    Sector("yard_se", [[(912, 384), (1664, 384), (1792, 512), (1792, 1008), (1728, 1008), (1728, 976),
-                        (1664, 976), (1664, 1008), (1168, 1008), (1168, 1024), (1008, 1024), (1008, 1008),
-                        (912, 1008)], ped_r, plat_se], 0, SKYC, BANK, SKY, 176, OUT_E, tag=TAG_TELE),
-    # The gag block: its south face is the switch; it sinks to the yard's level.
-    Sector("gag", [rect(1664, 976, 1728, 1008)], 128, SKYC, BANK, SKY, 176, OUT_E, tag=TAG_GAG),
+    Sector("yard_se", [[(912, 384), (1664, 384), (1792, 512), (1792, 1008), (1168, 1008), (1168, 1024),
+                        (1008, 1024), (1008, 1008), (912, 1008)], ped_r, plat_se], 0, SKYC, BANK, SKY, 176, OUT_E,
+           tag=TAG_TELE),
+    # Its back wall (1800, 944)-(1800, 1008) is the gag switch, which drops par_gag.
+    Sector("niche_gag", [rect(1792, 944, 1800, 1008)], 0, 128, BANK, "CEIL5_1", 176, OUT_E),
     Sector("ped_r", [ped_r], 24, SKYC, "TLITE6_1", SKY, 240, OUT_E, lower="METAL", special=LIGHT_GLOW),
     Sector("plat_se", [plat_se], 64, SKYC, "FLOOR4_8", SKY, 176, OUT_E, lower="METAL2"),
     # Its back wall (896, 448)-(896, 512) is the gate switch.
     Sector("niche_g", [rect(896, 448, 912, 512)], 0, 128, BANK, "CEIL5_1", 176, "METAL2"),
     *doorway("d_gate", (864, 736), "e", alcove=16, far_alcove=16, alcove_wall="METAL2", face="BIGDOOR7",
              tag=TAG_GATE, alcove_flat=BANK, flat=BANK),
-    *doorway("d_secl_e", (1792, 896), "e", face=OUT_E, track=OUT_E, tag=TAG_REDCL, flat=BANK),
+    *doorway("d_secl_e", (1792, 872), "e", face=OUT_E, track=OUT_E, tag=TAG_REDCL, flat=BANK),
     Sector("secl_e", [rect(1808, 800, 1968, 992)], 0, 128, BANK, "CEIL5_1", 96, "STONE2",
            special=LIGHT_BLINK_RANDOM),
     *doorway("d_secl_s", (1408, 384), "s", face=OUT_E, track=OUT_E, tag=TAG_REDCL, flat=BANK),
@@ -211,10 +210,10 @@ SPECIAL_BETWEEN = {
     ("river_e_lip", "river_e"): Special(WR_TELEPORT, TAG_TELE),   # gag: back to the yard
 }
 SPECIAL_WALLS = {
-    ((672, 1440), (672, 1504)): Special(S1_FLOOR_LOWEST, TAG_BRIDGE, "SW1COMP"),
+    ((672, 1504), (672, 1568)): Special(S1_FLOOR_LOWEST, TAG_BRIDGE, "SW1COMP"),
     ((896, 448), (896, 512)): Special(S1_DOOR_OPEN, TAG_GATE, "SW1MET2"),
     ((1456, 2360), (1488, 2360)): Special(S1_EXIT, 0, "SW1EXIT"),
-    ((1664, 976), (1728, 976)): Special(S1_FLOOR_LOWEST, TAG_GAG, "SW1STON1"),   # gag
+    ((1800, 944), (1800, 1008)): Special(S1_FLOOR_LOWEST, TAG_GAG, "SW1STON1"),   # gag
 }
 SECRET_DOORS = {"d_sec1", "d_pier", "d_sec4"}
 MUST_REACH = ["sec1", "ledge", "island", "sec4", "hall_cl", "control", "yard_se", "ped_r", "secl_e",
@@ -274,7 +273,7 @@ THINGS = [Thing(*t) for t in [
     (IMP, 1632, 672, 90), (IMP, 1696, 672, 90, "mh"),
     (SARGE, 1056, 544, 270, "emha"), (SARGE, 1632, 448, 270, "mha"), (CACO, 1216, 640, 90, "mh"),
     (REDKEY, 1408, 704),
-    (TELEPORT_DEST, 1696, 928, 90),   # gag: in front of the switch
+    (TELEPORT_DEST, 1760, 976, 0),   # gag: in front of the switch
     (MEDI, 1024, 448), (SHELLS, 1536, 480), (STIM, 1152, 880), (STIM, 1744, 576), (ROCKET, 1600, 512),
     # red-key closets: east and south of the yard, and the guardroom by the red door
     (DEMON, 1856, 848, 180), (DEMON, 1856, 944, 180, "mh"), (KNIGHT, 1920, 896, 180, "h"),

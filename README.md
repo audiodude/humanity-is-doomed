@@ -18,20 +18,15 @@
 
 ## Included WAD - NUKAGE.WAD
 
-`wads/NUKAGE.WAD` holds both generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), and MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` for MAP02) and GZDoom. Top-down maps of both levels are in `wads/NUKAGE-MAP01.svg` and `wads/NUKAGE-MAP02.svg`.
+`wads/NUKAGE.WAD` holds both generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), and MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` for MAP02) and GZDoom. Top-down maps of both levels are in `wads/NUKAGE-MAP01.svg` and `wads/NUKAGE-MAP02.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
 
 ### Nukage Junction (`nukage_junction`)
 A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/medium/hard, one secret.
 
-Route: tech start room → courtyard hub with a nukage pool → warehouse (lift to a ledge switch that lowers the blue-key island; the fake wall in the west wall leads to the secret) → blue door → lab (lift to the red key; grabbing it opens a monster closet) → red door → exit arena (ambush closets on entry) → exit switch. The `UMAPINFO` lump names the level for ports that read it (dsda-doom, GZDoom). Vanilla DOOM II still calls it "entryway".
+The `UMAPINFO` lump names the level for ports that read it (dsda-doom, GZDoom). Vanilla DOOM II still calls it "entryway".
 
 ### Nukage Crossing (`nukage_crossing`)
-MAP02, designed from the [research](#research-what-makes-doom-levels-fun) below: 100 sectors, 21/43/57 monsters on easy/medium/hard, four secrets.
-
-- **Set piece:** a 128-high sluice gate stands in a nukage canal. A switch in the silver control tower lowers it into a footbridge, and you can watch it sink through the window beside the switch. The pinkies pacing the far yard then charge across.
-- **Route:** start window with a view across the canal to the red door and a soulsphere on a lit pedestal → south yard → dark blinking pipe corridor → bright pump hall, up a step to the blue key (grabbing it opens a closet behind you) → blue door → north bank → control tower → across the bridge to the sealed south-east yard (red key; grabbing it opens closets between you and the bridge and a guardroom by the red door) → back across → terrace → red door → exit. A switch in the south-east yard opens a gate back to the start, which closes a loop through the start yard.
-- **Secrets:** each is marked by a shifted panel or a light. A start-room closet holds armor. A canal ledge, reached by wading in from the pump hall's intake, holds the rocket launcher. A tower panel opens onto a pier and a lift down to the soulsphere island. The filter house hides a backpack.
-- **Gag:** a stone block by the south-east yard's parapet has a switch on it. Press it and the block sinks, the parapet behind it drops away, and the only thing left to do is walk into the canal, which teleports you back to where the switch was.
+MAP02, designed from the [research](#research-what-makes-doom-levels-fun) below: 99 sectors, 21/43/57 monsters on easy/medium/hard, four secrets.
 
 Measured with the research scripts against the DOOM II maps (median in brackets):
 
