@@ -1,0 +1,102 @@
+# Nukage Crossing (MAP02) wiring test: every door, switch, lift, key trap and
+# secret on the intended route, then the exit.
+#   python3 ~/.agents/skills/doom-playtest/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest
+
+killall
+shot start
+
+# Secret 1: hinted panel in the start room's west wall.
+walk -96 272
+open -128 272
+walk -224 272
+expect secrets == 1
+expect has BasicArmor
+walk -96 272 320 384
+open 320 416
+
+# South yard -> pump door -> dark corridor -> pump hall -> blue key on its pedestal.
+walk 320 470 -300 600 -370 624
+open -400 624
+walk -450 624 -960 624 -960 800 -1024 1380 -1024 1500 -768 1632
+expect has BlueCard
+wait 70
+expect ceil -1160 1216 > 64        # the closet behind you opened
+
+# Secret 2: wade in through the intake and along the canal to the ledge.
+walk -1024 1500 -1024 1424 -960 1300 -930 1216 -700 1216 -400 1216 -300 1216 -32 1300 -64 1376
+expect secrets == 2
+expect has RocketLauncher
+walk -32 1300 -300 1216 -400 1216 -700 1216 -930 1216 -1024 1424 -1024 1740 -500 1740 -444 1664
+expect floor -444 1664 == 16       # back up the intake steps
+
+# Blue door -> north bank.
+open -424 1664
+walk -380 1664 -300 1664
+
+# Secret 4: filter house, hinted panel to the backpack.
+walk -128 2000 -128 2044
+open -128 2064
+walk -128 2150 -330 2288
+open -352 2288
+walk -448 2288
+expect secrets == 3
+expect has Backpack
+walk -330 2288 -128 2150 -128 2100
+open -128 2080
+walk -128 2000
+
+# Control tower: the switch lowers the sluice gate into a bridge.
+walk 464 1960 464 1892
+open 464 1872
+walk 464 1800 320 1790 320 1560 640 1472
+expect floor 1088 1216 == 128
+use 672 1472
+walk 620 1560
+look 324
+wait 30
+shot control-window    # the gate sinking, seen through the window by the switch
+expect floor 1088 1216 < 128
+
+# Secret 3: hinted panel to the pier, lift down to the soulsphere island.
+walk 448 1450
+open 448 1424
+walk 448 1300 448 1184
+wait 35
+walk 352 1184 352 1120 448 1120
+expect secrets == 4
+walk 448 1184
+wait 140
+walk 448 1300 448 1380
+open 448 1408
+walk 448 1450
+expect floor 1088 1216 == 0        # the bridge is down
+
+# Out of the tower and across the bridge to the sealed south-east yard.
+walk 320 1560 320 1790 464 1840
+open 464 1856
+walk 464 1900 464 1960 1000 1960 1088 1700 1088 1450
+look 270
+shot bridge
+walk 1088 1200 1088 950
+
+# Red key: grabbing it opens both yard closets and the guardroom by the red door.
+walk 1408 880 1408 704
+expect has RedCard
+wait 105
+expect ceil 1800 896 > 64
+expect ceil 1408 376 > 64
+expect ceil 1184 2056 > 104
+
+# Gate switch opens the way back to the start yard.
+walk 930 480
+use 896 480
+wait 105
+expect ceil 888 736 > 64
+walk 930 736 840 736 930 736 1088 950
+
+# Back across, up the terrace, red door, exit.
+walk 1088 1450 1472 1500 1472 1900 1472 1950 1472 2010 1472 2046
+open 1472 2064
+walk 1472 2120 1472 2330
+shot exit
+exit 1472 2360

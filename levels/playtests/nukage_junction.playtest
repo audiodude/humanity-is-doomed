@@ -1,0 +1,61 @@
+# Nukage Junction (MAP01) wiring test: doors, both lifts, the island switch,
+# the secret, both key traps and the exit.
+#   python3 ~/.agents/skills/doom-playtest/playtest.py wads/NUKAGE.WAD MAP01 levels/playtests/nukage_junction.playtest
+
+killall
+walk 256 360
+open 256 384
+walk 256 480 256 620 0 760 -300 1024 -396 1024
+open -416 1024
+walk -500 1024 -560 1250        # around the barrel at -496,1232
+
+# Warehouse lift up to the ledge switch, which lowers the blue-key island.
+use -512 1280
+wait 35
+walk -512 1344
+wait 120
+walk -864 1370
+expect floor 384 1056 == 64
+use -864 1408
+wait 100
+expect floor 384 1056 == -16
+
+# Secret: hinted panel in the warehouse's west wall.
+walk -864 1250 -1120 1024
+open -1152 1024
+walk -1264 1024
+expect secrets == 1
+expect has SuperShotgun
+walk -1120 1024 -960 1080 -452 1024    # clear of the crates
+open -432 1024
+
+# Wade into the pool for the blue key, then the blue door.
+walk -300 1024 384 860 384 1056
+expect has BlueCard
+walk 384 860 850 1024 908 1024
+open 928 1024
+
+# Lab lift up to the red key; stepping toward it opens the closet.
+walk 1000 1024 1260 1344
+use 1296 1344
+wait 35
+walk 1360 1344
+wait 120
+walk 1488 1312 1616 1312
+expect has RedCard
+wait 70
+expect ceil 1688 992 > 64
+walk 1616 1150 1200 1024 962 1024
+open 944 1024
+
+# Red door, the arena closets on entry, the exit.
+walk 850 1024 256 1440 256 1486
+open 256 1504
+walk 256 1600 256 1800
+wait 70
+expect ceil -200 2016 > 64
+expect ceil 712 2016 > 64
+walk 256 2290 256 2320
+open 256 2336
+walk 256 2470
+exit 256 2504

@@ -1,0 +1,10 @@
+research/
+__pycache__/
+wads/SFPC*
+
+# Doom Builder editor backups and autosaves
+*.backup[0-9]*
+*.autosave[0-9]*
+
+# Symlink to the local Steam saved-games directory
+/steam_wads
