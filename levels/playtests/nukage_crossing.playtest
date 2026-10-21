@@ -1,6 +1,6 @@
 # Nukage Crossing (MAP02) wiring test: every door, switch, lift, key trap and
 # secret on the intended route, then the exit.
-#   python3 ~/.agents/skills/doom-playtest/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest
+#   python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest
 
 killall
 shot start

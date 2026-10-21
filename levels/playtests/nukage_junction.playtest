@@ -1,6 +1,6 @@
 # Nukage Junction (MAP01) wiring test: doors, both lifts, the island switch,
 # the secret, both key traps and the exit.
-#   python3 ~/.agents/skills/doom-playtest/playtest.py wads/NUKAGE.WAD MAP01 levels/playtests/nukage_junction.playtest
+#   python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP01 levels/playtests/nukage_junction.playtest
 
 killall
 walk 256 360

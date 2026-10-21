@@ -31,11 +31,12 @@ start at offset 0.
 
 build() writes an SVG preview, prints a balance report, validates thing
 placement, progression (derived from keys, door specials and tagged
-triggers) and texture fit, then runs ZDBSP (bundled with Ultimate Doom
-Builder) for nodes, blockmap and reject. Several level modules can share a
-WAD: build() replaces only its own map slot and UMAPINFO entry.
+triggers) and texture fit, then runs ZDBSP (by default the copy bundled with
+Ultimate Doom Builder) for nodes, blockmap and reject. Several level modules
+can share a WAD: build() replaces only its own map slot and UMAPINFO entry.
 """
 import os
+import shutil
 import subprocess
 import tempfile
 
@@ -48,8 +49,18 @@ from .preview import write_svg
 from .wad import (IWAD, iwad_textures, map_lumps, read_wad, replace_map, umapinfo_lump,
                   write_wad)
 
-ZDBSP = "/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp"
+UDB_ZDBSP = "/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def find_zdbsp(path=None):
+    """The ZDBSP executable to run: path if given, else the copy bundled with
+    Ultimate Doom Builder, else zdbsp on PATH. Raises LevelError if there's none."""
+    found = shutil.which(os.path.expanduser(path)) if path else shutil.which(UDB_ZDBSP) or shutil.which("zdbsp")
+    if not found:
+        raise LevelError(f"ZDBSP not found: {path} is not an executable" if path else
+                         f"ZDBSP not found at {UDB_ZDBSP} or on PATH; install it or pass --zdbsp-path")
+    return found
 
 
 def build_lines(level):
@@ -166,13 +177,13 @@ def line_sides(l: Linedef, secret_doors, ranges) -> list[Sidedef]:
     return sides
 
 
-def build(module, check_only=False, out=None, zdbsp=ZDBSP):
+def build(module, check_only=False, out=None, zdbsp=None):
     """Validate a level module and write its map into its WAD (default
     wads/<WAD>), keeping any other maps already there, plus an SVG preview
     wads/<WAD stem>-<MAP>.svg. The preview is written first, even when checks
     fail or check_only is set. zdbsp is the node builder executable (default:
-    the one bundled with Ultimate Doom Builder). Returns the WAD path, or None
-    with check_only. Raises LevelError."""
+    see find_zdbsp). Returns the WAD path, or None with check_only. Raises
+    LevelError."""
     level = load(module)
     out = out or os.path.join(ROOT, "wads", level.wad)
     lines = build_lines(level)
@@ -202,6 +213,7 @@ def build(module, check_only=False, out=None, zdbsp=ZDBSP):
         raise LevelError("\n".join(errors))
     if check_only:
         return None
+    zdbsp = find_zdbsp(zdbsp)
     with tempfile.TemporaryDirectory() as tmp:
         raw = os.path.join(tmp, "raw.wad")
         built = os.path.join(tmp, "built.wad")

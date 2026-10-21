@@ -64,8 +64,8 @@ python3 -m levels nukage_junction --check  # check only
 From Python: `from levels import build, nukage_junction; build(nukage_junction)`. A build replaces only its own map slot and `UMAPINFO` entry, so several levels can share one WAD.
 
 Requirements:
-- **Python 3**, standard library only.
-- **ZDBSP** to build nodes, blockmap and reject. The default is the copy bundled with [Ultimate Doom Builder](https://github.com/UltimateDoomBuilder/UltimateDoomBuilder), at `/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp` (Arch: `chaotic-aur/ultimate-doom-builder-git`). Use `--zdbsp-path PATH` (or `build(..., zdbsp=PATH)`) for any other ZDBSP binary.
+- **Python 3.8+**, standard library only.
+- **ZDBSP** to build nodes, blockmap and reject. The default is the copy bundled with [Ultimate Doom Builder](https://github.com/UltimateDoomBuilder/UltimateDoomBuilder), at `/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp` (Arch: `chaotic-aur/ultimate-doom-builder-git`), then `zdbsp` on `PATH`. Use `--zdbsp-path PATH` (or `build(..., zdbsp=PATH)`) for any other ZDBSP binary.
 - **`doom2.wad`** for the texture checks, read from `~/.local/share/dsda-doom/doom2.wad` or `$DOOM2_WAD`. Without it those checks are skipped with a warning.
 
 ### What every build checks
@@ -95,23 +95,23 @@ Helpers in `levels/model.py` build the common shapes. `doorway()` makes a door w
 - `levels/doom2.py`: DOOM II thing types, monster sizes and health, pickups, line actions and sector specials.
 
 ### Playtests in GZDoom
-`levels/playtests/<module>.playtest` scripts walk each map's intended route in GZDoom: doors, switches, lifts, key traps, secrets and the exit, checking floor and ceiling heights after each trigger. The runner is the `doom-playtest` agent skill (`~/.agents/skills/doom-playtest/`). It runs GZDoom (`gzdoom` from chaotic-aur) headless on a hidden X display, with god mode, and writes screenshots to `/tmp/playtest-shots/<MAP>/`. A full route takes about a minute:
+`levels/playtests/<module>.playtest` scripts walk each map's intended route in GZDoom: doors, switches, lifts, key traps, secrets and the exit, checking floor and ceiling heights after each trigger. The runner, `scripts/tools/playtest.py`, needs GZDoom and Xvfb. It runs GZDoom headless on a hidden X display, with god mode, and writes screenshots to `/tmp/playtest-shots/<MAP>/`. The IWAD is `$DOOM2_WAD` or `~/.local/share/dsda-doom/doom2.wad`; override with `--iwad`. A full route takes about a minute:
 
 ```sh
-python3 ~/.agents/skills/doom-playtest/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest
-python3 ~/.agents/skills/doom-playtest/playtest.py wads/NUKAGE.WAD MAP02 --describe   # start, keys, special lines
+python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest
+python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 --describe   # start, keys, special lines
 ```
 
 A pass shows the map's wiring works in GZDoom, run in its strict Doom compatibility mode. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
 
 ## Research: what makes DOOM levels fun
-[`REPORT.md`](REPORT.md) studies the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It draws on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. It ends with a list of checks `levels/` could add. Supporting material is in `research/`: facet reports in `facets/`, CSVs in `data/`, cleaned sources in `sources/`, and scripts in `tools/`.
+[`REPORT.md`](REPORT.md) studies the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It draws on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. It ends with a list of checks `levels/` could add. Supporting material is in `research/`: facet reports in `facets/`, CSVs in `data/` and cleaned sources in `sources/`.
 
-The metrics scripts are stdlib-only and read the Steam v1.9 IWADs by default (override with `DOOM_WAD` / `DOOM2_WAD`). Run them from the repo root:
+The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs to `research/data/`. They read the v1.9 IWADs from the Steam "Ultimate Doom" install in the default Steam library (override with `DOOM_WAD` / `DOOM2_WAD`). Run them from the repo root:
 
 ```sh
-python3 research/tools/space_metrics.py        # -> research/data/metrics_space.csv (about 2 minutes)
-python3 research/tools/combat_metrics.py       # -> research/data/metrics_combat.csv
-python3 research/tools/progression_metrics.py  # -> research/data/metrics_progression.csv; pass a slot (E1M7) to dump one map
-python3 research/tools/correlate.py            # -> research/data/correlations.csv, metrics vs research/data/reception.csv
+python3 scripts/metrics/space_metrics.py        # -> research/data/metrics_space.csv (about 2 minutes)
+python3 scripts/metrics/combat_metrics.py       # -> research/data/metrics_combat.csv
+python3 scripts/metrics/progression_metrics.py  # -> research/data/metrics_progression.csv; pass a slot (E1M7) to dump one map
+python3 scripts/metrics/correlate.py            # -> research/data/correlations.csv, metrics vs research/data/reception.csv
 ```

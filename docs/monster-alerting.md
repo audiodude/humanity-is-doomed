@@ -25,5 +25,5 @@ Sound comes only from weapon fire. Doors, lifts, item pickups, footsteps and mon
 
 ## Support in the level generator (`levels/`)
 
-- `levels/mapgen.py`: adding `"a"` to a `Thing`'s `skills` sets the Ambush flag.
-- There's no sound-blocking constant. `mapgen.py` defines only `ML_BLOCKING`, `ML_TWOSIDED`, `ML_DONTPEGBOTTOM` and `ML_SECRET`, so tool 2 isn't available to generated levels yet. Supporting it means adding `ML_SOUNDBLOCK = 64` and a way to put it on shared lines.
+- `levels/model.py`: adding `"a"` to a `Thing`'s `skills` sets the Ambush flag.
+- There's no sound-blocking constant. `model.py` defines only `ML_BLOCKING`, `ML_TWOSIDED`, `ML_DONTPEGTOP`, `ML_DONTPEGBOTTOM` and `ML_SECRET`, so tool 2 isn't available to generated levels yet. Supporting it means adding `ML_SOUNDBLOCK = 64` and a way to put it on shared lines.
