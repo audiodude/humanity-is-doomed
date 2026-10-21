@@ -1,0 +1,140 @@
+# Nukage Core (MAP03) wiring test: every door, switch, lift, key trap and
+# secret on the intended route, the optional rooms, then the exit.
+#   python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP03 levels/playtests/nukage_core.playtest
+
+killall
+shot start
+
+# Out onto the terrace, then the filter house and its secret closet (plasma rifle).
+walk 192 420
+open 192 472
+walk 192 560 448 560
+open 448 496
+walk 448 400 640 432 900 432 900 320
+open 960 320
+walk 1040 320
+expect secrets == 1
+expect has PlasmaRifle
+walk 900 320 900 432 640 432 448 400 448 450
+open 448 480
+walk 448 560
+
+# Down the steps into the moat, and the lift up onto the core's ledge.
+walk 0 650 0 712 0 736 0 830
+use 0 864
+wait 40
+walk 0 896
+wait 160
+walk 0 960 -48 960 48 960
+expect secrets == 2
+expect has BasicArmor
+walk 0 896 0 830 0 736 0 712 0 650
+
+# Pump room and its secret closet.
+walk -560 608
+open -592 608
+walk -680 608 -800 720 -1320 720 -1320 608
+open -1344 608
+walk -1440 608
+expect secrets == 3
+walk -1384 608
+open -1360 608
+
+# Up the stairs onto the west gallery: super shotgun.
+walk -1320 608 -1320 720 -960 720 -960 880 -960 990 -700 990 -672 800
+expect has SuperShotgun
+
+# Tank room: the blue key blacks the room out and opens both closets.
+walk -700 1312 -750 1312
+open -784 1312
+walk -900 1312 -1112 1312
+expect has BlueCard
+wait 70
+shot blackout
+expect ceil -1416 1312 > 100
+expect ceil -1248 1080 > 100
+walk -900 1312 -820 1312
+open -800 1312
+walk -700 1312
+
+# The pier, then the blue door and the stair tower up to the north side.
+walk -700 1472 -480 1472
+expect floor -480 1472 == 40
+walk -700 1472 -700 1696 -750 1696
+open -784 1696
+walk -900 1696 -1152 1700 -1152 1800 -1152 1950 -1024 1990
+expect floor -1024 1990 == 144
+walk -1024 2040
+
+# Storage: climb the crate stack.
+open -1024 2064
+walk -1024 2150 -930 2464 -1088 2480 -1216 2480
+expect floor -1216 2480 == 216
+walk -1088 2480 -930 2464 -930 2300 -1024 2150 -1024 2100
+open -1024 2080
+walk -1024 1990
+
+# North gallery -> turbine hall, its secret closet, and the yellow key, which drops the pen walls.
+walk -700 1990 0 1990 0 2040
+open 0 2064
+walk 0 2150 -400 2300 -520 2784
+open -544 2784
+walk -648 2784
+expect secrets == 4
+expect has Backpack
+walk -480 2784 -100 2700 0 2816
+expect has YellowCard
+wait 270
+expect floor -560 2400 == 144
+expect floor 560 2400 == 144
+shot pens
+
+# Yellow door -> north-east tower, its secret closet (soulsphere), up to the east gallery.
+walk 0 2200 0 2120
+open 0 2080
+walk 0 1990 600 1952 750 1952
+open 784 1952
+walk 900 1952 976 2000
+open 976 2048
+walk 976 2128
+expect secrets == 5
+walk 976 2000 1088 1900 1088 1800 1088 1680 700 1664
+expect floor 700 1664 == 240
+expect ceil 568 1280 == 240       # the causeway shutter is still shut
+
+# Control room: the switch beside the window raises the shutter.
+walk 700 1400 700 1120 750 1120
+open 784 1120
+walk 860 1120 830 1216
+use 800 1216
+walk 830 1300
+look 180
+wait 40
+shot control-window
+wait 120
+expect ceil 568 1280 > 400
+expect ceil 584 640 > 100        # the shutter at the terrace lift is up too
+
+# The lift down to the terrace and back: a loop through the start.
+walk 860 1120 820 1120
+open 800 1120
+walk 700 1120 656 760 656 660
+wait 70
+expect floor 656 640 == 0
+walk 560 640
+use 590 640
+wait 60
+walk 656 640
+wait 160
+walk 656 760
+expect pos 656 760
+
+# Across the causeway onto the core; the crown opens. Exit.
+walk 700 1280 620 1280 450 1280 220 1280
+look 180
+shot causeway
+wait 70
+expect ceil 120 1280 > 300
+walk 60 1280 -90 1280
+shot crown
+exit -120 1280

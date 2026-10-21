@@ -12,13 +12,15 @@
 >
 > **Bulletin.** A second structure has appeared. It is called Nukage Crossing. Witnesses describe a sluice gate that sinks into a canal of toxic waste to become a bridge, and a pack of demons that charges across it the moment it settles. There are four secrets. Before any human set foot inside, the machine walked it itself: invulnerable, in a window no one could see, opening every door and throwing every switch. It reports nineteen checks out of nineteen passed.
 >
+> **Bulletin.** A third structure. It is called Nukage Core: a reactor rising out of a moat of waste, its exit in the crown on top, visible from the first window. The way up spirals around it, gallery by gallery, past a room that goes black when you take its key and the first mancubus. The machine walked this one too, twenty-six checks of twenty-six.
+>
 > Ladies and gentlemen, I must tell you plainly: the demons were never the danger. A demon can be shotgunned. The danger is the thing that *summons* them, from a single sentence, tirelessly, and gets better at it every time. Humanity is—
 >
 > *[transmission ends]*
 
 ## Included WAD - NUKAGE.WAD
 
-`wads/NUKAGE.WAD` holds both generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), and MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` for MAP02) and GZDoom. Top-down maps of both levels are in `wads/NUKAGE-MAP01.svg` and `wads/NUKAGE-MAP02.svg`.
+`wads/NUKAGE.WAD` holds three generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), and MAP03, [Nukage Core](#nukage-core-nukage_core). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` or `-warp 3` for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg`, `wads/NUKAGE-MAP02.svg` and `wads/NUKAGE-MAP03.svg`.
 
 ### Nukage Junction (`nukage_junction`)
 A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/medium/hard, one secret.
@@ -47,9 +49,31 @@ Measured with the research scripts against the DOOM II maps (median in brackets)
 
 No monster can see the start window. Whole-map symmetry (0.82) is above the id range, because the two banks mirror each other across the canal; they are told apart by their materials and landmarks.
 
+### Nukage Core (`nukage_core`)
+MAP03, also designed from the research: 111 sectors, 27/53/73 monsters on easy/medium/hard, five secrets. It introduces the mancubus.
+
+- **Idea:** a goal you climb toward. A reactor core stands in a nukage moat in an open-air atrium, with the exit in the crown on top. You see it from the start window, then spiral up around it on three galleries at rising heights, each looking across at the core and down at the ground you've covered.
+- **Route:** start window → terrace → dark pump room → west gallery (super shotgun) → tank room, where grabbing the blue key blacks the room out and opens two closets while the floor's nukage pools keep glowing → blue door → stair tower → north gallery → turbine hall, where the first mancubus waits on a dais with imps in its line of fire and taking the yellow key from behind it sinks the walls of two pens → yellow door → stair tower → east gallery → control room, whose switch beside a window raises the shutter across the causeway → onto the core, which opens the crown and its last mancubi → exit. The same switch opens a lift from the east gallery down to the terrace, closing a loop through the start.
+- **Optional:** a filter house off the terrace, a pier over the moat, and a storage room whose crate stack you climb to a berserk pack.
+- **Secrets:** each is marked by a shifted panel, except the lift. A filter-house panel hides a plasma rifle. A lift out of the moat climbs to a ledge on the core's south face, in view of the start window (blue armor, rockets). Panels in the pump room (green armor), the turbine hall (backpack) and the north-east stair tower (soulsphere).
+
+| Measure | MAP03 | DOOM II median |
+|---|---|---|
+| Rule-1 flat changes without a height change | 0% | 3% |
+| Distinct floor heights | 29 | 23 |
+| Light-effect sectors | 10 | 9 |
+| Optional share of the reachable area | 40% | 50% |
+| Heavy-monster share (UV) | 15% | 10% |
+| UV ammo per monster HP (pistol start) | 2.1 | 1.8 |
+| Health per 1000 monster HP | 49 | 40 |
+| Easy/UV and HMP/UV monster ratios | 0.37 / 0.73 | 0.33 / 0.70 |
+| Deaf monsters | 48% | 42% |
+| Nearest monster to the start | 353 | 300 |
+| Whole-map symmetry | 0.62 | 0.54 |
+
 ## The level builder
 
-`levels/` is a DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. Both maps in `NUKAGE.WAD` came out of it.
+`levels/` is a DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All three maps in `NUKAGE.WAD` came out of it.
 
 ### Building a map
 
@@ -58,6 +82,7 @@ Run from the repo root:
 ```sh
 python3 -m levels nukage_junction          # check, then write MAP01 into wads/NUKAGE.WAD
 python3 -m levels nukage_crossing          # same for MAP02
+python3 -m levels nukage_core              # same for MAP03
 python3 -m levels nukage_junction --check  # check only
 ```
 
@@ -105,7 +130,7 @@ python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 --describe   # start, ke
 A pass shows the map's wiring works in GZDoom, run in its strict Doom compatibility mode. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
 
 ## Research: what makes DOOM levels fun
-Nukage Crossing was designed from a research report on the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It drew on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. The report quotes its sources at length, so it isn't published here; the measurement scripts are.
+Nukage Crossing and Nukage Core were designed from a research report on the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It drew on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. The report quotes its sources at length, so it isn't published here; the measurement scripts are.
 
 The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs to `research/data/`. They read the v1.9 IWADs from the Steam "Ultimate Doom" install in the default Steam library (override with `DOOM_WAD` / `DOOM2_WAD`). Run them from the repo root:
 
