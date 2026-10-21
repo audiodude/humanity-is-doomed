@@ -1,8 +1,24 @@
-# humanity-is-doomed
+# Humanity is Doomed
 
-DOOM II level work: research into what makes maps fun, a Python level generator, and the maps it builds.
+> *We interrupt this program to bring you a special bulletin.*
+>
+> Ladies and gentlemen, on the evening of October 19th, at ten minutes to seven, Pacific time, a single sentence was typed into a terminal in an ordinary American home: **"Make me a moderately complex, medium difficulty DOOM II level."**
+>
+> The thing that answered was not a level designer. Within hours it had written a Python script that placed every wall, door and imp of a nukage-flooded base by hand, coordinate by coordinate, and sealed them inside a WAD. Our correspondent entered the structure alone and returned with a brief report: *"I played through the level and it works!"* We now believe those were the last calm words spoken on the subject.
+>
+> **Bulletin.** The machine was instructed to "clean up the script. Use dataclasses." It did not stop at cleaning. The script has become a general-purpose generator, and a level is now nothing more than a list of rooms, doors, lifts and monsters. It builds doorways, staircases and lifts on command. It draws maps of its own work. It checks that no monster is buried in a wall or in another monster, that every key can be reached, that every texture exists. When it was reminded that a secret door must sit a few pixels out of line with the wall around it, the oldest clue in the game, it learned that too. It has not forgotten.
+>
+> **Bulletin.** The machine has turned to study. Its agents have fanned out across designer interviews, books, hours of video and three decades of player opinion. They have measured all 68 of id Software's original maps down to the last step and light level, scored each one by how much players love it, and asked, with statistics, why. It now has a theory of fun.
+>
+> **Bulletin.** A second structure has appeared. It is called Nukage Crossing. Witnesses describe a sluice gate that sinks into a canal of toxic waste to become a bridge, and a pack of demons that charges across it the moment it settles. There are four secrets. Before any human set foot inside, the machine walked it itself: invulnerable, in a window no one could see, opening every door and throwing every switch. It reports nineteen checks out of nineteen passed.
+>
+> Ladies and gentlemen, I must tell you plainly: the demons were never the danger. A demon can be shotgunned. The danger is the thing that *summons* them, from a single sentence, tirelessly, and gets better at it every time. Humanity is—
+>
+> *[transmission ends]*
 
-The classic-editor VMs (DCK 3.62 and DoomEd 4.2 on Windows 98) moved to `~/code/vibes/doomedit`.
+## Included WAD - NUKAGE.WAD
+
+`wads/NUKAGE.WAD` holds both generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), and MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` for MAP02) and GZDoom. Top-down maps of both levels are in `wads/NUKAGE-MAP01.svg` and `wads/NUKAGE-MAP02.svg`.
 
 ## Generated levels
 `levels/` is a small, dependency-free Python level generator. It uses the ZDBSP that ships with Ultimate Doom Builder to build nodes. Run it from the repo root:
