@@ -81,5 +81,3 @@ python3 research/tools/combat_metrics.py       # -> research/data/metrics_combat
 python3 research/tools/progression_metrics.py  # -> research/data/metrics_progression.csv; pass a slot (E1M7) to dump one map
 python3 research/tools/correlate.py            # -> research/data/correlations.csv, metrics vs research/data/reception.csv
 ```
-
-`research/sources/scarydarkfast/` is chapter text extracted from a personal copy of the book (`9780472028931.epub`). Don't publish it.
