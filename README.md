@@ -1,9 +1,8 @@
-# DOOM II level work
+# humanity-is-doomed
+
+DOOM II level work: research into what makes maps fun, a Python level generator, and the maps it builds.
 
 The classic-editor VMs (DCK 3.62 and DoomEd 4.2 on Windows 98) moved to `~/code/vibes/doomedit`.
-
-## Modern editor (host)
-[Ultimate Doom Builder](https://github.com/UltimateDoomBuilder/UltimateDoomBuilder) runs natively on the host (`chaotic-aur/ultimate-doom-builder-git`, runs under Mono). Start it with `ultimate-doom-builder`, then open a WAD with File → Open Map and choose the "Doom: Doom 2 (Doom format)" configuration. It can open the WADs in `wads/`. F9 tests the map in `dsda-doom -window` with `~/.local/share/dsda-doom/doom2.wad`, which is set in `~/.local/share/Doom Builder/UDBuilder.cfg`. Opening a file from the command line (`ultimate-doom-builder FILE -map MAP01 -cfg ...`) crashes in this build, so use the menu.
 
 ## Generated levels
 `levels/` is a small, dependency-free Python level generator. It uses the ZDBSP that ships with Ultimate Doom Builder to build nodes. Run it from the repo root:
