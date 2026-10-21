@@ -166,12 +166,13 @@ def line_sides(l: Linedef, secret_doors, ranges) -> list[Sidedef]:
     return sides
 
 
-def build(module, check_only=False, out=None):
+def build(module, check_only=False, out=None, zdbsp=ZDBSP):
     """Validate a level module and write its map into its WAD (default
     wads/<WAD>), keeping any other maps already there, plus an SVG preview
     wads/<WAD stem>-<MAP>.svg. The preview is written first, even when checks
-    fail or check_only is set. Returns the WAD path, or None with check_only.
-    Raises LevelError."""
+    fail or check_only is set. zdbsp is the node builder executable (default:
+    the one bundled with Ultimate Doom Builder). Returns the WAD path, or None
+    with check_only. Raises LevelError."""
     level = load(module)
     out = out or os.path.join(ROOT, "wads", level.wad)
     lines = build_lines(level)
@@ -205,7 +206,7 @@ def build(module, check_only=False, out=None):
         raw = os.path.join(tmp, "raw.wad")
         built = os.path.join(tmp, "built.wad")
         write_wad(raw, map_lumps(level, lines, sides))
-        subprocess.run([ZDBSP, "-R", "-w", "-t", "-o", built, raw], check=True, stdout=subprocess.DEVNULL)
+        subprocess.run([zdbsp, "-R", "-w", "-t", "-o", built, raw], check=True, stdout=subprocess.DEVNULL)
         lumps = read_wad(built)
     existing = read_wad(out) if os.path.exists(out) else []
     info = umapinfo_lump(level) if level.umapinfo else None

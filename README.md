@@ -21,18 +21,19 @@
 `wads/NUKAGE.WAD` holds both generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), and MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` for MAP02) and GZDoom. Top-down maps of both levels are in `wads/NUKAGE-MAP01.svg` and `wads/NUKAGE-MAP02.svg`.
 
 ## Generated levels
-`levels/` is a small Python level generator. The Python is stdlib-only, but building a map needs [Ultimate Doom Builder](https://github.com/UltimateDoomBuilder/UltimateDoomBuilder) installed: the generator runs the ZDBSP node builder that ships with it, at `/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp` (the path the Arch package `chaotic-aur/ultimate-doom-builder-git` installs to). The texture checks also read `doom2.wad`; without it they're skipped with a warning. Run it from the repo root:
+`levels/` is a small Python level generator. The Python is stdlib-only, but building a map needs the ZDBSP node builder. By default the generator runs the copy that ships with [Ultimate Doom Builder](https://github.com/UltimateDoomBuilder/UltimateDoomBuilder), at `/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp` (the path the Arch package `chaotic-aur/ultimate-doom-builder-git` installs to). To use a different ZDBSP binary, pass `--zdbsp-path`. The texture checks also read `doom2.wad`; without it they're skipped with a warning. Run it from the repo root:
 
 ```sh
 python3 -m levels nukage_junction          # validate, then write MAP01 into wads/NUKAGE.WAD and wads/NUKAGE-MAP01.svg
 python3 -m levels nukage_crossing          # same for MAP02 (wads/NUKAGE-MAP02.svg)
 python3 -m levels nukage_junction --check  # only validate (still writes the SVG preview)
+python3 -m levels nukage_junction --zdbsp-path ~/bin/zdbsp  # build with another ZDBSP
 dsda-doom -iwad doom2 -file wads/NUKAGE.WAD          # add -warp 2 to start on MAP02
 ```
 
 Several level modules can share a WAD. `build()` replaces only its own map slot and `UMAPINFO` entry and keeps the other maps, so `NUKAGE.WAD` holds both MAP01 and MAP02.
 
-or from Python: `from levels import build, nukage_junction; build(nukage_junction)`.
+or from Python: `from levels import build, nukage_junction; build(nukage_junction)` (pass `zdbsp="/path/to/zdbsp"` to override the node builder).
 
 - `levels/model.py`: the dataclasses levels are written in (`Sector`, `Special`, `Thing`) and shape helpers. `doorway()` makes a door with optional recesses, plus its use action. Its `alcove_flat`/`far_flat`, and `door()`'s `flat`, set the recess and threshold floors so they can match the rooms (Romero's rule 1: floor texture changes only with a height change). `stairs()` makes a run of steps; `lift()` makes a lift whose SR/WR actions are added automatically.
 - `levels/mapgen.py`: `build()`, which turns sectors into lines and sides and places textures. Its docstring describes the level format.

@@ -1,14 +1,19 @@
-"""python3 -m levels LEVEL [--check]   e.g. python3 -m levels nukage_junction"""
+"""python3 -m levels LEVEL [--check] [--zdbsp-path PATH]   e.g. python3 -m levels nukage_junction"""
+import argparse
 import importlib
 import sys
 
 from . import LevelError, build
+from .mapgen import ZDBSP
 
-args = [a for a in sys.argv[1:] if a != "--check"]
-if len(args) != 1:
-    sys.exit(__doc__)
+parser = argparse.ArgumentParser(prog="python3 -m levels", description="Validate a level module and build its map.")
+parser.add_argument("level", help="level module in levels/, e.g. nukage_junction")
+parser.add_argument("--check", action="store_true", help="only validate (still writes the SVG preview)")
+parser.add_argument("--zdbsp-path", default=ZDBSP, metavar="PATH",
+                    help=f"ZDBSP node builder executable (default: {ZDBSP})")
+args = parser.parse_args()
 try:
-    build(importlib.import_module(f"levels.{args[0]}"), check_only="--check" in sys.argv)
+    build(importlib.import_module(f"levels.{args.level}"), check_only=args.check, zdbsp=args.zdbsp_path)
 except LevelError as e:
     for line in str(e).splitlines():
         print("ERROR:", line)
