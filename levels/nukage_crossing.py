@@ -17,16 +17,17 @@ between you and the bridge, and a guardroom by the red door) -> back across
 a gate back to the start yard.
 
 Secrets: a hinted panel in the start room (armor); a lit ledge in the canal,
-reached by wading in from the pump hall's intake (rocket launcher); a hinted
+reached by wading in from the pump hall's intake (rocket launcher); a seamless
 panel in the tower that opens onto a pier and a lift down to the soulsphere
-island; a hinted panel in the sunken filter house (backpack).
+island, hinted only by the pier and island in view outside; a hinted panel in
+the sunken filter house (backpack).
 
 Gag: a switch in a niche in the south-east yard's east wall drops the
 parapet beside it. Walk through and you fall into the canal, which
 teleports you back to the switch.
 """
 from .doom2 import *  # noqa: F403 - thing types, actions, sector specials
-from .model import SKY, Sector, Special, Thing, door, doorway, lift, rect, stairs
+from .model import SECRET_HINT, SKY, Sector, Special, Thing, door, doorway, lift, rect, stairs
 
 MAP = "MAP02"
 WAD = "NUKAGE.WAD"
@@ -215,7 +216,8 @@ SPECIAL_WALLS = {
     ((1456, 2360), (1488, 2360)): Special(S1_EXIT, 0, "SW1EXIT"),
     ((1800, 944), (1800, 1008)): Special(S1_FLOOR_LOWEST, TAG_GAG, "SW1STON1"),   # gag
 }
-SECRET_DOORS = {"d_sec1", "d_pier", "d_sec4"}
+# The pier door is seamless: the hint is the pier and island visible outside.
+SECRET_DOORS = {"d_sec1": SECRET_HINT, "d_pier": (0, 0), "d_sec4": SECRET_HINT}
 MUST_REACH = ["sec1", "ledge", "island", "sec4", "hall_cl", "control", "yard_se", "ped_r", "secl_e",
               "secl_s", "guard", "d_gate", "exit_hall", "river_e_lip"]
 
