@@ -20,46 +20,6 @@
 
 `wads/NUKAGE.WAD` holds both generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), and MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` for MAP02) and GZDoom. Top-down maps of both levels are in `wads/NUKAGE-MAP01.svg` and `wads/NUKAGE-MAP02.svg`.
 
-## Generated levels
-`levels/` is a small Python level generator. The Python is stdlib-only, but building a map needs the ZDBSP node builder. By default the generator runs the copy that ships with [Ultimate Doom Builder](https://github.com/UltimateDoomBuilder/UltimateDoomBuilder), at `/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp` (the path the Arch package `chaotic-aur/ultimate-doom-builder-git` installs to). To use a different ZDBSP binary, pass `--zdbsp-path`. The texture checks also read `doom2.wad`; without it they're skipped with a warning. Run it from the repo root:
-
-```sh
-python3 -m levels nukage_junction          # validate, then write MAP01 into wads/NUKAGE.WAD and wads/NUKAGE-MAP01.svg
-python3 -m levels nukage_crossing          # same for MAP02 (wads/NUKAGE-MAP02.svg)
-python3 -m levels nukage_junction --check  # only validate (still writes the SVG preview)
-python3 -m levels nukage_junction --zdbsp-path ~/bin/zdbsp  # build with another ZDBSP
-dsda-doom -iwad doom2 -file wads/NUKAGE.WAD          # add -warp 2 to start on MAP02
-```
-
-Several level modules can share a WAD. `build()` replaces only its own map slot and `UMAPINFO` entry and keeps the other maps, so `NUKAGE.WAD` holds both MAP01 and MAP02.
-
-or from Python: `from levels import build, nukage_junction; build(nukage_junction)` (pass `zdbsp="/path/to/zdbsp"` to override the node builder).
-
-- `levels/model.py`: the dataclasses levels are written in (`Sector`, `Special`, `Thing`) and shape helpers. `doorway()` makes a door with optional recesses, plus its use action. Its `alcove_flat`/`far_flat`, and `door()`'s `flat`, set the recess and threshold floors so they can match the rooms (Romero's rule 1: floor texture changes only with a height change). `stairs()` makes a run of steps; `lift()` makes a lift whose SR/WR actions are added automatically.
-- `levels/mapgen.py`: `build()`, which turns sectors into lines and sides and places textures. Its docstring describes the level format.
-- `levels/checks.py`: validation and the balance report. `levels/preview.py` draws the SVG, and `levels/wad.py` reads and writes WADs.
-- `levels/doom2.py`: DOOM II thing types, monster sizes and health, pickups, line actions and sector specials.
-- Each level is a module of plain data (`MAP`, `WAD`, `SECTORS`, `THINGS`, `SPECIAL_BETWEEN`, `SPECIAL_WALLS`, `MUST_REACH`, …). To add one, copy `levels/nukage_junction.py`.
-
-Sectors are polygons: an outer loop, holes that other sectors fill, and solid `pillars`. A hole with no sector in it is an error. Edges that two sectors share become two-sided lines; the rest become walls. Texture x offsets follow each sector's outline, so patterns run continuously along a wall, and the wall above or below an opening uses the room's own texture. The exception is secret doors (`SECRET_DOORS`): their faces are shifted off the wall pattern by `SECRET_HINT` (16 across, 8 down) as the classic clue. Pass a `{name: (x, y)}` dict instead to pick offsets per door, with `(0, 0)` for a seamless door.
-
-On every run, `build()`:
-- writes a top-down SVG preview next to the WAD, one per map (sectors shaded by floor height, special lines in red, monsters by skill, pickups and keys);
-- prints a balance report: monster health against ammo damage, health and armor, for each skill;
-- checks that every thing is inside a sector, not stuck in a wall, and not overlapping another monster or player on a skill they share;
-- walks the progression from the player start, working out which keys, door specials and tagged switches/triggers open what, and fails if a `MUST_REACH` sector can't be reached;
-- checks every texture and flat against `doom2.wad` (`~/.local/share/dsda-doom/doom2.wad`, or set `DOOM2_WAD`). Pictures such as switches and door faces must fit their wall exactly. Textures that vanilla can't tile cleanly print a warning.
-
-### Playtests in GZDoom
-`levels/playtests/<module>.playtest` scripts walk each map's intended route in GZDoom: doors, switches, lifts, key traps, secrets and the exit, checking floor and ceiling heights after each trigger. The runner is the `doom-playtest` agent skill (`~/.agents/skills/doom-playtest/`). It runs GZDoom (`gzdoom` from chaotic-aur) headless on a hidden X display, with god mode, and writes screenshots to `/tmp/playtest-shots/<MAP>/`. A full route takes about a minute:
-
-```sh
-python3 ~/.agents/skills/doom-playtest/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest
-python3 ~/.agents/skills/doom-playtest/playtest.py wads/NUKAGE.WAD MAP02 --describe   # start, keys, special lines
-```
-
-A pass shows the map's wiring works in GZDoom, run in its strict Doom compatibility mode. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
-
 ### Nukage Junction (`nukage_junction`)
 A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/medium/hard, one secret.
 
@@ -86,6 +46,63 @@ Measured with the research scripts against the DOOM II maps (median in brackets)
 | Nearest monster to the start | 487 | 300 |
 
 No monster can see the start window. Whole-map symmetry (0.82) is above the id range, because the two banks mirror each other across the canal; they are told apart by their materials and landmarks.
+
+## The level builder
+
+`levels/` is a DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. Both maps in `NUKAGE.WAD` came out of it.
+
+### Building a map
+
+Run from the repo root:
+
+```sh
+python3 -m levels nukage_junction          # check, then write MAP01 into wads/NUKAGE.WAD
+python3 -m levels nukage_crossing          # same for MAP02
+python3 -m levels nukage_junction --check  # check only
+```
+
+From Python: `from levels import build, nukage_junction; build(nukage_junction)`. A build replaces only its own map slot and `UMAPINFO` entry, so several levels can share one WAD.
+
+Requirements:
+- **Python 3**, standard library only.
+- **ZDBSP** to build nodes, blockmap and reject. The default is the copy bundled with [Ultimate Doom Builder](https://github.com/UltimateDoomBuilder/UltimateDoomBuilder), at `/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp` (Arch: `chaotic-aur/ultimate-doom-builder-git`). Use `--zdbsp-path PATH` (or `build(..., zdbsp=PATH)`) for any other ZDBSP binary.
+- **`doom2.wad`** for the texture checks, read from `~/.local/share/dsda-doom/doom2.wad` or `$DOOM2_WAD`. Without it those checks are skipped with a warning.
+
+### What every build checks
+
+- Every thing is inside a sector, clear of walls, and not overlapping another monster or player on a skill they share.
+- Progression: starting from the player start, it works out which keys, door specials and tagged switches and triggers open what, and fails if any `MUST_REACH` sector can't be reached.
+- Every texture and flat exists in `doom2.wad`. Pictures such as switches and door faces must fit their wall exactly; textures vanilla can't tile cleanly get a warning.
+- A balance report for each skill: monster health against ammo damage, health and armor.
+- A top-down SVG preview, `wads/<WAD stem>-<MAP>.svg`: sectors shaded by floor height, special lines in red, monsters by skill, pickups and keys.
+
+A failed check prints `ERROR:` lines and stops the build before the WAD is touched. The preview is still written, so you can see what went wrong.
+
+### Writing a level
+
+A level is a module of plain data: `MAP`, `WAD`, `SECTORS`, `THINGS`, `SPECIAL_BETWEEN`, `SPECIAL_WALLS`, `MUST_REACH`, … To start a new one, copy `levels/nukage_junction.py`.
+
+Sectors are polygons: an outer loop, holes that other sectors fill, and solid `pillars`. A hole with no sector in it is an error. Edges that two sectors share become two-sided lines; the rest become walls. Texture x offsets follow each sector's outline, so patterns run continuously along a wall, and the wall above or below an opening uses the room's own texture. The exception is secret doors (`SECRET_DOORS`): their faces are shifted off the wall pattern by `SECRET_HINT` (16 across, 8 down) as the classic clue. Pass a `{name: (x, y)}` dict instead to pick offsets per door, with `(0, 0)` for a seamless door.
+
+Helpers in `levels/model.py` build the common shapes. `doorway()` makes a door with optional recesses, plus its use action; its `alcove_flat`/`far_flat`, and `door()`'s `flat`, set the recess and threshold floors so they can match the rooms (Romero's rule 1: floor texture changes only with a height change). `stairs()` makes a run of steps, and `lift()` makes a lift whose SR/WR actions are added automatically.
+
+### Code layout
+
+- `levels/model.py`: the dataclasses levels are written in (`Sector`, `Special`, `Thing`) and the shape helpers.
+- `levels/mapgen.py`: `build()`, which turns sectors into lines and sides and places textures. Its docstring describes the level format.
+- `levels/checks.py`: the checks and the balance report.
+- `levels/preview.py`: the SVG preview. `levels/wad.py`: WAD reading and writing.
+- `levels/doom2.py`: DOOM II thing types, monster sizes and health, pickups, line actions and sector specials.
+
+### Playtests in GZDoom
+`levels/playtests/<module>.playtest` scripts walk each map's intended route in GZDoom: doors, switches, lifts, key traps, secrets and the exit, checking floor and ceiling heights after each trigger. The runner is the `doom-playtest` agent skill (`~/.agents/skills/doom-playtest/`). It runs GZDoom (`gzdoom` from chaotic-aur) headless on a hidden X display, with god mode, and writes screenshots to `/tmp/playtest-shots/<MAP>/`. A full route takes about a minute:
+
+```sh
+python3 ~/.agents/skills/doom-playtest/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest
+python3 ~/.agents/skills/doom-playtest/playtest.py wads/NUKAGE.WAD MAP02 --describe   # start, keys, special lines
+```
+
+A pass shows the map's wiring works in GZDoom, run in its strict Doom compatibility mode. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
 
 ## Research: what makes DOOM levels fun
 [`REPORT.md`](REPORT.md) studies the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It draws on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. It ends with a list of checks `levels/` could add. Supporting material is in `research/`: facet reports in `facets/`, CSVs in `data/`, cleaned sources in `sources/`, and scripts in `tools/`.
