@@ -7,7 +7,8 @@ A level module is plain data, read as module attributes:
     SECTORS         list[Sector]; list order is the SECTORS lump order
     THINGS          list[Thing]; needs a PLAYER1 start
     SPECIAL_BETWEEN {(sector_name, sector_name): Special} for every line two
-                    sectors share (pair order doesn't matter)       [optional]
+                    sectors share; the lines face the first sector, which
+                    matters for teleports                           [optional]
     SPECIAL_WALLS   {(point, point): Special} for one-sided wall segments,
                     keyed by exact endpoints, e.g. switches          [optional]
     SECRET_DOORS    door sector names drawn as plain wall on the automap,
@@ -106,6 +107,13 @@ def build_lines(level):
     return lines
 
 
+def face(l: Linedef, v1):
+    """Flip l so it starts at v1 (its front is then on the other side)."""
+    if l.v1 != v1:
+        l.v1, l.v2, l.front, l.back = l.v2, l.v1, l.back, l.front
+        l.front_x, l.back_x = l.back_x, l.front_x
+
+
 def assign_specials(level, lines):
     used_walls = set()
     for l in lines:
@@ -123,9 +131,11 @@ def assign_specials(level, lines):
         else:
             l.flags |= ML_TWOSIDED
             f, b = l.front, l.back
-            sp = level.special_between.get((f.name, b.name)) or level.special_between.get((b.name, f.name))
-            if sp:
+            if sp := level.special_between.get((f.name, b.name)):
                 l.action, l.tag = sp.action, sp.tag
+            elif sp := level.special_between.get((b.name, f.name)):
+                l.action, l.tag = sp.action, sp.tag
+                face(l, l.v2)
             elif f.action or b.action:
                 l.action = b.action or f.action
             elif LIFT in (f.kind, b.kind) and f.kind != b.kind:

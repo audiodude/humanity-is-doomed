@@ -48,11 +48,11 @@ walk -128 2000
 # Control tower: the switch lowers the sluice gate into a bridge.
 walk 464 1960 464 1892
 open 464 1872
-walk 464 1800 320 1790 320 1560 640 1472
+walk 464 1800 320 1790 320 1560 640 1536
 expect floor 1088 1216 == 128
-use 672 1472
-walk 620 1560
-look 324
+use 672 1536
+walk 620 1500
+look 329
 wait 30
 shot control-window    # the gate sinking, seen through the window by the switch
 expect floor 1088 1216 < 128

@@ -13,6 +13,7 @@ STIM, MEDI, HBONUS, ABONUS, GREENARMOR, BLUEARMOR, SOUL, BACKPACK = \
 BLUEKEY, YELLOWKEY, REDKEY, BLUESKULL, YELLOWSKULL, REDSKULL = 5, 6, 13, 40, 39, 38
 BARREL, TECHLAMP, COLUMN, TORCH = 2035, 85, 2028, 44
 RADSUIT, BERSERK = 2025, 2023
+TELEPORT_DEST = 14
 
 PLAYERS = {PLAYER1, PLAYER2, PLAYER3, PLAYER4}
 KEY_OF = {BLUEKEY: "blue", BLUESKULL: "blue", YELLOWKEY: "yellow", YELLOWSKULL: "yellow",
@@ -58,6 +59,7 @@ S1_FLOOR_LOWEST, W1_FLOOR_LOWEST, SR_FLOOR_LOWEST, WR_FLOOR_LOWEST = 23, 38, 60,
 SR_LIFT, WR_LIFT = 62, 88
 S1_EXIT = 11
 W1_LIGHT_35 = 35   # tagged sectors' light drops to 35 (a blackout)
+WR_TELEPORT = 97   # only from the line's front side
 
 # Doors opened by using the line next to them -> key needed (None = no key).
 USE_DOORS = {DR_DOOR: None, DR_BLUE: "blue", DR_YELLOW: "yellow", DR_RED: "red",
