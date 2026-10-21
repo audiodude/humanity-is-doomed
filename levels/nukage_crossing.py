@@ -1,4 +1,4 @@
-"""Nukage Crossing: MAP02 of NUKAGE.WAD, built on the findings in REPORT.md.
+"""Nukage Crossing: MAP02 of NUKAGE.WAD, designed from the level-design research (see the README).
 
     python3 -m levels nukage_crossing
 

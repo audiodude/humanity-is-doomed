@@ -26,7 +26,7 @@ A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/med
 Route: tech start room → courtyard hub with a nukage pool → warehouse (lift to a ledge switch that lowers the blue-key island; the fake wall in the west wall leads to the secret) → blue door → lab (lift to the red key; grabbing it opens a monster closet) → red door → exit arena (ambush closets on entry) → exit switch. The `UMAPINFO` lump names the level for ports that read it (dsda-doom, GZDoom). Vanilla DOOM II still calls it "entryway".
 
 ### Nukage Crossing (`nukage_crossing`)
-MAP02, built from the findings in [`REPORT.md`](REPORT.md): 96 sectors, 21/43/57 monsters on easy/medium/hard, four secrets.
+MAP02, designed from the [research](#research-what-makes-doom-levels-fun) below: 96 sectors, 21/43/57 monsters on easy/medium/hard, four secrets.
 
 - **Set piece:** a 128-high sluice gate stands in a nukage canal. A switch in the silver control tower lowers it into a footbridge, and you can watch it sink through the window beside the switch. The pinkies pacing the far yard then charge across.
 - **Route:** start window with a view across the canal to the red door and a soulsphere on a lit pedestal → south yard → dark blinking pipe corridor → bright pump hall, up a step to the blue key (grabbing it opens a closet behind you) → blue door → north bank → control tower → across the bridge to the sealed south-east yard (red key; grabbing it opens closets between you and the bridge and a guardroom by the red door) → back across → terrace → red door → exit. A switch in the south-east yard opens a gate back to the start, which closes a loop through the start yard.
@@ -105,7 +105,7 @@ python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 --describe   # start, ke
 A pass shows the map's wiring works in GZDoom, run in its strict Doom compatibility mode. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
 
 ## Research: what makes DOOM levels fun
-[`REPORT.md`](REPORT.md) studies the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It draws on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. It ends with a list of checks `levels/` could add. Supporting material is in `research/`: facet reports in `facets/`, CSVs in `data/` and cleaned sources in `sources/`.
+Nukage Crossing was designed from a research report on the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It drew on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. The report quotes its sources at length, so it isn't published here; the measurement scripts are.
 
 The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs to `research/data/`. They read the v1.9 IWADs from the Steam "Ultimate Doom" install in the default Steam library (override with `DOOM_WAD` / `DOOM2_WAD`). Run them from the repo root:
 
@@ -113,5 +113,5 @@ The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs t
 python3 scripts/metrics/space_metrics.py        # -> research/data/metrics_space.csv (about 2 minutes)
 python3 scripts/metrics/combat_metrics.py       # -> research/data/metrics_combat.csv
 python3 scripts/metrics/progression_metrics.py  # -> research/data/metrics_progression.csv; pass a slot (E1M7) to dump one map
-python3 scripts/metrics/correlate.py            # -> research/data/correlations.csv, metrics vs research/data/reception.csv
+python3 scripts/metrics/correlate.py            # -> research/data/correlations.csv; needs the unpublished research/data/reception.csv
 ```
