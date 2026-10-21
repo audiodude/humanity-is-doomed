@@ -7,9 +7,13 @@ A level module is plain data, read as module attributes:
     SECTORS         list[Sector]; list order is the SECTORS lump order
     THINGS          list[Thing]; needs a PLAYER1 start
     SPECIAL_BETWEEN {(sector_name, sector_name): Special} for every line two
-                    sectors share (pair order doesn't matter)       [optional]
-    SPECIAL_WALLS   {(point, point): Special} for one-sided wall segments,
-                    keyed by exact endpoints, e.g. switches          [optional]
+                    sectors share; the lines face the first sector, which
+                    matters for teleports                           [optional]
+    SPECIAL_WALLS   {(point, point): Special} for wall segments, keyed by
+                    exact endpoints, e.g. switches. On a two-sided line
+                    the texture replaces the lower wall, and the line
+                    faces the right of point -> point (switches only
+                    work from the front)                             [optional]
     SECRET_DOORS    door sector names drawn as plain wall on the automap,
                     faces shifted by model.SECRET_HINT as a visual clue;
                     or {name: (x, y)} to pick offsets, (0, 0) = seamless
@@ -106,26 +110,39 @@ def build_lines(level):
     return lines
 
 
+def face(l: Linedef, v1):
+    """Flip l so it starts at v1 (its front is then on the other side)."""
+    if l.v1 != v1:
+        l.v1, l.v2, l.front, l.back = l.v2, l.v1, l.back, l.front
+        l.front_x, l.back_x = l.back_x, l.front_x
+
+
 def assign_specials(level, lines):
     used_walls = set()
     for l in lines:
+        key = (l.v1, l.v2)
+        if key not in level.special_walls:
+            key = key[::-1]
+        if key in level.special_walls:
+            sp = level.special_walls[key]
+            l.action, l.tag, l.texture = sp.action, sp.tag, sp.texture
+            used_walls.add(key)
+            if l.back:
+                face(l, key[0])
         if l.back is None:
             l.flags |= ML_BLOCKING
-            key = (l.v1, l.v2)
-            if key not in level.special_walls:
-                key = key[::-1]
-            if key in level.special_walls:
-                sp = level.special_walls[key]
-                l.action, l.tag, l.texture = sp.action, sp.tag, sp.texture
-                used_walls.add(key)
             if l.front.kind == DOOR:
                 l.flags |= ML_DONTPEGBOTTOM   # door track stays put while the door moves
         else:
             l.flags |= ML_TWOSIDED
             f, b = l.front, l.back
-            sp = level.special_between.get((f.name, b.name)) or level.special_between.get((b.name, f.name))
-            if sp:
+            if l.action:
+                pass   # a SPECIAL_WALLS switch
+            elif sp := level.special_between.get((f.name, b.name)):
                 l.action, l.tag = sp.action, sp.tag
+            elif sp := level.special_between.get((b.name, f.name)):
+                l.action, l.tag = sp.action, sp.tag
+                face(l, l.v2)
             elif f.action or b.action:
                 l.action = b.action or f.action
             elif LIFT in (f.kind, b.kind) and f.kind != b.kind:
@@ -170,7 +187,7 @@ def line_sides(l: Linedef, secret_doors, ranges) -> list[Sidedef]:
             l.flags |= ML_DONTPEGTOP
         moving = LIFT in (me.kind, other.kind)
         if ranges[other][1] > ranges[me][0] or moving:
-            lo = other.lower
+            lo = l.texture or other.lower
             if lo == me.wall and not moving:
                 l.flags |= ML_DONTPEGBOTTOM
         sides.append(Sidedef(up, lo, NO_TEX, me, x_offset(pos, up, lo) + dx, dy))
