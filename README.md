@@ -59,8 +59,8 @@ Measured with the research scripts against the DOOM II maps:
 | Light-effect sectors | 10 | 9 |
 | Optional share of the reachable area | 40% | 50% |
 | Heavy-monster share (UV) | 15% | 10% |
-| UV ammo per monster HP (pistol start) | 2.1 | 1.8 |
-| Health per 1000 monster HP | 49 | 40 |
+| UV ammo per monster HP (pistol start) | 2.7 | 1.8 |
+| Health per 1000 monster HP | 38 | 40 |
 | Easy/UV and HMP/UV monster ratios | 0.37 / 0.73 | 0.33 / 0.70 |
 | Deaf monsters | 48% | 42% |
 | Nearest monster to the start | 353 | 300 |

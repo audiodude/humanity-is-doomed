@@ -259,7 +259,7 @@ THINGS = [Thing(*t) for t in [
     (TECHLAMP, -224, 192), (TECHLAMP, 224, 192),
     # terrace: the first fight, at range, facing away from the start
     (ZOMBIE, -464, 640, 180), (ZOMBIE, 464, 640, 0, "mh"), (SARGE, -416, 560, 180, "h"), (IMP, 496, 576, 0),
-    (CLIP, -288, 576), (SHELLS, 320, 576),
+    (CLIP, -288, 576), (SHELLS, 320, 576), (SHELLS, -160, 600),
     # filter house (optional): waiting behind its door
     (IMP, 400, 400, 270, "emha"), (IMP, 640, 416, 270, "mha"), (IMP, 928, 64, 90, "ha"),
     (SARGE, 896, 256, 180, "mha"), (SARGE, 352, 320, 0, "ha"), (DEMON, 624, 128, 90, "emh"),
@@ -274,14 +274,14 @@ THINGS = [Thing(*t) for t in [
     # pump room (dark)
     (IMP, -1280, 448, 0, "emha"), (IMP, -1056, 768, 270, "mha"), (ZOMBIE, -880, 448, 90),
     (SARGE, -1216, 768, 0), (SPECTRE, -1280, 720, 0, "h"), (ZOMBIE, -1104, 448, 90, "h"),
-    (CHAINGUN, -1040, 704), (CLIP, -880, 800), (STIM, -1312, 416),
+    (CHAINGUN, -1040, 704), (CLIP, -880, 800), (STIM, -1312, 416), (SHELLS, -880, 560),
     (GREENARMOR, -1432, 608), (SHELLS, -1440, 576),                            # secret: pump closet
     # west gallery, and turret imps across on the north gallery
     (SSG, -672, 800), (SHELLS, -704, 864),
     (SARGE, -672, 1200, 270, "emha"), (ZOMBIE, -640, 1440, 270, "emha"), (IMP, -672, 1600, 270, "mha"),
     (SARGE, -704, 1776, 270, "ha"),
     (IMP, -448, 1952, 270, "emha"), (IMP, -256, 1952, 270, "ha"),
-    (SHELLS, -704, 1520), (MEDI, -704, 1824),
+    (SHELLS, -704, 1520),
     (MEDI, -448, 1440), (SHELLS, -448, 1504),                                   # the pier
     # tank room; grabbing the blue key blacks it out and opens both closets
     (ZOMBIE, -960, 1504, 180, "emha"), (SARGE, -1280, 1504, 0, "mha"), (IMP, -1376, 1120, 0, "ha"),
@@ -289,9 +289,11 @@ THINGS = [Thing(*t) for t in [
     (SHELLS, -880, 1120), (MEDI, -880, 1504), (CLIP, -1376, 1504),
     (SPECTRE, -1504, 1272, 0), (SPECTRE, -1504, 1352, 0, "h"), (IMP, -1448, 1312, 0, "mh"),
     (DEMON, -1288, 992, 90, "emh"), (DEMON, -1208, 992, 90, "mh"),
+    (SHELLBOX, -1560, 1256), (SHELLS, -1560, 1368),                             # behind the closet monsters
+    (ROCKETBOX, -1304, 936), (SHELLS, -1192, 936),
     # north-west stair tower
     (IMP, -1152, 1696, 0, "emha"), (ZOMBIE, -944, 1696, 180, "mha"), (SARGE, -1152, 1888, 270, "mh"),
-    (CHAINGUY, -848, 1984, 180, "ha"), (MEDI, -1152, 2000), (SHELLS, -896, 1648),
+    (CHAINGUY, -848, 1984, 180, "ha"), (MEDI, -1152, 2000), (SHELLS, -896, 1648), (SHELLS, -1000, 1760),
     # storage (optional)
     (DEMON, -1024, 2288, 270, "emh"), (DEMON, -1120, 2224, 270, "mh"), (IMP, -1344, 2560, 270, "mh"),
     (IMP, -880, 2560, 270, "h"), (SARGE, -880, 2176, 180, "ha"),
@@ -299,12 +301,13 @@ THINGS = [Thing(*t) for t in [
     # north gallery
     (SARGE, 192, 1984, 180, "mha"), (ZOMBIE, 0, 1920, 270, "emha"), (KNIGHT, 576, 1952, 180, "mh"),
     (SARGE, 448, 2000, 180, "ha"),
-    (SHELLS, -640, 1920), (CLIP, 384, 2000), (MEDI, -128, 2000), (SHELLS, 640, 2000),
+    (SHELLS, -640, 1920), (CLIP, 384, 2000), (SHELLS, 640, 2000),
     # turbine hall: the first mancubus, imps in its line of fire
     (FATSO, 0, 2736, 270, "emh"),
     (IMP, -160, 2560, 270, "emh"), (IMP, 160, 2560, 270, "mh"), (IMP, -416, 2720, 270, "h"),
     (IMP, 416, 2720, 270, "emh"), (ZOMBIE, -416, 2480, 270, "mh"),
     (LAUNCHER, -448, 2192), (ROCKETBOX, 448, 2192), (SHELLS, -96, 2192), (MEDI, 448, 2320),
+    (SHELLBOX, 96, 2192),
     (YELLOWKEY, 0, 2816), (SHELLS, -128, 2816), (STIM, 128, 2816),
     # pens, revealed when the yellow key is taken
     (KNIGHT, -672, 2400, 0, "mh"), (DEMON, -672, 2560, 0), (IMP, -672, 2640, 0, "h"),
@@ -317,14 +320,16 @@ THINGS = [Thing(*t) for t in [
     # east gallery
     (IMP, 672, 1504, 270, "emha"), (SARGE, 672, 960, 90, "mha"), (KNIGHT, 672, 800, 90, "h"),
     (ZOMBIE, 704, 1280, 90, "emha"),
-    (ROCKET, 640, 1568), (MEDI, 720, 1632), (SHELLS, 640, 1056),
+    (ROCKET, 640, 1568), (SHELLS, 640, 1056),
     # control room
     (CHAINGUY, 1056, 1408, 180, "mha"), (CHAINGUY, 1056, 1088, 180, "ha"), (SARGE, 1056, 1248, 180, "emha"),
     (ROCKETBOX, 1040, 1312), (MEDI, 880, 1440), (SHELLBOX, 880, 1056),
     # core ledge (secret)
     (BLUEARMOR, -48, 960), (ROCKETBOX, 48, 960),
+    # causeway: resupply before the crown
+    (ROCKETBOX, 424, 1232),
     # the crown: the last mancubi, between you and the exit
     (FATSO, -48, 1232, 0, "emh"), (FATSO, 48, 1336, 180, "h"), (KNIGHT, 48, 1336, 180, "m"),
-    (MEDI, 224, 1120), (MEDI, 224, 1440), (TECHLAMP, 176, 1184), (TECHLAMP, 176, 1376),
+    (MEDI, 224, 1120), (TECHLAMP, 176, 1184), (TECHLAMP, 176, 1376),
     (TECHLAMP, -160, 1040), (TECHLAMP, 160, 1040),      # exit markers, seen from the start window
 ]]
