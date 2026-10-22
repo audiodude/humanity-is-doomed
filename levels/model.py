@@ -53,9 +53,12 @@ class Sector:
 
 @dataclass(frozen=True)
 class Special:
-    action: int
+    action: int = 0
     tag: int = 0
-    texture: str | None = None   # switch texture for one-sided walls
+    # Middle texture. On a one-sided wall: the switch picture. On a two-sided
+    # line (SPECIAL_BETWEEN, FREE_LINES): bars, a grate or a fence hung in the
+    # opening, standing on the floor; the line becomes impassable.
+    texture: str | None = None
 
 
 SKILL_BITS = {"e": 1, "m": 2, "h": 4}
@@ -80,11 +83,11 @@ class Linedef:
     v1: Point
     v2: Point
     front: Sector
-    back: Sector | None
+    back: Sector | None   # None: one-sided wall; front itself: a free-standing line inside front
     flags: int = 0
     action: int = 0
     tag: int = 0
-    texture: str | None = None
+    texture: str | None = None   # middle texture (see Special.texture)
     front_x: float = 0   # distance along the front/back sector's loop: texture x offset
     back_x: float = 0
 
@@ -119,6 +122,7 @@ class Level:
     things: list[Thing]
     special_between: dict[tuple[str, str], Special]
     special_walls: dict[tuple[Point, Point], Special]
+    free_lines: dict[tuple[Point, Point], Special]
     secret_doors: dict[str, tuple[int, int]]
     must_reach: list[str]
     umapinfo: dict[str, str]
@@ -138,6 +142,7 @@ def load(module) -> Level:
         things=list(module.THINGS),
         special_between=dict(getattr(module, "SPECIAL_BETWEEN", {})),
         special_walls=dict(getattr(module, "SPECIAL_WALLS", {})),
+        free_lines=dict(getattr(module, "FREE_LINES", {})),
         secret_doors=secret_door_offsets(getattr(module, "SECRET_DOORS", ())),
         must_reach=list(getattr(module, "MUST_REACH", ())),
         umapinfo=dict(getattr(module, "UMAPINFO", {})),
@@ -206,6 +211,16 @@ def point_in_loop(p, loop):
     return inside
 
 
+def cross(o, a, b) -> int:
+    """z of (a - o) x (b - o): > 0 if b is left of o->a, < 0 right, 0 on the line."""
+    return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+
+def segments_cross(a, b, c, d) -> bool:
+    """ab and cd cross at a point inside both; touching or overlapping doesn't count."""
+    return (cross(a, b, c) * cross(a, b, d) < 0) and (cross(c, d, a) * cross(c, d, b) < 0)
+
+
 def seg_dist(p, a, b):
     (px, py), (ax, ay), (bx, by) = p, a, b
     dx, dy = bx - ax, by - ay
@@ -218,7 +233,8 @@ def sector_at(level, p):
 
 
 def neighbours(sec, lines):
-    return [l.other(sec) for l in lines if l.back and l.touches(sec)]
+    """Sectors across sec's two-sided lines; free-standing lines inside it don't count."""
+    return [l.other(sec) for l in lines if l.back and l.touches(sec) and l.front is not l.back]
 
 
 def open_ceil(door_sec, lines):

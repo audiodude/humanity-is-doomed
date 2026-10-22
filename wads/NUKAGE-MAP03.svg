@@ -823,5 +823,5 @@
 <circle cx="742.4" cy="633.6" r="1.8" fill="#888"/>
 <circle cx="608.0" cy="768.0" r="1.8" fill="#888"/>
 <circle cx="736.0" cy="768.0" r="1.8" fill="#888"/>
-<text x="8" y="1255" font-size="11" fill="#222">levels.nukage_core (MAP03): grey = floor height (lighter is higher), brown = door, yellow = lift, purple = secret, green = liquid, red line = special; red circles = monsters (faint/dashed = not on easy), blue dots = pickups, green = start</text>
+<text x="8" y="1255" font-size="11" fill="#222">levels.nukage_core (MAP03): grey = floor height (lighter is higher), brown = door, yellow = lift, purple = secret, green = liquid, red line = special, dashed = bars/fence; red circles = monsters (faint/dashed = not on easy), blue dots = pickups, green = start</text>
 </svg>

@@ -59,11 +59,14 @@ def write_svg(level, lines, path, scale=0.4, pad=96):
         (x1, y1), (x2, y2) = xy(*l.v1), xy(*l.v2)
         if l.action:
             style = 'stroke="#d0201a" stroke-width="2.5"'
+        elif l.back and l.texture:
+            style = 'stroke="#111" stroke-width="1.6" stroke-dasharray="4 2"'
         elif l.back is None:
             style = 'stroke="#111" stroke-width="1.6"'
         else:
             style = 'stroke="#777" stroke-width="0.6"'
-        tip = f"action {l.action} tag {l.tag}" if l.action else ""
+        tip = " ".join(([f"action {l.action} tag {l.tag}"] if l.action else [])
+                       + ([l.texture] if l.back and l.texture else []))
         out.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" {style}>'
                    f'<title>{tip}</title></line>' if tip else
                    f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" {style}/>')
@@ -94,7 +97,7 @@ def write_svg(level, lines, path, scale=0.4, pad=96):
         else:
             out.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="1.8" fill="#888"/>')
     legend = (f"{level.name} ({level.map}): grey = floor height (lighter is higher), brown = door, "
-              "yellow = lift, purple = secret, green = liquid, red line = special; "
+              "yellow = lift, purple = secret, green = liquid, red line = special, dashed = bars/fence; "
               "red circles = monsters (faint/dashed = not on easy), blue dots = pickups, green = start")
     out.append(f'<text x="8" y="{h - 14:.0f}" font-size="11" fill="#222">{escape(legend)}</text>')
     out.append("</svg>")

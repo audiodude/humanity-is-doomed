@@ -428,5 +428,5 @@
 <circle cx="915.2" cy="233.6" r="19.2" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 67 skills m</title></circle>
 <circle cx="659.2" cy="60.8" r="1.8" fill="#888"/>
 <circle cx="710.4" cy="60.8" r="1.8" fill="#888"/>
-<text x="8" y="1104" font-size="11" fill="#222">levels.nukage_junction (MAP01): grey = floor height (lighter is higher), brown = door, yellow = lift, purple = secret, green = liquid, red line = special; red circles = monsters (faint/dashed = not on easy), blue dots = pickups, green = start</text>
+<text x="8" y="1104" font-size="11" fill="#222">levels.nukage_junction (MAP01): grey = floor height (lighter is higher), brown = door, yellow = lift, purple = secret, green = liquid, red line = special, dashed = bars/fence; red circles = monsters (faint/dashed = not on easy), blue dots = pickups, green = start</text>
 </svg>
