@@ -1,0 +1,133 @@
+# Nukage Divided (MAP04) wiring test: both wings, every trap, shortcut and
+# secret, both arena entrances, then the exit.
+#   python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP04 levels/playtests/nukage_divided.playtest
+
+killall
+shot start
+
+# Secret: the hot fork's panel, a landing, and the lift down to the pit's island.
+walk -100 200 -160 540
+open -160 576
+walk -152 616 -152 680
+wait 20
+walk -152 740 -152 768
+expect secrets == 1
+wait 140
+walk -152 680 -152 610
+open -160 592
+walk -160 540
+shot fork-hot
+
+# Hot wing: the fire corridor, the furnace hall; the super shotgun opens its closets.
+walk -430 416
+open -464 416
+walk -560 416 -928 416 -928 540 -928 640 -1088 704
+expect has SuperShotgun
+wait 70
+expect ceil -1416 784 > 100
+expect ceil -1416 1040 > 100
+shot furnace
+
+# The loft (optional) and its secret.
+walk -1344 1150 -1344 1300 -1344 1380
+expect floor -1344 1380 == 152
+walk -1380 1536
+open -1408 1536
+walk -1488 1536
+expect secrets == 2
+expect has RocketLauncher
+walk -1450 1536
+open -1424 1536
+walk -1300 1536 -1344 1380 -1344 1300 -1344 1180 -800 1180 -790 960
+
+# Hot antechamber: the red key opens a closet; the blue arena door stays shut.
+open -752 960
+walk -720 960 -600 960 -288 960
+expect has RedCard
+wait 70
+expect ceil -640 696 > 100
+expect ceil -448 1248 == 40
+walk -224 960
+look 0 -5
+shot across-the-pit        # the blue key, glowing on the cold side
+
+# Its switch opens the shortcut back to the fork.
+walk -528 720
+use -528 688
+wait 70
+expect ceil -320 680 > 100
+walk -320 720 -320 650 -320 600 -320 540
+expect floor -320 540 == -16
+
+# Cold wing: through the start room to the coolant hall, its crate-stack secret.
+walk -100 200 100 200 300 416 430 416
+shot fork-cold
+open 464 416
+walk 520 416 600 300
+expect has Chaingun
+walk 656 600 656 672 592 672 528 672
+expect secrets == 3
+expect has BasicArmor
+
+# The server room and its secret.
+walk 656 672 656 600 1088 690
+open 1088 728
+walk 1088 800 832 1000 832 1380
+open 832 1408
+walk 832 1464
+expect secrets == 4
+expect has Backpack
+walk 832 1440
+open 832 1424
+walk 832 1380
+
+# The sump (optional): the lift down, the spotlit super shotgun turns the lights on.
+walk 1088 1380 1088 1440
+wait 30
+walk 1088 1500 1152 1700 1152 1760
+wait 10
+shot sump-lit
+wait 70
+walk 1088 1500
+use 1088 1472
+wait 30
+walk 1088 1440
+wait 140
+walk 1088 1380
+
+# Cold antechamber: up the stairs; the blue key opens a closet.
+walk 850 1300 790 1024
+open 744 1024
+walk 680 1024 600 1024 400 1024 322 1024
+expect has BlueCard
+wait 70
+expect ceil 584 888 > 150
+walk 400 1150 228 1150 228 1024
+look 180 5
+shot across-the-pit-cold
+
+# Its switch opens the other shortcut.
+walk 512 850
+use 512 816
+wait 70
+expect ceil 384 808 > 150
+walk 384 850 384 760 384 600 384 540
+expect floor 384 540 == -16
+
+# Holding both keys: back up the cold shortcut, through the red door onto the balcony.
+walk 384 600 384 760 384 850 384 900 480 1190
+open 480 1240
+walk 480 1320
+wait 70
+expect ceil -712 1888 > 100      # entering opened the arena closets
+expect ceil 712 1600 > 100
+shot balcony
+
+# Drop into the arena; the blue door opens from inside too. Exit on the dais.
+walk 480 1500 0 1400 -448 1300
+open -448 1256
+wait 35
+expect ceil -448 1248 > 150
+walk 0 1400 0 1500 0 1960
+shot exit
+exit 0 1992

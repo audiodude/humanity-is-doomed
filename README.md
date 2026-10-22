@@ -20,7 +20,7 @@
 
 ## Included WAD - NUKAGE.WAD
 
-`wads/NUKAGE.WAD` holds three generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), and MAP03, [Nukage Core](#nukage-core-nukage_core). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` or `-warp 3` for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg`, `wads/NUKAGE-MAP02.svg` and `wads/NUKAGE-MAP03.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
+`wads/NUKAGE.WAD` holds four generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), and MAP04, [Nukage Divided](#nukage-divided-nukage_divided). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg`, `wads/NUKAGE-MAP02.svg`, `wads/NUKAGE-MAP03.svg` and `wads/NUKAGE-MAP04.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
 
 ### Nukage Junction (`nukage_junction`)
 A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/medium/hard, one secret.
@@ -66,9 +66,28 @@ Measured with the research scripts against the DOOM II maps:
 | Nearest monster to the start | 353 | 300 |
 | Whole-map symmetry | 0.62 | 0.54 |
 
+### Nukage Divided (`nukage_divided`)
+MAP04: 110 sectors, 23/43/56 monsters on easy/medium/hard, four secrets, and the first barons.
+
+You leave the start room facing a wall that is half lava, half blue computer screens: a red furnace wing on one side, a blue cooling wing on the other. The wings never meet, and each ends at its own key beside a locked arena door of the other colour, with the other key in sight across a nukage pit.
+
+| Measure | MAP04 | DOOM II median |
+|---|---|---|
+| Rule-1 flat changes without a height change | 2% | 3% |
+| Distinct floor heights | 23 | 23 |
+| Light SD / light-effect sectors | 39 / 11 | 23 / 9 |
+| Most-used wall texture | 26% | 30% |
+| UV ammo per monster HP (pistol start) | 1.8 | 1.8 |
+| Health per 1000 monster HP | 36 | 40 |
+| Easy/UV and HMP/UV monster ratios | 0.41 / 0.77 | 0.33 / 0.70 |
+| Nearest monster to the start | 563 | 300 |
+| Whole-map symmetry | 0.71 | 0.54 |
+
+Symmetry is high because the two wings mirror each other's footprint around the fork and the pit; their materials, lighting and monsters are opposites.
+
 ## The level builder
 
-`levels/` is a DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All three maps in `NUKAGE.WAD` came out of it.
+`levels/` is a DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All four maps in `NUKAGE.WAD` came out of it.
 
 ### Building a map
 
@@ -78,6 +97,7 @@ Run from the repo root:
 python3 -m levels nukage_junction          # check, then write MAP01 into wads/NUKAGE.WAD
 python3 -m levels nukage_crossing          # same for MAP02
 python3 -m levels nukage_core              # same for MAP03
+python3 -m levels nukage_divided            # same for MAP04
 python3 -m levels nukage_junction --check  # check only
 ```
 
