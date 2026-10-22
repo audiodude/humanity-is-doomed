@@ -1745,7 +1745,7 @@ def analyse_map(m, textures):
 def main(argv):
     textures = {}
     for game, path in dw.IWADS.items():
-        tx, _ = iwad_textures(path)
+        tx = iwad_textures(path)[0]
         first = next(iter(tx.values()))
         textures[game] = (tx, first[1])
     maps = dw.load_all()

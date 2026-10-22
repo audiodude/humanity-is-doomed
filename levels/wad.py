@@ -94,19 +94,32 @@ def replace_map(lumps, slot, map_lumps, umapinfo=None):
 
 
 def iwad_textures(path=IWAD):
-    """({texture: (width, height)}, {flat names}) from an IWAD, or None if
-    the file is missing."""
+    """({texture: (width, height)}, {flat names}, {medusa textures}) from an
+    IWAD, or None if the file is missing. A medusa texture has a column where
+    patches overlap; vanilla can't draw those on two-sided lines."""
     if not os.path.exists(path):
         return None
     lumps = read_wad(path)
-    textures = {}
+    by_name = {name.upper(): data for name, data in lumps}
+    pnames = by_name["PNAMES"]
+    patches = [pnames[4 + 8 * i:12 + 8 * i].split(b"\0")[0].decode().upper()
+               for i in range(struct.unpack_from("<i", pnames)[0])]
+    patch_width = [struct.unpack_from("<h", by_name[p])[0] if p in by_name else 0 for p in patches]
+    textures, medusa = {}, set()
     for name, data in lumps:
         if name not in ("TEXTURE1", "TEXTURE2"):
             continue
         for i in range(struct.unpack_from("<i", data)[0]):
             o = struct.unpack_from("<i", data, 4 + 4 * i)[0]
             tex = data[o:o + 8].split(b"\0")[0].decode().upper()
-            textures[tex] = struct.unpack_from("<hh", data, o + 12)
+            w, h = textures[tex] = struct.unpack_from("<hh", data, o + 12)
+            cover = [0] * w
+            for k in range(struct.unpack_from("<h", data, o + 20)[0]):
+                x, _, patch = struct.unpack_from("<hhh", data, o + 22 + 10 * k)
+                for c in range(max(0, x), min(w, x + patch_width[patch])):
+                    cover[c] += 1
+            if max(cover) > 1:
+                medusa.add(tex)
     names = [n for n, _ in lumps]
     flats = set(names[names.index("F_START") + 1:names.index("F_END")])
-    return textures, flats - {"F1_START", "F1_END", "F2_START", "F2_END", "F3_START", "F3_END"}
+    return textures, flats - {"F1_START", "F1_END", "F2_START", "F2_END", "F3_START", "F3_END"}, medusa

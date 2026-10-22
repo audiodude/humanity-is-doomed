@@ -782,5 +782,5 @@
 <circle cx="1000.0" cy="217.2" r="8.0" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 3001 skills emh</title></circle>
 <circle cx="633.6" cy="83.2" r="1.8" fill="#888"/>
 <circle cx="710.4" cy="83.2" r="1.8" fill="#888"/>
-<text x="8" y="938" font-size="11" fill="#222">levels.nukage_divided (MAP04): grey = floor height (lighter is higher), brown = door, yellow = lift, purple = secret, green = liquid, red line = special; red circles = monsters (faint/dashed = not on easy), blue dots = pickups, green = start</text>
+<text x="8" y="938" font-size="11" fill="#222">levels.nukage_divided (MAP04): grey = floor height (lighter is higher), brown = door, yellow = lift, purple = secret, green = liquid, red line = special, dashed = bars/fence; red circles = monsters (faint/dashed = not on easy), blue dots = pickups, green = start</text>
 </svg>

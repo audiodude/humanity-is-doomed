@@ -110,22 +110,25 @@ Requirements:
 
 ### What every build checks
 
-- Every thing is inside a sector, clear of walls, and not overlapping another monster or player on a skill they share.
-- Progression: starting from the player start, it works out which keys, door specials and tagged switches and triggers open what, follows teleporters, and fails if any `MUST_REACH` sector can't be reached.
+- Geometry: lines only meet at shared vertices. A sector outline that crosses itself, or sectors and free lines that cut through each other, is an error.
+- Every thing is inside a sector, clear of walls, bars and fences, and not overlapping another monster or player on a skill they share.
+- Progression: starting from the player start, it works out which keys, door specials and tagged switches and triggers open what, follows teleporters, and fails if any `MUST_REACH` sector can't be reached. Bars block the way.
 - 100% kills and secrets: every secret sector can be reached, and every monster can either be reached or walk (or fly) to somewhere the player can go. A sniper the player can only shoot at fails this too.
 - No nukage softlocks: from every damaging floor the player can get onto, the exit can still be reached.
 - Damaging floors sit lower than every neighbouring floor that isn't damaging.
-- Every texture and flat exists in `doom2.wad`. Pictures such as switches and door faces must fit their wall exactly; textures vanilla can't tile cleanly get a warning.
+- Every texture and flat exists in `doom2.wad`. Pictures such as switches and door faces must fit their wall exactly; textures vanilla can't tile cleanly get a warning. Bars and fences can't use textures built from overlapping patches, which vanilla draws as garbage on two-sided lines (the medusa effect).
 - A balance report for each skill: monster health against ammo damage, health and armor.
-- A top-down SVG preview, `wads/<WAD stem>-<MAP>.svg`: sectors shaded by floor height, special lines in red, monsters by skill, pickups and keys.
+- A top-down SVG preview, `wads/<WAD stem>-<MAP>.svg`: sectors shaded by floor height, special lines in red, bars and fences dashed, monsters by skill, pickups and keys.
 
 A failed check prints `ERROR:` lines and stops the build before the WAD is touched. The preview is still written, so you can see what went wrong.
 
 ### Writing a level
 
-A level is a module of plain data: `MAP`, `WAD`, `SECTORS`, `THINGS`, `SPECIAL_BETWEEN`, `SPECIAL_WALLS`, `MUST_REACH`, … To start a new one, copy `levels/nukage_junction.py`.
+A level is a module of plain data: `MAP`, `WAD`, `SECTORS`, `THINGS`, `SPECIAL_BETWEEN`, `SPECIAL_WALLS`, `FREE_LINES`, `MUST_REACH`, … To start a new one, copy `levels/nukage_junction.py`.
 
 Sectors are polygons: an outer loop, holes that other sectors fill, and solid `pillars`. A hole with no sector in it is an error. Edges that two sectors share become two-sided lines; the rest become walls. Texture x offsets follow each sector's outline, so patterns run continuously along a wall, and the wall above or below an opening uses the room's own texture. The exception is secret doors (`SECRET_DOORS`): their faces are shifted off the wall pattern by `SECRET_HINT` (16 across, 8 down) as the classic clue. Pass a `{name: (x, y)}` dict instead to pick offsets per door, with `(0, 0)` for a seamless door.
+
+Lines that aren't sector edges go in `FREE_LINES`, keyed by their two endpoints: `{((384, 32), (384, 480)): Special(W1_DOOR_OPEN, 5)}` is a walk-over trigger across the middle of a room, so you don't have to split the room into two sectors for it. Give a `Special` a `texture` to hang bars or a fence: on a free line it stands inside one room (`Special(texture="MIDGRATE")`). In `SPECIAL_BETWEEN` it fills every opening between two sectors, such as bars between a cage and the room around it. These lines are impassable, and the texture stands on the floor. A free fence doesn't split its sector for the progression check, so to wall off part of a room with bars, make that part its own sector.
 
 Helpers in `levels/model.py` build the common shapes. `doorway()` makes a door with optional recesses, plus its use action; its `alcove_flat`/`far_flat`, and `door()`'s `flat`, set the recess and threshold floors so they can match the rooms (Romero's rule 1: floor texture changes only with a height change). `stairs()` makes a run of steps, and `lift()` makes a lift whose SR/WR actions are added automatically.
 

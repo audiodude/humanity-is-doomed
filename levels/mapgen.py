@@ -8,9 +8,14 @@ A level module is plain data, read as module attributes:
     THINGS          list[Thing]; needs a PLAYER1 start
     SPECIAL_BETWEEN {(sector_name, sector_name): Special} for every line two
                     sectors share; the lines face the first sector, which
-                    matters for teleports                           [optional]
+                    matters for teleports. A Special.texture hangs bars or a
+                    grate in those lines and makes them impassable [optional]
     SPECIAL_WALLS   {(point, point): Special} for one-sided wall segments,
                     keyed by exact endpoints, e.g. switches          [optional]
+    FREE_LINES      {(point, point): Special} for lines standing inside a
+                    sector, not on its edge: walk-over triggers, or with a
+                    texture an impassable fence. The front is on the right
+                    going from the first point to the second         [optional]
     SECRET_DOORS    door sector names drawn as plain wall on the automap,
                     faces shifted by model.SECRET_HINT as a visual clue;
                     or {name: (x, y)} to pick offsets, (0, 0) = seamless
@@ -45,7 +50,7 @@ from .checks import balance_report, check_hazards, check_reach, check_textures, 
 from .doom2 import ACTORS, FLOOR_LOWERERS, PLAYERS, SR_LIFT, WR_LIFT, is_decal
 from .model import (ALL, DOOR, LIFT, ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, ML_SECRET,
                     ML_TWOSIDED, NO_TEX, ROOM, SKY, LevelError, Linedef, Sidedef, dist, edges,
-                    floor_range, load, on_segment, oriented)
+                    floor_range, load, on_segment, oriented, sector_at, segments_cross)
 from .preview import write_svg
 from .wad import (IWAD, iwad_textures, map_lumps, read_wad, replace_map, umapinfo_lump,
                   write_wad)
@@ -66,8 +71,11 @@ def find_zdbsp(path=None):
 
 def build_lines(level):
     """Split every sector edge at vertices lying on it, then pair opposite
-    directed edges into two-sided lines; unpaired edges become walls."""
-    verts = sorted({p for s in level.sectors.values() for loop in s.loops + s.pillars for p in loop})
+    directed edges into two-sided lines; unpaired edges become walls. Free
+    lines are split the same way and each piece belongs to the sector it
+    stands in. Lines may only meet at shared vertices."""
+    verts = sorted({p for s in level.sectors.values() for loop in s.loops + s.pillars for p in loop}
+                   | {p for pq in level.free_lines for p in pq})
     directed = {}   # (a, b) -> (sector on its right, loop role, distance along the loop at a)
     for sec in level.sectors.values():
         for loop, role in oriented(sec):
@@ -102,9 +110,47 @@ def build_lines(level):
             lines.append(Linedef(b, a, t, s, front_x=tpos, back_x=pos))
         else:
             lines.append(Linedef(a, b, s, t, front_x=pos, back_x=tpos))
+    for (p, q), sp in level.free_lines.items():
+        if p == q:
+            problems[(p, q)] = f"free line {p}-{q} has no length"
+            continue
+        chain = [p] + sorted((v for v in verts if on_segment(v, p, q)), key=lambda v: dist(p, v)) + [q]
+        for u, v in zip(chain, chain[1:]):
+            mid = ((u[0] + v[0]) / 2, (u[1] + v[1]) / 2)
+            if (u, v) in directed or (v, u) in directed:
+                problems[(p, q)] = f"free line {p}-{q} runs along a sector edge at {u}-{v}"
+            elif any({l.v1, l.v2} == {u, v} for l in lines):
+                problems[(p, q)] = f"free line {p}-{q} overlaps another free line at {u}-{v}"
+            elif (sec := sector_at(level, mid)) is None:
+                problems[(p, q)] = f"free line {p}-{q} is in the void at {u}-{v}"
+            else:
+                lines.append(Linedef(u, v, sec, sec, action=sp.action, tag=sp.tag, texture=sp.texture))
+    for k, msg in enumerate(crossings(lines)):
+        problems[("cross", k)] = msg
     if problems:
         raise LevelError("\n".join(problems.values()))
     return lines
+
+
+def crossings(lines):
+    """A message for every pair of lines that cross in an X instead of
+    meeting at a vertex: a self-intersecting sector, or sectors or free lines
+    cutting through each other."""
+    by_x = sorted(lines, key=lambda l: min(l.v1[0], l.v2[0]))
+    out = []
+    for i, a in enumerate(by_x):
+        ax2 = max(a.v1[0], a.v2[0])
+        ay1, ay2 = sorted((a.v1[1], a.v2[1]))
+        for b in by_x[i + 1:]:
+            if min(b.v1[0], b.v2[0]) > ax2:
+                break
+            if max(b.v1[1], b.v2[1]) < ay1 or min(b.v1[1], b.v2[1]) > ay2:
+                continue
+            if segments_cross(a.v1, a.v2, b.v1, b.v2):
+                names = sorted({s.name for l in (a, b) for s in (l.front, l.back) if s})
+                out.append(f"lines {a.v1}-{a.v2} and {b.v1}-{b.v2} cross ({', '.join(names)}); "
+                           "lines may only meet at a shared vertex")
+    return out
 
 
 def face(l: Linedef, v1):
@@ -131,10 +177,12 @@ def assign_specials(level, lines):
         else:
             l.flags |= ML_TWOSIDED
             f, b = l.front, l.back
-            if sp := level.special_between.get((f.name, b.name)):
-                l.action, l.tag = sp.action, sp.tag
+            if f is b:
+                pass   # free-standing: action, tag and texture came from FREE_LINES
+            elif sp := level.special_between.get((f.name, b.name)):
+                l.action, l.tag, l.texture = sp.action, sp.tag, sp.texture
             elif sp := level.special_between.get((b.name, f.name)):
-                l.action, l.tag = sp.action, sp.tag
+                l.action, l.tag, l.texture = sp.action, sp.tag, sp.texture
                 face(l, l.v2)
             elif f.action or b.action:
                 l.action = b.action or f.action
@@ -143,6 +191,8 @@ def assign_specials(level, lines):
                 if not lft.tag:
                     raise LevelError(f"lift {lft.name} needs a tag")
                 l.action, l.tag = (WR_LIFT if nb.floor >= lft.floor else SR_LIFT), lft.tag
+            if l.texture:
+                l.flags |= ML_BLOCKING | ML_DONTPEGBOTTOM   # bars or fence, standing on the floor
         if l.front.name in level.secret_doors or (l.back and l.back.name in level.secret_doors):
             # Shown as a plain wall on the map; the face is pegged like the wall it
             # hides in, so only the level's hint offset makes it stand out.
@@ -168,6 +218,9 @@ def line_sides(l: Linedef, secret_doors, ranges) -> list[Sidedef]:
     if l.back is None:
         tex = l.texture or l.front.wall
         return [Sidedef(NO_TEX, NO_TEX, tex, l.front, x_offset(l.front_x, tex))]
+    mid = l.texture or NO_TEX
+    if l.front is l.back:
+        return [Sidedef(NO_TEX, NO_TEX, mid, l.front), Sidedef(NO_TEX, NO_TEX, mid, l.front)]
     sides = []
     for me, other, pos in ((l.front, l.back, l.front_x), (l.back, l.front, l.back_x)):
         up = lo = NO_TEX
@@ -183,7 +236,7 @@ def line_sides(l: Linedef, secret_doors, ranges) -> list[Sidedef]:
             lo = other.lower
             if lo == me.wall and not moving:
                 l.flags |= ML_DONTPEGBOTTOM
-        sides.append(Sidedef(up, lo, NO_TEX, me, x_offset(pos, up, lo) + dx, dy))
+        sides.append(Sidedef(up, lo, mid, me, x_offset(pos, up, lo, mid) + dx, dy))
     return sides
 
 

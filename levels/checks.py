@@ -6,7 +6,8 @@ from collections import defaultdict, deque
 from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, DAMAGE_PER_AMMO, DAMAGING, DROPS, EXITS,
                     FLOOR_LOWERERS, HEALTH_PICKUPS, KEY_OF, PLAYER1, PLAYERS, SECRET_AREA, START_AMMO,
                     TAG_DOOR_OPENERS, TELEPORT_DEST, USE_DOORS, WR_TELEPORT, is_decal)
-from .model import ALL, DOOR, LIFT, NO_TEX, floor_range, neighbours, open_ceil, sector_at, seg_dist
+from .model import (ALL, DOOR, LIFT, ML_BLOCKING, NO_TEX, floor_range, neighbours, open_ceil,
+                    sector_at, seg_dist)
 
 
 def check_things(level, lines):
@@ -30,7 +31,7 @@ def check_things(level, lines):
             d = seg_dist((t.x, t.y), l.v1, l.v2)
             if d >= actor.radius:
                 continue
-            if l.back is None:
+            if l.back is None or l.flags & ML_BLOCKING:
                 errors.append(f"{where} clips wall {l.v1}-{l.v2} ({d:.0f}<{actor.radius})")
             else:
                 o = l.other(s)
@@ -94,7 +95,7 @@ def explore(level, lines):
     def passable(a, b, line, actor, keys, opened, lowered):
         if line is None:
             return True
-        if line.length <= 2 * actor.radius:
+        if line.length <= 2 * actor.radius or line.flags & ML_BLOCKING:   # bars and fences block
             return False
         if b.kind == DOOR and b.tag not in opened:
             if line.action not in USE_DOORS:
@@ -182,7 +183,7 @@ def check_hazards(level, lines):
 def check_textures(level, lines, sides, iwad):
     """Every texture and flat exists, and textures fit the walls they're on.
     Returns (errors, warnings); each is one message per texture and problem."""
-    textures, flats = iwad
+    textures, flats, medusa = iwad
     errors = [f"{s.name}: unknown flat {f}" for s in level.sectors.values()
               for f in (s.ftex, s.ctex) if f not in flats]
     lowered = {l.tag for l in lines if l.action in FLOOR_LOWERERS}
@@ -196,6 +197,8 @@ def check_textures(level, lines, sides, iwad):
                 top = other.floor if other.kind == DOOR else other.ceil   # closed door: whole face shows
                 span = (floor_range(other, lines, lowered)[1] - floor_range(me, lines, lowered)[0])
                 parts = [(sd.upper, me.ceil - top), (sd.lower, span)]
+                if sd.mid != NO_TEX and (found := mid_fit(sd.mid, textures, medusa)):
+                    problems[(sd.mid, *found)].append(f"{me.name} {l.v1}-{l.v2}")
             for tex, h in parts:
                 if tex == NO_TEX or h <= 0:
                     continue
@@ -206,6 +209,21 @@ def check_textures(level, lines, sides, iwad):
         more = f" (+{len(places) - 1} more)" if len(places) > 1 else ""
         (errors if is_error else warnings).append(f"{tex}: {msg}, at {places[0]}{more}")
     return errors, warnings
+
+
+def mid_fit(tex, textures, medusa):
+    """(message, is_error) if `tex` can't hang in a two-sided line, else None.
+    Vanilla draws it once, never tiled vertically, so its height is free: a
+    short one leaves a gap above, a tall one is cut off at the ceiling."""
+    if tex not in textures:
+        return "unknown texture", True
+    if tex in medusa:
+        return ("has columns made of several patches, which vanilla draws as garbage "
+                "(the medusa effect) on a two-sided line"), True
+    w = textures[tex][0]
+    if w & (w - 1):
+        return f"width {w} isn't a power of two; vanilla repeats only part of it", False
+    return None
 
 
 def texture_fit(tex, h, length, textures):
