@@ -1,10 +1,11 @@
-"""Level validation (thing placement, progression, textures) and the balance
-report. Check functions return lists of messages; build() decides what fails."""
+"""Level validation (thing placement, progression, kills, secrets, hazards,
+textures) and the balance report. Check functions return lists of messages;
+build() decides what fails."""
 from collections import defaultdict, deque
 
-from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, DAMAGE_PER_AMMO, DROPS, FLOOR_LOWERERS,
-                    HEALTH_PICKUPS, KEY_OF, PLAYER1, PLAYERS, START_AMMO, TAG_DOOR_OPENERS,
-                    USE_DOORS, is_decal)
+from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, DAMAGE_PER_AMMO, DAMAGING, DROPS, EXITS,
+                    FLOOR_LOWERERS, HEALTH_PICKUPS, KEY_OF, PLAYER1, PLAYERS, SECRET_AREA, START_AMMO,
+                    TAG_DOOR_OPENERS, TELEPORT_DEST, USE_DOORS, WR_TELEPORT, is_decal)
 from .model import ALL, DOOR, LIFT, NO_TEX, floor_range, neighbours, open_ceil, sector_at, seg_dist
 
 
@@ -54,18 +55,32 @@ def check_overlaps(level):
     return errors
 
 
-def check_progression(level, lines):
+def explore(level, lines):
     """Flood-fill from the player 1 start, picking up keys and firing tagged
-    triggers as their sectors become reachable, until nothing changes."""
+    triggers as their sectors become reachable, until nothing changes.
+    Returns (reached sectors, adjacency, move), or None without a player 1
+    start. adjacency maps a sector to [(sector, line)], line None for a
+    teleport. move(a, b, line, actor) says whether `actor` (an Actor) can
+    cross from a to b once the player has every key, door and floor they can
+    get; only the player opens keyed doors."""
     p1 = next((t for t in level.things if t.type == PLAYER1), None)
     start = p1 and sector_at(level, (p1.x, p1.y))
     if start is None:
-        return ["no player 1 start inside a sector"]
+        return None
+    player = ACTORS[PLAYER1]
     adj = defaultdict(list)
     for l in lines:
         if l.back:
             adj[l.front].append((l.back, l))
             adj[l.back].append((l.front, l))
+    dests = defaultdict(list)   # tag -> sectors holding a teleport destination
+    for t in level.things:
+        s = t.type == TELEPORT_DEST and sector_at(level, (t.x, t.y))
+        if s and s.tag:
+            dests[s.tag].append(s)
+    for l in lines:
+        if l.action == WR_TELEPORT:   # fires crossing from the front side
+            adj[l.front] += [(d, None) for d in dests[l.tag]]
     keys_at = [(KEY_OF[t.type], sector_at(level, (t.x, t.y))) for t in level.things if t.type in KEY_OF]
     # (tag, action, sectors the player can trigger it from)
     triggers = [(l.tag, l.action, (l.front,) if l.back is None else (l.front, l.back))
@@ -76,31 +91,26 @@ def check_progression(level, lines):
         ceil = open_ceil(s, lines) if s.kind == DOOR else s.ceil
         return floor, ceil
 
-    def passable(a, b, line, keys, opened, lowered):
-        if line.length < 33:   # player is 32 wide
+    def passable(a, b, line, actor, keys, opened, lowered):
+        if line is None:
+            return True
+        if line.length <= 2 * actor.radius:
             return False
         if b.kind == DOOR and b.tag not in opened:
             if line.action not in USE_DOORS:
                 return False
             key = USE_DOORS[line.action]
-            if key and key not in keys:
+            if key and (actor is not player or key not in keys):
                 return False
         fa, ca = heights(a, lowered)
         fb, cb = heights(b, lowered)
-        if fb - fa > 24 and LIFT not in (a.kind, b.kind):
+        if not actor.flies and fb - fa > 24 and LIFT not in (a.kind, b.kind):
             return False
-        return min(ca, cb) - max(fa, fb) >= 56
+        return min(ca, cb) - max(fa, fb) >= actor.height
 
     state = (set(), set(), set())   # keys, opened door tags, lowered floor tags
     while True:
-        seen = {start}
-        q = deque([start])
-        while q:
-            a = q.popleft()
-            for b, line in adj[a]:
-                if b not in seen and passable(a, b, line, *state):
-                    seen.add(b)
-                    q.append(b)
+        seen = flood({start}, adj, lambda a, b, line: passable(a, b, line, player, *state))
         fired = {(tag, action) for tag, action, secs in triggers if any(s in seen for s in secs)}
         new = ({k for k, s in keys_at if s in seen},
                {tag for tag, action in fired if action in TAG_DOOR_OPENERS},
@@ -108,8 +118,65 @@ def check_progression(level, lines):
         if new == state:
             break
         state = new
+    return seen, adj, lambda a, b, line, actor: passable(a, b, line, actor, *state)
+
+
+def flood(start, adj, ok):
+    """Sectors reachable from `start` over edges where ok(a, b, line)."""
+    seen = set(start)
+    q = deque(start)
+    while q:
+        a = q.popleft()
+        for b, line in adj[a]:
+            if b not in seen and ok(a, b, line):
+                seen.add(b)
+                q.append(b)
+    return seen
+
+
+def check_reach(level, lines):
+    """Every MUST_REACH sector and every secret can be reached, every monster
+    can be reached or walk (fly) to where the player can go (100% kills; a
+    sniper the player can only shoot at fails this too), and the exit can
+    still be reached from every damaging floor the player can get onto (no
+    softlock in a pit of nukage)."""
+    found = explore(level, lines)
+    if found is None:
+        return ["no player 1 start inside a sector"]
+    seen, adj, move = found
     names = {s.name for s in seen}
-    return [f"unreachable: {n}" for n in level.must_reach if n not in names]
+    errors = [f"unreachable: {n}" for n in level.must_reach if n not in names]
+    errors += [f"secret {s.name} is unreachable" for s in level.sectors.values()
+               if s.special == SECRET_AREA and s not in seen]
+    for t in level.things:
+        s = sector_at(level, (t.x, t.y))
+        if t.type in PLAYERS or t.type not in ACTORS or s is None or s in seen:
+            continue
+        actor = ACTORS[t.type]
+        if not seen & flood({s}, adj, lambda a, b, line: move(a, b, line, actor)):
+            errors.append(f"thing {t.type} at {t.x},{t.y} in {s.name} can't be reached and can't come "
+                          f"to the player")
+    exits = {s for l in lines if l.action in EXITS for s in (l.front, l.back) if s}
+    if not exits:
+        return errors + ["no exit line"]
+    exits |= {n for s in exits for n in neighbours(s, lines)}   # exit switches sit in niches
+    player = ACTORS[PLAYER1]
+    for s in sorted((s for s in seen if s.special in DAMAGING), key=lambda s: s.name):
+        if not exits & flood({s}, adj, lambda a, b, line: move(a, b, line, player)):
+            errors.append(f"damaging floor {s.name} is a softlock: the exit can't be reached from it")
+    return errors
+
+
+def check_hazards(level, lines):
+    """Damaging floors sit below every neighbour that isn't damaging, so the
+    hazard reads as a pit (and Romero's rule 1 holds)."""
+    bad = set()
+    for l in lines:
+        if l.back and (l.front.special in DAMAGING) != (l.back.special in DAMAGING):
+            h, n = (l.front, l.back) if l.front.special in DAMAGING else (l.back, l.front)
+            if n.floor <= h.floor:
+                bad.add((h.name, h.floor, n.name, n.floor))
+    return [f"damaging floor {h} ({hf}) isn't below its neighbour {n} ({nf})" for h, hf, n, nf in sorted(bad)]
 
 
 def check_textures(level, lines, sides, iwad):
