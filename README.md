@@ -111,7 +111,10 @@ Requirements:
 ### What every build checks
 
 - Every thing is inside a sector, clear of walls, and not overlapping another monster or player on a skill they share.
-- Progression: starting from the player start, it works out which keys, door specials and tagged switches and triggers open what, and fails if any `MUST_REACH` sector can't be reached.
+- Progression: starting from the player start, it works out which keys, door specials and tagged switches and triggers open what, follows teleporters, and fails if any `MUST_REACH` sector can't be reached.
+- 100% kills and secrets: every secret sector can be reached, and every monster can either be reached or walk (or fly) to somewhere the player can go. A sniper the player can only shoot at fails this too.
+- No nukage softlocks: from every damaging floor the player can get onto, the exit can still be reached.
+- Damaging floors sit lower than every neighbouring floor that isn't damaging.
 - Every texture and flat exists in `doom2.wad`. Pictures such as switches and door faces must fit their wall exactly; textures vanilla can't tile cleanly get a warning.
 - A balance report for each skill: monster health against ammo damage, health and armor.
 - A top-down SVG preview, `wads/<WAD stem>-<MAP>.svg`: sectors shaded by floor height, special lines in red, monsters by skill, pickups and keys.

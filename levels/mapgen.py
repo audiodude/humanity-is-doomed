@@ -41,7 +41,7 @@ import shutil
 import subprocess
 import tempfile
 
-from .checks import balance_report, check_progression, check_textures, check_things
+from .checks import balance_report, check_hazards, check_reach, check_textures, check_things
 from .doom2 import ACTORS, FLOOR_LOWERERS, PLAYERS, SR_LIFT, WR_LIFT, is_decal
 from .model import (ALL, DOOR, LIFT, ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, ML_SECRET,
                     ML_TWOSIDED, NO_TEX, ROOM, SKY, LevelError, Linedef, Sidedef, dist, edges,
@@ -210,7 +210,7 @@ def build(module, check_only=False, out=None, zdbsp=None):
           + "/".join(str(sum(sk in t.skills for t in monsters)) for sk in ALL) + " (e/m/h)")
     print("preview:", svg)
     print("\n".join(balance_report(level)))
-    errors = check_things(level, lines) + check_progression(level, lines)
+    errors = check_things(level, lines) + check_reach(level, lines) + check_hazards(level, lines)
     iwad = iwad_textures()
     if iwad is None:
         print(f"warning: {IWAD} not found (set DOOM2_WAD); skipping texture checks")

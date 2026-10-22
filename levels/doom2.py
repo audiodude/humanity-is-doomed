@@ -58,6 +58,7 @@ W1_DOOR_OPEN, S1_DOOR_OPEN, SR_DOOR_OPEN, WR_DOOR_OPEN = 2, 103, 61, 86   # tagg
 S1_FLOOR_LOWEST, W1_FLOOR_LOWEST, SR_FLOOR_LOWEST, WR_FLOOR_LOWEST = 23, 38, 60, 82
 SR_LIFT, WR_LIFT = 62, 88
 S1_EXIT = 11
+EXITS = {S1_EXIT, 51, 52, 124}   # S1/W1, normal and secret exits
 W1_LIGHT_35 = 35   # tagged sectors' light drops to 35 (a blackout)
 W1_LIGHT_255 = 13  # tagged sectors light up to 255
 WR_TELEPORT = 97   # only from the line's front side
@@ -70,6 +71,8 @@ FLOOR_LOWERERS = {S1_FLOOR_LOWEST, W1_FLOOR_LOWEST, SR_FLOOR_LOWEST, WR_FLOOR_LO
 
 # -------------------------------------------------------- sector specials ---
 LIGHT_BLINK_RANDOM, LIGHT_GLOW, DAMAGE_5, SECRET_AREA, LIGHT_FLICKER = 1, 8, 7, 9, 17
+DAMAGE_20_BLINK, DAMAGE_10, DAMAGE_20 = 4, 5, 16
+DAMAGING = {DAMAGE_20_BLINK, DAMAGE_10, DAMAGE_5, DAMAGE_20}
 
 # --------------------------------------------------------------- textures ---
 # Pictures (switches, door faces, signs) that must be shown whole, never
