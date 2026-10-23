@@ -4,9 +4,10 @@ build() decides what fails."""
 from collections import defaultdict, deque
 
 from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, DAMAGE_PER_AMMO, DAMAGING, DROPS, EXITS,
-                    FLOOR_LOWERERS, HEALTH_PICKUPS, KEY_OF, PLAYER1, PLAYERS, SECRET_AREA, START_AMMO,
+                    FLOOR_LOWERERS, FLOOR_RAISERS, HEALTH_PICKUPS, KEY_OF, PLAYER1, PLAYERS, SECRET_AREA, START_AMMO,
                     TAG_DOOR_OPENERS, TELEPORT_DEST, USE_DOORS, WR_TELEPORT, is_decal)
-from .model import (ALL, DOOR, LIFT, ML_BLOCKING, NO_TEX, floor_range, neighbours, open_ceil,
+from .model import (ALL, DOOR, LIFT, ML_BLOCKING, NO_TEX, floor_movers, floor_range, moved_floor,
+                    neighbours, open_ceil,
                     sector_at, seg_dist)
 
 
@@ -85,14 +86,15 @@ def explore(level, lines):
     keys_at = [(KEY_OF[t.type], sector_at(level, (t.x, t.y))) for t in level.things if t.type in KEY_OF]
     # (tag, action, sectors the player can trigger it from)
     triggers = [(l.tag, l.action, (l.front,) if l.back is None else (l.front, l.back))
-                for l in lines if l.tag and l.action in TAG_DOOR_OPENERS | FLOOR_LOWERERS]
+                for l in lines if l.tag and l.action in TAG_DOOR_OPENERS | FLOOR_LOWERERS | FLOOR_RAISERS]
+    movers = floor_movers(lines)
 
-    def heights(s, lowered):
-        floor = min(n.floor for n in neighbours(s, lines)) if s.tag in lowered else s.floor
+    def heights(s, moved):
+        floor = moved_floor(s, lines, {t: k for t, k in movers.items() if t in moved})
         ceil = open_ceil(s, lines) if s.kind == DOOR else s.ceil
         return floor, ceil
 
-    def passable(a, b, line, actor, keys, opened, lowered):
+    def passable(a, b, line, actor, keys, opened, moved):
         if line is None:
             return True
         if line.length <= 2 * actor.radius or line.flags & ML_BLOCKING:   # bars and fences block
@@ -103,19 +105,19 @@ def explore(level, lines):
             key = USE_DOORS[line.action]
             if key and (actor is not player or key not in keys):
                 return False
-        fa, ca = heights(a, lowered)
-        fb, cb = heights(b, lowered)
+        fa, ca = heights(a, moved)
+        fb, cb = heights(b, moved)
         if not actor.flies and fb - fa > 24 and LIFT not in (a.kind, b.kind):
             return False
         return min(ca, cb) - max(fa, fb) >= actor.height
 
-    state = (set(), set(), set())   # keys, opened door tags, lowered floor tags
+    state = (set(), set(), set())   # keys, opened door tags, moved floor tags
     while True:
         seen = flood({start}, adj, lambda a, b, line: passable(a, b, line, player, *state))
         fired = {(tag, action) for tag, action, secs in triggers if any(s in seen for s in secs)}
         new = ({k for k, s in keys_at if s in seen},
                {tag for tag, action in fired if action in TAG_DOOR_OPENERS},
-               {tag for tag, action in fired if action in FLOOR_LOWERERS})
+               {tag for tag, action in fired if action in FLOOR_LOWERERS | FLOOR_RAISERS})
         if new == state:
             break
         state = new
@@ -186,7 +188,7 @@ def check_textures(level, lines, sides, iwad):
     textures, flats, medusa = iwad
     errors = [f"{s.name}: unknown flat {f}" for s in level.sectors.values()
               for f in (s.ftex, s.ctex) if f not in flats]
-    lowered = {l.tag for l in lines if l.action in FLOOR_LOWERERS}
+    movers = floor_movers(lines)
     problems = defaultdict(list)   # (texture, message, is_error) -> places
     for l, line_sides in zip(lines, sides):
         for sd in line_sides:
@@ -195,7 +197,7 @@ def check_textures(level, lines, sides, iwad):
                 parts = [(sd.mid, me.ceil - me.floor)]
             else:
                 top = other.floor if other.kind == DOOR else other.ceil   # closed door: whole face shows
-                span = (floor_range(other, lines, lowered)[1] - floor_range(me, lines, lowered)[0])
+                span = (floor_range(other, lines, movers)[1] - floor_range(me, lines, movers)[0])
                 parts = [(sd.upper, me.ceil - top), (sd.lower, span)]
                 if sd.mid != NO_TEX and (found := mid_fit(sd.mid, textures, medusa)):
                     problems[(sd.mid, *found)].append(f"{me.name} {l.v1}-{l.v2}")

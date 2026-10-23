@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 # ------------------------------------------------------------ thing types ---
 PLAYER1, PLAYER2, PLAYER3, PLAYER4 = 1, 2, 3, 4
-ZOMBIE, SARGE, IMP, DEMON, SPECTRE, CACO, KNIGHT, CHAINGUY, REVENANT, FATSO, BARON = \
-    3004, 9, 3001, 3002, 58, 3005, 69, 65, 66, 67, 3003
+ZOMBIE, SARGE, IMP, DEMON, SPECTRE, CACO, KNIGHT, CHAINGUY, REVENANT, FATSO, BARON, LOSTSOUL = \
+    3004, 9, 3001, 3002, 58, 3005, 69, 65, 66, 67, 3003, 3006
 SHOTGUN, SSG, CHAINGUN, LAUNCHER, PLASMA = 2001, 82, 2002, 2003, 2004
 CLIP, AMMOBOX, SHELLS, SHELLBOX, ROCKET, ROCKETBOX, CELL = 2007, 2048, 2008, 2049, 2010, 2046, 2047
 STIM, MEDI, HBONUS, ABONUS, GREENARMOR, BLUEARMOR, SOUL, BACKPACK = \
@@ -34,7 +34,7 @@ ACTORS = {
     ZOMBIE: Actor(20, 56, 20), SARGE: Actor(20, 56, 30), IMP: Actor(20, 56, 60),
     DEMON: Actor(30, 56, 150), SPECTRE: Actor(30, 56, 150), CACO: Actor(31, 56, 400, flies=True),
     KNIGHT: Actor(24, 64, 500), CHAINGUY: Actor(20, 56, 70), REVENANT: Actor(20, 56, 300),
-    FATSO: Actor(48, 64, 600), BARON: Actor(24, 64, 1000),
+    FATSO: Actor(48, 64, 600), BARON: Actor(24, 64, 1000), LOSTSOUL: Actor(16, 56, 100, flies=True),
 }
 
 # ---------------------------------------------------------------- pickups ---
@@ -68,6 +68,10 @@ USE_DOORS = {DR_DOOR: None, DR_BLUE: "blue", DR_YELLOW: "yellow", DR_RED: "red",
              D1_DOOR: None, D1_BLUE: "blue", D1_RED: "red", D1_YELLOW: "yellow"}
 TAG_DOOR_OPENERS = {W1_DOOR_OPEN, S1_DOOR_OPEN, SR_DOOR_OPEN, WR_DOOR_OPEN}
 FLOOR_LOWERERS = {S1_FLOOR_LOWEST, W1_FLOOR_LOWEST, SR_FLOOR_LOWEST, WR_FLOOR_LOWEST}
+# Raise to the next higher neighbouring floor, taking the floor texture of the
+# trigger line's front sector and clearing the sector's special (e.g. nukage damage).
+S1_RAISE_CHANGE, W1_RAISE_CHANGE, SR_RAISE_CHANGE, WR_RAISE_CHANGE = 20, 22, 68, 95
+FLOOR_RAISERS = {S1_RAISE_CHANGE, W1_RAISE_CHANGE, SR_RAISE_CHANGE, WR_RAISE_CHANGE}
 
 # -------------------------------------------------------- sector specials ---
 LIGHT_BLINK_RANDOM, LIGHT_GLOW, DAMAGE_5, SECRET_AREA, LIGHT_FLICKER = 1, 8, 7, 9, 17

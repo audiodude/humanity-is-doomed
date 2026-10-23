@@ -2,7 +2,7 @@
 primitives, and shape helpers (doorway, stairs, lift)."""
 from dataclasses import dataclass, field
 
-from .doom2 import DR_DOOR
+from .doom2 import DR_DOOR, FLOOR_LOWERERS, FLOOR_RAISERS
 
 Point = tuple[int, int]
 Loop = list[Point]
@@ -241,12 +241,32 @@ def open_ceil(door_sec, lines):
     """Height a door's ceiling rises to: lowest neighbouring ceiling - 4."""
     return min(n.ceil for n in neighbours(door_sec, lines)) - 4
 
-def floor_range(sec, lines, lowered):
-    """Lowest and highest floor `sec` can have: lifts and floors tagged by a
-    floor-lowering trigger (tag in `lowered`) drop to their lowest neighbour."""
-    if sec.kind == LIFT or (sec.tag and sec.tag in lowered):
+def floor_movers(lines):
+    """{tag: "lower" | "raise"} for every tag a floor-moving trigger moves."""
+    return {l.tag: ("lower" if l.action in FLOOR_LOWERERS else "raise") for l in lines
+            if l.tag and l.action in FLOOR_LOWERERS | FLOOR_RAISERS}
+
+
+def moved_floor(sec, lines, movers):
+    """Where sec's floor ends up once its trigger fires: lowering floors drop
+    to their lowest neighbour, raising floors rise to the next higher
+    neighbouring floor. movers: {tag: kind}, as from floor_movers."""
+    kind = sec.tag and movers.get(sec.tag)
+    if kind == "lower":
+        return min(n.floor for n in neighbours(sec, lines))
+    if kind == "raise":
+        return min((n.floor for n in neighbours(sec, lines) if n.floor > sec.floor), default=sec.floor)
+    return sec.floor
+
+
+def floor_range(sec, lines, movers):
+    """Lowest and highest floor `sec` can have: lifts drop to their lowest
+    neighbour, and floors tagged by a floor-moving trigger move as
+    moved_floor says. movers: {tag: kind}, as from floor_movers."""
+    if sec.kind == LIFT:
         return min(n.floor for n in neighbours(sec, lines)), sec.floor
-    return sec.floor, sec.floor
+    to = moved_floor(sec, lines, movers)
+    return min(sec.floor, to), max(sec.floor, to)
 
 # --------------------------------------------------------------- helpers ---
 

@@ -20,7 +20,7 @@
 
 ## Included WAD - NUKAGE.WAD
 
-`wads/NUKAGE.WAD` holds four generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), and MAP04, [Nukage Divided](#nukage-divided-nukage_divided). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg`, `wads/NUKAGE-MAP02.svg`, `wads/NUKAGE-MAP03.svg` and `wads/NUKAGE-MAP04.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
+`wads/NUKAGE.WAD` holds five generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), and MAP05, [Nukage Drain](#nukage-drain-nukage_drain). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg`, `wads/NUKAGE-MAP02.svg`, `wads/NUKAGE-MAP03.svg`, `wads/NUKAGE-MAP04.svg` and `wads/NUKAGE-MAP05.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
 
 ### Nukage Junction (`nukage_junction`)
 A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/medium/hard, one secret.
@@ -85,9 +85,28 @@ You leave the start room facing a wall that is half lava, half blue computer scr
 
 Symmetry is high because the two wings mirror each other's footprint around the fork and the pit; their materials, lighting and monsters are opposites.
 
+### Nukage Drain (`nukage_drain`)
+MAP05: 82 sectors, 24/43/59 monsters on easy/medium/hard, four secrets, and the first revenants.
+
+You start on the only dry catwalk of a reservoir full of nukage, with the exit vault standing in the middle. Each of three pump houses has a switch beside an opening onto the reservoir: throw it and watch the next walkway rise out of the sludge to take you onward, while whatever was waiting inside the vault's pillar comes out at you.
+
+| Measure | MAP05 | DOOM II median |
+|---|---|---|
+| Rule-1 flat changes without a height change | 0% | 3% |
+| Distinct floor heights | 13 | 23 |
+| Light SD / light-effect sectors | 24 / 9 | 23 / 9 |
+| Optional share of the reachable area | 36% | 50% |
+| UV ammo per monster HP (pistol start) | 1.8 | 1.8 |
+| Health per 1000 monster HP | 32 | 40 |
+| Easy/UV and HMP/UV monster ratios | 0.39 / 0.72 | 0.33 / 0.70 |
+| Nearest monster to the start | 697 | 300 |
+| Whole-map symmetry | 0.64 | 0.54 |
+
+It has fewer floor heights than most id maps because the reservoir is one flat pool; symmetry is high because it's a square reservoir with a pump house off each side.
+
 ## The level builder
 
-`levels/` is a DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All four maps in `NUKAGE.WAD` came out of it.
+`levels/` is a DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All five maps in `NUKAGE.WAD` came out of it.
 
 ### Building a map
 
@@ -98,6 +117,7 @@ python3 -m levels nukage_junction          # check, then write MAP01 into wads/N
 python3 -m levels nukage_crossing          # same for MAP02
 python3 -m levels nukage_core              # same for MAP03
 python3 -m levels nukage_divided            # same for MAP04
+python3 -m levels nukage_drain              # same for MAP05
 python3 -m levels nukage_junction --check  # check only
 ```
 
@@ -132,6 +152,8 @@ Lines that aren't sector edges go in `FREE_LINES`, keyed by their two endpoints:
 
 Helpers in `levels/model.py` build the common shapes. `doorway()` makes a door with optional recesses, plus its use action; its `alcove_flat`/`far_flat`, and `door()`'s `flat`, set the recess and threshold floors so they can match the rooms (Romero's rule 1: floor texture changes only with a height change). `stairs()` makes a run of steps, and `lift()` makes a lift whose SR/WR actions are added automatically.
 
+Floors can move both ways for the progression check: the lowering actions (`S1_FLOOR_LOWEST` and kin) drop a tagged floor to its lowest neighbour, and the raise-and-change actions (`S1_RAISE_CHANGE` and kin) lift it to the next higher neighbouring floor, taking the floor texture of the trigger line's front sector and clearing the sector's special. MAP05 uses that to raise walkways out of damaging nukage and leave them dry.
+
 ### Code layout
 
 - `levels/model.py`: the dataclasses levels are written in (`Sector`, `Special`, `Thing`) and the shape helpers.
@@ -151,7 +173,7 @@ python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 --describe   # start, ke
 A pass shows the map's wiring works in GZDoom, run in its strict Doom compatibility mode. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
 
 ## Research: what makes DOOM levels fun
-Nukage Crossing and Nukage Core were designed from a research report on the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It drew on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. The report quotes its sources at length, so it isn't published here; the measurement scripts are.
+Nukage Crossing and the maps after it were designed from a research report on the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It drew on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. The report quotes its sources at length, so it isn't published here; the measurement scripts are.
 
 The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs to `research/data/`. They read the v1.9 IWADs from the Steam "Ultimate Doom" install in the default Steam library (override with `DOOM_WAD` / `DOOM2_WAD`). Run them from the repo root:
 

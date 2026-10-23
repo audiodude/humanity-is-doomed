@@ -47,10 +47,10 @@ import subprocess
 import tempfile
 
 from .checks import balance_report, check_hazards, check_reach, check_textures, check_things
-from .doom2 import ACTORS, FLOOR_LOWERERS, PLAYERS, SR_LIFT, WR_LIFT, is_decal
+from .doom2 import ACTORS, PLAYERS, SR_LIFT, WR_LIFT, is_decal
 from .model import (ALL, DOOR, LIFT, ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, ML_SECRET,
                     ML_TWOSIDED, NO_TEX, ROOM, SKY, LevelError, Linedef, Sidedef, dist, edges,
-                    floor_range, load, on_segment, oriented, sector_at, segments_cross)
+                    floor_movers, floor_range, load, on_segment, oriented, sector_at, segments_cross)
 from .preview import write_svg
 from .wad import (IWAD, iwad_textures, map_lumps, read_wad, replace_map, umapinfo_lump,
                   write_wad)
@@ -251,8 +251,8 @@ def build(module, check_only=False, out=None, zdbsp=None):
     out = out or os.path.join(ROOT, "wads", level.wad)
     lines = build_lines(level)
     assign_specials(level, lines)
-    lowered = {l.tag for l in lines if l.tag and l.action in FLOOR_LOWERERS}
-    ranges = {s: floor_range(s, lines, lowered) for s in level.sectors.values()}
+    movers = floor_movers(lines)
+    ranges = {s: floor_range(s, lines, movers) for s in level.sectors.values()}
     sides = [line_sides(l, level.secret_doors, ranges) for l in lines]
     os.makedirs(os.path.dirname(out), exist_ok=True)
     svg = f"{os.path.splitext(out)[0]}-{level.map}.svg"
