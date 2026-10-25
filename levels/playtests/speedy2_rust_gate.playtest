@@ -1,0 +1,43 @@
+# Rust Gate (SPEEDY2 MAP01) wiring test: every door, the shotgun, the
+# secret, the yellow key and its closet trap, the exit-hall closet, the exit.
+#   uv run --with vizdoom scripts/tools/playtest.py /tmp/speedy2/MAP01.wad MAP01 levels/playtests/speedy2_rust_gate.playtest
+
+# Bunker out to the yard.
+killall
+walk 256 370
+open 256 400
+walk 256 600
+
+# Guardhouse: shotgun, then the hinted panel.
+walk -200 840
+open -272 840
+walk -480 840
+expect has Shotgun
+walk -680 840
+open -704 840
+walk -816 840
+expect secrets == 1
+expect has GreenArmor
+walk -500 840 -240 840
+
+# Pump hall: up the stairs to the yellow key; the closet opens.
+walk 740 840
+open 784 840
+walk 900 950 1000 950 1150 950 1216 952
+expect has YellowCard
+wait 70
+expect ceil 1040 608 > 0
+killall
+walk 1040 520
+walk 900 840 740 840
+
+# Yellow gate, exit hall closet, exit.
+walk 256 1260
+open 256 1312
+walk 256 1400 256 1500
+wait 70
+expect ceil 120 1456 > 0
+killall
+walk 40 1456
+walk 256 1560
+exit 256 1592

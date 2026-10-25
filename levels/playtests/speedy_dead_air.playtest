@@ -1,0 +1,61 @@
+# Dead Air (SPEEDY MAP01) wiring test: the side passage and shotgun, all three
+# secrets, the barracks, the control-room lift, the key trap (closets), the
+# porch door, the yellow door and the exit.
+#   uv run --with vizdoom scripts/tools/playtest.py /tmp/speedy/MAP01.wad MAP01 levels/playtests/speedy_dead_air.playtest
+
+killall
+# Side passage: the shotgun, then the hinted stash.
+walk 400 224 528 224 608 300 608 384
+expect has Shotgun
+open 672 256
+walk 768 256
+expect secrets == 1
+expect has Berserk
+
+# Courtyard, then the hinted shed in its south wall.
+walk 608 256 608 580
+open 608 608
+walk 608 700 -64 700
+open -64 640
+walk -64 528
+expect secrets == 2
+expect has Backpack
+
+# Barracks and the armory behind its west wall.
+walk -64 700 -200 1088
+open -288 1088
+walk -400 1088 -760 1088
+open -832 1088
+walk -944 1088
+expect secrets == 3
+expect has Chaingun
+walk -760 1088 -400 1088
+open -304 1088
+walk -200 1088
+
+# Control room: lift up to the ledge, the key kills the lights and opens the closets.
+walk 990 960
+open 1056 960
+walk 1150 1100 1424 1180
+use 1424 1216
+wait 35
+walk 1424 1280
+wait 120
+expect floor 1424 1280 == 128
+walk 1250 1280 1120 1280
+expect has YellowCard
+wait 70
+expect ceil 1184 760 > 8
+expect ceil 1392 760 > 8
+expect ceil 64 1480 > 0
+
+# Out through the ledge door onto the porch, down into the courtyard.
+open 1040 1280
+walk 960 1280
+expect floor 960 1280 == 128
+walk 860 1280 384 1400
+
+# Yellow door, the uplink and the exit.
+open 384 1504
+walk 384 1600 384 1900
+exit 384 1992

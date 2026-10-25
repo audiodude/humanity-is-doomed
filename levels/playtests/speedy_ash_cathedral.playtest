@@ -1,0 +1,114 @@
+# Ash Cathedral (SPEEDY MAP03) wiring test: every door, both lifts, the
+# three key traps, the bridge trap, the spire switch, the sanctum waves, all
+# three secrets and the exit.
+#   uv run --with vizdoom scripts/tools/playtest.py /tmp/speedy/MAP03.wad MAP03 levels/playtests/speedy_ash_cathedral.playtest
+
+killall
+walk 256 200
+
+# Secret: shifted marble panel in the narthex east wall.
+open 512 160
+walk 608 160
+expect secrets == 1
+expect has Soulsphere
+walk 400 160
+
+# West door, lift down into the crypt.
+open 0 64
+walk -40 64 -96 64
+wait 100
+expect floor -96 64 == -120
+walk -176 96
+
+# Blue skull on the lit pedestal: both crypt closets open.
+walk -384 -60 -384 -128
+expect has BlueSkull
+wait 70
+expect ceil -648 -128 > -120
+expect ceil -384 -392 > -120
+
+# Secret: shifted stone in the crypt's north wall.
+walk -560 100
+open -560 128
+walk -560 224
+expect secrets == 2
+expect has SuperShotgun
+walk -560 100
+checkpoint crypt
+
+# Stairs up to the nave, blue door to the library.
+walk -272 100 -272 200 -272 420 -300 880
+open -400 880
+walk -560 880
+
+# Library lift up to the balcony and the yellow skull: the library closets open.
+use -960 1072
+wait 35
+walk -1024 1072
+wait 120
+expect floor -1024 1072 == 128
+walk -1024 1220 -640 1200 -640 1264
+expect has YellowSkull
+wait 70
+expect ceil -880 616 > 0
+expect ceil -640 616 > 0
+
+# Drop through the gap in the balcony wall into the nave.
+walk -408 1264 -300 1264
+expect floor -300 1264 == 0
+checkpoint nave
+
+# Yellow door, the forge bridge: the forge closets open.
+walk 800 880
+open 912 880
+walk 1000 880 1400 880
+wait 70
+expect ceil 1488 552 > 0
+expect ceil 1672 784 > 0
+
+# Stairs up to the gallery.
+walk 1600 800 1600 1232
+expect floor 1600 1232 == 160
+
+# Secret: shifted panel at the gallery's east end.
+open 1664 1232
+walk 1744 1232
+expect secrets == 3
+expect has BlueArmor
+walk 1500 1232
+
+# The spire switch, at the window onto the nave: the spire sinks to the altar.
+expect floor 256 880 == 288
+use 1008 1344
+wait 280
+expect floor 256 880 == 32
+checkpoint spire
+
+# Back down the stairs and across the bridge to the red skull: the nave closets open.
+walk 1600 1100 1600 800 1100 880
+open 928 880
+walk 600 880 256 880
+expect has RedSkull
+wait 70
+expect ceil -128 1400 > 0
+expect ceil 640 1400 > 0
+
+# Red door, the hall, the sanctum: wave one on entry.
+open 256 1408
+walk 256 1500 256 1700
+expect has PlasmaRifle
+wait 70
+expect ceil -264 1984 > 0
+expect ceil 776 1984 > 0
+checkpoint sanctum
+
+# The lion switch: wave two and the gate.
+use 96 2384
+wait 70
+expect ceil -96 2376 > 0
+expect ceil 608 2376 > 0
+expect ceil 256 2392 > 0
+
+# Exit.
+walk 256 2450 256 2620
+exit 256 2680

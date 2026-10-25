@@ -1,0 +1,59 @@
+# The Hellforge (SPEEDY2 MAP03) wiring test: the secret, all three keys and
+# their traps, the forge lift, the arena closets and the exit.
+#   uv run --with vizdoom scripts/tools/playtest.py /tmp/speedy2/MAP03.wad MAP03 levels/playtests/speedy2_hellforge.playtest
+
+killall
+# Secret: hinted panel in the gatehouse's east wall.
+open 512 192
+walk 624 192
+expect secrets == 1
+expect has RocketLauncher
+walk 256 300
+open 256 368
+
+# Library: the blue skull opens the closet behind it.
+walk 256 600 -480 840
+open -528 840
+walk -800 760 -1056 840
+expect has BlueSkull
+wait 70
+expect ceil -840 1048 > 0
+walk -840 1150
+walk -800 840 -480 840 900 840
+
+# Crypt: stairs to the balcony; the yellow key opens both crypt closets.
+open 1056 840
+walk 1300 900 1312 1100 1312 1300 1504 1360
+expect has YellowCard
+wait 70
+expect ceil 1200 632 > 0
+expect ceil 1472 632 > 0
+walk 1312 1300 1312 1000 1200 700 1200 560 1472 560 1300 900 1120 840
+walk 900 840 256 1200
+
+# Forge hall: over the bridge, lift up to the red key, which opens the closet.
+open 256 1312
+walk 256 1400 256 1550 256 1650 540 1776
+use 576 1776
+wait 35
+walk 640 1776
+wait 120
+walk 760 1700 850 1712
+expect has RedCard
+wait 70
+expect ceil 128 1848 > 0
+walk 128 1950
+walk 640 1776 256 1650 256 1400 256 1200
+
+# The Anvil: red door, closets open on entry, then the exit.
+walk -256 450
+open -256 368
+walk -256 250
+wait 70
+expect ceil -1032 64 > 0
+expect ceil -1032 -384 > 0
+expect ceil -256 -648 > 0
+walk -1120 64 -1120 -384 -256 -760 -544 -600
+open -544 -656
+walk -544 -800
+exit -544 -856

@@ -1,0 +1,63 @@
+# Cinder Works (SPEEDY.WAD MAP02) wiring test: every door, the stairs, the
+# blue-key trap, both secrets, the foundry lift, the red-key trap, the crucible
+# ambush and the exit.
+#   uv run --with vizdoom scripts/tools/playtest.py /tmp/speedy/MAP02.wad MAP02 levels/playtests/speedy_cinder_works.playtest
+
+killall
+walk 256 360
+open 256 400
+walk 256 480
+
+# West door into the ore yard; the hinted panel in its west wall is a secret.
+walk -200 768
+open -272 768
+walk -400 768 -980 1056
+open -1024 1056
+walk -1136 1056
+expect secrets == 1
+expect has SuperShotgun
+
+# Up the stairs to the ledge; taking the blue key opens the yard closets.
+walk -980 1056 -448 1100 -448 1328 -600 1300 -928 1280
+expect has BlueCard
+wait 70
+expect ceil -640 504 > 0
+expect ceil -1032 832 > 0
+walk -600 1300 -448 1328 -448 1100 -400 768
+open -288 768
+walk -200 768 700 768
+
+# Blue door into the foundry; second secret in its south wall.
+open 800 768
+walk 900 768 1376 420
+open 1376 384
+walk 1376 300
+expect secrets == 2
+
+# Lift up to the deck; the red key opens the foundry closets.
+walk 1376 420 1024 920
+expect floor 1024 1024 == 128
+use 1024 960
+wait 35
+expect floor 1024 1024 == 0
+walk 1024 1024
+wait 120
+expect floor 1024 1024 == 128
+walk 1200 1072 1408 1072
+expect has RedCard
+wait 70
+expect ceil 1152 376 > 0
+expect ceil 1480 640 > 0
+walk 1300 900 900 768    # drop off the deck
+open 816 768
+walk 600 768
+
+# Red door, the crucible ambush, across the causeway to the exit dais.
+walk 600 1080 256 1100       # round the lava trough
+open 256 1184
+walk 256 1300 256 1500
+wait 70
+expect ceil -8 1648 > 0
+expect ceil 520 1648 > 0
+walk 256 1680 256 1800
+exit 256 1848

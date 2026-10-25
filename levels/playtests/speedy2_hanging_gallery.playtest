@@ -1,0 +1,49 @@
+# The Hanging Gallery (SPEEDY2 MAP02) wiring test: start door, the stairs and
+# the blue-key pedestal trap, blue door, lift to the yellow key, the secret,
+# yellow door and the exit.
+#   uv run --with vizdoom scripts/tools/playtest.py /tmp/speedy2/MAP02.wad MAP02 levels/playtests/speedy2_hanging_gallery.playtest
+
+killall
+walk 256 360
+open 256 384
+walk 256 500 256 704
+expect has Chaingun
+
+# Stairs up to the gallery; the blue key springs all three closets.
+walk -480 640 -880 640
+expect floor -900 640 == 96
+walk -1024 704
+expect has BlueCard
+wait 70
+expect ceil -1024 968 > 96
+expect ceil -1024 440 > 96
+expect ceil -256 1288 > 0
+walk -880 640 -480 640
+
+# Blue door, tech room, lift up to the yellow key.
+walk 900 832 1000 832
+wait 105                 # let the door settle if a fight already bumped it
+open 1056 832
+walk 1150 832 1152 1150
+use 1152 1216
+wait 35
+walk 1152 1280
+wait 120
+walk 1536 1312
+expect has YellowCard
+expect floor 1536 1312 == 128
+
+# Secret: hinted panel in the tech room's east wall.
+walk 1400 1150 1500 800
+open 1600 800
+walk 1712 800
+expect secrets == 1
+expect has RocketLauncher
+walk 1500 800 1150 832
+open 1072 832
+
+# Yellow door, the vault, the exit.
+walk 900 832 256 1200
+open 256 1312
+walk 256 1400 256 1680
+exit 256 1720
