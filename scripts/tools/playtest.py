@@ -784,9 +784,10 @@ class Run:
                 return
             x, y = self.pos()
             g = self.geo
-            items = sorted((math.hypot(o.position_x - x, o.position_y - y), o) for o in self.state().objects
-                           if o.name in want and o.id not in self.skip
-                           and math.hypot(o.position_x - x, o.position_y - y) < FORAGE)
+            items = sorted(((math.hypot(o.position_x - x, o.position_y - y), o) for o in self.state().objects
+                            if o.name in want and o.id not in self.skip
+                            and math.hypot(o.position_x - x, o.position_y - y) < FORAGE),
+                           key=lambda t: t[0])   # equal distances mustn't compare the objects
             for d, o in items:
                 at = (o.position_x, o.position_y)
                 c = self.plan.cell(at)
