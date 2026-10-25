@@ -1210,7 +1210,7 @@ def replay(args, vzd):
             return 2
         enc = subprocess.Popen(["ffmpeg", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24",
                                 "-s", f"{w}x{h}", "-r", "35", "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p",
-                                "-crf", "34", "-preset", "slow", args.video], stdin=subprocess.PIPE)
+                                "-crf", "22", "-preset", "slow", "-tune", "animation", args.video], stdin=subprocess.PIPE)
     frames = 0
     while not g.is_episode_finished():
         t0 = time.time()
