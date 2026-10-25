@@ -3,7 +3,7 @@
 
     uv run --with vizdoom scripts/tools/playtest.py WAD MAP SCRIPT [--skill 4] [--shots DIR] [--from NAME]
     uv run --with vizdoom scripts/tools/playtest.py WAD MAP SCRIPT --fight [--seed N] [--watch]
-    uv run --with vizdoom scripts/tools/playtest.py WAD MAP --replay [--video FILE.mp4]
+    uv run --with vizdoom scripts/tools/playtest.py WAD MAP --replay [--video FILE.mp4 [--hd]]
     python3 scripts/tools/playtest.py WAD MAP --describe     # start, keys, special lines (no ViZDoom needed)
 
 ViZDoom (pip install vizdoom) runs a ZDoom-based engine as a Python library.
@@ -65,7 +65,8 @@ so try several. Every --fight run is recorded to ~/.cache/playtest/recordings/.
 
 --watch shows the game in a window at normal speed. --replay plays back the
 last --fight recording of MAP at --skill (or --recording FILE) in a window;
-add --video FILE.mp4 to render it with ffmpeg instead. A recording only plays
+add --video FILE.mp4 to render it with ffmpeg instead (--hd: at 1920x1080,
+widescreen, instead of 640x480). A recording only plays
 back right with the WAD it was made with.
 
 Exit status: 0 all checks passed, 1 a check failed or the bot got stuck, 2 the
@@ -1195,7 +1196,8 @@ def replay(args, vzd):
     g.set_doom_skill(args.skill)
     g.set_window_visible(not args.video)
     g.set_sound_enabled(not args.video)
-    g.set_screen_resolution(vzd.ScreenResolution.RES_640X480)
+    w, h = (1920, 1080) if args.hd else (WIDTH, HEIGHT)
+    g.set_screen_resolution(getattr(vzd.ScreenResolution, f"RES_{w}X{h}"))
     g.set_screen_format(vzd.ScreenFormat.RGB24)
     g.set_render_hud(True)
     g.set_mode(vzd.Mode.PLAYER)
@@ -1207,7 +1209,7 @@ def replay(args, vzd):
             print("--video needs ffmpeg")
             return 2
         enc = subprocess.Popen(["ffmpeg", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24",
-                                "-s", f"{WIDTH}x{HEIGHT}", "-r", "35", "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                                "-s", f"{w}x{h}", "-r", "35", "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p",
                                 "-crf", "34", "-preset", "slow", args.video], stdin=subprocess.PIPE)
     frames = 0
     while not g.is_episode_finished():
@@ -1281,6 +1283,7 @@ def main():
     p.add_argument("--replay", action="store_true", help="watch the last --fight recording of MAP at --skill")
     p.add_argument("--recording", metavar="FILE", help="with --replay: the recording to play (default: the last)")
     p.add_argument("--video", metavar="FILE", help="with --replay: render it to an MP4 instead (needs ffmpeg)")
+    p.add_argument("--hd", action="store_true", help="with --replay: render at 1920x1080 (widescreen) instead of 640x480")
     p.add_argument("--seed", type=int, default=1, help="random seed (default 1): the same seed plays the same way")
     args = p.parse_args()
     pos = args.wad
