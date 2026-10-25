@@ -61,10 +61,11 @@ comment block starts one): time, kills, damage taken, deaths, health and
 armor, and ammo fired. The bot is a weaker player than a person: its deaths
 show where a map is hard, or where the bot is stuck, and the footage says
 which. Results vary with --seed (default 1; the same seed plays the same way),
-so try several. Every --fight run is recorded to ~/.cache/playtest/recordings/.
+so try several. Every --fight run is recorded to ~/.cache/playtest/recordings/,
+one recording per WAD, map, skill and seed (the latest run replaces it).
 
 --watch shows the game in a window at normal speed. --replay plays back the
-last --fight recording of MAP at --skill (or --recording FILE) in a window;
+last --fight recording of MAP at --skill and --seed (or --recording FILE) in a window;
 add --video FILE.mp4 to render it, with sound, using ffmpeg instead (--hd: at 1920x1080,
 widescreen, instead of 640x480). A recording only plays
 back right with the WAD it was made with.
@@ -467,7 +468,12 @@ def clock(tics):
 
 
 def recording_path(args):
-    return os.path.join(RECORDINGS, f"{os.path.basename(args.wad[-1])}-{args.map.upper()}-skill{args.skill}.lmp")
+    """Where the last --fight run of these WADs, map, skill and seed is kept.
+    The WADs' full paths are hashed in, so two WADs that share a file name
+    don't overwrite each other's recordings."""
+    where = hashlib.sha256("\0".join(os.path.abspath(w) for w in args.wad).encode()).hexdigest()[:8]
+    return os.path.join(RECORDINGS, f"{os.path.basename(args.wad[-1])}-{where}-{args.map.upper()}"
+                                    f"-skill{args.skill}-seed{args.seed}.lmp")
 
 
 def check_step(ln, cmd, args, raw):
@@ -580,7 +586,10 @@ class Run:
         if args.fight:
             os.makedirs(RECORDINGS, exist_ok=True)
             self.recording = recording_path(args)
-            g.new_episode(self.recording)   # record the run, for --replay
+            # Record to a file of this run's own, renamed into place at the end,
+            # so runs at the same time never write the same file.
+            self.recording_part = f"{self.recording[:-4]}.{os.getpid()}.part.lmp"
+            g.new_episode(self.recording_part)   # record the run, for --replay
         self.ignore = {}      # monster id -> tic until which the bot stops trying to hit it
         self.skip = set()     # pickups the bot couldn't get to
         self.deaths = []      # (section, x, y, tic) where the player would have died
@@ -1166,7 +1175,11 @@ def run(args):
             r.report()
         r.game.close()
     if r.recording:
-        json.dump({"wad": wad_hash(args.wad)}, open(r.recording + ".json", "w"))
+        os.replace(r.recording_part, r.recording)
+        part = f"{r.recording_part}.json"
+        with open(part, "w") as f:
+            json.dump({"wad": wad_hash(args.wad)}, f)
+        os.replace(part, r.recording + ".json")
         print(f"recorded to {r.recording}; watch it with --replay")
     print(f"DONE checks={r.checks} fails={r.fails} ({time.time() - t0:.1f} s)")
     return status if status is not None else (1 if r.fails else 0)
@@ -1298,7 +1311,7 @@ def main():
     p.add_argument("--from", dest="start_from", metavar="NAME", help="start at `checkpoint NAME` (see above)")
     p.add_argument("--fight", action="store_true", help="play for real: no god mode, the bot fights (see above)")
     p.add_argument("--watch", action="store_true", help="show the game in a window, at normal speed")
-    p.add_argument("--replay", action="store_true", help="watch the last --fight recording of MAP at --skill")
+    p.add_argument("--replay", action="store_true", help="watch the last --fight recording of MAP at --skill and --seed")
     p.add_argument("--recording", metavar="FILE", help="with --replay: the recording to play (default: the last)")
     p.add_argument("--video", metavar="FILE", help="with --replay: render it to an MP4 instead (needs ffmpeg)")
     p.add_argument("--hd", action="store_true", help="with --replay: render at 1920x1080 (widescreen) instead of 640x480")
