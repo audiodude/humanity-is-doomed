@@ -65,7 +65,7 @@ so try several. Every --fight run is recorded to ~/.cache/playtest/recordings/.
 
 --watch shows the game in a window at normal speed. --replay plays back the
 last --fight recording of MAP at --skill (or --recording FILE) in a window;
-add --video FILE.mp4 to render it with ffmpeg instead (--hd: at 1920x1080,
+add --video FILE.mp4 to render it, with sound, using ffmpeg instead (--hd: at 1920x1080,
 widescreen, instead of 640x480). A recording only plays
 back right with the WAD it was made with.
 
@@ -84,6 +84,7 @@ import shutil
 import struct
 import subprocess
 import sys
+import tempfile
 import time
 import zlib
 
@@ -1179,7 +1180,7 @@ def wad_hash(wads):
 
 def replay(args, vzd):
     """Play back the last --fight recording of this map and skill, in a window,
-    or (--video FILE) render it to an MP4 with ffmpeg."""
+    or (--video FILE) render it, picture and sound, to an MP4 with ffmpeg."""
     path = args.recording or recording_path(args)
     if not os.path.exists(path):
         print(f"no recording at {path}: run with --fight first")
@@ -1195,7 +1196,11 @@ def replay(args, vzd):
     g.set_doom_map(args.map.upper())
     g.set_doom_skill(args.skill)
     g.set_window_visible(not args.video)
-    g.set_sound_enabled(not args.video)
+    g.set_sound_enabled(True)
+    if args.video:   # the game's own mix, one tic of 44.1 kHz stereo per frame
+        g.set_audio_buffer_enabled(True)
+        g.set_audio_sampling_rate(vzd.SamplingRate.SR_44100)
+        g.set_audio_buffer_size(1)
     w, h = (1920, 1080) if args.hd else (WIDTH, HEIGHT)
     g.set_screen_resolution(getattr(vzd.ScreenResolution, f"RES_{w}X{h}"))
     g.set_screen_format(vzd.ScreenFormat.RGB24)
@@ -1203,14 +1208,19 @@ def replay(args, vzd):
     g.set_mode(vzd.Mode.PLAYER)
     g.init()
     g.replay_episode(path)
-    enc = None
+    enc = tmp = None
     if args.video:
         if not shutil.which("ffmpeg"):
             print("--video needs ffmpeg")
             return 2
+        # Picture and sound go to separate files as they're made, then are muxed:
+        # one ffmpeg reading two live pipes can deadlock.
+        tmp = tempfile.TemporaryDirectory(dir=os.path.dirname(os.path.abspath(args.video)))
+        silent = os.path.join(tmp.name, "video.mp4")
+        sound = open(os.path.join(tmp.name, "audio.raw"), "wb")
         enc = subprocess.Popen(["ffmpeg", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24",
                                 "-s", f"{w}x{h}", "-r", "35", "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p",
-                                "-crf", "22", "-preset", "slow", "-tune", "animation", args.video], stdin=subprocess.PIPE)
+                                "-crf", "22", "-preset", "slow", "-tune", "animation", silent], stdin=subprocess.PIPE)
     frames = 0
     while not g.is_episode_finished():
         t0 = time.time()
@@ -1218,6 +1228,7 @@ def replay(args, vzd):
             s = g.get_state()
             if s is not None:
                 enc.stdin.write(s.screen_buffer.tobytes())
+                sound.write(s.audio_buffer.tobytes())
                 frames += 1
         g.advance_action()
         if not enc:
@@ -1225,7 +1236,13 @@ def replay(args, vzd):
     g.close()
     if enc:
         enc.stdin.close()
-        enc.wait()
+        sound.close()
+        if enc.wait() != 0 or subprocess.run(
+                ["ffmpeg", "-loglevel", "error", "-y", "-i", silent, "-f", "s16le", "-ar", "44100", "-ac", "2",
+                 "-i", sound.name, "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", args.video]).returncode:
+            print("ffmpeg failed")
+            return 2
+        tmp.cleanup()
         print(f"wrote {args.video} ({clock(frames)})")
     return 0
 
