@@ -1,7 +1,7 @@
-# The Hanging Gallery (SPEEDY2 MAP02) wiring test: start door, the stairs and
+# The Hanging Gallery (SPEEDY1 MAP05) wiring test: start door, the stairs and
 # the blue-key pedestal trap, blue door, lift to the yellow key, the secret,
 # yellow door and the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py /tmp/speedy2/MAP02.wad MAP02 levels/playtests/speedy2_hanging_gallery.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY1.WAD MAP05 levels/playtests/speedy2_hanging_gallery.playtest
 
 killall
 walk 256 360

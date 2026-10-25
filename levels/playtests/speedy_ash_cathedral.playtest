@@ -1,7 +1,7 @@
-# Ash Cathedral (SPEEDY MAP03) wiring test: every door, both lifts, the
+# Ash Cathedral (SPEEDY1 MAP03) wiring test: every door, both lifts, the
 # three key traps, the bridge trap, the spire switch, the sanctum waves, all
 # three secrets and the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py /tmp/speedy/MAP03.wad MAP03 levels/playtests/speedy_ash_cathedral.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY1.WAD MAP03 levels/playtests/speedy_ash_cathedral.playtest
 
 killall
 walk 256 200

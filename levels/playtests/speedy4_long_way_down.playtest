@@ -1,0 +1,51 @@
+# The Long Way Down (SPEEDY2 MAP04) wiring test: the roof door, the gallery
+# secret, the sinking elevator, the cistern pump, the cave drop, the quarry
+# closets and the exit.
+#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY2.WAD MAP04 levels/playtests/speedy4_long_way_down.playtest
+
+killall
+# Rooftop: the shotgun, then the stair door.
+walk 160 -704
+expect has Shotgun
+open 48 -704
+walk -100 -704 -340 -704
+
+# Gallery: the hinted panel in the south wall.
+open -448 -832
+walk -448 -900
+expect secrets == 1
+expect has GreenArmor
+
+# The elevator floor sinks out from under you into the cistern.
+walk -448 -760 -620 -656
+expect floor -672 -656 == 376   # east of the free trigger line: the runner's even-odd lookup counts it
+walk -736 -656
+wait 300
+expect floor -672 -656 == 128
+checkpoint cistern
+
+# Cistern: round the walkway to the pump, which drains the basin.
+walk -900 -656 -704 -300 -704 320 -960 330
+expect floor -960 0 == 104
+use -960 400
+wait 140
+expect floor -960 0 == 0
+expect ceil -1216 0 == 96
+
+# Drop into the basin, out through the tunnel to the cave ledge.
+walk -960 0 -1200 0 -1344 0 -1344 560
+checkpoint cave
+
+# Jump down from the ledge, out of the cave mouth onto the quarry floor.
+walk -1250 680 -1000 640
+expect floor -1000 640 == -80
+walk -580 560 -400 400
+wait 70
+expect ceil 776 0 > -128
+expect ceil 776 320 > -128
+
+# Across the quarry to the exit.
+walk 256 560 256 620
+open 256 672
+walk 256 780
+exit 256 840

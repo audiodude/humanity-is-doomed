@@ -1,0 +1,37 @@
+# The Long Way Down (SPEEDY2 MAP01): roof, shaft lift, cistern sluice, secret, ledge jump, exit.
+#   uv run -q --with vizdoom scripts/tools/playtest.py wads/SPEEDY2.WAD MAP01 levels/playtests/speedy3_long_way_down.playtest
+
+killall
+walk 320 256 480 300
+expect pos 480 300
+walk 128 40
+open 128 0
+walk 128 -100
+
+# Shaft: the lift drops from the landing to the bottom.
+walk 128 -240
+wait 50
+expect floor 128 -240 == 256
+walk 128 -400
+walk 280 -320
+open 320 -320
+
+# Cistern: secret panel, then the switch drops the sluice.
+walk 500 -300 700 -560
+open 700 -600
+walk 700 -700
+expect secrets == 1
+expect has GreenArmor
+walk 700 -560 1000 -560
+expect floor 1132 -272 == 360
+use 1000 -616
+wait 280
+expect floor 1132 -272 == 128
+
+# Ledge: jump down into the cavern, then the exit.
+walk 1132 -272 1260 -200 1260 -60 1260 100
+expect floor 1260 100 == 0
+walk 1660 200
+open 1700 200
+walk 1860 200
+exit 1956 200

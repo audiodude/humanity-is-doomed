@@ -1,0 +1,41 @@
+# Ash Canyon (SPEEDY2 MAP03) wiring test: secret grotto, river, rock stair,
+# mine lift, bridge switch, cliff caves, exit.
+
+killall
+walk 272 -40 272 120 832 60
+open 832 0
+walk 832 -120
+expect secrets == 1
+expect has Soulsphere
+walk 832 100
+
+# Wade the river, climb the rock stair to the trench ledge.
+walk 0 560 0 760 -448 780 -448 1120
+expect floor -448 1120 == 96
+
+# Mine lift up to the plateau.
+walk 300 1120 600 1120
+use 640 1120
+wait 35
+walk 688 1120
+wait 120
+expect floor 688 1120 == 192
+walk 800 1120
+
+# Watch hut switch raises the bridge.
+walk -160 1380 -160 1560
+use -160 1616
+wait 240
+expect floor 936 1216 == 192
+
+# Crossing opens the cliff caves.
+walk 936 1216 1100 1216
+wait 70
+expect ceil 1800 1056 > 192
+expect ceil 1800 1248 > 192
+expect ceil 1216 1608 > 192
+walk 1560 1260
+
+# Up the crag to the exit.
+walk 1408 1560 1408 1900 1408 2120
+exit 1408 2184

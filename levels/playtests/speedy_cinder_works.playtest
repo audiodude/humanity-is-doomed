@@ -1,7 +1,7 @@
-# Cinder Works (SPEEDY.WAD MAP02) wiring test: every door, the stairs, the
+# Cinder Works (SPEEDY1 MAP02) wiring test: every door, the stairs, the
 # blue-key trap, both secrets, the foundry lift, the red-key trap, the crucible
 # ambush and the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py /tmp/speedy/MAP02.wad MAP02 levels/playtests/speedy_cinder_works.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY1.WAD MAP02 levels/playtests/speedy_cinder_works.playtest
 
 killall
 walk 256 360

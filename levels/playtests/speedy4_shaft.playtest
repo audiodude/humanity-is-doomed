@@ -1,0 +1,62 @@
+# Spiral Shaft (SPEEDY2 MAP05) wiring test: the secret, the pump door and lift,
+# the machine-room switch that drops the stair block, the storage door and
+# lift, the bridge-switch trap, the rising bridge and the exit on the spire.
+#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY2.WAD MAP05 levels/playtests/speedy4_shaft.playtest
+
+killall
+walk 0 -560
+walk 0 -400
+
+# Secret: hinted panel in the sump gallery's west wall.
+walk -400 -304
+open -480 -304
+walk -600 -304
+expect secrets == 1
+expect has SuperShotgun
+walk -400 -304
+
+# Sump: pump-room door, the lift up to the machine floor.
+walk 400 -304
+open 480 -304
+walk 560 -300
+use 704 -224
+wait 35
+walk 704 -160
+wait 140
+expect floor 704 -160 == 144
+walk 704 0
+checkpoint machine
+
+# Machine floor: the switch drops the block off the corner stairs.
+expect floor 400 400 == 320
+use 896 48
+wait 150
+expect floor 400 400 == 192
+walk 400 0
+walk 400 200 400 400 224 400 0 400
+checkpoint storage
+
+# Storage floor: door, crate hall, the lift up to the top floor.
+open 0 480
+walk 0 600
+use -288 608
+wait 35
+walk -288 544
+wait 140
+expect floor -288 544 == 400
+walk -288 440 -400 200 -400 0
+checkpoint top
+
+# Top floor: stepping into the booth opens both closets; the switch raises the
+# bridge out of the nukage. Hold the gallery while it rises.
+expect floor -232 0 == 0
+walk -520 0
+wait 35
+expect ceil -488 160 > 400
+expect ceil -416 488 > 400
+use -544 0
+walk -400 -40
+wait 800
+expect floor -232 0 == 400
+walk -232 0 -100 0 -40 0
+exit -16 0

@@ -1,6 +1,6 @@
-# The Hellforge (SPEEDY2 MAP03) wiring test: the secret, all three keys and
+# The Hellforge (SPEEDY1 MAP06) wiring test: the secret, all three keys and
 # their traps, the forge lift, the arena closets and the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py /tmp/speedy2/MAP03.wad MAP03 levels/playtests/speedy2_hellforge.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY1.WAD MAP06 levels/playtests/speedy2_hellforge.playtest
 
 killall
 # Secret: hinted panel in the gatehouse's east wall.

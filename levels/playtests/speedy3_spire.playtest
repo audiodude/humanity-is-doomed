@@ -1,0 +1,54 @@
+# The Spire (SPEEDY2 MAP02) wiring test: both lifts, the secret, the gate
+# switch, the stair climb, the trap closets, the bridge and the exit.
+#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY2.WAD MAP02 levels/playtests/speedy3_spire.playtest
+
+killall
+# Ground ring: round the bend to the first lift.
+walk 480 0 300 372
+use 286 442
+wait 35
+walk 247 481
+wait 120
+expect floor 247 481 == 128
+walk 200 560 96 480
+
+# First gallery: the hinted panel in the north wall is the secret.
+walk -128 560
+open -128 640
+walk -128 736
+expect secrets == 1
+expect has SuperShotgun
+walk -128 560
+
+# The gate switch opens the door to the stairs.
+walk 128 600
+expect ceil -480 168 == 128
+use 128 656
+wait 140
+expect ceil -480 168 > 300
+checkpoint gallery1
+
+# Stairs up the west side to the second gallery.
+walk -408 264 -480 168 -480 -168 -336 -336
+expect floor -336 -336 == 248
+
+# Bridge switch booth: stepping in opens the trap closets.
+walk -64 -600 -64 -670
+wait 70
+expect ceil -192 -720 > 248
+expect ceil 48 -720 > 248
+expect floor 144 -144 == 336
+use -64 -688
+wait 140
+expect floor 144 -144 == 400
+checkpoint bridge
+
+# Second lift up to the top ledge, across the bridge to the crown.
+walk -64 -560 48 -480
+use 104 -520
+wait 35
+walk 156 -520
+wait 140
+expect floor 156 -520 == 400
+walk 264 -408 224 -224 144 -144 64 -64 0 -32
+exit 0 24

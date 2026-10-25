@@ -1,7 +1,7 @@
-# Dead Air (SPEEDY MAP01) wiring test: the side passage and shotgun, all three
+# Dead Air (SPEEDY1 MAP01) wiring test: the side passage and shotgun, all three
 # secrets, the barracks, the control-room lift, the key trap (closets), the
 # porch door, the yellow door and the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py /tmp/speedy/MAP01.wad MAP01 levels/playtests/speedy_dead_air.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY1.WAD MAP01 levels/playtests/speedy_dead_air.playtest
 
 killall
 # Side passage: the shotgun, then the hinted stash.

@@ -1,0 +1,75 @@
+# Cinder Gorge (SPEEDY2 MAP06) wiring test: shelter door, both secrets, the cave
+# switch and the bridge it raises, the three closet traps, the plateau lift, the
+# plug switch and the exit.
+#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY2.WAD MAP06 levels/playtests/speedy4_gorge.playtest
+
+killall
+walk 320 224 400 224
+expect has Shotgun
+open 432 224
+walk 560 224 1000 700
+
+# Down the stair cut into the west cliff; the secret crack at the landing.
+walk 1050 900 1050 1090
+open 912 1088
+walk 800 1088
+expect secrets == 1
+expect has RocketLauncher
+walk 1000 1088 1100 1300 1100 1500
+checkpoint bank
+
+# The cave: stepping in opens the bank closet; the switch raises the bridge.
+walk 900 2048 760 2048 600 1960
+wait 70
+expect ceil 1088 2440 > 16
+walk 470 2048
+expect floor 1408 1600 == -72
+use 400 2048
+wait 240
+expect floor 1408 1600 == 16
+walk 650 2100
+expect has SuperShotgun
+checkpoint bridge
+
+# Back to the bridge, now level with the banks.
+walk 900 2048 1200 1600
+
+# Over the bridge into the village: its closets open behind you.
+walk 1200 1600 1408 1600 1700 1600
+wait 70
+expect ceil 1824 2440 > 16
+expect ceil 2048 2440 > 16
+walk 1720 2200
+expect has Chaingun
+
+# Up the east stair to the ledge; the secret cache behind it; the ravine below the crag.
+walk 1728 1320 1728 1060 1760 560 2016 960
+open 2016 1024
+walk 2016 1180
+expect secrets == 2
+expect has PlasmaRifle
+walk 2016 960 2100 704 2500 704 2770 740
+checkpoint ledge
+
+# The lift up the cliff; stepping off it opens the plateau closets.
+walk 2140 896
+use 2176 896
+wait 35
+walk 2240 896
+wait 175
+expect floor 2240 896 == 352
+walk 2400 900
+wait 70
+expect ceil 3080 1152 > 352
+expect ceil 3080 1664 > 352
+expect ceil 2368 2056 > 352
+checkpoint plateau
+
+# The switch at the far end sinks the plug; across the land bridge to the exit.
+walk 2752 2000
+expect floor 2880 608 == 480
+use 2752 2064
+wait 160
+expect floor 2880 608 == 352
+walk 2880 700 2880 600 2700 500 2848 260
+exit 2848 184
