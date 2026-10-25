@@ -24,7 +24,7 @@
 <path d="M217.6,595.2 L230.4,595.2 L230.4,441.6 L217.6,441.6 Z" fill="rgb(175,175,175)" fill-rule="evenodd"><title>isteps4: floor -32 ceil 256 FLOOR0_3/CEIL3_5 light 160</title></path>
 <path d="M268.8,595.2 L409.6,595.2 L409.6,441.6 L268.8,441.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>intake: floor -96 ceil 256 NUKAGE1/CEIL3_5 light 160</title></path>
 <path d="M409.6,595.2 L422.4,595.2 L422.4,441.6 L409.6,441.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>culvert: floor -96 ceil 32 NUKAGE1/CEIL5_2 light 128</title></path>
-<path d="M108.8,544.0 L115.2,544.0 L115.2,492.8 L108.8,492.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_hcl: floor -16 ceil -16 FLOOR5_2/FLAT20 light 144 tag 2</title></path>
+<path d="M108.8,544.0 L115.2,544.0 L115.2,492.8 L108.8,492.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_hall_cl: floor -16 ceil -16 FLOOR5_2/FLAT20 light 144 tag 2</title></path>
 <path d="M38.4,556.8 L108.8,556.8 L108.8,480.0 L38.4,480.0 Z" fill="rgb(182,182,182)" fill-rule="evenodd"><title>hall_cl: floor -16 ceil 112 FLOOR5_2/CEIL3_5 light 96</title></path>
 <path d="M396.8,371.2 L406.4,371.2 L406.4,307.2 L396.8,307.2 Z" fill="rgb(195,195,195)" fill-rule="evenodd"><title>d_blue_alcove: floor 16 ceil 144 FLOOR5_2/CEIL5_1 light 176</title></path>
 <path d="M406.4,364.8 L412.8,364.8 L412.8,313.6 L406.4,313.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_blue: floor 16 ceil 16 FLOOR5_2/FLAT20 light 144</title></path>

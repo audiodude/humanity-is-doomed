@@ -59,9 +59,9 @@
 <path d="M281.6,723.2 L320.0,723.2 L320.0,684.8 L281.6,684.8 Z" fill="#7ccf4a" fill-rule="evenodd"><title>pool1: floor 32 ceil 256 NUKAGE1/CEIL4_1 light 192</title></path>
 <path d="M134.4,633.6 L172.8,633.6 L172.8,595.2 L134.4,595.2 Z" fill="#7ccf4a" fill-rule="evenodd"><title>pool2: floor 32 ceil 256 NUKAGE1/CEIL4_1 light 192</title></path>
 <path d="M281.6,633.6 L320.0,633.6 L320.0,595.2 L281.6,595.2 Z" fill="#7ccf4a" fill-rule="evenodd"><title>pool3: floor 32 ceil 256 NUKAGE1/CEIL4_1 light 192</title></path>
-<path d="M102.4,684.8 L108.8,684.8 L108.8,633.6 L102.4,633.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_tcw: floor 48 ceil 48 FLAT9/FLAT20 light 144 tag 3</title></path>
+<path d="M102.4,684.8 L108.8,684.8 L108.8,633.6 L102.4,633.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_tcl_w: floor 48 ceil 48 FLAT9/FLAT20 light 144 tag 3</title></path>
 <path d="M38.4,691.2 L102.4,691.2 L102.4,627.2 L38.4,627.2 Z" fill="rgb(169,169,169)" fill-rule="evenodd"><title>tcl_w: floor 48 ceil 176 FLAT9/CEIL4_1 light 96</title></path>
-<path d="M147.2,755.2 L198.4,755.2 L198.4,748.8 L147.2,748.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_tcs: floor 48 ceil 48 FLAT9/FLAT20 light 144 tag 3</title></path>
+<path d="M147.2,755.2 L198.4,755.2 L198.4,748.8 L147.2,748.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_tcl_s: floor 48 ceil 48 FLAT9/FLAT20 light 144 tag 3</title></path>
 <path d="M140.8,819.2 L204.8,819.2 L204.8,755.2 L140.8,755.2 Z" fill="rgb(169,169,169)" fill-rule="evenodd"><title>tcl_s: floor 48 ceil 176 FLAT9/CEIL4_1 light 96</title></path>
 <path d="M358.4,537.6 L364.8,537.6 L364.8,473.6 L358.4,473.6 Z" fill="rgb(170,170,170)" fill-rule="evenodd"><title>d_blue_alcove: floor 56 ceil 184 FLOOR7_1/CEIL5_1 light 176</title></path>
 <path d="M352.0,531.2 L358.4,531.2 L358.4,480.0 L352.0,480.0 Z" fill="#a0703c" fill-rule="evenodd"><title>d_blue: floor 56 ceil 56 FLOOR7_1/FLAT20 light 144</title></path>

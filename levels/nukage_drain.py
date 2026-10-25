@@ -23,7 +23,8 @@ rockets); a hinted panel in the north lobby (soulsphere); a hinted panel in
 the east boiler hall (backpack).
 """
 from .doom2 import *  # noqa: F403 - thing types, actions, sector specials
-from .model import SKY, Sector, Special, Thing, door, doorway, rect, stairs
+from .model import (SKY, Sector, Special, Thing, closet, door, doorway, lit_ledge, pedestal, rect, stairs, switch_niche,
+                    window)
 
 MAP = "MAP05"
 WAD = "NUKAGE.WAD"
@@ -42,19 +43,22 @@ def nukage(name, loop, tag=0, light=176):
                   special=DAMAGE_5)
 
 
-def niche(name, box, light):
-    """A switch booth a step up, 128 tall (the switch texture's height), floored like the catwalks.
-    It's 112 deep, so you have to step inside to reach the switch on its back wall; stepping in
-    is what opens the pillar closet facing the pump house."""
-    return Sector(name, [rect(*box)], WING + 8, WING + 136, F_WALK, "CEIL5_1", light, "SUPPORT2")
+# Switch booths a step up, 128 tall (the switch texture's height), floored like the catwalks.
+# They're 112 deep, so you have to step inside to reach the switch on the back wall; stepping in
+# is what opens the pillar closet facing the pump house.
+BOOTH = dict(floor=WING + 8, flat=F_WALK, wall="SUPPORT2", ctex="CEIL5_1", depth=112)
+niche_w, sw_p1 = switch_niche("niche_w", (-944, 976), "e", Special(S1_RAISE_CHANGE, TAG_P1, "SW1BRN2"), light=160, **BOOTH)
+niche_n, sw_p2 = switch_niche("niche_n", (256, 1872), "s", Special(S1_RAISE_CHANGE, TAG_P2, "SW1TEK"), light=176, **BOOTH)
+niche_e, sw_p3 = switch_niche("niche_e", (976, 1424), "w", Special(S1_RAISE_CHANGE, TAG_P3, "SW1METAL"), light=160,
+                              **BOOTH)
+exit_niche, sw_exit = switch_niche("exit_niche", (-128, 1024), "w", Special(S1_EXIT, 0, "SW1EXIT"), floor=WALK + 40,
+                                   flat="FLOOR0_1", wall="EXITSTON", ctex="TLITE6_4", light=240, width=32, height=72,
+                                   depth=8)
 
 
-def window(name, box, light, wall, flat):
-    """An opening from a pump house onto the reservoir, level with the pump
-    house floor and floored like it, so fireballs aimed up at your feet and
-    floating cacodemons both get through."""
-    return Sector(name, [rect(*box)], WING, WING + 144, flat, "CEIL5_1", light, wall)
-
+W_CL = dict(face="PIPE2", flat="FLOOR3_3", wall="BROWNPIP", floor=WING, ctex="CEIL5_2", special=LIGHT_FLICKER)
+N_CL = dict(face="TEKGREN2", flat="FLOOR0_3", wall="TEKGREN1", floor=WING, special=LIGHT_BLINK_RANDOM)
+AMB_CL = dict(face=OUT, flat=F_WALK, wall="SUPPORT3", floor=WALK, light=112)
 
 SECTORS = [
     # Start room, open onto the south catwalk and the view over the reservoir.
@@ -80,11 +84,9 @@ SECTORS = [
     nukage("wn", rect(-640, 1536, 800, 1696), TAG_P2),
     nukage("we", rect(640, 512, 800, 1536), TAG_P3),
     nukage("wc", rect(288, 944, 640, 1104), TAG_P3),
-    # Secret: a lit ledge on the pillar's north face, out of sight until you're wading round
-    # it. An unlit strip against the pillar keeps its wall from lighting up too.
-    Sector("v_ledge", [rect(-160, 1264, -32, 1312)], 8, SKYC, "FLAT5_4", SKY, 224, VAULT, lower="METAL",
-           special=SECRET_AREA),
-    Sector("v_ledge_back", [rect(-160, 1248, -32, 1264)], 8, SKYC, "FLAT5_4", SKY, 176, VAULT, lower="METAL"),
+    # Secret: a lit ledge on the pillar's north face, out of sight until you're wading round it.
+    *lit_ledge("v_ledge", (-160, 1248, -32, 1312), "s", floor=8, ceil=SKYC, flat="FLAT5_4", ctex=SKY, light=224,
+               ambient=176, wall=VAULT),
     # The pillar: the vault in the middle, a hall to its door, and a closet
     # behind each face that looks at a pump house's window. The pumps open them.
     *doorway("d_vault", (288, 1024), "w", alcove=16, alcove_wall=VAULT, face="BIGDOOR2", floor=WALK + 8,
@@ -101,9 +103,7 @@ SECTORS = [
     Sector("cl_e", [rect(192, 1120, 272, 1232)], WALK, WALK + 128, F_WALK, "CEIL5_1", 96, VAULT),
     Sector("vault", [rect(-128, 912, 128, 1136)], WALK + 16, WALK + 176, "FLOOR0_1", "TLITE6_4", 208, "SILVER3",
            special=LIGHT_GLOW),
-    # Niche sized to SW1EXIT (32x72): its back wall is the exit switch.
-    Sector("exit_niche", [rect(-136, 1008, -128, 1040)], WALK + 40, WALK + 112, "FLOOR0_1", "TLITE6_4", 240,
-           "EXITSTON"),
+    exit_niche,
 
     # ---- West pump house: dark pipework ----
     *doorway("d_west", (-800, 432), "w", alcove=16, alcove_wall=OUT, face="BIGDOOR2", floor=WALK,
@@ -117,20 +117,17 @@ SECTORS = [
     Sector("w_pump", [[(-1408, 544), (-832, 544), (-832, 928), (-944, 928), (-944, 1024), (-832, 1024), (-832, 1216), (-1024, 1216), (-1024, 1120), (-1408, 1120)],
                        rect(-1056, 832, -992, 896)], WING, WING + 192, "FLOOR3_3",
            "CEIL5_2", 144, "PIPE2", pillars=[rect(-1280, 704, -1184, 800), rect(-1280, 960, -1184, 1056)]),
-    Sector("ped_ssg", [rect(-1056, 832, -992, 896)], WING + 16, WING + 192, "TLITE6_1", "CEIL5_2", 240, "PIPE2",
-           lower="METAL", special=LIGHT_GLOW),
+    pedestal("ped_ssg", (-1056, 832, -992, 896), WING + 16, WING + 192, "PIPE2", "CEIL5_2"),
     *stairs("wgst", (-1120, 1120, -1024, 1216), "w", 3, WING + 16, 16, WING + 192, "FLOOR3_3", "CEIL5_2", 160,
             "PIPE2", "SUPPORT2"),
     Sector("w_gal", [rect(-1408, 1120, -1120, 1216)], WING + 64, WING + 192, "FLOOR3_3", "CEIL5_2", 176, "PIPE2",
            lower="SUPPORT2"),
-    window("w_wwin", (-832, 1024, -800, 1152), 160, "PIPE2", "FLOOR3_3"),
-    niche("niche_w", (-944, 944, -832, 1008), 160),
-    *doorway("d_wcl1", (-1408, 784), "w", face="PIPE2", track="PIPE2", tag=TAG_WCL, floor=WING, flat="FLOOR3_3"),
-    Sector("wcl1", [rect(-1584, 704, -1424, 864)], WING, WING + 128, "FLOOR3_3", "CEIL5_2", 96, "BROWNPIP",
-           special=LIGHT_FLICKER),
-    *doorway("d_wcl2", (-1408, 1040), "w", face="PIPE2", track="PIPE2", tag=TAG_WCL, floor=WING, flat="FLOOR3_3"),
-    Sector("wcl2", [rect(-1584, 960, -1424, 1120)], WING, WING + 128, "FLOOR3_3", "CEIL5_2", 96, "BROWNPIP",
-           special=LIGHT_FLICKER),
+    # Each pump house looks onto the reservoir through an opening level with its floor and floored
+    # like it, so fireballs aimed up at your feet and floating cacodemons both get through.
+    window("w_wwin", (-832, 1024, -800, 1152), WING, WING + 144, "PIPE2", 160, flat="FLOOR3_3", lower="PIPE2"),
+    niche_w,
+    *closet("wcl1", (-1408, 784), "w", TAG_WCL, **W_CL),
+    *closet("wcl2", (-1408, 1040), "w", TAG_WCL, **W_CL),
 
     # ---- North pump house: green tech, the first revenant ----
     *doorway("d_north", (-720, 1696), "n", alcove=16, far_alcove=16, alcove_wall="SUPPORT2", face="BIGDOOR2", floor=WALK,
@@ -148,18 +145,11 @@ SECTORS = [
     # The revenant's ledge, 96 up: it can jump down to you, you can't climb up.
     Sector("n_ledge", [rect(-256, 2208, 256, 2336)], WING + 96, WING + 256, "FLOOR5_2", "CEIL5_1", 208,
            "TEKGREN2", lower="SUPPORT2"),
-    Sector("ped_y", [rect(64, 1952, 128, 2016)], WING + 16, WING + 256, "TLITE6_1", "CEIL5_1", 240, "TEKGREN2",
-           lower="METAL", special=LIGHT_GLOW),
-    window("w_nwin", (0, 1696, 192, 1760), 176, "TEKGREN2", "FLOOR0_3"),
-    niche("niche_n", (224, 1760, 288, 1872), 176),
-    *doorway("d_ncl1", (512, 1920), "e", face="TEKGREN2", track="TEKGREN2", tag=TAG_NCL, floor=WING,
-             flat="FLOOR0_3"),
-    Sector("ncl1", [rect(528, 1840, 688, 2000)], WING, WING + 128, "FLOOR0_3", "CEIL5_1", 96, "TEKGREN1",
-           special=LIGHT_BLINK_RANDOM),
-    *doorway("d_ncl2", (512, 2144), "e", face="TEKGREN2", track="TEKGREN2", tag=TAG_NCL, floor=WING,
-             flat="FLOOR0_3"),
-    Sector("ncl2", [rect(528, 2064, 688, 2224)], WING, WING + 128, "FLOOR0_3", "CEIL5_1", 96, "TEKGREN1",
-           special=LIGHT_BLINK_RANDOM),
+    pedestal("ped_y", (64, 1952, 128, 2016), WING + 16, WING + 256, "TEKGREN2", "CEIL5_1"),
+    window("w_nwin", (0, 1696, 192, 1760), WING, WING + 144, "TEKGREN2", 176, flat="FLOOR0_3", lower="TEKGREN2"),
+    niche_n,
+    *closet("ncl1", (512, 1920), "e", TAG_NCL, **N_CL),
+    *closet("ncl2", (512, 2144), "e", TAG_NCL, **N_CL),
 
     # ---- East pump house: stone boiler hall and the last pump ----
     *doorway("d_east", (800, 1616), "e", alcove=16, far_alcove=16, alcove_wall="SUPPORT2", face="BIGDOOR7", track="DOORYEL",
@@ -177,13 +167,11 @@ SECTORS = [
              floor=WING + 8, alcove_flat="FLOOR5_1", far_flat="FLOOR5_1", flat="FLOOR5_1"),
     Sector("e_pump", [[(864, 1152), (1376, 1152), (1376, 1472), (976, 1472), (976, 1376), (864, 1376)]], WING, WING + 168, "FLOOR0_2", "CEIL5_2", 160, "METAL1",
            pillars=[rect(1024, 1248, 1120, 1344), rect(1216, 1248, 1312, 1344)]),
-    window("w_ewin", (800, 1264, 864, 1392), 160, "METAL1", "FLOOR0_2"),
-    niche("niche_e", (864, 1392, 976, 1456), 160),
+    window("w_ewin", (800, 1264, 864, 1392), WING, WING + 144, "METAL1", 160, flat="FLOOR0_2", lower="METAL1"),
+    niche_e,
     # Closets in the east walkway's wall, opened when you step onto the causeway.
-    *doorway("d_amb1", (800, 704), "e", face=OUT, track=OUT, tag=TAG_AMB, floor=WALK, flat=F_WALK),
-    Sector("amb1", [rect(816, 624, 976, 784)], WALK, WALK + 128, F_WALK, "CEIL5_1", 112, "SUPPORT3"),
-    *doorway("d_amb2", (800, 1024), "e", face=OUT, track=OUT, tag=TAG_AMB, floor=WALK, flat=F_WALK),
-    Sector("amb2", [rect(816, 944, 976, 1104)], WALK, WALK + 128, F_WALK, "CEIL5_1", 112, "SUPPORT3"),
+    *closet("amb1", (800, 704), "e", TAG_AMB, **AMB_CL),
+    *closet("amb2", (800, 1024), "e", TAG_AMB, **AMB_CL),
 ]
 
 # Door specials come from the sectors; these are the extra triggers.
@@ -198,10 +186,7 @@ SPECIAL_BETWEEN = {
 }
 SPECIAL_WALLS = {
     # The pumps: each raises its walkways out of the nukage (and dries them).
-    ((-832, 944), (-832, 1008)): Special(S1_RAISE_CHANGE, TAG_P1, "SW1BRN2"),
-    ((224, 1760), (288, 1760)): Special(S1_RAISE_CHANGE, TAG_P2, "SW1TEK"),
-    ((864, 1392), (864, 1456)): Special(S1_RAISE_CHANGE, TAG_P3, "SW1METAL"),
-    ((-136, 1008), (-136, 1040)): Special(S1_EXIT, 0, "SW1EXIT"),
+    **sw_p1, **sw_p2, **sw_p3, **sw_exit,
 }
 SECRET_DOORS = {"d_ws", "d_ns", "d_es"}
 MUST_REACH = ["w_sec", "wcl1", "wcl2", "v_ledge", "n_lobby", "n_sec", "n_hall", "ncl1", "ncl2", "e_hall", "e_sec",

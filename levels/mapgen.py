@@ -51,6 +51,7 @@ from .doom2 import ACTORS, PLAYERS, SR_LIFT, WR_LIFT, is_decal
 from .model import (ALL, DOOR, LIFT, ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, ML_SECRET,
                     ML_TWOSIDED, NO_TEX, ROOM, SKY, LevelError, Linedef, Sidedef, dist, edges,
                     floor_movers, floor_range, load, on_segment, oriented, sector_at, segments_cross)
+from .measure import check_sector_overlaps, measure
 from .preview import write_svg
 from .wad import (IWAD, iwad_textures, map_lumps, read_wad, replace_map, umapinfo_lump,
                   write_wad)
@@ -263,7 +264,8 @@ def build(module, check_only=False, out=None, zdbsp=None):
           + "/".join(str(sum(sk in t.skills for t in monsters)) for sk in ALL) + " (e/m/h)")
     print("preview:", svg)
     print("\n".join(balance_report(level)))
-    errors = check_things(level, lines) + check_reach(level, lines) + check_hazards(level, lines)
+    errors = (check_sector_overlaps(level) + check_things(level, lines) + check_reach(level, lines)
+              + check_hazards(level, lines))
     iwad = iwad_textures()
     if iwad is None:
         print(f"warning: {IWAD} not found (set DOOM2_WAD); skipping texture checks")
@@ -274,13 +276,16 @@ def build(module, check_only=False, out=None, zdbsp=None):
             print("warning:", w)
     if errors:
         raise LevelError("\n".join(errors))
+    lumps = map_lumps(level, lines, sides)
+    if iwad is not None:
+        print("\n".join(measure(level, lines, lumps, IWAD)))
     if check_only:
         return None
     zdbsp = find_zdbsp(zdbsp)
     with tempfile.TemporaryDirectory() as tmp:
         raw = os.path.join(tmp, "raw.wad")
         built = os.path.join(tmp, "built.wad")
-        write_wad(raw, map_lumps(level, lines, sides))
+        write_wad(raw, lumps)
         subprocess.run([zdbsp, "-R", "-w", "-t", "-o", built, raw], check=True, stdout=subprocess.DEVNULL)
         lumps = read_wad(built)
     existing = read_wad(out) if os.path.exists(out) else []

@@ -27,7 +27,8 @@ parapet beside it. Walk through and you fall into the canal, which
 teleports you back to the switch.
 """
 from .doom2 import *  # noqa: F403 - thing types, actions, sector specials
-from .model import SECRET_HINT, SKY, Sector, Special, Thing, door, doorway, lift, rect, stairs
+from .model import (SECRET_HINT, SKY, Sector, Special, Thing, closet, door, doorway, lift, lit_ledge, pedestal, rect,
+                    stairs, switch_niche, window)
 
 MAP = "MAP02"
 WAD = "NUKAGE.WAD"
@@ -41,17 +42,25 @@ BANK = "MFLR8_1"                                         # yard floors
 SKYC, RIVER = 256, -96                                   # outdoor ceiling, canal bed
 
 housing = [(512, 608), (576, 672), (512, 736), (448, 672)]   # diamond-shaped pump housing
-pump_s, pump_n, ped_b = rect(-704, 832, -576, 960), rect(-640, 1536, -512, 1664), rect(-832, 1568, -704, 1696)
-ped_r, plat_se = rect(1344, 640, 1472, 768), rect(1600, 576, 1728, 768)
-ped_s = rect(416, 1096, 480, 1144)   # soulsphere pedestal, visible over the parapets from the start
+pump_s, pump_n = rect(-704, 832, -576, 960), rect(-640, 1536, -512, 1664)
+ped_b, ped_r, plat_se = (-832, 1568, -704, 1696), (1344, 640, 1472, 768), rect(1600, 576, 1728, 768)
+ped_s = (416, 1096, 480, 1144)   # soulsphere pedestal, visible over the parapets from the start
 crates_n = [rect(1248, 1616, 1312, 1680), rect(832, 1696, 896, 1760)]
 crates_f = [rect(-288, 2288, -224, 2352), rect(32, 2176, 96, 2240), rect(-96, 2320, -32, 2384)]
+
+niche_exit, sw_exit = switch_niche("exit_niche", (1472, 2352), "n", Special(S1_EXIT, 0, "SW1EXIT"), floor=64,
+                                   flat="FLOOR0_1", wall="EXITSTON", ctex="TLITE6_4", light=208, width=32,
+                                   height=72, depth=8)
+# The gag switch drops par_gag.
+niche_gag, sw_gag = switch_niche("niche_gag", (1792, 976), "e", Special(S1_FLOOR_LOWEST, TAG_GAG, "SW1STON1"),
+                                 floor=0, flat=BANK, wall=OUT_E, ctex="CEIL5_1", light=176, depth=8)
+niche_g, sw_gate = switch_niche("niche_g", (912, 480), "w", Special(S1_DOOR_OPEN, TAG_GATE, "SW1MET2"),
+                                floor=0, flat=BANK, wall="METAL2", ctex="CEIL5_1", light=176)
 
 SECTORS = [
     # Start room: the window looks north over the yard and canal to the red door.
     Sector("start", [rect(-128, 128, 384, 416)], 0, 128, "FLOOR4_8", "CEIL3_5", 160, "STARG3"),
-    Sector("window_s", [rect(-64, 416, 192, 448)], 25, 104, "FLAT5_4", "CEIL3_5", 176, "STARG3",
-           lower="METAL"),
+    window("window_s", (-64, 416, 192, 448), 25, 104, "STARG3", 176, ctex="CEIL3_5"),
     *doorway("d_start", (320, 416), "n", far_alcove=16, alcove_wall="STARG3", far_flat=BANK, floor=8,
              flat=BANK),
     *doorway("d_sec1", (-128, 272), "w", 64, face="STARG3", track="STARG3", flat="FLOOR4_8"),
@@ -75,22 +84,19 @@ SECTORS = [
                        (-1152, 832)], pump_s], -16, 256, "FLOOR5_2", "CEIL3_5", 176, "PIPE2", lower="NUKEDGE1"),
     Sector("hstep", [rect(-1152, 1408, -896, 1440)], 0, 256, "FLOOR5_2", "CEIL3_5", 176, "PIPE2", lower="STEP4"),
     Sector("hall_n", [[(-1152, 1440), (-896, 1440), (-896, 1408), (-448, 1408), (-448, 1792), (-1024, 1792),
-                       (-1152, 1664)], pump_n, ped_b], 16, 256, "FLOOR5_2", "CEIL3_5", 176, "PIPE2",
+                       (-1152, 1664)], pump_n, rect(*ped_b)], 16, 256, "FLOOR5_2", "CEIL3_5", 176, "PIPE2",
            lower="NUKEDGE1"),
     Sector("pump_s", [pump_s], 48, 256, "FLOOR4_8", "CEIL3_5", 176, "PIPE2", lower="METAL2"),
     Sector("pump_n", [pump_n], 80, 256, "FLOOR4_8", "CEIL3_5", 176, "PIPE2", lower="METAL2"),
-    Sector("ped_b", [ped_b], 40, 256, "TLITE6_1", "CEIL3_5", 240, "PIPE2", lower="METAL",
-           special=LIGHT_GLOW),
+    pedestal("ped_b", ped_b, 40, 256, "PIPE2", "CEIL3_5"),
     *stairs("isteps", (-896, 1024, -768, 1408), "w", 4, -80, 16, 256, "FLOOR0_3", "CEIL3_5", 160,
             "PIPE2", "STEP4"),
     Sector("intake", [rect(-768, 1024, -416, 1408)], RIVER, 256, "NUKAGE1", "CEIL3_5", 160, "PIPE2",
            special=DAMAGE_5),
     Sector("culvert", [rect(-416, 1024, -384, 1408)], RIVER, 32, "NUKAGE1", "CEIL5_2", 128, "BROWNPIP",
            special=DAMAGE_5),
-    *doorway("d_hcl", (-1152, 1216), "w", face="PIPE2", track="PIPE2", tag=TAG_HALLCL, floor=-16,
-             flat="FLOOR5_2"),
-    Sector("hall_cl", [rect(-1344, 1120, -1168, 1312)], -16, 112, "FLOOR5_2", "CEIL3_5", 96, "PIPEWAL2",
-           special=LIGHT_FLICKER),
+    *closet("hall_cl", (-1152, 1216), "w", TAG_HALLCL, face="PIPE2", flat="FLOOR5_2", wall="PIPEWAL2", floor=-16,
+            width=192, depth=176, ctex="CEIL3_5", special=LIGHT_FLICKER),
     *doorway("d_blue", (-448, 1664), "e", alcove=24, far_alcove=24, alcove_wall="SILVER2", face="BIGDOOR4",
              track="DOORBLU", action=DR_BLUE, floor=16, alcove_flat="FLOOR5_2", far_flat=BANK, flat="FLOOR5_2"),
 
@@ -118,17 +124,14 @@ SECTORS = [
     # The sluice gate: a 128-high block between the rails that sinks to the banks' level.
     Sector("bridge", [rect(1024, 1024, 1152, 1408)], 128, SKYC, "FLAT23", SKY, 176, "SUPPORT3",
            lower="SUPPORT3", tag=TAG_BRIDGE),
-    # Secret ledge in the canal wall, lit and visible from the south yard. A 16-wide
-    # strip at canal light runs along its back, so the wall behind it isn't lit up too.
-    Sector("ledge", [rect(-128, 1344, 64, 1392)], -72, SKYC, "FLAT5_4", SKY, 208, "SILVER2", lower="METAL",
-           special=SECRET_AREA),
-    Sector("ledge_back", [rect(-128, 1392, 64, 1408)], -72, SKYC, "FLAT5_4", SKY, 160, "SILVER2",
-           lower="METAL"),
+    # Secret ledge in the canal wall, lit and visible from the south yard.
+    *lit_ledge("ledge", (-128, 1344, 64, 1408), "n", floor=-72, ceil=SKYC, flat="FLAT5_4", ctex=SKY, light=208,
+               ambient=160, wall="SILVER2"),
     # Soulsphere island: pier from the tower's hidden door, lift down to the island.
     Sector("island", [[(320, 1088), (576, 1088), (576, 1216), (512, 1216), (512, 1152), (384, 1152),
-                       (384, 1216), (320, 1216)], ped_s], 8, SKYC, "FLAT5_4", SKY, 224, "SILVER2", lower="METAL",
-           special=SECRET_AREA),
-    Sector("ped_s", [ped_s], 32, SKYC, "TLITE6_1", SKY, 240, "SILVER2", lower="METAL", special=LIGHT_GLOW),
+                       (384, 1216), (320, 1216)], rect(*ped_s)], 8, SKYC, "FLAT5_4", SKY, 224, "SILVER2",
+           lower="METAL", special=SECRET_AREA),
+    pedestal("ped_s", ped_s, 32, SKYC, "SILVER2", SKY),
     lift("lift_i", (384, 1152, 512, 1216), 96, SKYC, TAG_ILIFT, SKY, 208, "SILVER2", ftex="FLAT23"),
     Sector("pier", [rect(384, 1216, 512, 1408)], 96, SKYC, "FLAT23", SKY, 208, "SILVER2", lower="SUPPORT3"),
 
@@ -155,10 +158,8 @@ SECTORS = [
     Sector("control", [[(256, 1424), (672, 1424), (672, 1440), (672, 1568), (672, 1584), (544, 1584), (544, 1744),
                         (384, 1744), (384, 1584), (256, 1584)]], 96, 224, "FLAT4", "TLITE6_5", 176,
            "SILVER2"),
-    Sector("window_t", [rect(544, 1408, 640, 1424)], 128, 192, "FLAT5_4", "CEIL5_1", 192, "SILVER2",
-           lower="METAL"),
-    Sector("window_e", [rect(672, 1440, 688, 1504)], 128, 192, "FLAT5_4", "CEIL5_1", 192, "SILVER2",
-           lower="METAL"),
+    window("window_t", (544, 1408, 640, 1424), 128, 192, "SILVER2", 192),
+    window("window_e", (672, 1440, 688, 1504), 128, 192, "SILVER2", 192),
     door("d_pier", rect(384, 1408, 512, 1424), face="SILVER2", track="SILVER2", floor=96, light=176,
          flat="FLAT4"),
 
@@ -174,34 +175,29 @@ SECTORS = [
            special=SECRET_AREA),
 
     # On the terrace: the guardroom (opens with the red key) and the red door to the exit.
-    *doorway("d_guard", (1184, 2048), "n", face=OUT_N, track=OUT_N, tag=TAG_REDCL, floor=40, flat="FLOOR5_1"),
-    Sector("guard", [rect(1088, 2064, 1280, 2256)], 40, 168, "FLOOR5_1", "CEIL5_1", 112, "STONE2",
-           special=LIGHT_FLICKER),
+    *closet("guard", (1184, 2048), "n", TAG_REDCL, face=OUT_N, flat="FLOOR5_1", wall="STONE2", floor=40,
+            width=192, depth=192, light=112, special=LIGHT_FLICKER),
     *doorway("d_red", (1472, 2048), "n", alcove=16, far_alcove=16, alcove_wall="STONE3", face="BIGDOOR4",
              track="DOORRED", action=DR_RED, light=208, floor=48, alcove_flat="FLOOR5_1", flat="FLOOR5_1"),
     Sector("exit_hall", [rect(1376, 2096, 1568, 2352)], 40, 200, "FLOOR0_1", "TLITE6_4", 192, "STONE3",
            special=LIGHT_GLOW),
-    # Niche sized to SW1EXIT (32x72): its back wall is the exit switch.
-    Sector("exit_niche", [rect(1456, 2352, 1488, 2360)], 64, 136, "FLOOR0_1", "TLITE6_4", 208, "EXITSTON"),
+    niche_exit,
 
     # South-east yard: sealed until the gate sinks. Red key on a glowing pedestal.
     Sector("yard_se", [[(912, 384), (1664, 384), (1792, 512), (1792, 1008), (1168, 1008), (1168, 1024),
-                        (1008, 1024), (1008, 1008), (912, 1008)], ped_r, plat_se], 0, SKYC, BANK, SKY, 176, OUT_E,
-           tag=TAG_TELE),
-    # Its back wall (1800, 944)-(1800, 1008) is the gag switch, which drops par_gag.
-    Sector("niche_gag", [rect(1792, 944, 1800, 1008)], 0, 128, BANK, "CEIL5_1", 176, OUT_E),
-    Sector("ped_r", [ped_r], 24, SKYC, "TLITE6_1", SKY, 240, OUT_E, lower="METAL", special=LIGHT_GLOW),
+                        (1008, 1024), (1008, 1008), (912, 1008)], rect(*ped_r), plat_se], 0, SKYC, BANK, SKY, 176,
+           OUT_E, tag=TAG_TELE),
+    niche_gag,
+    pedestal("ped_r", ped_r, 24, SKYC, OUT_E, SKY),
     Sector("plat_se", [plat_se], 64, SKYC, "FLOOR4_8", SKY, 176, OUT_E, lower="METAL2"),
-    # Its back wall (896, 448)-(896, 512) is the gate switch.
-    Sector("niche_g", [rect(896, 448, 912, 512)], 0, 128, BANK, "CEIL5_1", 176, "METAL2"),
+    niche_g,
     *doorway("d_gate", (864, 736), "e", alcove=16, far_alcove=16, alcove_wall="METAL2", face="BIGDOOR7",
              tag=TAG_GATE, alcove_flat=BANK, flat=BANK),
     *doorway("d_secl_e", (1792, 872), "e", face=OUT_E, track=OUT_E, tag=TAG_REDCL, flat=BANK),
     Sector("secl_e", [rect(1808, 800, 1968, 992)], 0, 128, BANK, "CEIL5_1", 96, "STONE2",
            special=LIGHT_BLINK_RANDOM),
-    *doorway("d_secl_s", (1408, 384), "s", face=OUT_E, track=OUT_E, tag=TAG_REDCL, flat=BANK),
-    Sector("secl_s", [rect(1312, 192, 1504, 368)], 0, 128, BANK, "CEIL5_1", 96, "STONE2",
-           special=LIGHT_BLINK_RANDOM),
+    *closet("secl_s", (1408, 384), "s", TAG_REDCL, face=OUT_E, flat=BANK, wall="STONE2", width=192, depth=176,
+            special=LIGHT_BLINK_RANDOM),
 ]
 
 # Door and lift specials come from the sectors; these are the extra triggers.
@@ -212,9 +208,7 @@ SPECIAL_BETWEEN = {
 }
 SPECIAL_WALLS = {
     ((672, 1504), (672, 1568)): Special(S1_FLOOR_LOWEST, TAG_BRIDGE, "SW1COMP"),
-    ((896, 448), (896, 512)): Special(S1_DOOR_OPEN, TAG_GATE, "SW1MET2"),
-    ((1456, 2360), (1488, 2360)): Special(S1_EXIT, 0, "SW1EXIT"),
-    ((1800, 944), (1800, 1008)): Special(S1_FLOOR_LOWEST, TAG_GAG, "SW1STON1"),   # gag
+    **sw_gate, **sw_exit, **sw_gag,
 }
 # The pier door is seamless: the hint is the pier and island visible outside.
 SECRET_DOORS = {"d_sec1": SECRET_HINT, "d_pier": (0, 0), "d_sec4": SECRET_HINT}

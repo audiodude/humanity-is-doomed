@@ -32,7 +32,8 @@ island in the pit; a hinted loft panel (rocket launcher); a hinted
 server-room panel (backpack); a crate stack in the coolant hall (armor).
 """
 from .doom2 import *  # noqa: F403 - thing types, actions, sector specials
-from .model import SKY, Sector, Special, Thing, door, doorway, lift, rect, stairs
+from .model import (SKY, Sector, Special, Thing, closet, door, doorway, lift, pedestal, rect, stairs, switch_niche,
+                    window)
 
 MAP = "MAP04"
 WAD = "NUKAGE.WAD"
@@ -54,39 +55,48 @@ start = [(-192, -96), (192, -96), (192, 256), (64, 256), (0, 256), (-64, 256), (
 # The pit between the antechambers, notched at its south-west corner for the
 # secret lift and island.
 pit = [(-112, 640), (192, 640), (192, 1264), (-192, 1264), (-192, 816), (-112, 816)]
-ped_s = rect(-168, 752, -136, 784)
+ped_s = (-168, 752, -136, 784)
 
-w_pool, w_furnace, ped_ssg = rect(-1312, 800, -1152, 960), rect(-1056, 960, -896, 1120), rect(-1120, 672, -1056, 736)
-ped_r = rect(-320, 928, -256, 992)
+w_pool, w_furnace, ped_ssg = rect(-1312, 800, -1152, 960), rect(-1056, 960, -896, 1120), (-1120, 672, -1056, 736)
+ped_r = (-320, 928, -256, 992)
 
 hall = [(496, 128), (1216, 128), (1216, 704), (688, 704), (688, 640), (496, 640)]
 coolant = rect(736, 320, 992, 512)
 racks = [rect(896, 880, 992, 944), rect(1184, 992, 1248, 1120), rect(960, 1184, 1088, 1248),
          rect(1248, 1248, 1312, 1312), rect(864, 1088, 928, 1216)]
 s_pools = [rect(960, 1536, 1088, 1664), rect(1216, 1664, 1344, 1792)]
-ped_c = rect(1120, 1728, 1184, 1792)
+ped_c = (1120, 1728, 1184, 1792)
 # The blue key stands on a narrow column, high enough to show through the hot side's window.
-ped_b, ring_b = rect(272, 1008, 304, 1040), rect(240, 976, 336, 1072)
+ped_b, ring_b = (272, 1008, 304, 1040), rect(240, 976, 336, 1072)
 
 arena = [(-704, 1280), (256, 1280), (256, 1440), (704, 1440), (704, 1984), (128, 1984), (128, 1856),
          (-128, 1856), (-128, 1984), (-704, 1984)]
 arena_pillars = [rect(-448, 1472, -320, 1600), rect(320, 1536, 448, 1664), rect(-224, 1696, -96, 1760),
                  rect(160, 1664, 256, 1760)]
 
+# The shortcut switches (SW1HOT, SW1COMP) and the exit switch.
+w_niche, sw_short = switch_niche("w_niche", (-528, 704), "s", Special(S1_DOOR_OPEN, TAG_SHORT, "SW1HOT"), floor=32,
+                                 flat="FLAT5_3", wall=HOT, ctex=H_CEIL, light=160)
+e_niche, sw_short_e = switch_niche("e_niche", (512, 832), "s", Special(S1_DOOR_OPEN, TAG_SHORT_E, "SW1COMP"),
+                                   floor=96, flat=C_FLOOR, wall=COMP, ctex=C_CEIL, light=192)
+exit_niche, sw_exit = switch_niche("exit_niche", (0, 1984), "n", Special(S1_EXIT, 0, "SW1EXIT"), floor=56,
+                                   flat="FLOOR0_1", wall="EXITSTON", ctex="TLITE6_4", light=240, width=32, height=72,
+                                   depth=8)
+
 SECTORS = [
     Sector("start", [start], 0, 128, "FLOOR0_6", "CEIL3_5", 160, "STARTAN2"),
     # The fork: two halves either side of a solid divider, each lit and built like its wing.
     Sector("fork_w", [rect(-448, 256, -64, 576)], -16, 192, H_FLOOR, H_CEIL, 176, HOT, special=LIGHT_FLICKER),
     Sector("fork_e", [rect(64, 256, 448, 576)], -16, 192, C_FLOOR, C_CEIL, 208, COLD),
-    Sector("f_win_w", [rect(-104, 576, -64, 640)], 40, 136, "FLAT5_4", "CEIL5_1", 176, HOT, lower="METAL"),
-    Sector("f_win_e", [rect(64, 576, 104, 640)], 40, 136, "FLAT5_4", "CEIL5_1", 208, COLD, lower="METAL"),
+    window("f_win_w", (-104, 576, -64, 640), 40, 136, HOT, 176),
+    window("f_win_e", (64, 576, 104, 640), 40, 136, COLD, 208),
     # Secret: a hinted panel in the hot fork, a landing and a lift down to the pit's island.
     door("d_pit", rect(-192, 576, -128, 592), face=HOT, track=HOT, floor=-16, light=176, flat=H_FLOOR),
     Sector("p_land", [rect(-192, 592, -112, 640)], -16, 112, H_FLOOR, H_CEIL, 96, HOT),
     lift("p_lift", (-192, 640, -112, 720), -16, SKYC, TAG_PLIFT, SKY, 160, "SUPPORT3", ftex="FLAT23"),
-    Sector("p_isle", [rect(-192, 720, -112, 816), ped_s], -40, SKYC, "FLAT5_4", SKY, 208, "SUPPORT3",
+    Sector("p_isle", [rect(-192, 720, -112, 816), rect(*ped_s)], -40, SKYC, "FLAT5_4", SKY, 208, "SUPPORT3",
            lower="METAL", special=SECRET_AREA),
-    Sector("p_ped", [ped_s], -24, SKYC, "TLITE6_1", SKY, 240, "SUPPORT3", lower="METAL", special=LIGHT_GLOW),
+    pedestal("p_ped", ped_s, -24, SKYC, "SUPPORT3", SKY),
     Sector("pit", [pit], -64, SKYC, "NUKAGE1", SKY, 160, "SUPPORT3", special=DAMAGE_5),
 
     # ---- Hot wing: red key, ends at the arena's blue door ----
@@ -95,33 +105,32 @@ SECTORS = [
     # A corridor walled with fire (FIREWALL is 112 tall).
     Sector("w_fire", [rect(-992, 320, -496, 512)], 0, 112, H_FLOOR, H_CEIL, 112, FIRE, special=LIGHT_FLICKER),
     *stairs("wst", (-992, 512, -864, 608), "n", 3, 8, 8, 144, H_FLOOR, H_CEIL, 128, HOT, "STEP4"),
-    Sector("w_hall", [rect(-1408, 608, -768, 1216), w_pool, w_furnace, ped_ssg], 32, 256, H_FLOOR, H_CEIL, 176,
+    Sector("w_hall", [rect(-1408, 608, -768, 1216), w_pool, w_furnace, rect(*ped_ssg)], 32, 256, H_FLOOR, H_CEIL, 176,
            HOT, special=LIGHT_GLOW),
     Sector("w_pool", [w_pool], 16, 256, "NUKAGE1", H_CEIL, 208, HOT, lower="NUKEDGE1", special=DAMAGE_5),
     Sector("w_furnace", [w_furnace], 96, 256, "NUKAGE1", H_CEIL, 224, HOT, lower="FIRELAVA"),
-    Sector("ped_ssg", [ped_ssg], 48, 256, H_LIGHT, H_CEIL, 240, HOT, lower="METAL"),
-    *doorway("d_wcl1", (-1408, 784), "w", face=HOT, track=HOT, tag=TAG_WCL, floor=32, flat=H_FLOOR),
-    Sector("wcl1", [rect(-1584, 704, -1424, 864)], 32, 144, H_FLOOR, H_CEIL, 112, FIRE, special=LIGHT_FLICKER),
-    *doorway("d_wcl2", (-1408, 1040), "w", face=HOT, track=HOT, tag=TAG_WCL, floor=32, flat=H_FLOOR),
-    Sector("wcl2", [rect(-1584, 960, -1424, 1120)], 32, 144, H_FLOOR, H_CEIL, 112, FIRE, special=LIGHT_FLICKER),
+    pedestal("ped_ssg", ped_ssg, 48, 256, HOT, H_CEIL, flat=H_LIGHT, glow=False),
+    *closet("wcl1", (-1408, 784), "w", TAG_WCL, face=HOT, flat=H_FLOOR, wall=FIRE, floor=32, height=112,
+            ctex=H_CEIL, light=112, special=LIGHT_FLICKER),
+    *closet("wcl2", (-1408, 1040), "w", TAG_WCL, face=HOT, flat=H_FLOOR, wall=FIRE, floor=32, height=112,
+            ctex=H_CEIL, light=112, special=LIGHT_FLICKER),
     # Optional loft, with a window down into the arena.
     *stairs("wst2", (-1408, 1216, -1280, 1344), "n", 4, 56, 24, 280, H_FLOOR, H_CEIL, 144, HOT, "SUPPORT2"),
     Sector("w_loft", [rect(-1408, 1344, -768, 1792)], 152, 280, H_FLOOR, H_CEIL, 192, HOT),
-    Sector("w_win", [rect(-768, 1504, -704, 1600)], 184, 248, "FLAT5_4", "CEIL5_1", 192, HOT, lower="METAL"),
+    window("w_win", (-768, 1504, -704, 1600), 184, 248, HOT, 192),
     *doorway("d_ws", (-1408, 1536), "w", 64, face=HOT, track=HOT, floor=152, flat=H_FLOOR),
     Sector("w_sec", [rect(-1552, 1472, -1424, 1600)], 152, 264, H_FLOOR, H_CEIL, 160, HOT, special=SECRET_AREA),
     *doorway("d_wend", (-768, 960), "e", alcove=16, far_alcove=32, alcove_wall="SUPPORT3", alcove_height=112,
              face=H_DOOR, floor=40, alcove_flat=H_FLOOR, flat=H_FLOOR),
     # Hot antechamber: the red key by the pit window, the blue arena door, the shortcut switch.
-    Sector("w_end", [rect(-704, 704, -208, 1216), ped_r], 32, 192, "FLAT5_3", H_CEIL, 160, HOT),
-    Sector("ped_r", [ped_r], 48, 192, H_LIGHT, H_CEIL, 240, HOT, lower="METAL", special=LIGHT_GLOW),
-    Sector("w_wwin", [rect(-208, 832, -192, 1088)], 40, 176, "FLAT5_4", "CEIL5_1", 160, HOT, lower="METAL"),
+    Sector("w_end", [rect(-704, 704, -208, 1216), rect(*ped_r)], 32, 192, "FLAT5_3", H_CEIL, 160, HOT),
+    pedestal("ped_r", ped_r, 48, 192, HOT, H_CEIL, flat=H_LIGHT),
+    window("w_wwin", (-208, 832, -192, 1088), 40, 176, HOT, 160),
     *doorway("d_blue2", (-448, 1216), "n", alcove=24, far_alcove=24, alcove_wall="SUPPORT2", face="BIGDOOR7",
              track="DOORBLU", action=DR_BLUE, floor=40, alcove_flat="FLAT5_3", flat="FLAT5_3"),
-    *doorway("d_whk", (-640, 704), "s", face=HOT, track=HOT, tag=TAG_WKEY, floor=32, flat="FLAT5_3"),
-    Sector("whk", [rect(-720, 576, -560, 688)], 32, 144, "FLAT5_3", H_CEIL, 112, FIRE, special=LIGHT_FLICKER),
-    # Switch niche (64 wide, 128 tall: its back wall is SW1HOT).
-    Sector("w_niche", [rect(-560, 688, -496, 704)], 32, 160, "FLAT5_3", H_CEIL, 160, HOT),
+    *closet("whk", (-640, 704), "s", TAG_WKEY, face=HOT, flat="FLAT5_3", wall=FIRE, floor=32, depth=112,
+            height=112, ctex=H_CEIL, light=112, special=LIGHT_FLICKER),
+    w_niche,
     # The shortcut: a shutter that only the switch opens, and steps down to the fork.
     *doorway("d_short", (-320, 704), "s", alcove=16, alcove_wall=HOT, face="METAL", track="METAL",
              tag=TAG_SHORT, floor=40, alcove_flat="FLAT5_3", flat="FLAT5_3"),
@@ -145,26 +154,25 @@ SECTORS = [
     Sector("e_sec", [rect(768, 1424, 896, 1504)], 16, 128, "FLOOR1_1", C_CEIL, 160, COMP, special=SECRET_AREA),
     # Optional sump: dark until you take the super shotgun.
     lift("e_lift", (1024, 1408, 1152, 1472), 16, 192, TAG_ELIFT, C_CEIL, 160, COLD, ftex="FLAT23"),
-    Sector("e_sump", [rect(896, 1472, 1408, 1856), ped_c] + s_pools, -48, 192, "FLOOR1_1", C_CEIL, 48, COLD,
+    Sector("e_sump", [rect(896, 1472, 1408, 1856), rect(*ped_c)] + s_pools, -48, 192, "FLOOR1_1", C_CEIL, 48, COLD,
            tag=TAG_LIGHTS),
     *[Sector(f"s_pool{i}", [p], -64, 192, "NUKAGE1", C_CEIL, 48, COLD, lower="NUKEDGE1", special=DAMAGE_5,
              tag=TAG_LIGHTS)
       for i, p in enumerate(s_pools)],
-    Sector("ped_c", [ped_c], -32, 192, C_LIGHT, C_CEIL, 240, COLD, lower="METAL"),
+    pedestal("ped_c", ped_c, -32, 192, COLD, C_CEIL, flat=C_LIGHT, glow=False),
     *doorway("d_blue", (768, 1024), "w", alcove=24, far_alcove=24, alcove_wall="SUPPORT2", alcove_height=96,
              face=C_DOOR, floor=24, alcove_flat="FLOOR1_1", flat="FLOOR1_1"),
     *stairs("e_up", (576, 960, 704, 1088), "w", 4, 40, 16, 256, C_FLOOR, C_CEIL, 192, COLD, "STEP4"),
     # Cold antechamber: the blue key by the pit window, the red arena door, the shortcut switch.
     Sector("e_end", [rect(208, 832, 576, 1216), ring_b], 96, 256, C_FLOOR, C_CEIL, 192, COMP),
-    Sector("ring_b", [ring_b, ped_b], 96, 256, C_FLOOR, C_CEIL, 208, COMP),
-    Sector("ped_b", [ped_b], 128, 256, C_LIGHT, C_CEIL, 240, COMP, lower="METAL", special=LIGHT_GLOW),
-    Sector("e_ewin", [rect(192, 896, 208, 1152)], 104, 240, "FLAT5_4", "CEIL5_1", 192, COMP, lower="METAL"),
+    Sector("ring_b", [ring_b, rect(*ped_b)], 96, 256, C_FLOOR, C_CEIL, 208, COMP),
+    pedestal("ped_b", ped_b, 128, 256, COMP, C_CEIL, flat=C_LIGHT),
+    window("e_ewin", (192, 896, 208, 1152), 104, 240, COMP, 192),
     *doorway("d_red2", (480, 1216), "n", alcove=24, far_alcove=24, alcove_wall="SUPPORT2", face="BIGDOOR7",
              track="DOORRED", action=DR_RED, floor=104, alcove_flat=C_FLOOR, flat=C_FLOOR),
-    *doorway("d_ehk", (576, 888), "e", 96, face=COMP, track=COMP, tag=TAG_EKEY, floor=96, flat=C_FLOOR),
-    Sector("ehk", [rect(592, 832, 752, 944)], 96, 224, C_FLOOR, C_CEIL, 112, COMP, special=LIGHT_BLINK_RANDOM),
-    # Switch niche (64 wide, 128 tall: its back wall is SW1COMP).
-    Sector("e_niche", [rect(480, 816, 544, 832)], 96, 224, C_FLOOR, C_CEIL, 192, COMP),
+    *closet("ehk", (576, 888), "e", TAG_EKEY, face=COMP, flat=C_FLOOR, wall=COMP, floor=96, width=112,
+            ctex=C_CEIL, light=112, special=LIGHT_BLINK_RANDOM, door_width=96),
+    e_niche,
     *doorway("d_short_e", (384, 832), "s", alcove=16, alcove_wall=COMP, face="METAL", track="METAL",
              tag=TAG_SHORT_E, floor=104, alcove_flat=C_FLOOR, flat=C_FLOOR),
     *stairs("est", (320, 576, 448, 800), "s", 7, 88, -16, 232, C_FLOOR, C_CEIL, 192, COLD, "STEP4"),
@@ -173,15 +181,14 @@ SECTORS = [
     # Its floor sits 8 below the hot door's threshold, so you can walk back out that way.
     Sector("arena", [arena], 32, SKYC, "FLOOR5_4", SKY, 192, "STONE3", pillars=arena_pillars),
     Sector("balcony", [rect(256, 1280, 704, 1440)], 96, SKYC, C_FLOOR, SKY, 192, "STONE3", lower="SILVER3"),
-    Sector("a_win", [rect(-128, 1264, 128, 1280)], 80, 160, "FLAT5_4", "CEIL5_1", 176, "STONE3", lower="METAL"),
+    window("a_win", (-128, 1264, 128, 1280), 80, 160, "STONE3", 176),
     Sector("dais", [rect(-128, 1856, 128, 1984)], 56, SKYC, "FLOOR0_1", SKY, 224, "STONE3", lower="SUPPORT2",
            special=LIGHT_GLOW),
-    # Niche sized to SW1EXIT (32x72): its back wall is the exit switch.
-    Sector("exit_niche", [rect(-16, 1984, 16, 1992)], 56, 128, "FLOOR0_1", "TLITE6_4", 240, "EXITSTON"),
-    *doorway("d_acw", (-704, 1888), "w", face="STONE3", track="STONE3", tag=TAG_ARENA, floor=32, flat="FLOOR5_4"),
-    Sector("acl_w", [rect(-880, 1808, -720, 1968)], 32, 160, "FLOOR5_4", "CEIL5_1", 112, "STONE2"),
-    *doorway("d_ace", (704, 1600), "e", face="STONE3", track="STONE3", tag=TAG_ARENA, floor=32, flat="FLOOR5_4"),
-    Sector("acl_e", [rect(720, 1520, 880, 1680)], 32, 160, "FLOOR5_4", "CEIL5_1", 112, "STONE2"),
+    exit_niche,
+    *closet("acl_w", (-704, 1888), "w", TAG_ARENA, face="STONE3", flat="FLOOR5_4", wall="STONE2", floor=32,
+            light=112),
+    *closet("acl_e", (704, 1600), "e", TAG_ARENA, face="STONE3", flat="FLOOR5_4", wall="STONE2", floor=32,
+            light=112),
 ]
 
 # Door and lift specials come from the sectors; these are the extra triggers.
@@ -197,9 +204,7 @@ SPECIAL_WALLS = {
     # The wall you face on leaving the start room: lava on the hot side, computers on the cold.
     ((-64, 256), (0, 256)): Special(0, 0, "FIRELAVA"),
     ((0, 256), (64, 256)): Special(0, 0, "COMPBLUE"),
-    ((-560, 688), (-496, 688)): Special(S1_DOOR_OPEN, TAG_SHORT, "SW1HOT"),
-    ((480, 816), (544, 816)): Special(S1_DOOR_OPEN, TAG_SHORT_E, "SW1COMP"),
-    ((-16, 1992), (16, 1992)): Special(S1_EXIT, 0, "SW1EXIT"),
+    **sw_short, **sw_short_e, **sw_exit,
 }
 SECRET_DOORS = {"d_pit", "d_ws", "d_ls"}
 MUST_REACH = ["p_isle", "w_loft", "w_sec", "wcl1", "wcl2", "whk", "w_end", "sst1", "e_ledge", "e_sec", "e_sump",

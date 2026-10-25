@@ -3,7 +3,7 @@
     python3 -m levels nukage_junction
 """
 from .doom2 import *  # noqa: F403 - thing types, actions, sector specials
-from .model import SKY, Sector, Special, Thing, doorway, lift, rect, stairs
+from .model import SKY, Sector, Special, Thing, doorway, lift, rect, stairs, switch_niche
 
 MAP = "MAP01"
 WAD = "NUKAGE.WAD"
@@ -15,6 +15,11 @@ TAG_WLIFT, TAG_LLIFT, TAG_ISLAND, TAG_LABCLOSET, TAG_ARENACLOSET = 1, 2, 3, 4, 5
 planters = [rect(-256, 1216, -128, 1344), rect(704, 768, 800, 864)]
 crates = [rect(-1024, 896, -896, 1024), rect(-768, 1088, -640, 1216), rect(-704, 832, -640, 896),
           rect(-1088, 1152, -1024, 1216)]
+
+# Sized to SW1EXIT (32x72).
+exit_niche, sw_exit = switch_niche("exit_niche", (256, 2496), "n", Special(S1_EXIT, 0, "SW1EXIT"), floor=24,
+                                   flat="FLOOR0_1", wall="STARTAN2", ctex="TLITE6_4", light=208,
+                                   width=32, height=72, depth=8)
 
 SECTORS = [
     # Start room: two support pillars.
@@ -87,8 +92,7 @@ SECTORS = [
     *doorway("d_exit", (256, 2304), "n", alcove=32, far_alcove=16, alcove_height=72,
              alcove_wall="STONE3", face="EXITDOOR"),
     Sector("exitrm", [rect(160, 2368, 352, 2496)], 0, 128, "FLOOR0_1", "TLITE6_4", 208, "STARTAN2"),
-    # Niche sized to SW1EXIT (32x72): its back wall is the exit switch.
-    Sector("exit_niche", [rect(240, 2496, 272, 2504)], 24, 96, "FLOOR0_1", "TLITE6_4", 208, "STARTAN2"),
+    exit_niche,
 ]
 
 # Door and lift specials come from the sectors; these are the extra triggers.
@@ -98,7 +102,7 @@ SPECIAL_BETWEEN = {
 }
 SPECIAL_WALLS = {
     ((-928, 1408), (-800, 1408)): Special(S1_FLOOR_LOWEST, TAG_ISLAND, "SW1BRCOM"),
-    ((240, 2504), (272, 2504)): Special(S1_EXIT, 0, "SW1EXIT"),
+    **sw_exit,
 }
 SECRET_DOORS = {"d_secret"}
 MUST_REACH = ["secret", "island", "plat2", "exitrm", "labcl", "arcl_w", "arcl_e"]

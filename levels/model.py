@@ -2,7 +2,7 @@
 primitives, and shape helpers (doorway, stairs, lift)."""
 from dataclasses import dataclass, field
 
-from .doom2 import DR_DOOR, FLOOR_LOWERERS, FLOOR_RAISERS
+from .doom2 import DR_DOOR, FLOOR_LOWERERS, FLOOR_RAISERS, LIGHT_GLOW, SECRET_AREA
 
 Point = tuple[int, int]
 Loop = list[Point]
@@ -322,6 +322,62 @@ def doorway(name, at, facing, width=128, *, alcove=0, far_alcove=0, alcove_wall=
         out.append(Sector(f"{name}_far", [strip(at, facing, alcove + thickness, far_alcove, width + 32)],
                           floor, floor + alcove_height, far_flat or alcove_flat, "CEIL5_1", 176, alcove_wall))
     return out
+
+
+def closet(name, at, facing, tag, *, face, flat, wall, floor=0, width=160, depth=160, height=128,
+           ctex="CEIL5_1", light=96, special=0, door_width=128, **door_kw) -> list[Sector]:
+    """A monster closet: a door in the wall at `at` that only `tag` opens,
+    disguised as the wall it's in (`face`), and a room `width` x `depth`
+    behind it. Returns the sectors d_<name>, <name>."""
+    return [*doorway(f"d_{name}", at, facing, door_width, face=face, track=face, tag=tag, floor=floor,
+                     flat=flat, **door_kw),
+            Sector(name, [strip(at, facing, door_kw.get("thickness", 16), depth, width)], floor, floor + height,
+                   flat, ctex, light, wall, special=special)]
+
+
+def pedestal(name, box, floor, ceil, wall, ctex, *, flat="TLITE6_1", glow=True) -> Sector:
+    """A lit pedestal for a key, weapon or power-up, with metal sides; its
+    top is `floor`. Put a W1 trigger on its edge (SPECIAL_BETWEEN) to make
+    taking the item spring a trap."""
+    return Sector(name, [rect(*box)], floor, ceil, flat, ctex, 240, wall, lower="METAL",
+                  special=LIGHT_GLOW if glow else 0)
+
+
+def switch_niche(name, at, facing, special, *, floor, flat, wall, ctex, light, width=64, height=128,
+                 depth=16) -> tuple[Sector, dict]:
+    """A recess `depth` deep in the wall at `at`, whose back wall is a switch
+    (special.texture). Size it to the switch picture: SW1EXIT is 32 x 72,
+    most others 64 x 128. A deep niche (a booth) makes the player step in to
+    reach the switch, so a W1 line on its entrance fires just before it.
+    Returns (sector, {back wall: special}) for SECTORS and SPECIAL_WALLS."""
+    (x, y), (dx, dy) = at, DIRS[facing]
+    bx, by = x + dx * depth, y + dy * depth
+    half = width // 2
+    back = ((bx - half, by), (bx + half, by)) if dy else ((bx, by - half), (bx, by + half))
+    return (Sector(name, [strip(at, facing, 0, depth, width)], floor, floor + height, flat, ctex, light, wall),
+            {back: special})
+
+
+def lit_ledge(name, box, wall_side, *, floor, ceil, flat, ctex, light, ambient, wall, lower="METAL",
+              special=SECRET_AREA, spacer=16) -> list[Sector]:
+    """A brightly lit ledge against a wall (on its `wall_side`, n/s/e/w),
+    with an unlit `spacer`-wide strip between it and the wall, at `ambient`
+    light, so the wall behind isn't lit up with it. Returns <name>,
+    <name>_back."""
+    x1, y1, x2, y2 = box
+    s = spacer
+    lit, back = {"n": ((x1, y1, x2, y2 - s), (x1, y2 - s, x2, y2)), "s": ((x1, y1 + s, x2, y2), (x1, y1, x2, y1 + s)),
+                 "e": ((x1, y1, x2 - s, y2), (x2 - s, y1, x2, y2)), "w": ((x1 + s, y1, x2, y2), (x1, y1, x1 + s, y2))
+                 }[wall_side]
+    return [Sector(name, [rect(*lit)], floor, ceil, flat, ctex, light, wall, lower=lower, special=special),
+            Sector(f"{name}_back", [rect(*back)], floor, ceil, flat, ctex, ambient, wall, lower=lower)]
+
+
+def window(name, box, floor, ceil, wall, light, *, flat="FLAT5_4", ctex="CEIL5_1", lower="METAL") -> Sector:
+    """An opening between two rooms: a sill at `floor` and a lintel at
+    `ceil`. Monsters fire through it; walking monsters can only climb a sill
+    24 or less above their floor, and fliers need it at least 56 tall."""
+    return Sector(name, [rect(*box)], floor, ceil, flat, ctex, light, wall, lower=lower)
 
 
 def stairs(name, box, facing, steps, floor, rise, ceil, ftex, ctex, light, wall, riser) -> list[Sector]:

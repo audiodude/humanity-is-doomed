@@ -106,9 +106,9 @@
 <path d="M620.8,329.6 L723.2,329.6 L723.2,323.2 L620.8,323.2 Z" fill="rgb(202,202,202)" fill-rule="evenodd"><title>a_win: floor 80 ceil 160 FLAT5_4/CEIL5_1 light 176</title></path>
 <path d="M620.8,92.8 L723.2,92.8 L723.2,41.6 L620.8,41.6 Z" fill="rgb(193,193,193)" fill-rule="evenodd"><title>dais: floor 56 ceil 384 FLOOR0_1/F_SKY1 light 224</title></path>
 <path d="M665.6,41.6 L678.4,41.6 L678.4,38.4 L665.6,38.4 Z" fill="rgb(193,193,193)" fill-rule="evenodd"><title>exit_niche: floor 56 ceil 128 FLOOR0_1/TLITE6_4 light 240</title></path>
-<path d="M384.0,105.6 L390.4,105.6 L390.4,54.4 L384.0,54.4 Z" fill="#a0703c" fill-rule="evenodd"><title>d_acw: floor 32 ceil 32 FLOOR5_4/FLAT20 light 144 tag 4</title></path>
+<path d="M384.0,105.6 L390.4,105.6 L390.4,54.4 L384.0,54.4 Z" fill="#a0703c" fill-rule="evenodd"><title>d_acl_w: floor 32 ceil 32 FLOOR5_4/FLAT20 light 144 tag 4</title></path>
 <path d="M320.0,112.0 L384.0,112.0 L384.0,48.0 L320.0,48.0 Z" fill="rgb(184,184,184)" fill-rule="evenodd"><title>acl_w: floor 32 ceil 160 FLOOR5_4/CEIL5_1 light 112</title></path>
-<path d="M953.6,220.8 L960.0,220.8 L960.0,169.6 L953.6,169.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_ace: floor 32 ceil 32 FLOOR5_4/FLAT20 light 144 tag 4</title></path>
+<path d="M953.6,220.8 L960.0,220.8 L960.0,169.6 L953.6,169.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_acl_e: floor 32 ceil 32 FLOOR5_4/FLAT20 light 144 tag 4</title></path>
 <path d="M960.0,227.2 L1024.0,227.2 L1024.0,163.2 L960.0,163.2 Z" fill="rgb(184,184,184)" fill-rule="evenodd"><title>acl_e: floor 32 ceil 160 FLOOR5_4/CEIL5_1 light 112</title></path>
 <line x1="595.2" y1="732.8" x2="646.4" y2="732.8" stroke="#777" stroke-width="0.6"/>
 <line x1="646.4" y1="732.8" x2="672.0" y2="732.8" stroke="#111" stroke-width="1.6"/>

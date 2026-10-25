@@ -96,9 +96,9 @@ You start on the only dry catwalk of a reservoir full of nukage, with the exit v
 | Distinct floor heights | 13 | 23 |
 | Light SD / light-effect sectors | 24 / 9 | 23 / 9 |
 | Optional share of the reachable area | 36% | 50% |
-| UV ammo per monster HP (pistol start) | 1.8 | 1.8 |
-| Health per 1000 monster HP | 32 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.39 / 0.72 | 0.33 / 0.70 |
+| UV ammo per monster HP (pistol start) | 1.9 | 1.8 |
+| Health per 1000 monster HP | 35 | 40 |
+| Easy/UV and HMP/UV monster ratios | 0.41 / 0.73 | 0.33 / 0.70 |
 | Nearest monster to the start | 697 | 300 |
 | Whole-map symmetry | 0.64 | 0.54 |
 
@@ -126,11 +126,11 @@ From Python: `from levels import build, nukage_junction; build(nukage_junction)`
 Requirements:
 - **Python 3.8+**, standard library only.
 - **ZDBSP** to build nodes, blockmap and reject. The default is the copy bundled with [Ultimate Doom Builder](https://github.com/UltimateDoomBuilder/UltimateDoomBuilder), at `/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp` (Arch: `chaotic-aur/ultimate-doom-builder-git`), then `zdbsp` on `PATH`. Use `--zdbsp-path PATH` (or `build(..., zdbsp=PATH)`) for any other ZDBSP binary.
-- **`doom2.wad`** for the texture checks, read from `~/.local/share/dsda-doom/doom2.wad` or `$DOOM2_WAD`. Without it those checks are skipped with a warning.
+- **`doom2.wad`** for the texture checks and the measurements, read from `~/.local/share/dsda-doom/doom2.wad` or `$DOOM2_WAD`. Without it those checks are skipped with a warning.
 
 ### What every build checks
 
-- Geometry: lines only meet at shared vertices. A sector outline that crosses itself, or sectors and free lines that cut through each other, is an error.
+- Geometry: lines only meet at shared vertices. A sector outline that crosses itself, sectors and free lines that cut through each other, or a sector lying inside another that doesn't have it as a hole, is an error.
 - Every thing is inside a sector, clear of walls, bars and fences, and not overlapping another monster or player on a skill they share.
 - Progression: starting from the player start, it works out which keys, door specials and tagged switches and triggers open what, follows teleporters, and fails if any `MUST_REACH` sector can't be reached. Bars block the way.
 - 100% kills and secrets: every secret sector can be reached, and every monster can either be reached or walk (or fly) to somewhere the player can go. A sniper the player can only shoot at fails this too.
@@ -138,6 +138,7 @@ Requirements:
 - Damaging floors sit lower than every neighbouring floor that isn't damaging.
 - Every texture and flat exists in `doom2.wad`. Pictures such as switches and door faces must fit their wall exactly; textures vanilla can't tile cleanly get a warning. Bars and fences can't use textures built from overlapping patches, which vanilla draws as garbage on two-sided lines (the medusa effect).
 - A balance report for each skill: monster health against ammo damage, health and armor.
+- The research measurements (`levels/measure.py`, using `scripts/metrics/`): floor heights, lighting, texture variety, symmetry, optional area, secrets, monster mix, ammo and health, skill ratios and distance to the nearest monster, each beside the DOOM II median and interquartile range and flagged `below` or `above` it. Rule-1 slips (a floor texture change with no height change) are listed by sector pair. This takes a couple of seconds.
 - A top-down SVG preview, `wads/<WAD stem>-<MAP>.svg`: sectors shaded by floor height, special lines in red, bars and fences dashed, monsters by skill, pickups and keys.
 
 A failed check prints `ERROR:` lines and stops the build before the WAD is touched. The preview is still written, so you can see what went wrong.
@@ -152,13 +153,20 @@ Lines that aren't sector edges go in `FREE_LINES`, keyed by their two endpoints:
 
 Helpers in `levels/model.py` build the common shapes. `doorway()` makes a door with optional recesses, plus its use action; its `alcove_flat`/`far_flat`, and `door()`'s `flat`, set the recess and threshold floors so they can match the rooms (Romero's rule 1: floor texture changes only with a height change). `stairs()` makes a run of steps, and `lift()` makes a lift whose SR/WR actions are added automatically.
 
+There are helpers for the rooms most maps repeat, sized so they pass the texture checks:
+- `closet()`: a monster closet behind a door disguised as the wall, opened only by its tag.
+- `pedestal()`: a glowing, metal-sided pedestal for a key or item. Put a W1 trigger on its edge in `SPECIAL_BETWEEN` to spring a trap when the item is taken.
+- `switch_niche()`: a recess whose back wall is a switch, sized to the switch picture (64 × 128, or 32 × 72 for `SW1EXIT`). It returns the sector and the `SPECIAL_WALLS` entry for the switch. Make it deep (a booth) to fire a W1 trigger on its entrance just before the switch is used.
+- `lit_ledge()`: a brightly lit ledge with an unlit strip against the wall behind it, so the wall isn't lit up too.
+- `window()`: an opening between rooms. Walking monsters can't climb a sill more than 24 above their floor, and fliers need at least 56 of height.
+
 Floors can move both ways for the progression check: the lowering actions (`S1_FLOOR_LOWEST` and kin) drop a tagged floor to its lowest neighbour, and the raise-and-change actions (`S1_RAISE_CHANGE` and kin) lift it to the next higher neighbouring floor, taking the floor texture of the trigger line's front sector and clearing the sector's special. MAP05 uses that to raise walkways out of damaging nukage and leave them dry.
 
 ### Code layout
 
 - `levels/model.py`: the dataclasses levels are written in (`Sector`, `Special`, `Thing`) and the shape helpers.
 - `levels/mapgen.py`: `build()`, which turns sectors into lines and sides and places textures. Its docstring describes the level format.
-- `levels/checks.py`: the checks and the balance report.
+- `levels/checks.py`: the checks and the balance report. `levels/measure.py`: the sector-overlap check, rule-1 slips and the research measurements.
 - `levels/preview.py`: the SVG preview. `levels/wad.py`: WAD reading and writing.
 - `levels/doom2.py`: DOOM II thing types, monster sizes and health, pickups, line actions and sector specials.
 
