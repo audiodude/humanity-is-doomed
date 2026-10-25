@@ -2,6 +2,8 @@
 """Scripted, headless playtests of DOOM II maps, run in ViZDoom.
 
     uv run --with vizdoom scripts/tools/playtest.py WAD MAP SCRIPT [--skill 4] [--shots DIR] [--from NAME]
+    uv run --with vizdoom scripts/tools/playtest.py WAD MAP SCRIPT --fight [--seed N] [--watch]
+    uv run --with vizdoom scripts/tools/playtest.py WAD MAP --replay [--video FILE.mp4]
     python3 scripts/tools/playtest.py WAD MAP --describe     # start, keys, special lines (no ViZDoom needed)
 
 ViZDoom (pip install vizdoom) runs a ZDoom-based engine as a Python library.
@@ -46,7 +48,29 @@ starts from the beginning, saving checkpoints as it goes. Saves live in
 ~/.cache/playtest/.
 
 The player has god mode and notarget, so tests check wiring, not balance.
-Exit status: 0 all checks passed, 1 a check failed, 2 the engine or script broke.
+
+--fight plays the route for real, to test balance: no god mode, and the
+monsters stay alive (`killall` and `checkpoint` are skipped). Between steps
+the bot fights the nearest monster on screen with the best weapon it has ammo
+for at that range, strafes onto safe floor only, backs away from melee
+monsters, turns to look when hit from out of sight, and detours for nearby
+health, armor and ammo when it's low. It plays in buddha mode: when it would
+die, the death is counted with its place and time and it's healed, so one run
+covers the whole map. At the end it reports each section of the script (each
+comment block starts one): time, kills, damage taken, deaths, health and
+armor, and ammo fired. The bot is a weaker player than a person: its deaths
+show where a map is hard, or where the bot is stuck, and the footage says
+which. Results vary with --seed (default 1; the same seed plays the same way),
+so try several. Every --fight run is recorded to ~/.cache/playtest/recordings/.
+
+--watch shows the game in a window at normal speed. --replay plays back the
+last --fight recording of MAP at --skill (or --recording FILE) in a window;
+add --video FILE.mp4 to render it with ffmpeg instead. A recording only plays
+back right with the WAD it was made with.
+
+Exit status: 0 all checks passed, 1 a check failed or the bot got stuck, 2 the
+engine or script broke. Deaths in a --fight run are in its report, not its
+exit status.
 """
 import argparse
 import hashlib
@@ -55,7 +79,9 @@ import json
 import math
 import os
 import re
+import shutil
 import struct
+import subprocess
 import sys
 import time
 import zlib
@@ -75,6 +101,20 @@ DAMAGING = {4, 5, 7, 11, 16}
 LIFTS = {10, 21, 62, 88, 120, 121, 122, 123}   # lift specials: their tagged sectors move up and down
 USE_DOORS = {1, 26, 27, 28, 31, 32, 33, 34, 117, 118}   # doors the player opens by using them
 STUCK_TICS, ARRIVE, PASS_BY = 70, 3, 24
+MONSTERS = {"Zombieman", "ShotgunGuy", "ChaingunGuy", "WolfensteinSS", "DoomImp", "Demon", "Spectre", "LostSoul",
+            "Cacodemon", "HellKnight", "BaronOfHell", "Revenant", "Fatso", "Arachnotron", "PainElemental", "Archvile",
+            "Cyberdemon", "SpiderMastermind"}
+MELEE = {"Demon", "Spectre", "LostSoul", "Revenant"}
+HEAVY = {"Cacodemon", "HellKnight", "BaronOfHell", "Revenant", "Fatso", "Arachnotron", "PainElemental", "Archvile",
+         "Cyberdemon", "SpiderMastermind"}
+SIGHT = 2048           # the bot ignores monsters farther away than this
+AMMO = {"bullets": "AMMO2", "shells": "AMMO3", "rockets": "AMMO5", "cells": "AMMO6"}
+RECORDINGS = os.path.join(CACHE, "recordings")
+HEALTH_ITEMS = {"Stimpack", "Medikit", "Soulsphere", "Megasphere", "Berserk"}
+AMMO_ITEMS = {"Clip", "ClipBox", "Shell", "ShellBox", "RocketAmmo", "RocketBox", "Cell", "CellPack", "Backpack",
+              "Shotgun", "SuperShotgun", "Chaingun", "RocketLauncher", "PlasmaRifle"}
+ARMOR_ITEMS = {"GreenArmor", "BlueArmor", "Megasphere"}
+FORAGE = 1024          # how far the bot goes out of its way for health or ammo it needs
 # Solid decorations the player has to go round, by radius. Monsters aren't here:
 # scripts kill them first, and their corpses keep their names.
 SOLID = {"ExplosiveBarrel": 10, "TechLamp": 16, "TechLamp2": 16, "Column": 16, "TallGreenColumn": 16,
@@ -90,6 +130,10 @@ class ScriptError(Exception):
 
 class Abort(Exception):
     """The run can't go on (stuck, no route, the level ended early)."""
+
+
+class Died(Exception):
+    """The player was killed (only with --fight)."""
 
 
 # ------------------------------------------------------------------ map ---
@@ -397,6 +441,33 @@ def parse(text):
     return steps
 
 
+def section_titles(text):
+    """{step line: title}: each step's section is the first line of the comment
+    block that last came before it."""
+    titles, title, prev_comment = {}, "start", False
+    for ln, raw in enumerate(text.splitlines(), 1):
+        line = raw.strip()
+        if line.startswith("#"):
+            if not prev_comment and titles:   # the comment block at the top describes the whole script
+                title = line.lstrip("# ").rstrip(":.") or title
+            prev_comment = True
+        else:
+            prev_comment = False
+            if line:
+                titles[ln] = title
+    return titles
+
+
+def clock(tics):
+    """Game time as m:ss, which is also the time into a --video of the run."""
+    secs = int(tics // 35)
+    return f"{secs // 60}:{secs % 60:02d}"
+
+
+def recording_path(args):
+    return os.path.join(RECORDINGS, f"{os.path.basename(args.wad[-1])}-{args.map.upper()}-skill{args.skill}.lmp")
+
+
 def check_step(ln, cmd, args, raw):
     def need(lo, hi=None):
         hi = lo if hi is None else hi
@@ -482,31 +553,74 @@ class Run:
             g.add_game_args("-file " + " ".join(args.wad[1:]))
         g.set_doom_map(args.map.upper())
         g.set_doom_skill(args.skill)
-        g.set_window_visible(False)
+        g.set_seed(args.seed)   # the same seed plays out the same way
+        g.set_window_visible(args.watch)
         g.set_mode(vzd.Mode.PLAYER)
         g.set_screen_resolution(vzd.ScreenResolution.RES_640X480)
         g.set_screen_format(vzd.ScreenFormat.RGB24)
         g.set_render_hud(True)
         g.set_sectors_info_enabled(True)
         g.set_objects_info_enabled(True)
-        g.set_sound_enabled(False)
+        g.set_labels_buffer_enabled(args.fight)   # which monsters are on screen
+        g.set_sound_enabled(args.watch)
         B = vzd.Button
-        g.set_available_buttons([B.MOVE_FORWARD_BACKWARD_DELTA, B.MOVE_LEFT_RIGHT_DELTA, B.TURN_LEFT_RIGHT_DELTA,
-                                 B.LOOK_UP_DOWN_DELTA, B.USE, B.ATTACK, B.SPEED])
+        self.buttons = ["MOVE_FORWARD_BACKWARD_DELTA", "MOVE_LEFT_RIGHT_DELTA", "TURN_LEFT_RIGHT_DELTA",
+                        "LOOK_UP_DOWN_DELTA", "USE", "ATTACK", "SPEED", *(f"SELECT_WEAPON{n}" for n in range(1, 8))]
+        g.set_available_buttons([getattr(B, b) for b in self.buttons])
         V = vzd.GameVariable
         self.vars = ["POSITION_X", "POSITION_Y", "POSITION_Z", "ANGLE", "PITCH", "VELOCITY_X", "VELOCITY_Y",
-                     "ARMOR", *COUNTERS.values()]
+                     "ARMOR", "HEALTH", "DAMAGE_TAKEN", "SELECTED_WEAPON", *COUNTERS.values(), *AMMO.values(),
+                     *(f"WEAPON{n}" for n in range(1, 8))]
         g.set_available_game_variables([getattr(V, v) for v in self.vars])
         g.add_game_args("+sv_cheats 1")
         g.init()
+        self.recording = None
+        if args.fight:
+            os.makedirs(RECORDINGS, exist_ok=True)
+            self.recording = recording_path(args)
+            g.new_episode(self.recording)   # record the run, for --replay
+        self.ignore = {}      # monster id -> tic until which the bot stops trying to hit it
+        self.skip = set()     # pickups the bot couldn't get to
+        self.deaths = []      # (section, x, y, tic) where the player would have died
+        self.spent = {k: 0.0 for k in AMMO}   # ammo fired so far
+        self._vars = []
+        self.hurt_at = -1     # tic the player last took damage
+        self.tics = 0
+        self.stats = []       # per script section: [title, tics, kills, damage, health, ammo used, died]
+        self.section = None
 
     # -- the game ------------------------------------------------------------
-    def tic(self, fwd=0.0, side=0.0, turn=0.0, look=0.0, use=0, attack=0, n=1):
+    def tic(self, fwd=0.0, side=0.0, turn=0.0, look=0.0, use=0, attack=0, n=1, weapon=0):
         g = self.game
         if g.is_episode_finished():
             raise Abort("the level ended before the script finished")
-        g.make_action([fwd, side, turn, look, use, attack, 1], n)
+        action = [fwd, side, turn, look, use, attack, 1] + [int(weapon == k) for k in range(1, 8)]
+        for _ in range(n if self.args.watch else 1):
+            t0 = time.time()
+            g.make_action(action, 1 if self.args.watch else n)
+            if self.args.watch:
+                time.sleep(max(0.0, 1 / 35 - (time.time() - t0)))   # real time, to watch
+            if g.is_episode_finished():
+                break
+        self.tics += n
         self._state = None
+        if g.is_player_dead():
+            raise Died()
+        if not g.is_episode_finished():
+            prev = self._vars
+            self._vars = list(self.state().game_variables)
+            if prev:   # ammo fired: every drop counts, pickups don't cancel it out
+                for kind, v in AMMO.items():
+                    i = self.vars.index(v)
+                    self.spent[kind] += max(0.0, prev[i] - self._vars[i])
+            if self.args.fight and self.var("HEALTH") <= 1:
+                # Buddha mode stopped a kill: count the death and carry on, so one run
+                # covers the whole map.
+                x, y = self.pos()
+                self.deaths.append((self.section[0] if self.section else "start", x, y, self.tics))
+                self.say(f"  DEATH {len(self.deaths)} at {x:.0f},{y:.0f} ({clock(self.tics)}); healed to carry on")
+                g.send_game_command("give health")
+                self._state = None
         if not g.is_episode_finished():
             self.watch()
 
@@ -519,7 +633,11 @@ class Run:
         return self._state
 
     def var(self, name):
-        return float(self.state().game_variables[self.vars.index(name)])
+        try:
+            v = self.state().game_variables
+        except Abort:
+            v = self._vars   # the episode ended (the player died): the last values seen
+        return float(v[self.vars.index(name)])
 
     def pos(self):
         v = self.state().game_variables
@@ -545,6 +663,187 @@ class Run:
             self.fails += 1
         self.say(f"{'PASS' if ok else 'FAIL'} {ln}: {what}")
 
+    # -- fighting (--fight) -----------------------------------------------------
+    def targets(self):
+        """Living monsters on screen that are worth shooting, nearest first."""
+        x, y = self.pos()
+        seen = {}
+        for lb in self.state().labels:
+            if lb.object_name in MONSTERS and self.ignore.get(lb.object_id, -1) < self.tics:
+                d = math.hypot(lb.object_position_x - x, lb.object_position_y - y)
+                if d < SIGHT:
+                    seen[lb.object_id] = (d, lb)
+        return [lb for _, lb in sorted(seen.values(), key=lambda v: v[0])]
+
+    def weapon_for(self, name, d):
+        """Weapon slot to fight `name` at distance d with, from what the player has."""
+        have = lambda slot, ammo: self.var(f"WEAPON{slot}") > 0 and self.var(AMMO[ammo]) > 0  # noqa: E731
+        order = []
+        if name in HEAVY and d > 192:
+            order += [(6, "cells"), (5, "rockets")]
+        if d < 384:
+            order += [(3, "shells")]
+        order += [(4, "bullets"), (3, "shells"), (6, "cells"), (2, "bullets")]
+        if d > 192:
+            order += [(5, "rockets")]
+        return next((slot for slot, ammo in order if have(slot, ammo)), 1)
+
+    def fight(self):
+        """Fight while a monster is on screen; if hit with none in sight, look for
+        whoever did it. Returns True if it fought (the route needs replanning)."""
+        if not self.args.fight:
+            return False
+        dmg = self.var("DAMAGE_TAKEN")
+        if dmg > getattr(self, "_dmg", 0):
+            self.hurt_at = self.tics
+        self._dmg = dmg
+        fought, engaged, turned = False, None, 0
+        while True:
+            tg = self.targets()
+            if not tg:
+                if self.tics - self.hurt_at < 35 and turned < 24:
+                    # Hit by something out of sight: turn to look for it.
+                    self.tic(turn=15)
+                    turned += 1
+                    continue
+                return fought
+            fought = True
+            t = tg[0]
+            if engaged != t.object_id:
+                engaged, since = t.object_id, 0
+            since += 1
+            if since > 175:   # 5 s without killing it: probably out of reach
+                self.ignore[t.object_id] = self.tics + 350
+                continue
+            x, y = self.pos()
+            d = math.hypot(t.object_position_x - x, t.object_position_y - y)
+            want = math.degrees(math.atan2(t.object_position_y - y, t.object_position_x - x))
+            err = (self.var("ANGLE") - want + 180) % 360 - 180
+            slot = self.weapon_for(t.object_name, d)
+            switch = slot if int(self.var("SELECTED_WEAPON")) != slot else 0
+            side, back = self.dodge(), 0
+            if t.object_name in MELEE and d < 192 and self.safe(180):
+                back = -100   # keep out of reach of biters
+            self.tic(turn=max(-30, min(30, err)), attack=int(abs(err) < max(2.0, 40 / max(d, 1) * 10)),
+                     side=side, fwd=back, weapon=switch)
+
+    def safe(self, rel):
+        """Moving 48 units toward `rel` degrees from the facing direction keeps the
+        player on floor it can walk on, off damaging floor and off ledges."""
+        ang = math.radians(self.var("ANGLE") + rel)
+        x, y = self.pos()
+        lv = self.plan.levels(self.heights(), ())
+        a = self.plan.cell((x, y))
+        g = self.geo
+        for dist in (24, 48):
+            b = self.plan.cell((x + math.cos(ang) * dist, y + math.sin(ang) * dist))
+            if not (0 <= b[0] < g.nx and 0 <= b[1] < g.ny) or g.cell_sector[b[1]][b[0]] in g.damaging:
+                return False
+            here, there = lv[a[1]][a[0]], lv[b[1]][b[0]]
+            if not self.plan.step_ok(here, there) or (here and there and here[0] - there[0] > 24):
+                return False
+        return True
+
+    def dodge(self):
+        """Strafe from side to side to dodge, onto safe floor only."""
+        if self.tics % 30 == 0 or not hasattr(self, "_strafe"):
+            self._strafe = 1 if (self.tics // 30) % 2 else -1
+        if not self.safe(-90 * self._strafe):
+            self._strafe = -self._strafe
+            if not self.safe(-90 * self._strafe):
+                return 0
+        return 100 * self._strafe
+
+    def idle(self, n):
+        """Wait n tics, fighting anything that shows up."""
+        for _ in range(n):
+            if not self.fight():
+                self.tic()
+
+    def needs(self):
+        """Pickup names worth a detour now."""
+        want = set()
+        if self.var("HEALTH") < 60:
+            want |= HEALTH_ITEMS
+        if self.var("ARMOR") < 20:
+            want |= ARMOR_ITEMS
+        dmg = (self.var("AMMO2") * 10 + self.var("AMMO3") * 70 * (self.var("WEAPON3") > 0)
+               + self.var("AMMO5") * 150 * (self.var("WEAPON5") > 0) + self.var("AMMO6") * 22 * (self.var("WEAPON6") > 0))
+        if dmg < 1500:
+            want |= AMMO_ITEMS
+        return want
+
+    def forage(self, ln):
+        """As a player would: go and get nearby health, armor or ammo the player
+        needs, if it's reachable without crossing doors or damaging floor."""
+        for _ in range(6):
+            want = self.needs()
+            if not want:
+                return
+            x, y = self.pos()
+            g = self.geo
+            items = sorted((math.hypot(o.position_x - x, o.position_y - y), o) for o in self.state().objects
+                           if o.name in want and o.id not in self.skip
+                           and math.hypot(o.position_x - x, o.position_y - y) < FORAGE)
+            for d, o in items:
+                at = (o.position_x, o.position_y)
+                c = self.plan.cell(at)
+                if not (0 <= c[0] < g.nx and 0 <= c[1] < g.ny) or g.cell_sector[c[1]][c[0]] in g.damaging:
+                    self.skip.add(o.id)
+                    continue
+                pts = self.plan.route(self.pos(), at, self.heights(),
+                                      [(round(s.position_x), round(s.position_y), SOLID[s.name])
+                                       for s in self.state().objects if s.name in SOLID])
+                if pts is None or sum(math.dist(a, b) for a, b in zip([self.pos()] + pts, pts)) > FORAGE * 1.5:
+                    self.skip.add(o.id)
+                    continue
+                self.say(f"  detour for {o.name} at {at[0]:.0f},{at[1]:.0f}")
+                for k, p in enumerate(pts):
+                    if not self.drive(p, ln, k == len(pts) - 1):
+                        break
+                if any(s.id == o.id for s in self.state().objects):
+                    self.skip.add(o.id)   # still there: couldn't get it
+                break
+            else:
+                return
+
+    # -- report (--fight) -----------------------------------------------------
+    def enter(self, title):
+        if self.section and self.section[0] == title:
+            return
+        self.close_section()
+        self.section = [title, self.tics, self.var("KILLCOUNT"), self.var("DAMAGE_TAKEN"), dict(self.spent)]
+
+    def close_section(self, died=None):
+        if not self.section:
+            return
+        title, t0, k0, d0, a0 = self.section
+        kills, dmg, health, armor = (self.var(v) for v in ("KILLCOUNT", "DAMAGE_TAKEN", "HEALTH", "ARMOR"))
+        if died:
+            health = 0
+        used = {k: int(self.spent[k] - a0[k]) for k in AMMO if self.spent[k] > a0[k]}
+        self.stats.append([title, (self.tics - t0) / 35, int(kills - k0), int(dmg - d0), int(health), int(armor),
+                           used, died])
+        self.section = None
+
+    def report(self):
+        self.say("")
+        per = {}
+        for title, _x, _y, _t in self.deaths:
+            per[title] = per.get(title, 0) + 1
+        self.say(f"{'section':<46} {'time':>5} {'kills':>5} {'hurt':>5} {'deaths':>6} {'health':>6} {'armor':>5}"
+                 "  ammo fired")
+        for title, secs, kills, dmg, health, armor, used, died in self.stats:
+            ammo = ", ".join(f"{n} {k}" for k, n in used.items()) or "-"
+            self.say(f"{title[:46]:<46} {secs:>4.0f}s {kills:>5} {dmg:>5} {per.get(title, 0) or '':>6} {health:>6}"
+                     f" {armor:>5}  {ammo}"
+                     + (f"   DIED at {died[0]:.0f},{died[1]:.0f} ({clock(self.tics)})" if died else ""))
+        self.say(f"deaths: {len(self.deaths)}"
+                 + "".join(f"\n  {clock(tic)} {t} at {x:.0f},{y:.0f}" for t, x, y, tic in self.deaths))
+        if self._vars:
+            self.say("ammo left: " + ", ".join(f"{int(self.var(v))} {k}" for k, v in AMMO.items())
+                     + f"; kills {int(self.var('KILLCOUNT'))}")
+
     # -- moving --------------------------------------------------------------
     def face(self, target, pitch=None):
         """Turn to face a point or an angle (degrees, 0 east)."""
@@ -561,9 +860,12 @@ class Run:
             self.tic(turn=turn, look=-look if pitch is not None else 0.0)
 
     def drive(self, target, ln, final):
-        """Run at target; on the last leg brake to stop within ARRIVE units."""
+        """Run at target; on the last leg brake to stop within ARRIVE units.
+        Returns False if it stopped to fight (the route needs replanning)."""
         last, since, presses = self.pos(), 0, 0
         while True:
+            if self.fight():
+                return False
             x, y = self.pos()
             dx, dy = target[0] - x, target[1] - y
             dist = math.hypot(dx, dy)
@@ -572,7 +874,7 @@ class Run:
             if dist <= (ARRIVE if final else PASS_BY) and (not final or speed < 1):
                 if final:
                     self.tic()
-                return
+                return True
             # Speed to aim for: full run, slowing on the final approach.
             want = min(16.0, dist * 0.2 + 0.3) if final else 16.0
             ux, uy = dx / dist, dy / dist
@@ -601,6 +903,14 @@ class Run:
                                 f"heading for {target[0]:.0f},{target[1]:.0f}")
 
     def walk_to(self, target, ln, final=True):
+        for _ in range(40):   # replanned after each fight
+            if self.args.fight:
+                self.forage(ln)
+            if self.walk_route(target, ln, final):
+                return
+        raise Abort(f"line {ln}: interrupted by fighting too often on the way to {target[0]:.0f},{target[1]:.0f}")
+
+    def walk_route(self, target, ln, final):
         solid = [(round(o.position_x), round(o.position_y), SOLID[o.name]) for o in self.state().objects
                  if o.name in SOLID]
         h = self.heights()
@@ -617,7 +927,9 @@ class Run:
             raise Abort(f"line {ln}: no way from {self.pos()[0]:.0f},{self.pos()[1]:.0f} "
                         f"to {target[0]:.0f},{target[1]:.0f}")
         for k, p in enumerate(pts):
-            self.drive(p, ln, final and k == len(pts) - 1)
+            if not self.drive(p, ln, final and k == len(pts) - 1):
+                return False
+        return True
 
     def line(self, x, y, ln):
         i = self.geo.line_near((x, y))
@@ -680,7 +992,7 @@ class Run:
                 if gap >= HEIGHT_P and gap == last:
                     return
                 last = gap
-                self.tic()
+                self.idle(1)
             if self.door_gap(i) < HEIGHT_P:
                 self.check(False, ln, f"open: door still only {self.door_gap(i):.0f} high after 4 s")
         elif cmd in ("use", "exit"):
@@ -709,19 +1021,20 @@ class Run:
             self.had.add(a[0].lower())
             self.tic()
         elif cmd == "killall":
-            self.game.send_game_command("kill monsters")
-            self.tic()
+            if not self.args.fight:
+                self.game.send_game_command("kill monsters")
+                self.tic()
         elif cmd == "look":
             self.face(num[0], num[1] if len(num) == 2 else None)
         elif cmd == "wait":
-            for _ in range(int(num[0])):
-                self.tic()
+            self.idle(int(num[0]))
         elif cmd == "shot":
             path = os.path.join(self.shots, a[0] + ".png")
             write_png(path, self.state().screen_buffer)
             self.say(f"shot {path}")
-            for _ in range(35):
-                self.tic()
+            self.idle(35)
+        elif cmd == "checkpoint" and self.args.fight:
+            pass   # a fight run's state isn't a wiring run's
         elif cmd == "checkpoint":
             path = self.save_path(a[0])
             os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -792,11 +1105,14 @@ class Run:
                 self.say(f"no current save for checkpoint {start_from} (the WAD, skill or an earlier step changed, "
                          f"or it was never reached); running from the start")
         if begin == 0:
-            for c in ("god", "notarget"):
+            for c in (("buddha",) if self.args.fight else ("god", "notarget")):
                 self.game.send_game_command(c)
             self.tic(n=35)    # the engine ignores turning for the first tics of a level
-            self.say(f"START {self.args.map.upper()} skill {self.args.skill}")
+            self.say(f"START {self.args.map.upper()} skill {self.args.skill}"
+                     + (" (fighting: monsters and damage are real)" if self.args.fight else ""))
         for ln, cmd, a, line in steps[begin:]:
+            if self.args.fight:
+                self.enter(self.titles.get(ln, "start"))
             self.say(f"STEP {ln}: {line}")
             self.step(ln, cmd, a, line)
 
@@ -808,8 +1124,14 @@ def run(args):
         print("playtests need ViZDoom: run with `uv run --with vizdoom scripts/tools/playtest.py ...`, "
               "or `pip install vizdoom` in a virtualenv")
         return 2
+    if args.replay:
+        return replay(args, vzd)
+    if args.fight and args.start_from:
+        print("--from can't be used with --fight: a fight starts from the beginning")
+        return 2
     try:
-        steps = parse(open(args.script).read())
+        text = open(args.script).read()
+        steps = parse(text)
     except ScriptError as e:
         print("script error:", e)
         return 2
@@ -819,20 +1141,91 @@ def run(args):
         return 2
     t0 = time.time()
     r = Run(args, vzd, Geometry(m))
+    r.titles = section_titles(text)
     status = None
     try:
         r.go(steps, args.start_from)
+        r.close_section()
+    except Died:
+        r.close_section(died=(r.var("POSITION_X"), r.var("POSITION_Y")))
+        r.say("DIED")
+        status = 1
     except Abort as e:
         r.fails += 1
         r.say(f"FAIL {e}")
+        r.close_section()
         status = 1
     except ScriptError as e:
         print("script error:", e)
         status = 2
     finally:
+        if args.fight:
+            r.report()
         r.game.close()
+    if r.recording:
+        json.dump({"wad": wad_hash(args.wad)}, open(r.recording + ".json", "w"))
+        print(f"recorded to {r.recording}; watch it with --replay")
     print(f"DONE checks={r.checks} fails={r.fails} ({time.time() - t0:.1f} s)")
     return status if status is not None else (1 if r.fails else 0)
+
+
+def wad_hash(wads):
+    h = hashlib.sha256()
+    for w in wads:
+        h.update(open(w, "rb").read())
+    return h.hexdigest()[:16]
+
+
+def replay(args, vzd):
+    """Play back the last --fight recording of this map and skill, in a window,
+    or (--video FILE) render it to an MP4 with ffmpeg."""
+    path = args.recording or recording_path(args)
+    if not os.path.exists(path):
+        print(f"no recording at {path}: run with --fight first")
+        return 2
+    meta = json.load(open(path + ".json")) if os.path.exists(path + ".json") else {}
+    if meta and meta.get("wad") != wad_hash(args.wad):
+        print("note: the WAD has changed since this was recorded, so the replay will drift from what happened")
+    g = vzd.DoomGame()
+    os.makedirs(CACHE, exist_ok=True)
+    g.set_doom_game_path(args.iwad)
+    g.set_doom_config_path(os.path.join(CACHE, "vizdoom.ini"))
+    g.set_doom_scenario_path(args.wad[0])
+    g.set_doom_map(args.map.upper())
+    g.set_doom_skill(args.skill)
+    g.set_window_visible(not args.video)
+    g.set_sound_enabled(not args.video)
+    g.set_screen_resolution(vzd.ScreenResolution.RES_640X480)
+    g.set_screen_format(vzd.ScreenFormat.RGB24)
+    g.set_render_hud(True)
+    g.set_mode(vzd.Mode.PLAYER)
+    g.init()
+    g.replay_episode(path)
+    enc = None
+    if args.video:
+        if not shutil.which("ffmpeg"):
+            print("--video needs ffmpeg")
+            return 2
+        enc = subprocess.Popen(["ffmpeg", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24",
+                                "-s", f"{WIDTH}x{HEIGHT}", "-r", "35", "-i", "-", "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                                "-crf", "34", "-preset", "slow", args.video], stdin=subprocess.PIPE)
+    frames = 0
+    while not g.is_episode_finished():
+        t0 = time.time()
+        if enc:
+            s = g.get_state()
+            if s is not None:
+                enc.stdin.write(s.screen_buffer.tobytes())
+                frames += 1
+        g.advance_action()
+        if not enc:
+            time.sleep(max(0.0, 1 / 35 - (time.time() - t0)))
+    g.close()
+    if enc:
+        enc.stdin.close()
+        enc.wait()
+        print(f"wrote {args.video} ({clock(frames)})")
+    return 0
 
 
 # ------------------------------------------------------------- describe ---
@@ -883,8 +1276,20 @@ def main():
     p.add_argument("--skill", type=int, default=4, help="1 ITYTD .. 4 UV, 5 NM (default 4)")
     p.add_argument("--shots", help="screenshot directory (default /tmp/playtest-shots/MAP)")
     p.add_argument("--from", dest="start_from", metavar="NAME", help="start at `checkpoint NAME` (see above)")
+    p.add_argument("--fight", action="store_true", help="play for real: no god mode, the bot fights (see above)")
+    p.add_argument("--watch", action="store_true", help="show the game in a window, at normal speed")
+    p.add_argument("--replay", action="store_true", help="watch the last --fight recording of MAP at --skill")
+    p.add_argument("--recording", metavar="FILE", help="with --replay: the recording to play (default: the last)")
+    p.add_argument("--video", metavar="FILE", help="with --replay: render it to an MP4 instead (needs ffmpeg)")
+    p.add_argument("--seed", type=int, default=1, help="random seed (default 1): the same seed plays the same way")
     args = p.parse_args()
     pos = args.wad
+    if args.replay:
+        args.watch = True
+        if len(pos) < 2:
+            p.error("give WAD... MAP")
+        args.map, args.wad = pos[-1], pos[:-1]
+        sys.exit(run(args))
     if not args.describe and not args.script:
         if len(pos) < 3:
             p.error("give WAD... MAP SCRIPT")

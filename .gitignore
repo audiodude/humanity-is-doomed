@@ -8,3 +8,6 @@ wads/SFPC*
 
 # Symlink to the local Steam saved-games directory
 /steam_wads
+
+# Combat bot video script and footage: kept locally
+docs/combat-bot/
