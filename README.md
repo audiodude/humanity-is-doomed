@@ -170,15 +170,20 @@ Floors can move both ways for the progression check: the lowering actions (`S1_F
 - `levels/preview.py`: the SVG preview. `levels/wad.py`: WAD reading and writing.
 - `levels/doom2.py`: DOOM II thing types, monster sizes and health, pickups, line actions and sector specials.
 
-### Playtests in GZDoom
-`levels/playtests/<module>.playtest` scripts walk each map's intended route in GZDoom: doors, switches, lifts, key traps, secrets and the exit, checking floor and ceiling heights after each trigger. The runner, `scripts/tools/playtest.py`, needs GZDoom and Xvfb. It runs GZDoom headless on a hidden X display, with god mode, and writes screenshots to `/tmp/playtest-shots/<MAP>/`. The IWAD is `$DOOM2_WAD` or `~/.local/share/dsda-doom/doom2.wad`; override with `--iwad`. A full route takes about a minute:
+### Playtests
+`levels/playtests/<module>.playtest` scripts walk each map's intended route: doors, switches, lifts, key traps, secrets and the exit, checking floor and ceiling heights after each trigger. The runner, `scripts/tools/playtest.py`, plays them in [ViZDoom](https://vizdoom.farama.org/), a ZDoom-based engine packaged as a Python library. It drives the player with real inputs as fast as the machine runs the game, with god mode on and no window, so a whole route takes 4–10 seconds. Screenshots go to `/tmp/playtest-shots/<MAP>/`. The IWAD is `$DOOM2_WAD` or `~/.local/share/dsda-doom/doom2.wad`; override with `--iwad`.
+
+ViZDoom isn't needed to build maps, so it isn't a requirement of the builder. `uv run --with vizdoom` fetches it into a cached environment the first time:
 
 ```sh
-python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest
+uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest
+uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP05 levels/playtests/nukage_drain.playtest --from pump3
 python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 --describe   # start, keys, special lines
 ```
 
-A pass shows the map's wiring works in GZDoom, run in its strict Doom compatibility mode. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
+Scripts say where to go, not how to get there: `walk X Y` finds its own way round walls, solid things, steps too high to climb and closed doors, avoiding damaging floors when it can, and `open` and `use` walk up to their line first. A script can mark `checkpoint NAME` steps; `--from NAME` resumes from the save the last full run made there, as long as the WAD, map, skill and every step before it are unchanged. The script language is in the runner's docstring.
+
+A pass shows the map's wiring works in a ZDoom-based engine, which, like vanilla, only lets the player use a line from its front side. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
 
 ## Research: what makes DOOM levels fun
 Nukage Crossing and the maps after it were designed from a research report on the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It drew on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. The report quotes its sources at length, so it isn't published here; the measurement scripts are.

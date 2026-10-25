@@ -1,78 +1,65 @@
 # Nukage Drain (MAP05) wiring test: each pump raises its walkways, every
 # closet, key door and secret, the loop back to the start, then the exit.
-#   python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP05 levels/playtests/nukage_drain.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP05 levels/playtests/nukage_drain.playtest
 
 killall
 shot start
 expect floor -720 1200 == -16      # the walkways are under the nukage
 
 # The radiation suit closet off the catwalk.
-walk 0 430 -560 400 -560 370
 open -560 336
 walk -560 272
 expect has PowerIronFeet
-walk -560 400
 
-# Secret: wade across the reservoir to the lit ledge on the pillar's south face.
-walk -320 430 -320 496 -320 600 400 700
+# Wading: the chaingun and the soulsphere in the nukage, then the secret ledge
+# on the pillar's north face.
+walk 400 700
 expect has Chaingun
-walk -400 760 -400 1320 -560 1464
-walk -400 1320 -96 1400 -96 1288
+walk -560 1464
+walk -96 1288
 expect secrets == 1
 expect has BasicArmor
-walk -96 1400 -400 1300 -320 600 -320 496 -320 430
 
 # West pump house: the corridor and its secret.
-walk -700 432 -790 432
 open -816 432
-walk -900 432 -1024 400
 open -1024 352
 walk -1024 280
 expect secrets == 2
-walk -1024 330
 open -1024 336
-walk -1024 430 -1024 528
 
 # The super shotgun opens the pump hall's closets.
-walk -1024 640 -1024 864
+walk -1024 864
 expect has SuperShotgun
 wait 70
 expect ceil -1416 784 > 100
 expect ceil -1416 1040 > 100
 
 # Pump 1: the west walkway rises out of the nukage.
-walk -990 900 -990 976
+walk -990 976
 expect ceil -280 1088 == 32       # the closet stays shut until you step into the booth
 walk -880 976
 wait 70
 expect ceil -280 1088 > 100        # stepping into the booth opened the pillar's west closet
 use -832 976
-walk -990 976 -990 1088 -860 1088
+walk -860 1088
 look 0
 wait 40
 shot pump1
 wait 90
 expect floor -720 1200 == 32
+checkpoint pump1
 
-# Back out, onto the west walkway, north to the north pump house.
-walk -1024 864 -1024 528 -1024 430 -860 432
+# Along the west walkway to the north pump house, and its lobby secret.
 open -832 432
-walk -760 432 -720 560 -720 1660
 open -720 1712
-walk -720 1800
-
-# North lobby secret.
-walk -840 1856
 open -864 1856
 walk -950 1856
 expect secrets == 3
-walk -900 1856
 open -880 1856
-walk -700 1856 -500 1856
 
 # North hall: the yellow key opens two closets; pump 2 raises the north walkway.
 open -488 1856
-walk -400 1856 0 1900 96 1984
+walk 96 1984
 expect has YellowCard
 wait 70
 expect ceil 520 1920 > 100
@@ -85,58 +72,50 @@ expect ceil 96 1240 > 100          # and the north closet
 use 256 1760
 wait 130
 expect floor 400 1620 == 32
-walk 256 1920 0 1920 -430 1856
-open -472 1856
-walk -720 1856 -720 1760
-open -720 1728
-walk -720 1650
+checkpoint pump2
 
-# Along the north walkway to the yellow door and the east pump house.
-walk 700 1616 790 1616
+# Along the north walkway to the yellow door and the east boiler house and its secret.
+open -472 1856
+open -720 1728
 open 816 1616
-walk 900 1616 1216 1600 1216 1900 1184 1925
 open 1184 1952
 walk 1184 2030
 expect secrets == 4
 expect has Backpack
-walk 1184 1980
 open 1184 1968
-walk 1184 1925 1216 1900 1216 1600 1332 1580
+walk 1332 1580
 expect has RocketLauncher
-walk 1120 1550
-open 1120 1504
-walk 1120 1424 1000 1424
-expect ceil 280 1176 == 32
-walk 910 1424
 
 # Pump 3 raises the east walkway and the causeway to the vault.
+open 1120 1504
+walk 1000 1424
+expect ceil 280 1176 == 32
+walk 910 1424
 wait 70
 expect ceil 280 1176 > 100         # and the east closet
 use 864 1424
-walk 1000 1424 1000 1328 880 1328
+walk 880 1328
 look 180
 wait 40
 shot pump3
 wait 90
 expect floor 720 800 == 32
 expect floor 400 1024 == 40       # up to the vault door's step
+checkpoint pump3
 
-# Back out; the east walkway closes a loop back to the start.
-walk 1120 1440 1120 1460
+# The east walkway closes a loop back to the start.
 open 1120 1488
-walk 1120 1550 1120 1600 860 1616
 open 832 1616
-walk 720 1616 720 600 720 440
+walk 720 440
 expect pos 720 440
-walk 720 600 720 1024
 
 # Onto the causeway: closets open behind you. Then the vault and the exit.
+walk 720 1024
 walk 600 1024
 wait 70
 expect ceil 808 704 > 100
 expect ceil 808 1024 > 100
-walk 300 1024 284 1024
 open 272 1024
-walk 200 1024 60 1024 -100 1024
+walk -100 1024
 shot vault
 exit -136 1024

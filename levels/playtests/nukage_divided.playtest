@@ -1,6 +1,6 @@
 # Nukage Divided (MAP04) wiring test: both wings, every trap, shortcut and
 # secret, both arena entrances, then the exit.
-#   python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP04 levels/playtests/nukage_divided.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP04 levels/playtests/nukage_divided.playtest
 
 killall
 shot start
