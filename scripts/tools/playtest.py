@@ -475,6 +475,8 @@ class Run:
         os.makedirs(self.shots, exist_ok=True)
         g = self.game = vzd.DoomGame()
         g.set_doom_game_path(args.iwad)
+        os.makedirs(CACHE, exist_ok=True)
+        g.set_doom_config_path(os.path.join(CACHE, "vizdoom.ini"))   # not the working directory
         g.set_doom_scenario_path(args.wad[0])
         if args.wad[1:]:
             g.add_game_args("-file " + " ".join(args.wad[1:]))
