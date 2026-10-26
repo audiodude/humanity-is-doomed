@@ -143,9 +143,11 @@ SECTORS = [
              alcove_wall="LITE5", alcove_flat=F_CONN),
     Sector("sr", [rect(432, 960, 552, 1088)], GANTRY + 8, GANTRY + 128, F_CTRL, C_GEN, 160, RACKS,
            special=SECRET_AREA),
-    # ... the switchgear vault, optional, dark and blinking
+    # ... the switchgear vault, optional, dark and blinking. A dead end between the annex and gantry B:
+    # monsters chasing a player on the gantry walked in and pressed against its south wall, so its door
+    # is one monsters can't open (a fast DR door; vanilla lets them use only the plain one).
     *doorway("d_sv", (1152, 1088), "e", alcove=16, far_alcove=16, floor=GANTRY, alcove_flat=F_CONN, flat=F_CONN,
-             **DOOR_KW),
+             action=DR_DOOR_FAST, **DOOR_KW),
     Sector("sv", [rect(1200, 960, 1424, 1216)], 144, 288, F_CTRL, C_GEN, 96, RACKS, special=LIGHT_BLINK_RANDOM),
     # ... the arachnotrons' closets behind the gantry's wall
     *closet("ar2", (352, 640), "n", TAG_AR2, **CL_GANTRY),
