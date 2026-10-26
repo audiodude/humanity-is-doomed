@@ -174,8 +174,8 @@ _textures = {}
 
 
 def measure(level, lines, found):
-    """Report lines: rule-1 slips, then each metric against the game's id
-    maps. found: the level's checks.Findings, whose reach run is reused."""
+    """(report lines, balance warnings): rule-1 slips, then each metric against
+    the game's id maps. found: the level's checks.Findings, whose reach run is reused."""
     if METRICS_DIR not in sys.path:
         sys.path.insert(0, METRICS_DIR)
     import combat_metrics as cm
@@ -209,7 +209,7 @@ def measure(level, lines, found):
         flag = "  below" if v < q1 else "  above" if v > q3 else ""
         out.append(f"{LABELS[k]:<44} {fmt(v):>9}   {fmt(med)} [{fmt(q1)}-{fmt(q3)}]{flag}")
     lines, warnings = report(bal, level.game)
-    return out + lines + [f"warning: {w}" for w in warnings]
+    return out + lines, warnings
 
 
 def fmt(v):

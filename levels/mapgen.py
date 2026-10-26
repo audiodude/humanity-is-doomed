@@ -39,7 +39,7 @@ A level module is plain data, read as module attributes:
                     word). Applied last; a key matching no line, or back= on
                     a one-sided line, is an error                    [optional]
     IMPORTED        True for decompiled maps                         [optional]
-    KNOWN_ISSUES    playability findings that don't fail the build   [optional]
+    KNOWN_ISSUES    playability findings and warnings it accepts     [optional]
     RESOURCES       PWAD paths (absolute, ~, or relative to the repo root)
                     whose textures, flats and patches the checks load after
                     the IWAD; not copied into the WAD                [optional]
@@ -341,20 +341,25 @@ def build(module, check_only=False, out=None, zdbsp=None):
     print("preview:", svg)
     print("\n".join(balance_report(level)))
     found = findings(level, compiled)
-    errors = [f for f in found.playability if f not in level.known_issues]
-    for issue in level.known_issues:
-        if issue not in found.playability:
-            print("fixed:", issue)
+    known = set(level.known_issues)
+    errors = [f for f in found.playability if f not in known]
     if level.imported:
         found.warnings = found.style + found.warnings
     else:
         errors += found.style
     for w in found.warnings:
-        print("warning:", w)
+        if w not in known:
+            print("warning:", w)
     if errors:
         raise LevelError("\n".join(errors))
+    seen = set(found.playability) | set(found.warnings)
     if found.reach and level_textures(level) is not None:
-        print("\n".join(measure(level, lines, found)))
+        report, warnings = measure(level, lines, found)
+        print("\n".join(report + [f"warning: {w}" for w in warnings if w not in known]))
+        seen |= set(warnings)
+    for issue in level.known_issues:
+        if issue not in seen:
+            print("fixed:", issue)
     if check_only:
         return None
     zdbsp = find_zdbsp(zdbsp)
