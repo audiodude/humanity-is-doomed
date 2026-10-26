@@ -20,7 +20,7 @@
 
 ## Included WAD - NUKAGE.WAD
 
-`wads/NUKAGE.WAD` holds five generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), and MAP05, [Nukage Drain](#nukage-drain-nukage_drain). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg`, `wads/NUKAGE-MAP02.svg`, `wads/NUKAGE-MAP03.svg`, `wads/NUKAGE-MAP04.svg` and `wads/NUKAGE-MAP05.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
+`wads/NUKAGE.WAD` holds six generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), and MAP06, [Nukage Turbine](#nukage-turbine-nukage_turbine). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP06.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
 
 ### Nukage Junction (`nukage_junction`)
 A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/medium/hard, one secret.
@@ -104,9 +104,27 @@ You start on the only dry catwalk of a reservoir full of nukage, with the exit v
 
 It has fewer floor heights than most id maps because the reservoir is one flat pool; symmetry is high because it's a square reservoir with a pump house off each side.
 
+### Nukage Turbine (`nukage_turbine`)
+MAP06: 116 sectors, 26/46/64 monsters on easy/medium/hard, four secrets, and the first arachnotrons. Its design doc is `levels/designs/nukage_turbine.md`.
+
+You cross the turbine hall on a railed gantry along its north wall, looking down at the exit door, the turbines and a floodgate across the floor. At the far end, taking the yellow key sinks the platform you're standing on into a pit of demons, and the only way back is along the hall floor, under the gantry, where arachnotrons now walk.
+
+| Measure | MAP06 | DOOM II median |
+|---|---|---|
+| Distinct floor heights | 24 | 23 |
+| Light SD / light-effect sectors | 35 / 12 | 23 / 9 |
+| Most-used wall texture | 22% | 30% |
+| Wall material changes with a border texture | 96% | 31% |
+| Optional share of the reachable area | 42% | 50% |
+| UV ammo per monster HP (pistol start) | 1.95 | 1.8 |
+| Health per 1000 monster HP | 44 | 40 |
+| Easy/UV and HMP/UV monster ratios | 0.41 / 0.72 | 0.33 / 0.70 |
+| Deaf monsters | 42% | 42% |
+| Nearest monster to the start | 511 | 300 |
+
 ## The level builder
 
-`levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All five maps in `NUKAGE.WAD` came out of it, and the [decompiler](#decompiling-existing-maps) turns any Doom-format map back into this form.
+`levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All six maps in `NUKAGE.WAD` came out of it, and the [decompiler](#decompiling-existing-maps) turns any Doom-format map back into this form.
 
 ### Building a map
 
@@ -118,6 +136,7 @@ python3 -m levels nukage_crossing          # same for MAP02
 python3 -m levels nukage_core              # same for MAP03
 python3 -m levels nukage_divided            # same for MAP04
 python3 -m levels nukage_drain              # same for MAP05
+python3 -m levels nukage_turbine            # same for MAP06
 python3 -m levels nukage_junction --check  # check only
 ```
 

@@ -1,0 +1,181 @@
+# Nukage Turbine (MAP06) wiring test: over the hall on the gantry, the annex and
+# the blue key, the generator house and the sinking cradle, the lower wing, back
+# under the gantry, the floodgate, all four secrets, the lift loop and the exit.
+#   uv run -q --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP06 levels/playtests/nukage_turbine.playtest
+
+killall
+look 0 8
+shot start
+expect floor 1056 224 == 128      # the floodgate is up
+expect ceil 1632 648 == 160       # arachnotron closets shut
+expect ceil 352 648 == 160
+
+# The balcony: the super shotgun, and the yellow exit door straight below.
+walk 96 352
+expect has SuperShotgun
+walk 120 300
+look 225 35
+shot balcony
+expect ceil 248 368 == 160        # the lift door is shut: no way down yet
+
+# Gantry segment A to its break; door N1 into the annex, and secret 2.
+walk 600 520
+open 640 656
+walk 640 1000
+open 576 1024
+walk 496 1024
+expect secrets == 1
+expect has Backpack
+open 560 1024
+
+# The control room: the blue key on the console opens the ring corridor's closets.
+open 720 928
+walk 728 928                      # door-centred steps: if a fight pushes the bot back and the
+walk 768 928                      # door shuts, it runs straight at the door and uses it
+walk 776 800 864 800              # round the pedestal: the key comes after the window
+look 270 25
+shot control-window
+walk 864 896
+expect has BlueCard
+wait 70
+expect ceil 784 1224 > 200
+expect ceil 944 1224 > 200
+
+# Corridor N2 and the switchgear vault.
+open 992 928
+open 1168 1088
+walk 1220 1180
+expect has ClipBox
+open 1184 1088
+open 1088 672
+
+# Gantry segment B: the floodgate and the far floor below, the blue door.
+walk 1300 600 1150 470
+look 240 30
+shot gantry-b
+walk 1300 600
+walk 1980 600 1980 490
+expect pos 1980 490
+open 2064 544
+
+# The generator gallery round the well, and the loft with secret 3.
+walk 2300 560
+look 0 20
+shot well
+walk 2880 720 2880 900 2880 1024
+open 2368 1024
+walk 2288 1024
+expect secrets == 2
+expect has PlasmaRifle
+open 2352 1024
+walk 2880 1024 2880 900 2880 720
+
+# The cradle: taking the yellow key sinks it and the parapet into the well.
+expect floor 2832 448 == 168
+walk 2832 600 2832 448
+expect has YellowCard
+look 180 10
+wait 35
+shot cradle
+wait 200
+expect floor 2832 448 == 0
+expect floor 2696 448 == 0
+expect ceil 2968 448 > 100        # the door at its foot
+checkpoint cradle
+
+# The boiler room: the rocket launcher.
+walk 3040 240
+expect has RocketLauncher
+look 90 0
+shot boiler
+
+# The pipe gallery and the boiler passage: its door into the hall opens from this side.
+walk 3100 -200 2500 -280 2150 -200
+expect has RocketBox
+walk 2152 250
+wait 70
+expect ceil 2072 368 > 100
+
+# The return: into the hall floor, and arachnotron 1 comes out onto the gantry.
+walk 1990 368
+wait 70
+expect ceil 1632 648 > 200
+walk 1900 360
+expect has RocketBox
+look 135 -20
+shot return
+checkpoint return
+
+# The sump: the pump room and the cooling yard.
+open 1408 -16
+walk 1408 -200 1000 -300
+open 816 -480
+walk 480 -580
+expect has Berserk
+open 800 -480
+open 1248 -624
+walk 1248 -888
+expect has Megasphere
+open 1248 -640
+
+# The switch booth: its switch sinks the floodgate, watched through the window.
+use 1264 -8
+walk 1160 -30
+look 135 -10
+wait 35
+shot floodgate
+wait 140
+expect floor 1056 224 == 0
+
+# Secret 1: the panel in the sump's east wall, the lift up to the lit ledge.
+open 1664 -288
+walk 1744 -200
+use 1744 -128
+wait 35
+walk 1744 -96
+wait 140                          # down 136, 3 s at the bottom, back up
+expect floor 1744 -96 == 96
+walk 1744 -24 1680 -24
+expect secrets == 3
+expect has Soulsphere
+walk 1744 100
+
+# Over the floodgate: arachnotron 2 above the exit, and the lift door opens.
+walk 900 368
+wait 70
+expect ceil 352 648 > 200
+expect ceil 248 368 > 200
+
+# Secret 4: the alcove at the back of the gap bay's pool.
+walk 864 560
+look 90 20
+shot gap-bay                      # the lit alcove at the back of the pool
+walk 900 500 984 704
+expect secrets == 4
+expect pos 984 704               # blue armor stays: the megasphere's 200 armor is more
+walk 900 500
+
+# The exit approach opens the mancubus closet. Lift L1 up to the balcony closes the loop.
+expect ceil 224 -8 == 0
+walk 500 368 400 368
+wait 140                          # fight the closet out before boarding the lift
+expect ceil 224 -8 > 64
+walk 320 260
+wait 140                          # and arachnotron 2 above: the bot strafes off a lift mid-fight
+use 320 288
+walk 320 368                      # on board while it's going down
+wait 150                          # down 160, 3 s at the bottom, back up
+expect floor 320 368 == 160
+walk 160 368
+expect pos 160 368
+use 256 368
+walk 320 368
+wait 70
+walk 420 368
+
+# The yellow door and the exit vault.
+open -16 160
+walk -200 160
+look 180 0
+shot exit
+exit -328 160
