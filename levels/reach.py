@@ -1184,7 +1184,7 @@ class Model:
         stay_fired = set()
         boss_fired = set()
         res = dict(sector_wave={}, key_wave={}, key_site={}, trig_wave={}, trig_site={},
-                   exit_wave={}, exit_site={}, boss_wave={}, boss_site={}, snaps=[])
+                   exit_wave={}, exit_site={}, boss_wave={}, boss_site={}, snaps=[], snap_now=[])
         wave = 0
         while True:
             base = [tuple(p) for p in perm]
@@ -1194,6 +1194,8 @@ class Model:
                 res["sector_wave"].setdefault(s, wave)
             if snapshots:
                 res["snaps"].append((base, man, frozenset(keys), frozenset(R)))
+                # heights as they are now (base keeps every state a sector has had)
+                res["snap_now"].append([tuple({cur[s]} | osc[s]) for s in range(self.n)])
             changed = False
             # exits
             for kind, i, trig in self.exits:

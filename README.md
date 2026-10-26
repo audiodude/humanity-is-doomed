@@ -67,7 +67,7 @@ Measured with the research scripts against the DOOM II maps:
 | Whole-map symmetry | 0.62 | 0.54 |
 
 ### Nukage Divided (`nukage_divided`)
-MAP04: 110 sectors, 23/43/56 monsters on easy/medium/hard, four secrets, and the first barons.
+MAP04: 112 sectors, 23/43/56 monsters on easy/medium/hard, four secrets, and the first barons.
 
 You leave the start room facing a wall that is half lava, half blue computer screens: a red furnace wing on one side, a blue cooling wing on the other. The wings never meet, and each ends at its own key beside a locked arena door of the other colour, with the other key in sight across a nukage pit.
 
@@ -166,7 +166,7 @@ Textures vanilla can't tile cleanly, and line actions or thing types that aren't
 
 Every build also prints:
 - A balance report for each skill: monster health against ammo damage, health and armor.
-- The research measurements (`levels/measure.py`, using `scripts/metrics/`): floor heights, lighting, texture variety, border textures, symmetry, optional area, secrets, monster mix, ammo and health, skill ratios and distance to the nearest monster, each beside the median and interquartile range of id's maps for that game and flagged `below` or `above` it. Rule-1 slips (a floor texture change with no height change) are listed by sector pair, and rule-2 seams (two wall textures meeting in one plane with no border texture such as `SUPPORT3`, `DOORTRAK` or `LITE5` between them) by sector, texture pair and one junction's coordinates. This takes a couple of seconds.
+- The research measurements (`levels/measure.py`, using `scripts/metrics/`): floor heights, lighting, texture variety, border textures, symmetry, optional area, secrets, monster mix, ammo and health, skill ratios and distance to the nearest monster, each beside the median and interquartile range of id's maps for that game and flagged `below` or `above` it. Then the balance along the route (`levels/balance.py`, design in `docs/balance-metrics.md`), with no bot: the reach model's critical path split into legs (one per required key or trigger), the monsters each leg engages (on the path, able to walk to it, or able to shoot it from within 1024 units), and two ammo curves leg by leg with carry caps: *thorough* (every reachable item) and *detour* (items within a 1024-unit round trip off the path, secrets excluded), plus health at the median id map's cost per monster HP, the long-range hitscan peak, side rooms, the monster HP each trap on the route releases against the ammo in hand, and monsters that can shoot the start. These are warnings judged against the id maps, never errors: a quarter of id's maps run short on the thorough curve too. Rule-1 slips (a floor texture change with no height change) are listed by sector pair, and rule-2 seams (two wall textures meeting in one plane with no border texture such as `SUPPORT3`, `DOORTRAK` or `LITE5` between them) by sector, texture pair and one junction's coordinates. This takes a couple of seconds.
 - A top-down SVG preview, `wads/<WAD stem>-<MAP>.svg`: sectors shaded by floor height, special lines in red, bars and fences dashed, monsters by skill, pickups and keys.
 
 A failed check prints `ERROR:` lines and stops the build before the WAD is touched. The preview is still written, so you can see what went wrong.
@@ -214,7 +214,7 @@ uv run --with pillow scripts/tools/texture_sheets.py            # DOOM2_WAD from
 
 - `levels/model.py`: the dataclasses levels are written in (`Sector`, `Special`, `Thing`, `Line`, `Side`) and the shape helpers.
 - `levels/mapgen.py`: `build()` and `compile_level()`, which turn sectors into lines and sides and place textures. Its docstring describes the level format.
-- `levels/checks.py`: the checks and the balance report. `levels/reach.py`: the reach model, shared with the research scripts. `levels/measure.py`: the sector-overlap check, rule-1 slips and the research measurements.
+- `levels/checks.py`: the checks and the balance report. `levels/reach.py`: the reach model, shared with the research scripts. `levels/measure.py`: the sector-overlap check, rule-1 slips and the research measurements. `levels/balance.py`: the resource curve and exposure checks along the route.
 - `levels/decompile.py`: the decompiler. `levels/wadmap.py`: reads maps from WADs.
 - `levels/preview.py`: the SVG preview. `levels/wad.py`: WAD reading and writing, IWAD paths from `.env`.
 - `levels/doom2.py`: every DOOM and DOOM II thing type, monster sizes and health, pickups, line actions and sector specials.
@@ -241,6 +241,8 @@ Building a decompiled module gives back the same map: the same sectors, things, 
 ### Playtests
 `levels/playtests/<module>.playtest` scripts walk each map's intended route: doors, switches, lifts, key traps, secrets and the exit, checking floor and ceiling heights after each trigger. The runner, `scripts/tools/playtest.py`, plays them in [ViZDoom](https://vizdoom.farama.org/), a ZDoom-based engine packaged as a Python library. It drives the player with real inputs as fast as the machine runs the game, with god mode on and no window, so a whole route takes 4–10 seconds. Screenshots go to `/tmp/playtest-shots/<MAP>/`. The IWAD is `DOOM2_WAD` from `.env`; override with `--iwad` (for example with your `DOOM.WAD` for a decompiled `ExMy` map).
 
+ViZDoom comes from Michał Kempka, Marek Wydmuch, Grzegorz Runc, Jakub Toczek and Wojciech Jaśkowski ([paper](https://arxiv.org/abs/1605.02097)), is maintained by the [Farama Foundation](https://github.com/Farama-Foundation/ViZDoom), and is built on [ZDoom](https://zdoom.org). It was made for research into AI that learns to play Doom from the screen, and the same hooks make playtesting simple. Python advances the game one tic at a time, so the runner steers like a player and checks as it goes; the GZDoom runner before it compiled each script to ZScript and played it in real time on a hidden X display. The runner reads the game's state straight from the engine: the player's position, health and ammo, every sector's floor and ceiling (`expect floor`, `expect ceil`), and every monster and item, which is how `expect has` sees a key taken and how the `--fight` bot finds monsters and pickups without any training. Saves give `checkpoint`, console commands give god mode, `give`, `killall` and `teleport`, seeds make a fight repeatable, recordings with the screen and sound buffers give `--replay` and `--video`, and ZDoom's compatibility settings give the vanilla rules described below.
+
 ViZDoom isn't needed to build maps, so it isn't a requirement of the builder. `uv run --with vizdoom` fetches it into a cached environment the first time:
 
 ```sh
@@ -251,7 +253,7 @@ python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 --describe   # start, ke
 
 Scripts say where to go, not how to get there: `walk X Y` finds its own way round walls, solid things, steps too high to climb and closed doors, avoiding damaging floors when it can, and `open` and `use` walk up to their line first. A script can mark `checkpoint NAME` steps; `--from NAME` resumes from the save the last full run made there, as long as the WAD, map, skill and every step before it are unchanged. The script language is in the runner's docstring.
 
-With `--fight` the same scripts test balance instead: god mode is off and a bot fights its way along the route, picking up health and ammo when it's low. Each death is counted, with where and when, and the run carries on. It reports each section of the route with time, kills, damage taken, deaths, health and ammo fired. Runs are recorded: `--watch` shows one live in a window, `--replay` plays the last one back (pass the same `--seed`), and `--replay --video FILE.mp4` renders it with sound (`--hd` for 1080p). The bot is a weaker player than a person and its results vary with `--seed`, so try several seeds and check the footage before blaming the map.
+With `--fight` the same scripts test balance instead: god mode is off and a bot fights its way along the route, picking up health and ammo when it's low. Each death is counted, with where, when and a label (`hazard`, `starved`, `unseen`, `stuck` or `combat`), and the run carries on. A step the bot gets stuck on, or 3 deaths in one spot within 30 s, is listed as skipped and the bot is warped to where the step was going, and `--max-time` (default 15 game minutes) caps the run, so a fight always finishes. The build's resource curve answers most balance questions faster; use fights to confirm it. It reports each section of the route with time, kills, damage taken, deaths, health and ammo fired. Runs are recorded: `--watch` shows one live in a window, `--replay` plays the last one back (pass the same `--seed`), and `--replay --video FILE.mp4` renders it with sound (`--hd` for 1080p). The bot is a weaker player than a person and its results vary with `--seed`, so try several seeds and check the footage before blaming the map.
 
 ```sh
 uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP03 levels/playtests/nukage_core.playtest --fight --seed 2
@@ -259,7 +261,7 @@ uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP03 --replay -
 uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP03 --replay --seed 2 --video run.mp4  # needs ffmpeg
 ```
 
-A pass shows the map's wiring works in a ZDoom-based engine, which, like vanilla, only lets the player use a line from its front side. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
+The runner turns on ZDoom's strict Doom compatibility, so a pass shows the map's wiring works under vanilla rules as far as ZDoom can follow them: the player can only use a line from its front side, pressing use stops at the first line with an action (so a walk-over trigger just in front of a door or switch blocks it), and monsters are infinitely tall. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
 
 ## Research: what makes DOOM levels fun
 Nukage Crossing and the maps after it were designed from a research report on the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It drew on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. The report quotes its sources at length, so it isn't published here; the measurement scripts are.
@@ -270,4 +272,5 @@ The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs t
 python3 scripts/metrics/space_metrics.py        # -> research/data/metrics_space.csv (about 2 minutes)
 python3 scripts/metrics/combat_metrics.py       # -> research/data/metrics_combat.csv
 python3 scripts/metrics/progression_metrics.py  # -> research/data/metrics_progression.csv; pass a slot (E1M7) to dump one map
+python3 scripts/metrics/route_metrics.py        # -> research/data/metrics_route.csv (balance along the route; about 40 s); pass a slot for its report
 ```

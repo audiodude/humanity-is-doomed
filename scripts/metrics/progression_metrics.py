@@ -331,6 +331,7 @@ def analyse(md, res):
         w = min(c[0] for c in cands)
         goals.append((w, sorted({c[1] for c in cands if c[0] == w}), "trig:%s/%s" % g))
     crit_seq, steps, fallbacks = [md.start], [], 0   # steps: (a, b, kind, length, one_way)
+    legs = []   # (goal label, wave, region path, length) in walking order
     if ex:
         by_wave = defaultdict(list)
         for w, site, lab in goals:
@@ -372,7 +373,8 @@ def analyse(md, res):
                     p = leg(md.start, site)
                     if p is None:
                         continue
-                _, path, kinds = p
+                length, path, kinds = p
+                legs.append((lab, w, path, length))
                 for a, b, kind in zip(path, path[1:], kinds):
                     one_way = kind in ("walk", "gap") and not any(
                         x == a for x, _, _ in md.moves(b, base, man, keys))
@@ -526,7 +528,7 @@ def analyse(md, res):
     else:
         row["exit_teased"] = ""
     debug = dict(model=md, res=res, goals=goals, keys_req=keys_req, required=required,
-                 effective=effective, key_dep=key_dep, crit_seq=crit_seq, room=room, exit=ex)
+                 effective=effective, key_dep=key_dep, crit_seq=crit_seq, legs=legs, room=room, exit=ex)
     return row, debug
 
 
