@@ -162,7 +162,7 @@ Findings come in two kinds. **Playability** findings fail every build:
 - Pictures such as switches and door faces fit their wall exactly. Bars and fences can't use textures built from overlapping patches, which vanilla draws as garbage on two-sided lines (the medusa effect).
 - The exit can be reached without a running jump. Jumps only count when the exit can't be reached any other way.
 
-Textures vanilla can't tile cleanly, and line actions or thing types that aren't vanilla, get a warning. A module can list playability findings it accepts in `KNOWN_ISSUES`: the build fails only on findings not on the list, and says `fixed:` for listed ones that no longer occur.
+Textures vanilla can't tile cleanly, and line actions or thing types that aren't vanilla, get a warning. A module can list the playability findings and warnings it accepts in `KNOWN_ISSUES`: the build fails only on findings not on the list, doesn't print listed warnings, and says `fixed:` for listed entries that no longer occur.
 
 Every build also prints:
 - A balance report for each skill: monster health against ammo damage, health and armor.

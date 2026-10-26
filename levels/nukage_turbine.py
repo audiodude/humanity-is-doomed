@@ -256,6 +256,9 @@ SPECIAL_WALLS = {**sw_fg, **sw_exit}
 SECRET_DOORS = {"d_sr", "d_lsec", "d_sc"}
 MUST_REACH = ["sv", "lo", "br", "pg", "sh", "swb", "pr", "cy", "isle", "nc1", "nc2", "ar1", "ar2", "mc", "ev",
               "pb_sec", "gb", "fw_s", "fe_s"]
+# The cacodemon over the gantry break is side-on to the start window (exactly
+# 90°, which vanilla counts as in view), about 1000 units off: accepted.
+KNOWN_ISSUES = ["start under fire: CACO at 864,560 can shoot the start and faces it"]
 
 # (type, x, y, angle=0, skills="emh"); "a" = ambush (deaf).
 THINGS = [Thing(*t) for t in [
