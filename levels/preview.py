@@ -1,28 +1,38 @@
 """Top-down SVG preview of a level: sectors shaded by floor height, walls,
 line specials, and things."""
+import math
 from html import escape
 
 from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, HEALTH_PICKUPS, KEY_OF, PLAYERS,
                     SECRET_AREA)
-from .model import DOOR, LIFT
+from .model import DOOR, LIFT, edges, point_in_loop
 
 KEY_COLORS = {"blue": "#2255ff", "yellow": "#e0c000", "red": "#e02020"}
 
 
-def label_point(sec):
-    """A point inside the sector near its bounding-box centre."""
-    xs = [x for x, _ in sec.loops[0]]
-    ys = [y for _, y in sec.loops[0]]
+def label_point(sec, loop):
+    """A point inside the sector and its outer loop `loop`, near the loop's
+    bounding-box centre: the centre, else the nearest point of a 16-unit
+    grid, else (a sector too thin for the grid) the nearest point 1 unit off
+    an edge's midpoint. None if there's none."""
+    xs = [x for x, _ in loop]
+    ys = [y for _, y in loop]
     cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
-    if sec.contains((cx, cy)):
+    if sec.contains((cx, cy)) and point_in_loop((cx, cy), loop):
         return cx, cy
-    grid = [(x, y) for x in range(min(xs) + 8, max(xs), 16) for y in range(min(ys) + 8, max(ys), 16)
-            if sec.contains((x, y))]
-    return min(grid, key=lambda p: (p[0] - cx) ** 2 + (p[1] - cy) ** 2) if grid else (cx, cy)
+    grid = [(x, y) for x in range(min(xs) + 8, max(xs), 16) for y in range(min(ys) + 8, max(ys), 16)]
+    if not any(sec.contains(p) and point_in_loop(p, loop) for p in grid):
+        grid = []
+        for (x1, y1), (x2, y2) in edges(loop):
+            n = math.hypot(x2 - x1, y2 - y1)
+            for k in (1, -1):
+                grid.append(((x1 + x2) / 2 + k * (y2 - y1) / n, (y1 + y2) / 2 - k * (x2 - x1) / n))
+    grid = [p for p in grid if sec.contains(p) and point_in_loop(p, loop)]
+    return min(grid, key=lambda p: (p[0] - cx) ** 2 + (p[1] - cy) ** 2, default=None)
 
 
 def write_svg(level, lines, path, scale=0.4, pad=96):
-    pts = [p for s in level.sectors.values() for p in s.loops[0]]
+    pts = [p for s in level.sectors.values() for loop in s.outer_loops() for p in loop]
     minx, maxx = min(x for x, _ in pts) - pad, max(x for x, _ in pts) + pad
     miny, maxy = min(y for _, y in pts) - pad, max(y for _, y in pts) + pad
 
@@ -38,7 +48,7 @@ def write_svg(level, lines, path, scale=0.4, pad=96):
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w:.0f}" height="{h:.0f}" '
            f'font-family="sans-serif">',
            '<rect width="100%" height="100%" fill="#fbfbf7"/>']
-    for s in level.sectors.values():
+    for s in (s for s in level.sectors.values() if s.loops):
         if s.kind == DOOR:
             fill = "#a0703c"
         elif s.kind == LIFT:
@@ -71,13 +81,16 @@ def write_svg(level, lines, path, scale=0.4, pad=96):
                    f'<title>{tip}</title></line>' if tip else
                    f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" {style}/>')
     for s in level.sectors.values():
-        xs, ys = [x for x, _ in s.loops[0]], [y for _, y in s.loops[0]]
-        if s.kind == DOOR or min(max(xs) - min(xs), max(ys) - min(ys)) < 48:   # too small to label
-            continue
-        x, y = xy(*label_point(s))
-        text = f"{s.name} {s.floor}" + (f" t{s.tag}" if s.tag else "")
-        out.append(f'<text x="{x:.1f}" y="{y:.1f}" font-size="9" text-anchor="middle" fill="#333">'
-                   f'{escape(text)}</text>')
+        for loop in s.outer_loops():
+            xs, ys = [x for x, _ in loop], [y for _, y in loop]
+            if s.kind == DOOR or min(max(xs) - min(xs), max(ys) - min(ys)) < 48:   # too small to label
+                continue
+            if (p := label_point(s, loop)) is None:
+                continue
+            x, y = xy(*p)
+            text = f"{s.name} {s.floor}" + (f" t{s.tag}" if s.tag else "")
+            out.append(f'<text x="{x:.1f}" y="{y:.1f}" font-size="9" text-anchor="middle" fill="#333">'
+                       f'{escape(text)}</text>')
     for t in level.things:
         x, y = xy(t.x, t.y)
         actor = ACTORS.get(t.type)

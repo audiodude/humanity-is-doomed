@@ -2,10 +2,14 @@
 
 A level module is plain data, read as module attributes:
 
-    MAP             map slot, e.g. "MAP01"
-    WAD             output file name, written to wads/
+    MAP             map slot, e.g. "MAP01"; ExMy is a DOOM map, MAPxx DOOM II
+                    (level.game), which picks the IWAD the checks use
+    WAD             output file name, written to wads/; may name a
+                    subdirectory, e.g. "imported/DOOM2.WAD"
     SECTORS         list[Sector]; list order is the SECTORS lump order
-    THINGS          list[Thing]; needs a PLAYER1 start
+    THINGS          list[Thing]; needs a PLAYER1 start. Thing.skills: e/m/h,
+                    a (ambush), n (multiplayer only); Thing.extra: other
+                    flag bits
     SPECIAL_BETWEEN {(sector_name, sector_name): Special} for every line two
                     sectors share; the lines face the first sector, which
                     matters for teleports. A Special.texture hangs bars or a
@@ -21,24 +25,50 @@ A level module is plain data, read as module attributes:
                     or {name: (x, y)} to pick offsets, (0, 0) = seamless
                                                                      [optional]
     MUST_REACH      sector names the progression check must reach    [optional]
-    UMAPINFO        {key: value} for the UMAPINFO lump               [optional]
+    UMAPINFO        {key: value} for the map's UMAPINFO entry, values
+                    written quoted; or a string, the entry's body between
+                    the braces written as it is (decompiled maps whose entry
+                    has repeated keys or unquoted values)             [optional]
+    OVERRIDES       {(point, point): model.Line} changing a built line, keyed
+                    by its exact endpoints after edges are split at vertices,
+                    sector edges and free lines alike. The front is on the
+                    right going from the first point to the second; a
+                    two-sided line built the other way is flipped, a wall
+                    must be keyed the way it was built. A Line/Side field that
+                    isn't None replaces the builder's value (flags: the whole
+                    word). Applied last; a key matching no line, or back= on
+                    a one-sided line, is an error                    [optional]
+    IMPORTED        True for decompiled maps                         [optional]
+    KNOWN_ISSUES    playability findings that don't fail the build   [optional]
+    RESOURCES       PWAD paths (absolute, ~, or relative to the repo root)
+                    whose textures, flats and patches the checks load after
+                    the IWAD; not copied into the WAD                [optional]
+    X_OFFSETS       "continuous" (default): x offsets run along each sector's
+                    outline; "zero": every x offset is 0 (secret door hints
+                    and OVERRIDES still apply). Decompiled maps use "zero"
+                    when it needs fewer overrides                    [optional]
 
 The dataclasses and shape helpers (doorway, stairs, lift) are in model.
-Sectors are polygons: an outer loop, holes that other sectors fill, and
-solid pillars. Edges two sectors share become two-sided linedefs; the rest
-become walls. Doors get their Sector.action on every line into them, and
-lifts get SR_LIFT from below (facing the player: vanilla uses a line only from its
-front) and WR_LIFT from above, unless SPECIAL_BETWEEN
-says otherwise.
+Sectors are polygons: loops and solid pillars. A loop inside an even number
+of the sector's other loops and pillars is an outer loop (a sector may have
+several), an odd number a hole that other sectors fill; a hole's edges with no sector
+across are walls. Edges two sectors share become two-sided linedefs; the
+rest become walls. Doors get their Sector.action on every line into them,
+and lifts get SR_LIFT from below (facing the player: vanilla uses a line
+only from its front) and WR_LIFT from above, unless SPECIAL_BETWEEN says
+otherwise.
 
 Textures are placed so walls read as continuous: x offsets run along each
-sector's outline, and the wall above or below an opening uses the room's own
-texture pegged like the rest of that wall. Pictures (switches, door faces)
-start at offset 0.
+sector's outline (unless X_OFFSETS is "zero"), and the wall above or below an
+opening uses the room's own texture pegged like the rest of that wall.
+Pictures (switches, door faces) start at offset 0.
 
-build() writes an SVG preview, prints a balance report, validates thing
-placement, progression (derived from keys, door specials and tagged
-triggers) and texture fit, then runs ZDBSP (by default the copy bundled with
+compile_level() builds a level's lines, sides and map lumps. build() writes
+an SVG preview, prints a balance report, runs checks.findings (thing
+placement, progression and kills by the reach model over every vanilla line
+action, texture fit against the map's game's IWAD): playability findings
+not in KNOWN_ISSUES fail the build, style findings too unless IMPORTED. Then
+it prints the measurements and runs ZDBSP (by default the copy bundled with
 Ultimate Doom Builder) for nodes, blockmap and reject. Several level modules
 can share a WAD: build() replaces only its own map slot and UMAPINFO entry.
 """
@@ -46,19 +76,18 @@ import os
 import shutil
 import subprocess
 import tempfile
+from dataclasses import dataclass
 
-from .checks import balance_report, check_hazards, check_reach, check_textures, check_things
+from .checks import balance_report, findings, level_textures
 from .doom2 import ACTORS, PLAYERS, SR_LIFT, WR_LIFT, is_decal
 from .model import (ALL, DOOR, LIFT, ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, ML_SECRET,
-                    ML_TWOSIDED, NO_TEX, ROOM, SKY, LevelError, Linedef, Sidedef, dist, edges,
-                    floor_movers, floor_range, load, on_segment, oriented, sector_at, segments_cross)
-from .measure import check_sector_overlaps, measure
+                    ML_TWOSIDED, NO_TEX, ROOM, ROOT, SKY, LevelError, Linedef, Sidedef, dist, edges,
+                    floor_movers, floor_range, load, on_segment, oriented, sector_at)
+from .measure import measure
 from .preview import write_svg
-from .wad import (IWAD, iwad_textures, map_lumps, read_wad, replace_map, umapinfo_lump,
-                  write_wad)
+from .wad import map_lumps, read_wad, replace_map, umapinfo_lump, write_wad
 
 UDB_ZDBSP = "/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp"
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def find_zdbsp(path=None):
@@ -73,9 +102,10 @@ def find_zdbsp(path=None):
 
 def build_lines(level):
     """Split every sector edge at vertices lying on it, then pair opposite
-    directed edges into two-sided lines; unpaired edges become walls. Free
-    lines are split the same way and each piece belongs to the sector it
-    stands in. Lines may only meet at shared vertices."""
+    directed edges into two-sided lines; unpaired edges become walls (a hole
+    must touch another sector somewhere). Free lines are split the same way
+    and each piece belongs to the sector it stands in. Lines should only meet
+    at shared vertices; the checks report lines that cross (model.crossings)."""
     verts = sorted({p for s in level.sectors.values() for loop in s.loops + s.pillars for p in loop}
                    | {p for pq in level.free_lines for p in pq})
     directed = {}   # (a, b) -> (sector on its right, loop role, distance along the loop at a)
@@ -90,18 +120,19 @@ def build_lines(level):
                         raise LevelError(f"overlap: edge {u}->{v} in {directed[(u, v)][0].name} and {sec.name}")
                     directed[(u, v)] = (sec, role, pos)
                     pos += dist(u, v)
-    lines, seen, problems = [], set(), {}
+    lines, seen, problems, open_holes, filled = [], set(), {}, {}, set()
     for (a, b), (s, role, pos) in directed.items():
         if (a, b) in seen:
             continue
         seen.add((a, b))
         if (b, a) not in directed:
             if role.startswith("hole"):
-                problems[(s.name, role)] = f"{s.name}: {role} at {a} has no sector in it; add one or move it to pillars"
+                open_holes[(s.name, role)] = f"{s.name}: {role} at {a} has no sector in it; add one or move it to pillars"
             lines.append(Linedef(a, b, s, None, front_x=pos))
             continue
         seen.add((b, a))
         t, trole, tpos = directed[(b, a)]
+        filled |= {(s.name, role), (t.name, trole)}
         if t is s:
             raise LevelError(f"sector {s.name} borders itself at {a}-{b}")
         for sec, r, o in ((s, role, t), (t, trole, s)):
@@ -112,6 +143,7 @@ def build_lines(level):
             lines.append(Linedef(b, a, t, s, front_x=tpos, back_x=pos))
         else:
             lines.append(Linedef(a, b, s, t, front_x=pos, back_x=tpos))
+    problems.update((k, msg) for k, msg in open_holes.items() if k not in filled)
     for (p, q), sp in level.free_lines.items():
         if p == q:
             problems[(p, q)] = f"free line {p}-{q} has no length"
@@ -127,32 +159,9 @@ def build_lines(level):
                 problems[(p, q)] = f"free line {p}-{q} is in the void at {u}-{v}"
             else:
                 lines.append(Linedef(u, v, sec, sec, action=sp.action, tag=sp.tag, texture=sp.texture))
-    for k, msg in enumerate(crossings(lines)):
-        problems[("cross", k)] = msg
     if problems:
         raise LevelError("\n".join(problems.values()))
     return lines
-
-
-def crossings(lines):
-    """A message for every pair of lines that cross in an X instead of
-    meeting at a vertex: a self-intersecting sector, or sectors or free lines
-    cutting through each other."""
-    by_x = sorted(lines, key=lambda l: min(l.v1[0], l.v2[0]))
-    out = []
-    for i, a in enumerate(by_x):
-        ax2 = max(a.v1[0], a.v2[0])
-        ay1, ay2 = sorted((a.v1[1], a.v2[1]))
-        for b in by_x[i + 1:]:
-            if min(b.v1[0], b.v2[0]) > ax2:
-                break
-            if max(b.v1[1], b.v2[1]) < ay1 or min(b.v1[1], b.v2[1]) > ay2:
-                continue
-            if segments_cross(a.v1, a.v2, b.v1, b.v2):
-                names = sorted({s.name for l in (a, b) for s in (l.front, l.back) if s})
-                out.append(f"lines {a.v1}-{a.v2} and {b.v1}-{b.v2} cross ({', '.join(names)}); "
-                           "lines may only meet at a shared vertex")
-    return out
 
 
 def face(l: Linedef, v1):
@@ -214,19 +223,22 @@ def x_offset(pos, *textures):
     return 0 if any(is_decal(t) for t in textures) else round(pos) % 2048
 
 
-def line_sides(l: Linedef, secret_doors, ranges) -> list[Sidedef]:
+def line_sides(l: Linedef, secret_doors, ranges, x_offsets) -> list[Sidedef]:
     """Pick textures for the line's sides, and set its pegging flags so the
     wall above or below an opening lines up with the rest of the wall.
     ranges: {sector: (lowest floor, highest floor)}; a side gets a lower
-    texture whenever the other sector's floor can be above its own."""
+    texture whenever the other sector's floor can be above its own.
+    x_offsets: "continuous" runs x offsets along the sector's outline,
+    "zero" leaves them 0."""
+    front_x, back_x = (l.front_x, l.back_x) if x_offsets == "continuous" else (0, 0)
     if l.back is None:
         tex = l.texture or l.front.wall
-        return [Sidedef(NO_TEX, NO_TEX, tex, l.front, x_offset(l.front_x, tex))]
+        return [Sidedef(NO_TEX, NO_TEX, tex, l.front, x_offset(front_x, tex))]
     mid = l.texture or NO_TEX
     if l.front is l.back:
         return [Sidedef(NO_TEX, NO_TEX, mid, l.front), Sidedef(NO_TEX, NO_TEX, mid, l.front)]
     sides = []
-    for me, other, pos in ((l.front, l.back, l.front_x), (l.back, l.front, l.back_x)):
+    for me, other, pos in ((l.front, l.back, front_x), (l.back, l.front, back_x)):
         up = lo = NO_TEX
         dx = dy = 0
         if other.kind == DOOR:
@@ -244,6 +256,68 @@ def line_sides(l: Linedef, secret_doors, ranges) -> list[Sidedef]:
     return sides
 
 
+def apply_overrides(level, lines, sides):
+    """Apply OVERRIDES (see model.Line) to the built lines and their sides,
+    flipping a two-sided line first if it was built the other way round. A
+    one-sided wall can't be flipped (it would face the void): its key must
+    run the way it was built."""
+    at = {(l.v1, l.v2): i for i, l in enumerate(lines)}
+    problems, done = [], {}
+    for (p, q), ov in level.overrides.items():
+        i = at.get((p, q))
+        if i is None and (i := at.get((q, p))) is not None:
+            l = lines[i]
+            if l.back is None:
+                problems.append(f"override {p}-{q} runs against one-sided wall {q}-{p}; key it {q}-{p}")
+                continue
+            l.v1, l.v2 = l.v2, l.v1
+            l.front, l.back, l.front_x, l.back_x = l.back, l.front, l.back_x, l.front_x
+            sides[i].reverse()
+            at[(p, q)] = at.pop((q, p))
+        if i is None:
+            problems.append(f"override {p}-{q} matches no line")
+            continue
+        if i in done:
+            problems.append(f"overrides {done[i]} and {p}-{q} are the same line")
+        done[i] = f"{p}-{q}"
+        l = lines[i]
+        for name in ("action", "tag", "flags"):
+            if getattr(ov, name) is not None:
+                setattr(l, name, getattr(ov, name))
+        for k, s in enumerate((ov.front, ov.back)):
+            if s is None:
+                continue
+            if k >= len(sides[i]):
+                problems.append(f"override {p}-{q} sets back= on a one-sided line")
+                continue
+            for name, attr in (("upper", "upper"), ("lower", "lower"), ("mid", "mid"), ("x", "x_offset"),
+                               ("y", "y_offset")):
+                if getattr(s, name) is not None:
+                    setattr(sides[i][k], attr, getattr(s, name))
+    if problems:
+        raise LevelError("\n".join(problems))
+
+
+@dataclass
+class Compiled:
+    """A level's built lines, each line's sides, and its map lumps (no nodes)."""
+    lines: list[Linedef]
+    sides: list[list[Sidedef]]
+    lumps: list[tuple[str, bytes]]
+
+
+def compile_level(level) -> Compiled:
+    """Build the level's lines, specials and sides, apply its OVERRIDES, and
+    pack its map lumps. Raises LevelError."""
+    lines = build_lines(level)
+    assign_specials(level, lines)
+    movers = floor_movers(lines)
+    ranges = {s: floor_range(s, lines, movers) for s in level.sectors.values()}
+    sides = [line_sides(l, level.secret_doors, ranges, level.x_offsets) for l in lines]
+    apply_overrides(level, lines, sides)
+    return Compiled(lines, sides, map_lumps(level, lines, sides))
+
+
 def build(module, check_only=False, out=None, zdbsp=None):
     """Validate a level module and write its map into its WAD (default
     wads/<WAD>), keeping any other maps already there, plus an SVG preview
@@ -253,36 +327,32 @@ def build(module, check_only=False, out=None, zdbsp=None):
     LevelError."""
     level = load(module)
     out = out or os.path.join(ROOT, "wads", level.wad)
-    lines = build_lines(level)
-    assign_specials(level, lines)
-    movers = floor_movers(lines)
-    ranges = {s: floor_range(s, lines, movers) for s in level.sectors.values()}
-    sides = [line_sides(l, level.secret_doors, ranges) for l in lines]
+    compiled = compile_level(level)
+    lines, sides, lumps = compiled.lines, compiled.sides, compiled.lumps
     os.makedirs(os.path.dirname(out), exist_ok=True)
     svg = f"{os.path.splitext(out)[0]}-{level.map}.svg"
     write_svg(level, lines, svg)
-    monsters = [t for t in level.things if t.type in ACTORS and t.type not in PLAYERS]
+    monsters = [t for t in level.things if t.type in ACTORS and t.type not in PLAYERS and "n" not in t.skills]
     print(f"{level.name}: {len(level.sectors)} sectors, {len(lines)} linedefs, "
           f"{sum(map(len, sides))} sidedefs, {len(level.things)} things; monsters "
           + "/".join(str(sum(sk in t.skills for t in monsters)) for sk in ALL) + " (e/m/h)")
     print("preview:", svg)
     print("\n".join(balance_report(level)))
-    errors = (check_sector_overlaps(level) + check_things(level, lines) + check_reach(level, lines)
-              + check_hazards(level, lines))
-    iwad = iwad_textures()
-    if iwad is None:
-        print(f"warning: no doom2.wad at DOOM2_WAD={IWAD} (set it in .env, see .env.example); "
-              "skipping texture checks")
+    found = findings(level, compiled)
+    errors = [f for f in found.playability if f not in level.known_issues]
+    for issue in level.known_issues:
+        if issue not in found.playability:
+            print("fixed:", issue)
+    if level.imported:
+        found.warnings = found.style + found.warnings
     else:
-        tex_errors, tex_warnings = check_textures(level, lines, sides, iwad)
-        errors += tex_errors
-        for w in tex_warnings:
-            print("warning:", w)
+        errors += found.style
+    for w in found.warnings:
+        print("warning:", w)
     if errors:
         raise LevelError("\n".join(errors))
-    lumps = map_lumps(level, lines, sides)
-    if iwad is not None:
-        print("\n".join(measure(level, lines, lumps, IWAD)))
+    if found.reach and level_textures(level) is not None:
+        print("\n".join(measure(level, lines, found)))
     if check_only:
         return None
     zdbsp = find_zdbsp(zdbsp)
