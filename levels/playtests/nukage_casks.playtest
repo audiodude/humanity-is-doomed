@@ -1,0 +1,192 @@
+# Nukage Casks (MAP07) wiring test: the staff wing up to the gallery, the
+# maze to the yellow key and its closets, the tower, the cask switch that
+# sinks the maze, MAP07's boss rule (the last mancubus lowers the dispatch
+# shutters), then the exit. Every secret on the way.
+#   uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP07 levels/playtests/nukage_casks.playtest
+#
+# The wiring run's killall kills the mancubi too, so it tests the boss rule
+# up front: the shutters are shut before it and down after it (nothing else
+# moves tag 666). A --fight run skips killall: its bot has to kill all six in
+# the arena, and the shutter check after the arena is the real test.
+
+# Guardhouse: the yard, the facade and the flatcar cask through the window.
+look 0
+shot start
+expect floor 448 1488 == 128       # the dispatch shutters are shut
+expect floor 896 928 == 192        # the tallest cask stands
+killall
+walk -576 -296
+expect has Shotgun
+walk -512 -400
+open -576 -256
+
+# Yard: the flatcar cask's hatch sinks into its top (secret 1); then the
+# locker-room door in the north-west corner.
+walk -240 -200 320 -300
+use 320 -336
+wait 175
+expect floor 320 -344 == 0
+walk 320 -390
+expect secrets == 1
+expect has Backpack
+walk 320 -300 -512 -96
+look 90
+shot yard
+open -512 -32
+
+# Lockers: the super shotgun on the bench.
+walk -480 176
+expect has SuperShotgun
+open -608 320
+
+# Decon corridor: dark, the drain on its east side, armor in the niches.
+walk -656 400
+expect has GreenArmor
+walk -608 500
+look 90
+shot decon
+open -608 816
+
+# Stair and landing; the corridor and passage back south to the gallery door.
+walk -608 1260
+walk -224 1100
+open -32 960
+
+# Gallery, the reveal: the cask field, the key stack, the shutters, the tower window.
+walk 120 960
+look 0 8
+shot gallery
+look 30 4
+shot gallery_ne
+walk 96 1200 96 1296
+expect has Chaingun
+
+# Records office loop through the gallery's north end; secret 2 behind the panel.
+open -16 1408
+walk -160 1560
+open -160 1600
+walk -176 1696
+expect secrets == 2
+expect has RocketLauncher
+walk -160 1500
+walk 96 1408
+
+# The gallery's south end: the yellow door down B1, over the low cask. Then
+# the stair down into B0.
+walk 120 560
+look 0 2
+shot gallery_b1
+walk 96 96
+look 0
+shot b0
+
+# B0: the gate switch opens the yard gate (a loop to the start).
+use 832 -16
+wait 105
+expect ceil 672 -24 > 64
+walk 672 -96
+look 270
+shot gate_yard
+walk 672 96
+checkpoint b0
+
+# Cooling pond yard (optional): the megaarmor on the island, the tower roof's
+# beacon and soulsphere above.
+open 1680 96
+walk 2064 96
+walk 2256 480
+expect has BlueArmor
+walk 2064 960 2064 300
+look 85
+shot cp_beacon
+walk 2064 96
+open 1696 96
+walk 1500 96
+
+# The maze: north up A0, east along B2, north up A1, east along B3 to the stack's foot.
+walk 288 300 288 928
+walk 704 928
+walk 704 1376 992 1376
+look 270 4
+shot stack_foot
+
+# The key stack: up the blue steps to the yellow key; two closets open across B3.
+walk 992 1248 928 1248 864 1248 800 1248 800 1184 832 1088
+expect has YellowCard
+wait 70
+expect ceil 832 1480 > 64
+expect ceil 960 1480 > 64
+look 270 10
+shot stack_south
+checkpoint key
+
+# North-east spur (optional): back down, round by A2 and B2 to AP; secret 3
+# behind the panel at its dead end.
+walk 992 1248 992 1376 1120 1376 1120 928 1568 928 1568 1376 1520 1424
+open 1568 1472
+walk 1568 1520
+expect secrets == 3
+expect has PlasmaRifle
+walk 1568 1376 1568 928 1120 928
+
+# South down A2 to B1; the B1 spur's supplies; then east to the yellow door.
+walk 1120 512 720 528
+walk 1120 512 1568 512
+open 1680 512
+
+# Tower base (the rocket boxes behind the east rack) and the stair to the cab.
+walk 1840 400 1944 420 1944 600
+walk 1776 720 1776 940 1800 1100
+checkpoint cab
+
+# Secret 4: the shifted screen in the cab's east wall, out onto the roof.
+open 1936 1120
+walk 2128 1056
+expect secrets == 4
+expect has Soulsphere
+walk 1800 1120
+
+# The cask switch: every cask sinks, the mancubi stand in the open, and the
+# stair closet opens behind you.
+walk 1720 1152
+look 180 12
+shot cab_window
+use 1680 1040
+walk 1720 1152
+look 180 12
+wait 20
+shot drop
+wait 140
+expect floor 896 928 == 0          # B2H12, the tallest
+expect floor 784 1040 == 0         # the key top
+expect floor 448 512 == 0          # B1's low cask, with the megasphere
+expect floor 1848 808 == 96        # the stair closet's wall
+look 180 12
+shot arena
+
+# The arena: down into the open hall, past every cell. The last mancubus's
+# death lowers the shutters (MAP07's boss rule).
+# The cask tops' supplies are on the floor now.
+walk 1776 940 1776 720 1840 512
+open 1696 512
+walk 1568 512 1568 320 1344 704 1248 320 1120 320 896 320 704 320 704 640 896 704 448 512 512 1152 1344 1376
+expect has Megasphere
+look 180
+shot arena_floor
+walk 448 1400
+expect floor 320 1488 == 0
+expect floor 448 1488 == 0
+expect floor 576 1488 == 0
+look 90 -4
+shot shutters
+
+# Dispatch: apron, steps, the dock among the crates.
+walk 448 1560 448 1760 1040 1744 960 1952 160 2016 640 1960
+look 90
+shot dock
+open 640 2064
+
+# Exit vault.
+walk 640 2200
+shot exit
+exit 640 2312
