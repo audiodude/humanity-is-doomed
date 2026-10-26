@@ -145,6 +145,8 @@ walk 900 368
 wait 70
 expect ceil 352 648 > 200
 expect ceil 248 368 > 200
+look 225 15
+shot turbines                    # T1/T2 and the hall's south wall
 
 # Secret 4: the alcove at the back of the gap bay's pool.
 walk 864 560

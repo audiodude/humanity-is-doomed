@@ -66,9 +66,9 @@ def octagon(cx, cy, r):
 
 
 def turbine(n, box):
-    """A plinth 16 high with a 128-high turbine housing on it."""
+    """A 128-high turbine housing standing in a moat of coolant nukage 8 deep."""
     x1, y1, x2, y2 = box
-    return [Sector(f"plinth{n}", [rect(*box)], 16, HALL_C, "FLAT19", C_HALL, 160, HALL, lower="METAL"),
+    return [Sector(f"plinth{n}", [rect(*box)], -8, HALL_C, "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5),
             Sector(f"turb{n}", [octagon((x1 + x2) // 2, (y1 + y2) // 2, 72)], 128, HALL_C, "FLAT23", C_HALL, 192,
                    HALL, lower="METAL2", special=LIGHT_GLOW)]
 
@@ -98,12 +98,16 @@ SECTORS = [
     # ... the floor: a lit lane under the gantry, the turbines' half to the south
     # (the turbine halves wrap round the floodgate's ends, so the lanes don't meet it)
     Sector("fw_lane", [rect(384, 288, 960, 448)], 0, HALL_C, F_HALL, C_LANE, 192, HALL),
-    Sector("fw_s", [[(0, 0), (1024, 0), (1024, 448), (960, 448), (960, 288), (0, 288)]], 0, HALL_C, F_HALL, C_HALL,
-           144, HALL),
+    Sector("fw_s", [[(0, 32), (1008, 32), (1008, 0), (1024, 0), (1024, 448), (960, 448), (960, 288), (0, 288)]], 0,
+           HALL_C, F_HALL, C_HALL, 144, HALL),
     Sector("fg", [rect(1024, 0, 1088, 448)], 128, HALL_C, F_HALL, C_HALL, 176, HALL, lower="METAL6", tag=TAG_FG),
     Sector("fe_lane", [rect(1152, 288, 2048, 448)], 0, HALL_C, F_HALL, C_LANE, 192, HALL),
-    Sector("fe_s", [[(1088, 0), (2048, 0), (2048, 288), (1152, 288), (1152, 448), (1088, 448)]], 0, HALL_C, F_HALL,
-           C_HALL, 144, HALL),
+    Sector("fe_s", [[(1088, 0), (1104, 0), (1104, 32), (1328, 32), (1328, 0), (1488, 0), (1488, 32), (2048, 32),
+                     (2048, 288), (1152, 288), (1152, 448), (1088, 448)]], 0, HALL_C, F_HALL, C_HALL, 144, HALL),
+    # ... a coolant channel along the south wall, stopping short of the floodgate (it would sink into it)
+    # and bridged at the sump door
+    *[Sector(f"chan{i}", [rect(x1, 0, x2, 32)], -8, HALL_C, "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5)
+      for i, (x1, x2) in enumerate(((0, 1008), (1104, 1328), (1488, 2048)))],
     *turbine(1, (544, 48, 752, 256)),
     *turbine(2, (800, 48, 1008, 256)),
     *turbine(3, (1536, 48, 1744, 256)),
@@ -245,6 +249,7 @@ SPECIAL_BETWEEN = {
     **{pair: Special(texture=RAIL) for pair in RAILED},
     ("cr", "pb"): Special(texture="MIDGRATE"),         # control room window over the pool
     ("win", "fe_s"): Special(texture="MIDGRATE"),      # switch booth window onto the floodgate
+    ("win", "chan1"): Special(texture="MIDGRATE"),
     ("cr", "ped_b"): Special(W1_DOOR_OPEN, TAG_NC),    # blue key: the ring corridor's closets
     ("d_el_far", "fe_lane"): Special(W1_DOOR_OPEN, TAG_AR1),   # into the hall: arachnotron 1
     ("fg", "fw_s"): Special(W1_DOOR_OPEN, TAG_AR2),           # over the floodgate: arachnotron 2
@@ -255,7 +260,7 @@ FREE_LINES = {
     **{e: Special(W1_FLOOR_LOWEST, TAG_CRADLE) for e in ring(KEY, 48)},
     **{e: Special(W1_DOOR_OPEN, TAG_CDE) for e in ring(KEY, 80)},
     ((2096, 160), (2208, 160)): Special(W1_DOOR_OPEN, TAG_EL),          # boiler passage: open the hall door
-    ((448, 0), (448, 288)): Special(W1_DOOR_OPEN, TAG_MC),              # exit approach: mancubus
+    ((448, 32), (448, 288)): Special(W1_DOOR_OPEN, TAG_MC),             # exit approach: mancubus
     ((448, 288), (448, 448)): Special(W1_DOOR_OPEN, TAG_MC),
 }
 SPECIAL_WALLS = {**sw_fg, **sw_exit}
@@ -272,8 +277,8 @@ THINGS = [Thing(*t) for t in [
     (SHOTGUN, -200, 600), (CLIP, -200, 488),
     # balcony and gantry A: super shotgun, fodder below among T1/T2 facing south
     (SSG, 96, 352), (SHELLS, 160, 400), (SHELLS, 600, 520),
-    (ZOMBIE, 480, 140, 270, "emha"), (ZOMBIE, 780, 280, 270, "mha"), (ZOMBIE, 620, 30, 270, "ha"),
-    (SARGE, 900, 30, 270, "emha"), (SARGE, 500, 380, 270, "ha"),
+    (ZOMBIE, 480, 140, 270, "emha"), (ZOMBIE, 780, 280, 270, "mha"), (ZOMBIE, 520, 272, 270, "ha"),
+    (SARGE, 1000, 272, 270, "emha"), (SARGE, 500, 380, 270, "ha"),
     (IMP, 650, 160, 270, "emha"), (IMP, 900, 160, 270, "mha"),
     (CACO, 864, 560, 270, "mh"),
     # annex
@@ -312,7 +317,7 @@ THINGS = [Thing(*t) for t in [
     (SHELLBOX, 2152, 60),   # the boiler passage: armed for the return, whatever the generator house cost
     # the return: arachnotron 1 and its imps on gantry B
     (ARACHNO, 1632, 720, 270, "emh"), (IMP, 1580, 816, 270, "mh"), (IMP, 1690, 816, 270, "h"),
-    (ROCKETBOX, 1900, 360), (STIM, 1912, 30), (CELL, 1400, 360, 0, "em"), (ROCKET, 1200, 360),
+    (ROCKETBOX, 1900, 360), (STIM, 1776, 150), (CELL, 1400, 360, 0, "em"), (ROCKET, 1200, 360),
     # sump and switch booth
     (SPECTRE, 1000, -300, 90, "emh"), (SPECTRE, 1300, -550, 90, "mh"), (SPECTRE, 1550, -300, 90, "emha"),
     (SPECTRE, 1500, -560, 90, "h"),
