@@ -30,8 +30,10 @@ Fix until there are no `ERROR` lines. Warnings are allowed when the reason is un
 - Read the preview SVG (`read` with `:img`) next to the doc's sketch. Every space in the route is there, with the heights the doc gives, and the shape reads as the doc's concept rather than boxes off a corridor.
 - Read the measurement table the build prints. Each of the doc's targets is met, or the miss is written into the doc's Targets section with the reason.
 - Check rule-1 slips (floor texture change with no height change) listed by sector pair; fix those that aren't door thresholds.
+- Check the wall textures against the doc's materials table: every sector's `wall`, `lower`, door faces and alcove walls come from its area's row, and the texture metrics (most-used wall texture, rule-2 border share) meet the doc's targets.
+- Fix the rule-2 seams the build lists (two textures meeting in one wall plane with no border texture), each at the coordinates given: use one material on both sides if the change has no reason in the doc; otherwise put a trim between them, as a door track, an alcove in the trim texture, or a short wall line (a vertex either side) given the trim in `OVERRIDES`. A switch or door face set straight into a material wall counts too; frame it.
 
-Done when the build is clean, every route space is in the preview, and every target is met or its miss recorded in the doc.
+Done when the build is clean, every route space is in the preview, every target is met or its miss recorded in the doc, and every wall texture is in the materials table.
 
 ## Gotchas
 

@@ -25,7 +25,7 @@ Done when it reports 0 fails.
 
 ## 3. Look
 
-Read every screenshot the run wrote. Check what the doc promises a player sees (the reveal, a goal visible across a gap) actually shows, and nothing looks broken: missing textures, bleeding sectors, a room lit like a corridor.
+Read every screenshot the run wrote. Check what the doc promises a player sees (the reveal, a goal visible across a gap) actually shows, and nothing looks broken: missing textures, bleeding sectors, a room lit like a corridor. Check the walls look like the doc's materials table: each area reads as one place, and where two materials meet in view there is a trim or a reason. A wall that looks picked at random goes back to `build-doom-ii-level`.
 
 ## 4. Fight runs
 

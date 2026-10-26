@@ -2,14 +2,18 @@
 of its game (DOOM II, or Ultimate Doom for ExMy maps).
 
 Every build prints these, so a map's numbers are known before it's played:
-rule-1 slips (floor-texture changes with no height change) by sector pair, and
-a table of the research metrics (scripts/metrics/) with each one's median and
-interquartile range over the game's maps, flagged when outside it. The
-progression metrics reuse the build checks' reach-model run.
+rule-1 slips (floor-texture changes with no height change) by sector pair,
+rule-2 seams (two wall materials meeting in one plane with no border texture
+between them) by sector, and a table of the research metrics (scripts/metrics/)
+with each one's median and interquartile range over the game's maps, flagged
+when outside it. The progression metrics reuse the build checks' reach-model
+run.
 """
+import math
 import os
+import re
 import sys
-from collections import Counter
+from collections import Counter, defaultdict
 
 from .model import label_point
 
@@ -27,6 +31,7 @@ DOOM2 = {
     "n_light_special_sectors": (3, 9, 14),
     "r1_floor_viol": (0.008825, 0.03095, 0.0913),
     "top_wall_tex_share": (0.1961, 0.2955, 0.4505),
+    "r2_border_frac_collinear": (0.1295, 0.313, 0.6276),
     "sym_max": (0.4349, 0.5367, 0.642),
     "optional_area_share": (0.3285, 0.497, 0.7077),
     "n_secrets": (2, 4, 6.75),
@@ -48,6 +53,7 @@ ULTIMATE = {
     "n_light_special_sectors": (2, 9, 14),
     "r1_floor_viol": (0.0241, 0.0481, 0.1026),
     "top_wall_tex_share": (0.1812, 0.3089, 0.5327),
+    "r2_border_frac_collinear": (0.4444, 0.64, 0.7748),
     "sym_max": (0.4617, 0.5495, 0.64),
     "optional_area_share": (0.3553, 0.4395, 0.587),
     "n_secrets": (2, 3.5, 6),
@@ -69,6 +75,7 @@ LABELS = {
     "n_light_special_sectors": "light-effect sectors",
     "r1_floor_viol": "rule-1 slips (share of flat changes)",
     "top_wall_tex_share": "most-used wall texture",
+    "r2_border_frac_collinear": "rule-2 seams with a border texture",
     "sym_max": "whole-map symmetry",
     "optional_area_share": "optional share of area",
     "n_secrets": "secrets",
@@ -111,6 +118,43 @@ def rule1_slips(level, lines):
     return slips.most_common()
 
 
+def texture_family(name):
+    """A texture's family: its name without trailing digits, first four
+    letters (STARTAN1/STARTAN3/STARG2 -> STAR, BROWN1/BROWNGRN -> BROW)."""
+    return re.sub(r"\d+$", "", name)[:4]
+
+
+def rule2_seams(m, names, sm, textures):
+    """[(sector, tex, tex, count, (x, y))] of wall surfaces that meet another
+    texture in the same plane (within 30 degrees) where neither is a border
+    texture (Romero's rule 2), most first, with one junction to look at. These
+    are the r2_border_frac_collinear metric's unbordered junctions, less those
+    between variants of one family (STONE2 beside STONE3), which belong
+    together."""
+    parts = sm.wall_parts(m, textures)
+    starts = defaultdict(list)
+    for p in parts:
+        starts[p[1]].append(p)
+    cos30 = math.cos(math.radians(30))
+    seams, where = Counter(), {}
+    for a in parts:
+        line, v0, va, ta, zlo, zhi, la = a[0], a[1], a[2], a[3], a[4], a[5], a[9]
+        ln = m.lines[line]
+        side = ln.front if (v0, va) == (ln.v1, ln.v2) else ln.back
+        for b in starts.get(va, ()):
+            tb = b[3]
+            if (b[0] == line or ta == tb or min(zhi, b[5]) - max(zlo, b[4]) <= 0 or not la or not b[9]
+                    or sm.BORDER_EXT.match(ta) or sm.BORDER_EXT.match(tb)
+                    or texture_family(ta) == texture_family(tb)):
+                continue
+            (ax, ay), (vx, vy), (bx, by) = m.verts[v0], m.verts[va], m.verts[b[2]]
+            if ((vx - ax) * (bx - vx) + (vy - ay) * (by - vy)) / (la * b[9]) > cos30:
+                k = (names[m.sides[side].sector], *sorted((ta, tb)))
+                seams[k] += 1
+                where.setdefault(k, (vx, vy))
+    return [(*k, n, where[k]) for k, n in seams.most_common()]
+
+
 _textures = {}
 
 
@@ -133,6 +177,10 @@ def measure(level, lines, found):
     if slips:
         out.append("rule-1 slips (floor texture changes, height doesn't): "
                    + ", ".join(f"{a}/{b} {n:.0f}" for (a, b), n in slips))
+    seams = rule2_seams(m, list(level.sectors), sm, _textures[key])
+    if seams:
+        out.append("rule-2 seams (wall material changes in one plane, no border texture): "
+                   + ", ".join(f"{s} {a}|{b} x{n} at ({x:.0f},{y:.0f})" for s, a, b, n, (x, y) in seams))
     table, name = (ULTIMATE, "Ultimate Doom") if level.game == "doom" else (DOOM2, "DOOM II")
     out.append(f"{'measure':<44} {'map':>9}   {name} median [IQR]")
     for k, (q1, med, q3) in table.items():

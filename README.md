@@ -147,7 +147,7 @@ Textures vanilla can't tile cleanly, and line actions or thing types that aren't
 
 Every build also prints:
 - A balance report for each skill: monster health against ammo damage, health and armor.
-- The research measurements (`levels/measure.py`, using `scripts/metrics/`): floor heights, lighting, texture variety, symmetry, optional area, secrets, monster mix, ammo and health, skill ratios and distance to the nearest monster, each beside the median and interquartile range of id's maps for that game and flagged `below` or `above` it. Rule-1 slips (a floor texture change with no height change) are listed by sector pair. This takes a couple of seconds.
+- The research measurements (`levels/measure.py`, using `scripts/metrics/`): floor heights, lighting, texture variety, border textures, symmetry, optional area, secrets, monster mix, ammo and health, skill ratios and distance to the nearest monster, each beside the median and interquartile range of id's maps for that game and flagged `below` or `above` it. Rule-1 slips (a floor texture change with no height change) are listed by sector pair, and rule-2 seams (two wall textures meeting in one plane with no border texture such as `SUPPORT3`, `DOORTRAK` or `LITE5` between them) by sector, texture pair and one junction's coordinates. This takes a couple of seconds.
 - A top-down SVG preview, `wads/<WAD stem>-<MAP>.svg`: sectors shaded by floor height, special lines in red, bars and fences dashed, monsters by skill, pickups and keys.
 
 A failed check prints `ERROR:` lines and stops the build before the WAD is touched. The preview is still written, so you can see what went wrong.
@@ -179,11 +179,17 @@ Anything the builder infers can be overridden line by line in `OVERRIDES`, keyed
 
 Three skills in `.claude/skills/` take an agent through a new map in order, each ending where the next begins:
 
-- `design-doom-ii-level`: pitch five structurally different concepts, pick one, and write a design doc to `levels/designs/<module>.md` (route, sketch, secrets, measurement targets).
+- `design-doom-ii-level`: pitch five structurally different concepts, pick one, and write a design doc to `levels/designs/<module>.md` (route, sketch, materials, secrets, measurement targets).
 - `build-doom-ii-level`: turn the doc into a level module that builds clean and matches it, with the builder's known gotchas.
 - `test-doom-ii-level`: route script, wiring run, screenshots, and combat-bot runs on three seeds, with each death cluster called as a map or bot problem.
 
 They came out of four timed rounds of agents building maps from scratch: the six maps in `SPEEDY1.WAD`, built from feature checklists, all came out as the same hub with a wing per key, while the six in `SPEEDY2.WAD`, each built around a layout idea, didn't.
+
+Agents choose textures by name unless they can see them, which is how a map ends up a collage. `scripts/tools/texture_sheets.py` renders the IWAD's wall textures (grouped into families by name, border textures labelled in yellow) and flats onto contact sheets in `/tmp/texture-sheets/<iwad>/`, with an `index.txt` of which sheet holds which family. The design skill has the agent look at them before writing the doc's materials plan:
+
+```sh
+uv run --with pillow scripts/tools/texture_sheets.py            # DOOM2_WAD from .env; --iwad for another
+```
 
 ### Code layout
 
