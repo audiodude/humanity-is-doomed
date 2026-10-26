@@ -66,12 +66,15 @@ def octagon(cx, cy, r):
 
 
 def turbine(n, box):
-    """A 128-high turbine housing standing in a moat of coolant nukage 8 deep,
-    which runs south into the channel along the hall's wall (y 32)."""
+    """A 128-high turbine housing centred in box (it stands in a moat)."""
     x1, y1, x2, y2 = box
-    return [Sector(f"plinth{n}", [rect(x1, 32, x2, y2)], -8, HALL_C, "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5),
-            Sector(f"turb{n}", [octagon((x1 + x2) // 2, (y1 + y2) // 2, 72)], 128, HALL_C, "FLAT23", C_HALL, 192,
-                   HALL, lower="METAL2", special=LIGHT_GLOW)]
+    return Sector(f"turb{n}", [octagon((x1 + x2) // 2, (y1 + y2) // 2, 72)], 128, HALL_C, "FLAT23", C_HALL, 192,
+                  HALL, lower="METAL2", special=LIGHT_GLOW)
+
+
+def moat(name, x1, x2):
+    """Coolant nukage 8 deep round a pair of turbines, running south into the wall channel (y 32)."""
+    return Sector(name, [rect(x1, 32, x2, 256)], -8, HALL_C, "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5)
 
 
 # Switches: the floodgate switch in the booth's north wall beside its window, and the exit.
@@ -99,26 +102,25 @@ SECTORS = [
     # ... the floor: a lit lane under the gantry, the turbines' half to the south
     # (the turbine halves wrap round the floodgate's ends, so the lanes don't meet it)
     Sector("fw_lane", [rect(384, 288, 960, 448)], 0, HALL_C, F_HALL, C_LANE, 192, HALL),
-    Sector("fw_s", [[(0, 32), (544, 32), (544, 256), (752, 256), (752, 32), (800, 32), (800, 256), (1008, 256),
-                     (1008, 32), (1008, 0), (1024, 0), (1024, 448), (960, 448), (960, 288), (0, 288)]], 0,
-           HALL_C, F_HALL, C_HALL, 144, HALL),
+    Sector("fw_s", [[(0, 32), (544, 32), (544, 256), (1008, 256), (1008, 32), (1008, 0), (1024, 0), (1024, 448),
+                     (960, 448), (960, 288), (0, 288)]], 0, HALL_C, F_HALL, C_HALL, 144, HALL),
     Sector("fg", [rect(1024, 0, 1088, 448)], 128, HALL_C, F_HALL, C_HALL, 176, HALL, lower="METAL6", tag=TAG_FG),
     Sector("fe_lane", [rect(1152, 288, 2048, 448)], 0, HALL_C, F_HALL, C_LANE, 192, HALL),
     Sector("fe_s", [[(1088, 0), (1104, 0), (1104, 32), (1328, 32), (1328, 0), (1488, 0), (1488, 32), (1536, 32),
-                     (1536, 256), (1744, 256), (1744, 32), (1808, 32), (1808, 256), (2016, 256), (2016, 32),
-                     (2048, 32), (2048, 288), (1152, 288), (1152, 448), (1088, 448)]], 0, HALL_C, F_HALL, C_HALL,
-           144, HALL),
+                     (1536, 256), (2016, 256), (2016, 32), (2048, 32), (2048, 288), (1152, 288), (1152, 448),
+                     (1088, 448)]], 0, HALL_C, F_HALL, C_HALL, 144, HALL),
     # ... a coolant channel along the south wall, feeding the turbines' moats, stopping short of the
     # floodgate (it would sink into it) and bridged at the sump door
-    Sector("chan0", [[(0, 0), (1008, 0), (1008, 32), (800, 32), (752, 32), (544, 32), (0, 32)]], -8, HALL_C,
+    Sector("chan0", [[(0, 0), (1008, 0), (1008, 32), (544, 32), (0, 32)]], -8, HALL_C,
            "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5),
     Sector("chan1", [rect(1104, 0, 1328, 32)], -8, HALL_C, "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5),
-    Sector("chan2", [[(1488, 0), (2048, 0), (2048, 32), (2016, 32), (1808, 32), (1744, 32), (1536, 32),
-                      (1488, 32)]], -8, HALL_C, "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5),
-    *turbine(1, (544, 48, 752, 256)),
-    *turbine(2, (800, 48, 1008, 256)),
-    *turbine(3, (1536, 48, 1744, 256)),
-    *turbine(4, (1808, 48, 2016, 256)),
+    Sector("chan2", [[(1488, 0), (2048, 0), (2048, 32), (2016, 32), (1536, 32), (1488, 32)]], -8, HALL_C,
+           "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5),
+    moat("moat_w", 544, 1008), moat("moat_e", 1536, 2016),
+    turbine(1, (544, 48, 752, 256)),
+    turbine(2, (800, 48, 1008, 256)),
+    turbine(3, (1536, 48, 1744, 256)),
+    turbine(4, (1808, 48, 2016, 256)),
     # ... the gantry break: the floor runs on under it to a nukage pool, and a lit secret alcove
     Sector("gb", [rect(768, 448, 960, 640)], 0, HALL_C, F_HALL, C_HALL, 160, HALL),
     Sector("pb", [rect(768, 640, 960, 768)], -16, HALL_C, "NUKAGE1", C_HALL, 192, HALL, special=DAMAGE_5),
@@ -324,7 +326,7 @@ THINGS = [Thing(*t) for t in [
     (SHELLBOX, 2152, 60),   # the boiler passage: armed for the return, whatever the generator house cost
     # the return: arachnotron 1 and its imps on gantry B
     (ARACHNO, 1632, 720, 270, "emh"), (IMP, 1580, 816, 270, "mh"), (IMP, 1690, 816, 270, "h"),
-    (ROCKETBOX, 1900, 360), (STIM, 1776, 150), (CELL, 1400, 360, 0, "em"), (ROCKET, 1200, 360),
+    (ROCKETBOX, 1900, 360), (STIM, 1776, 272), (CELL, 1400, 360, 0, "em"), (ROCKET, 1200, 360),
     # sump and switch booth
     (SPECTRE, 1000, -300, 90, "emh"), (SPECTRE, 1300, -550, 90, "mh"), (SPECTRE, 1550, -300, 90, "emha"),
     (SPECTRE, 1500, -560, 90, "h"),

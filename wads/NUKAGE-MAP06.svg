@@ -8,20 +8,18 @@
 <path d="M272.0,467.2 L323.2,467.2 L323.2,403.2 L272.0,403.2 Z" fill="#e8c547" fill-rule="evenodd"><title>l1: floor 160 ceil 384 FLAT20/CEIL5_1 light 176 tag 9</title></path>
 <path d="M553.6,403.2 L988.8,403.2 L988.8,326.4 L553.6,326.4 Z" fill="rgb(214,214,214)" fill-rule="evenodd"><title>gbn: floor 160 ceil 384 FLAT20/CEIL5_1 light 176</title></path>
 <path d="M323.2,467.2 L553.6,467.2 L553.6,403.2 L323.2,403.2 Z" fill="rgb(171,171,171)" fill-rule="evenodd"><title>fw_lane: floor 0 ceil 384 FLOOR0_3/TLITE6_5 light 192</title></path>
-<path d="M169.6,569.6 L387.2,569.6 L387.2,480.0 L470.4,480.0 L470.4,569.6 L489.6,569.6 L489.6,480.0 L572.8,480.0 L572.8,569.6 L572.8,582.4 L579.2,582.4 L579.2,403.2 L553.6,403.2 L553.6,467.2 L169.6,467.2 Z" fill="rgb(171,171,171)" fill-rule="evenodd"><title>fw_s: floor 0 ceil 384 FLOOR0_3/CEIL5_1 light 144</title></path>
+<path d="M169.6,569.6 L387.2,569.6 L387.2,480.0 L572.8,480.0 L572.8,569.6 L572.8,582.4 L579.2,582.4 L579.2,403.2 L553.6,403.2 L553.6,467.2 L169.6,467.2 Z" fill="rgb(171,171,171)" fill-rule="evenodd"><title>fw_s: floor 0 ceil 384 FLOOR0_3/CEIL5_1 light 144</title></path>
 <path d="M579.2,582.4 L604.8,582.4 L604.8,403.2 L579.2,403.2 Z" fill="rgb(205,205,205)" fill-rule="evenodd"><title>fg: floor 128 ceil 384 FLOOR0_3/CEIL5_1 light 176 tag 6</title></path>
 <path d="M630.4,467.2 L988.8,467.2 L988.8,403.2 L630.4,403.2 Z" fill="rgb(171,171,171)" fill-rule="evenodd"><title>fe_lane: floor 0 ceil 384 FLOOR0_3/TLITE6_5 light 192</title></path>
-<path d="M604.8,582.4 L611.2,582.4 L611.2,569.6 L700.8,569.6 L700.8,582.4 L764.8,582.4 L764.8,569.6 L784.0,569.6 L784.0,480.0 L867.2,480.0 L867.2,569.6 L892.8,569.6 L892.8,480.0 L976.0,480.0 L976.0,569.6 L988.8,569.6 L988.8,467.2 L630.4,467.2 L630.4,403.2 L604.8,403.2 Z" fill="rgb(171,171,171)" fill-rule="evenodd"><title>fe_s: floor 0 ceil 384 FLOOR0_3/CEIL5_1 light 144</title></path>
-<path d="M169.6,582.4 L572.8,582.4 L572.8,569.6 L489.6,569.6 L470.4,569.6 L387.2,569.6 L169.6,569.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>chan0: floor -8 ceil 384 NUKAGE1/CEIL5_1 light 176</title></path>
+<path d="M604.8,582.4 L611.2,582.4 L611.2,569.6 L700.8,569.6 L700.8,582.4 L764.8,582.4 L764.8,569.6 L784.0,569.6 L784.0,480.0 L976.0,480.0 L976.0,569.6 L988.8,569.6 L988.8,467.2 L630.4,467.2 L630.4,403.2 L604.8,403.2 Z" fill="rgb(171,171,171)" fill-rule="evenodd"><title>fe_s: floor 0 ceil 384 FLOOR0_3/CEIL5_1 light 144</title></path>
+<path d="M169.6,582.4 L572.8,582.4 L572.8,569.6 L387.2,569.6 L169.6,569.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>chan0: floor -8 ceil 384 NUKAGE1/CEIL5_1 light 176</title></path>
 <path d="M611.2,582.4 L700.8,582.4 L700.8,569.6 L611.2,569.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>chan1: floor -8 ceil 384 NUKAGE1/CEIL5_1 light 176</title></path>
-<path d="M764.8,582.4 L988.8,582.4 L988.8,569.6 L976.0,569.6 L892.8,569.6 L867.2,569.6 L784.0,569.6 L764.8,569.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>chan2: floor -8 ceil 384 NUKAGE1/CEIL5_1 light 176</title></path>
-<path d="M387.2,569.6 L470.4,569.6 L470.4,480.0 L387.2,480.0 Z M414.4,550.4 L443.2,550.4 L457.6,536.0 L457.6,507.2 L443.2,492.8 L414.4,492.8 L400.0,507.2 L400.0,536.0 Z" fill="#7ccf4a" fill-rule="evenodd"><title>plinth1: floor -8 ceil 384 NUKAGE1/CEIL5_1 light 176</title></path>
+<path d="M764.8,582.4 L988.8,582.4 L988.8,569.6 L976.0,569.6 L784.0,569.6 L764.8,569.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>chan2: floor -8 ceil 384 NUKAGE1/CEIL5_1 light 176</title></path>
+<path d="M387.2,569.6 L572.8,569.6 L572.8,480.0 L387.2,480.0 Z M414.4,550.4 L443.2,550.4 L457.6,536.0 L457.6,507.2 L443.2,492.8 L414.4,492.8 L400.0,507.2 L400.0,536.0 Z M516.8,550.4 L545.6,550.4 L560.0,536.0 L560.0,507.2 L545.6,492.8 L516.8,492.8 L502.4,507.2 L502.4,536.0 Z" fill="#7ccf4a" fill-rule="evenodd"><title>moat_w: floor -8 ceil 384 NUKAGE1/CEIL5_1 light 176</title></path>
+<path d="M784.0,569.6 L976.0,569.6 L976.0,480.0 L784.0,480.0 Z M811.2,550.4 L840.0,550.4 L854.4,536.0 L854.4,507.2 L840.0,492.8 L811.2,492.8 L796.8,507.2 L796.8,536.0 Z M920.0,550.4 L948.8,550.4 L963.2,536.0 L963.2,507.2 L948.8,492.8 L920.0,492.8 L905.6,507.2 L905.6,536.0 Z" fill="#7ccf4a" fill-rule="evenodd"><title>moat_e: floor -8 ceil 384 NUKAGE1/CEIL5_1 light 176</title></path>
 <path d="M414.4,550.4 L443.2,550.4 L457.6,536.0 L457.6,507.2 L443.2,492.8 L414.4,492.8 L400.0,507.2 L400.0,536.0 Z" fill="rgb(205,205,205)" fill-rule="evenodd"><title>turb1: floor 128 ceil 384 FLAT23/CEIL5_1 light 192</title></path>
-<path d="M489.6,569.6 L572.8,569.6 L572.8,480.0 L489.6,480.0 Z M516.8,550.4 L545.6,550.4 L560.0,536.0 L560.0,507.2 L545.6,492.8 L516.8,492.8 L502.4,507.2 L502.4,536.0 Z" fill="#7ccf4a" fill-rule="evenodd"><title>plinth2: floor -8 ceil 384 NUKAGE1/CEIL5_1 light 176</title></path>
 <path d="M516.8,550.4 L545.6,550.4 L560.0,536.0 L560.0,507.2 L545.6,492.8 L516.8,492.8 L502.4,507.2 L502.4,536.0 Z" fill="rgb(205,205,205)" fill-rule="evenodd"><title>turb2: floor 128 ceil 384 FLAT23/CEIL5_1 light 192</title></path>
-<path d="M784.0,569.6 L867.2,569.6 L867.2,480.0 L784.0,480.0 Z M811.2,550.4 L840.0,550.4 L854.4,536.0 L854.4,507.2 L840.0,492.8 L811.2,492.8 L796.8,507.2 L796.8,536.0 Z" fill="#7ccf4a" fill-rule="evenodd"><title>plinth3: floor -8 ceil 384 NUKAGE1/CEIL5_1 light 176</title></path>
 <path d="M811.2,550.4 L840.0,550.4 L854.4,536.0 L854.4,507.2 L840.0,492.8 L811.2,492.8 L796.8,507.2 L796.8,536.0 Z" fill="rgb(205,205,205)" fill-rule="evenodd"><title>turb3: floor 128 ceil 384 FLAT23/CEIL5_1 light 192</title></path>
-<path d="M892.8,569.6 L976.0,569.6 L976.0,480.0 L892.8,480.0 Z M920.0,550.4 L948.8,550.4 L963.2,536.0 L963.2,507.2 L948.8,492.8 L920.0,492.8 L905.6,507.2 L905.6,536.0 Z" fill="#7ccf4a" fill-rule="evenodd"><title>plinth4: floor -8 ceil 384 NUKAGE1/CEIL5_1 light 176</title></path>
 <path d="M920.0,550.4 L948.8,550.4 L963.2,536.0 L963.2,507.2 L948.8,492.8 L920.0,492.8 L905.6,507.2 L905.6,536.0 Z" fill="rgb(205,205,205)" fill-rule="evenodd"><title>turb4: floor 128 ceil 384 FLAT23/CEIL5_1 light 192</title></path>
 <path d="M476.8,403.2 L553.6,403.2 L553.6,326.4 L476.8,326.4 Z" fill="rgb(171,171,171)" fill-rule="evenodd"><title>gb: floor 0 ceil 384 FLOOR0_3/CEIL5_1 light 160</title></path>
 <path d="M476.8,326.4 L553.6,326.4 L553.6,275.2 L476.8,275.2 Z" fill="#7ccf4a" fill-rule="evenodd"><title>pb: floor -16 ceil 384 NUKAGE1/CEIL5_1 light 192</title></path>
@@ -170,11 +168,7 @@
 <line x1="579.2" y1="582.4" x2="572.8" y2="582.4" stroke="#111" stroke-width="1.6"/>
 <line x1="572.8" y1="582.4" x2="572.8" y2="569.6" stroke="#777" stroke-width="0.6"/>
 <line x1="572.8" y1="569.6" x2="572.8" y2="480.0" stroke="#777" stroke-width="0.6"/>
-<line x1="572.8" y1="480.0" x2="489.6" y2="480.0" stroke="#777" stroke-width="0.6"/>
-<line x1="489.6" y1="480.0" x2="489.6" y2="569.6" stroke="#777" stroke-width="0.6"/>
-<line x1="489.6" y1="569.6" x2="470.4" y2="569.6" stroke="#777" stroke-width="0.6"/>
-<line x1="470.4" y1="569.6" x2="470.4" y2="480.0" stroke="#777" stroke-width="0.6"/>
-<line x1="470.4" y1="480.0" x2="387.2" y2="480.0" stroke="#777" stroke-width="0.6"/>
+<line x1="572.8" y1="480.0" x2="387.2" y2="480.0" stroke="#777" stroke-width="0.6"/>
 <line x1="387.2" y1="480.0" x2="387.2" y2="569.6" stroke="#777" stroke-width="0.6"/>
 <line x1="387.2" y1="569.6" x2="348.8" y2="569.6" stroke="#777" stroke-width="0.6"/>
 <line x1="348.8" y1="569.6" x2="169.6" y2="569.6" stroke="#777" stroke-width="0.6"/>
@@ -189,11 +183,7 @@
 <line x1="988.8" y1="467.2" x2="988.8" y2="569.6" stroke="#111" stroke-width="1.6"/>
 <line x1="988.8" y1="569.6" x2="976.0" y2="569.6" stroke="#777" stroke-width="0.6"/>
 <line x1="976.0" y1="569.6" x2="976.0" y2="480.0" stroke="#777" stroke-width="0.6"/>
-<line x1="976.0" y1="480.0" x2="892.8" y2="480.0" stroke="#777" stroke-width="0.6"/>
-<line x1="892.8" y1="480.0" x2="892.8" y2="569.6" stroke="#777" stroke-width="0.6"/>
-<line x1="892.8" y1="569.6" x2="867.2" y2="569.6" stroke="#777" stroke-width="0.6"/>
-<line x1="867.2" y1="569.6" x2="867.2" y2="480.0" stroke="#777" stroke-width="0.6"/>
-<line x1="867.2" y1="480.0" x2="784.0" y2="480.0" stroke="#777" stroke-width="0.6"/>
+<line x1="976.0" y1="480.0" x2="784.0" y2="480.0" stroke="#777" stroke-width="0.6"/>
 <line x1="784.0" y1="480.0" x2="784.0" y2="569.6" stroke="#777" stroke-width="0.6"/>
 <line x1="784.0" y1="569.6" x2="764.8" y2="569.6" stroke="#777" stroke-width="0.6"/>
 <line x1="764.8" y1="569.6" x2="764.8" y2="582.4" stroke="#777" stroke-width="0.6"/>
@@ -202,16 +192,14 @@
 <line x1="700.8" y1="569.6" x2="611.2" y2="569.6" stroke="#777" stroke-width="0.6"/>
 <line x1="611.2" y1="569.6" x2="611.2" y2="582.4" stroke="#777" stroke-width="0.6"/>
 <line x1="604.8" y1="582.4" x2="611.2" y2="582.4" stroke="#111" stroke-width="1.6" stroke-dasharray="4 2"><title>MIDGRATE</title></line>
-<line x1="387.2" y1="569.6" x2="470.4" y2="569.6" stroke="#777" stroke-width="0.6"/>
-<line x1="489.6" y1="569.6" x2="572.8" y2="569.6" stroke="#777" stroke-width="0.6"/>
+<line x1="387.2" y1="569.6" x2="572.8" y2="569.6" stroke="#777" stroke-width="0.6"/>
 <line x1="572.8" y1="582.4" x2="284.8" y2="582.4" stroke="#111" stroke-width="1.6"/>
 <line x1="284.8" y1="582.4" x2="233.6" y2="582.4" stroke="#777" stroke-width="0.6"/>
 <line x1="233.6" y1="582.4" x2="169.6" y2="582.4" stroke="#111" stroke-width="1.6"/>
 <line x1="169.6" y1="582.4" x2="169.6" y2="569.6" stroke="#111" stroke-width="1.6"/>
 <line x1="700.8" y1="582.4" x2="656.0" y2="582.4" stroke="#111" stroke-width="1.6"/>
 <line x1="611.2" y1="582.4" x2="656.0" y2="582.4" stroke="#111" stroke-width="1.6" stroke-dasharray="4 2"><title>MIDGRATE</title></line>
-<line x1="784.0" y1="569.6" x2="867.2" y2="569.6" stroke="#777" stroke-width="0.6"/>
-<line x1="892.8" y1="569.6" x2="976.0" y2="569.6" stroke="#777" stroke-width="0.6"/>
+<line x1="784.0" y1="569.6" x2="976.0" y2="569.6" stroke="#777" stroke-width="0.6"/>
 <line x1="988.8" y1="569.6" x2="988.8" y2="582.4" stroke="#111" stroke-width="1.6"/>
 <line x1="988.8" y1="582.4" x2="918.4" y2="582.4" stroke="#111" stroke-width="1.6"/>
 <line x1="918.4" y1="582.4" x2="816.0" y2="582.4" stroke="#777" stroke-width="0.6"/>
@@ -695,13 +683,11 @@
 <text x="592.0" y="492.8" font-size="9" text-anchor="middle" fill="#333">fg 128 t6</text>
 <text x="809.6" y="435.2" font-size="9" text-anchor="middle" fill="#333">fe_lane 0</text>
 <text x="780.8" y="496.0" font-size="9" text-anchor="middle" fill="#333">fe_s 0</text>
-<text x="428.8" y="553.6" font-size="9" text-anchor="middle" fill="#333">plinth1 -8</text>
+<text x="480.0" y="524.8" font-size="9" text-anchor="middle" fill="#333">moat_w -8</text>
+<text x="880.0" y="524.8" font-size="9" text-anchor="middle" fill="#333">moat_e -8</text>
 <text x="428.8" y="521.6" font-size="9" text-anchor="middle" fill="#333">turb1 128</text>
-<text x="531.2" y="553.6" font-size="9" text-anchor="middle" fill="#333">plinth2 -8</text>
 <text x="531.2" y="521.6" font-size="9" text-anchor="middle" fill="#333">turb2 128</text>
-<text x="825.6" y="553.6" font-size="9" text-anchor="middle" fill="#333">plinth3 -8</text>
 <text x="825.6" y="521.6" font-size="9" text-anchor="middle" fill="#333">turb3 128</text>
-<text x="934.4" y="553.6" font-size="9" text-anchor="middle" fill="#333">plinth4 -8</text>
 <text x="934.4" y="521.6" font-size="9" text-anchor="middle" fill="#333">turb4 128</text>
 <text x="515.2" y="364.8" font-size="9" text-anchor="middle" fill="#333">gb 0</text>
 <text x="515.2" y="300.8" font-size="9" text-anchor="middle" fill="#333">pb -16</text>
@@ -837,7 +823,7 @@
 <circle cx="801.6" cy="256.0" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3001 skills mh</title></circle>
 <circle cx="845.6" cy="256.0" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3001 skills h</title></circle>
 <circle cx="929.6" cy="438.4" r="2.5" fill="#1f6fd0"/>
-<circle cx="880.0" cy="522.4" r="2.5" fill="#1f6fd0"/>
+<circle cx="880.0" cy="473.6" r="2.5" fill="#1f6fd0"/>
 <circle cx="729.6" cy="438.4" r="2.5" fill="#1f6fd0"/>
 <circle cx="649.6" cy="438.4" r="2.5" fill="#1f6fd0"/>
 <circle cx="569.6" cy="702.4" r="12.0" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 58 skills emh</title></circle>

@@ -105,7 +105,7 @@ You start on the only dry catwalk of a reservoir full of nukage, with the exit v
 It has fewer floor heights than most id maps because the reservoir is one flat pool; symmetry is high because it's a square reservoir with a pump house off each side.
 
 ### Nukage Undercurrent (`nukage_undercurrent`)
-MAP06: 120 sectors, 26/46/64 monsters on easy/medium/hard, four secrets, and the first arachnotrons. Its design doc is `levels/designs/nukage_undercurrent.md`.
+MAP06: 118 sectors, 26/46/64 monsters on easy/medium/hard, four secrets, and the first arachnotrons. Its design doc is `levels/designs/nukage_undercurrent.md`.
 
 You cross the turbine hall on a railed gantry along its north wall, looking down at the exit door, the turbines and a floodgate across the floor. At the far end, taking the yellow key sinks the platform you're standing on into a pit of demons, and the only way back is along the hall floor, under the gantry, where arachnotrons now walk.
 
