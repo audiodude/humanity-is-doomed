@@ -66,9 +66,10 @@ def octagon(cx, cy, r):
 
 
 def turbine(n, box):
-    """A 128-high turbine housing standing in a moat of coolant nukage 8 deep."""
+    """A 128-high turbine housing standing in a moat of coolant nukage 8 deep,
+    which runs south into the channel along the hall's wall (y 32)."""
     x1, y1, x2, y2 = box
-    return [Sector(f"plinth{n}", [rect(*box)], -8, HALL_C, "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5),
+    return [Sector(f"plinth{n}", [rect(x1, 32, x2, y2)], -8, HALL_C, "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5),
             Sector(f"turb{n}", [octagon((x1 + x2) // 2, (y1 + y2) // 2, 72)], 128, HALL_C, "FLAT23", C_HALL, 192,
                    HALL, lower="METAL2", special=LIGHT_GLOW)]
 
@@ -98,16 +99,22 @@ SECTORS = [
     # ... the floor: a lit lane under the gantry, the turbines' half to the south
     # (the turbine halves wrap round the floodgate's ends, so the lanes don't meet it)
     Sector("fw_lane", [rect(384, 288, 960, 448)], 0, HALL_C, F_HALL, C_LANE, 192, HALL),
-    Sector("fw_s", [[(0, 32), (1008, 32), (1008, 0), (1024, 0), (1024, 448), (960, 448), (960, 288), (0, 288)]], 0,
+    Sector("fw_s", [[(0, 32), (544, 32), (544, 256), (752, 256), (752, 32), (800, 32), (800, 256), (1008, 256),
+                     (1008, 32), (1008, 0), (1024, 0), (1024, 448), (960, 448), (960, 288), (0, 288)]], 0,
            HALL_C, F_HALL, C_HALL, 144, HALL),
     Sector("fg", [rect(1024, 0, 1088, 448)], 128, HALL_C, F_HALL, C_HALL, 176, HALL, lower="METAL6", tag=TAG_FG),
     Sector("fe_lane", [rect(1152, 288, 2048, 448)], 0, HALL_C, F_HALL, C_LANE, 192, HALL),
-    Sector("fe_s", [[(1088, 0), (1104, 0), (1104, 32), (1328, 32), (1328, 0), (1488, 0), (1488, 32), (2048, 32),
-                     (2048, 288), (1152, 288), (1152, 448), (1088, 448)]], 0, HALL_C, F_HALL, C_HALL, 144, HALL),
-    # ... a coolant channel along the south wall, stopping short of the floodgate (it would sink into it)
-    # and bridged at the sump door
-    *[Sector(f"chan{i}", [rect(x1, 0, x2, 32)], -8, HALL_C, "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5)
-      for i, (x1, x2) in enumerate(((0, 1008), (1104, 1328), (1488, 2048)))],
+    Sector("fe_s", [[(1088, 0), (1104, 0), (1104, 32), (1328, 32), (1328, 0), (1488, 0), (1488, 32), (1536, 32),
+                     (1536, 256), (1744, 256), (1744, 32), (1808, 32), (1808, 256), (2016, 256), (2016, 32),
+                     (2048, 32), (2048, 288), (1152, 288), (1152, 448), (1088, 448)]], 0, HALL_C, F_HALL, C_HALL,
+           144, HALL),
+    # ... a coolant channel along the south wall, feeding the turbines' moats, stopping short of the
+    # floodgate (it would sink into it) and bridged at the sump door
+    Sector("chan0", [[(0, 0), (1008, 0), (1008, 32), (800, 32), (752, 32), (544, 32), (0, 32)]], -8, HALL_C,
+           "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5),
+    Sector("chan1", [rect(1104, 0, 1328, 32)], -8, HALL_C, "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5),
+    Sector("chan2", [[(1488, 0), (2048, 0), (2048, 32), (2016, 32), (1808, 32), (1744, 32), (1536, 32),
+                      (1488, 32)]], -8, HALL_C, "NUKAGE1", C_HALL, 176, HALL, special=DAMAGE_5),
     *turbine(1, (544, 48, 752, 256)),
     *turbine(2, (800, 48, 1008, 256)),
     *turbine(3, (1536, 48, 1744, 256)),
