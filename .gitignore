@@ -14,3 +14,6 @@ docs/combat-bot/
 
 # omp harness config (local agent definitions)
 .omp/
+
+# Local settings: IWAD paths (see .env.example)
+.env

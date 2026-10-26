@@ -7,8 +7,8 @@ Use from another script in scripts/metrics/:
     from doomwad import load_all, IWADS
     for m in load_all(): ...
 
-IWADs default to the Steam "Ultimate Doom" install in the default Steam
-library (v1.9 DOOM.WAD and DOOM2.WAD); override with DOOM_WAD / DOOM2_WAD.
+IWAD paths come from DOOM_WAD (Ultimate Doom) and DOOM2_WAD in the repo's
+.env or the environment (see .env.example); use the v1.9 IWADs.
 """
 import math
 import os
@@ -18,13 +18,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-from levels.wad import read_wad  # noqa: E402
-
-_STEAM = os.path.expanduser("~/.local/share/Steam/steamapps/common/Ultimate Doom/base")
-IWADS = {
-    "doom": os.environ.get("DOOM_WAD", f"{_STEAM}/DOOM.WAD"),
-    "doom2": os.environ.get("DOOM2_WAD", f"{_STEAM}/doom2/DOOM2.WAD"),
-}
+from levels.wad import IWAD_VARS, IWADS, read_wad  # noqa: E402
 
 # ----------------------------------------------------------------- things ---
 # Thing flags. Skill bits: EASY = ITYTD + HNTR, MEDIUM = HMP, HARD = UV + NM.
@@ -273,7 +267,10 @@ def _parse(game, slot, lumps):
 
 
 def load_maps(game, path=None):
-    lumps = read_wad(path or IWADS[game])
+    path = path or IWADS[game]
+    if not path:
+        sys.exit(f"{IWAD_VARS[game]} is not set: add it to .env (see .env.example)")
+    lumps = read_wad(path)
     maps = []
     for i, (name, _) in enumerate(lumps):
         if (name.startswith("E") and len(name) == 4 and name[2] == "M") or \

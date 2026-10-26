@@ -3,7 +3,28 @@ import os
 import re
 import struct
 
-IWAD = os.environ.get("DOOM2_WAD", os.path.expanduser("~/.local/share/dsda-doom/doom2.wad"))
+ENV_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+
+
+def read_env(path=ENV_FILE):
+    """KEY=VALUE settings from the repo's .env (see .env.example), with
+    variables already set in the environment taking precedence. Blank lines
+    and # comments are skipped; quotes around a value are dropped."""
+    env = {}
+    if os.path.exists(path):
+        with open(path) as f:
+            for line in f:
+                key, sep, value = line.strip().partition("=")
+                if sep and not key.startswith("#"):
+                    env[key.strip()] = value.strip().strip("\"'")
+    return {**env, **os.environ}
+
+
+# IWAD paths by game, None if unset: DOOM_WAD (Ultimate Doom) and DOOM2_WAD.
+IWAD_VARS = {"doom": "DOOM_WAD", "doom2": "DOOM2_WAD"}
+_env = read_env()
+IWADS = {game: os.path.expanduser(_env[var]) if _env.get(var) else None for game, var in IWAD_VARS.items()}
+IWAD = IWADS["doom2"]
 
 
 def name8(s):
@@ -95,9 +116,9 @@ def replace_map(lumps, slot, map_lumps, umapinfo=None):
 
 def iwad_textures(path=IWAD):
     """({texture: (width, height)}, {flat names}, {medusa textures}) from an
-    IWAD, or None if the file is missing. A medusa texture has a column where
+    IWAD, or None if the path is unset or missing. A medusa texture has a column where
     patches overlap; vanilla can't draw those on two-sided lines."""
-    if not os.path.exists(path):
+    if not path or not os.path.exists(path):
         return None
     lumps = read_wad(path)
     by_name = {name.upper(): data for name, data in lumps}

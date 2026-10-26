@@ -126,7 +126,7 @@ From Python: `from levels import build, nukage_junction; build(nukage_junction)`
 Requirements:
 - **Python 3.8+**, standard library only.
 - **ZDBSP** to build nodes, blockmap and reject. The default is the copy bundled with [Ultimate Doom Builder](https://github.com/UltimateDoomBuilder/UltimateDoomBuilder), at `/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp` (Arch: `chaotic-aur/ultimate-doom-builder-git`), then `zdbsp` on `PATH`. Use `--zdbsp-path PATH` (or `build(..., zdbsp=PATH)`) for any other ZDBSP binary.
-- **`doom2.wad`** for the texture checks and the measurements, read from `~/.local/share/dsda-doom/doom2.wad` or `$DOOM2_WAD`. Without it those checks are skipped with a warning.
+- **`doom2.wad`** for the texture checks and the measurements. Copy `.env.example` to `.env` and set `DOOM2_WAD` to its path (a variable set in the environment overrides `.env`). Without it those checks are skipped with a warning.
 
 ### What every build checks
 
@@ -171,7 +171,7 @@ Floors can move both ways for the progression check: the lowering actions (`S1_F
 - `levels/doom2.py`: DOOM II thing types, monster sizes and health, pickups, line actions and sector specials.
 
 ### Playtests
-`levels/playtests/<module>.playtest` scripts walk each map's intended route: doors, switches, lifts, key traps, secrets and the exit, checking floor and ceiling heights after each trigger. The runner, `scripts/tools/playtest.py`, plays them in [ViZDoom](https://vizdoom.farama.org/), a ZDoom-based engine packaged as a Python library. It drives the player with real inputs as fast as the machine runs the game, with god mode on and no window, so a whole route takes 4–10 seconds. Screenshots go to `/tmp/playtest-shots/<MAP>/`. The IWAD is `$DOOM2_WAD` or `~/.local/share/dsda-doom/doom2.wad`; override with `--iwad`.
+`levels/playtests/<module>.playtest` scripts walk each map's intended route: doors, switches, lifts, key traps, secrets and the exit, checking floor and ceiling heights after each trigger. The runner, `scripts/tools/playtest.py`, plays them in [ViZDoom](https://vizdoom.farama.org/), a ZDoom-based engine packaged as a Python library. It drives the player with real inputs as fast as the machine runs the game, with god mode on and no window, so a whole route takes 4–10 seconds. Screenshots go to `/tmp/playtest-shots/<MAP>/`. The IWAD is `DOOM2_WAD` from `.env`; override with `--iwad`.
 
 ViZDoom isn't needed to build maps, so it isn't a requirement of the builder. `uv run --with vizdoom` fetches it into a cached environment the first time:
 
@@ -196,7 +196,7 @@ A pass shows the map's wiring works in a ZDoom-based engine, which, like vanilla
 ## Research: what makes DOOM levels fun
 Nukage Crossing and the maps after it were designed from a research report on the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It drew on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. The report quotes its sources at length, so it isn't published here; the measurement scripts are.
 
-The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs to `research/data/`. They read the v1.9 IWADs from the Steam "Ultimate Doom" install in the default Steam library (override with `DOOM_WAD` / `DOOM2_WAD`). Run them from the repo root:
+The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs to `research/data/`. They read the v1.9 IWADs set by `DOOM_WAD` (Ultimate Doom) and `DOOM2_WAD` in `.env`. Run them from the repo root:
 
 ```sh
 python3 scripts/metrics/space_metrics.py        # -> research/data/metrics_space.csv (about 2 minutes)

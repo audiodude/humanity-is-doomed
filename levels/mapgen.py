@@ -271,7 +271,8 @@ def build(module, check_only=False, out=None, zdbsp=None):
               + check_hazards(level, lines))
     iwad = iwad_textures()
     if iwad is None:
-        print(f"warning: {IWAD} not found (set DOOM2_WAD); skipping texture checks")
+        print(f"warning: no doom2.wad at DOOM2_WAD={IWAD} (set it in .env, see .env.example); "
+              "skipping texture checks")
     else:
         tex_errors, tex_warnings = check_textures(level, lines, sides, iwad)
         errors += tex_errors
