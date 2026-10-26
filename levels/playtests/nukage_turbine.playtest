@@ -13,8 +13,8 @@ expect ceil 352 648 == 160
 # The balcony: the super shotgun, and the yellow exit door straight below.
 walk 96 352
 expect has SuperShotgun
-walk 120 300
-look 225 35
+walk 64 304
+look 245 45
 shot balcony
 expect ceil 248 368 == 160        # the lift door is shut: no way down yet
 

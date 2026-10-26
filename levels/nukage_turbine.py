@@ -131,8 +131,12 @@ SECTORS = [
              **DOOR_KW),
     *doorway("d_cr2", (1024, 928), "w", alcove=16, far_alcove=16, floor=GANTRY, alcove_flat=F_CONN, flat=F_CONN,
              **DOOR_KW),
-    Sector("cr", [rect(752, 768, 976, 1088)], 176, 304, F_CTRL, "TLITE6_1", 192, CTRL, lower="COMPSTA1"),
-    Sector("desk", [rect(768, 992, 960, 1024)], 216, 304, "CONS1_1", "TLITE6_1", 192, CTRL, lower="COMPSTA2"),
+    Sector("cr", [rect(752, 768, 976, 992)], 176, 304, F_CTRL, "TLITE6_1", 192, CTRL, lower="COMPSTA1"),
+    # The desk runs from the west wall, with a walkway round its east end: the
+    # old 16-unit gaps let a player squeeze behind it and never get back.
+    Sector("desk", [rect(752, 992, 912, 1024)], 216, 304, "CONS1_1", "TLITE6_1", 192, CTRL, lower="COMPSTA2"),
+    Sector("cr_back", [[(752, 1024), (912, 1024), (912, 992), (976, 992), (976, 1088), (752, 1088)]], 176, 304,
+           F_CTRL, "TLITE6_1", 192, CTRL, lower="COMPSTA1"),
     pedestal("ped_b", (832, 864, 896, 928), 200, 304, CTRL, "TLITE6_1"),
     # ... secret 2: a server room behind a lit panel in the corridor's west wall
     *doorway("d_sr", (576, 1024), "w", 64, far_alcove=8, floor=GANTRY, face=CONN, track="LITE5", flat=F_CONN,
@@ -256,8 +260,8 @@ SPECIAL_WALLS = {**sw_fg, **sw_exit}
 SECRET_DOORS = {"d_sr", "d_lsec", "d_sc"}
 MUST_REACH = ["sv", "lo", "br", "pg", "sh", "swb", "pr", "cy", "isle", "nc1", "nc2", "ar1", "ar2", "mc", "ev",
               "pb_sec", "gb", "fw_s", "fe_s"]
-# The cacodemon over the gantry break is side-on to the start window (exactly
-# 90°, which vanilla counts as in view), about 1000 units off: accepted.
+# The cacodemon over the gantry break faces south, side-on to the start window
+# (exactly 90°, which vanilla counts as in view), about 1000 units off: accepted.
 KNOWN_ISSUES = ["start under fire: CACO at 864,560 can shoot the start and faces it"]
 
 # (type, x, y, angle=0, skills="emh"); "a" = ambush (deaf).
@@ -273,7 +277,7 @@ THINGS = [Thing(*t) for t in [
     # annex
     (IMP, 640, 760, 90, "emh"), (IMP, 640, 1150, 270, "mha"),
     (SARGE, 790, 1056, 270, "emh"), (SARGE, 940, 1056, 270, "mh"), (CHAINGUY, 860, 1056, 270, "h"),
-    (BLUEKEY, 864, 896), (CHAINGUN, 760, 800), (CLIP, 960, 800),
+    (BLUEKEY, 864, 896), (CHAINGUN, 760, 800), (CLIP, 960, 800), (MEDI, 768, 896),
     (DEMON, 784, 1296, 270, "emh"), (DEMON, 944, 1296, 270, "mh"),
     # switchgear vault
     (CACO, 1300, 1100, 180, "mh"), (IMP, 1240, 1000, 90, "emh"), (IMP, 1380, 1180, 180, "h"),

@@ -116,8 +116,8 @@ You cross the turbine hall on a railed gantry along its north wall, looking down
 | Most-used wall texture | 22% | 30% |
 | Wall material changes with a border texture | 96% | 31% |
 | Optional share of the reachable area | 42% | 50% |
-| UV ammo per monster HP (pistol start) | 1.95 | 1.8 |
-| Health per 1000 monster HP | 44 | 40 |
+| UV ammo per monster HP (pistol start) | 2.26 | 1.81 |
+| Health per 1000 monster HP | 47 | 40 |
 | Easy/UV and HMP/UV monster ratios | 0.41 / 0.72 | 0.33 / 0.70 |
 | Deaf monsters | 42% | 42% |
 | Nearest monster to the start | 511 | 300 |
