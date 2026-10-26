@@ -6,8 +6,9 @@ rule-1 slips (floor-texture changes with no height change) by sector pair,
 rule-2 seams (two wall materials meeting in one plane with no border texture
 between them) by sector, and a table of the research metrics (scripts/metrics/)
 with each one's median and interquartile range over the game's maps, flagged
-when outside it. The progression metrics reuse the build checks' reach-model
-run.
+when outside it, then the resource curve and exposure flags along the route
+(levels/balance.py). The progression metrics reuse the build checks'
+reach-model run.
 """
 import math
 import os
@@ -15,14 +16,16 @@ import re
 import sys
 from collections import Counter, defaultdict
 
+from .balance import health_rate, report, route_balance
 from .model import label_point
 
 METRICS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts", "metrics")
 
 # Quartiles (q1, median, q3) of each metric over DOOM II MAP01-MAP32 and
 # Ultimate Doom E1M1-E4M9, from the research CSVs (research/data/metrics_*.csv,
-# written by scripts/metrics/): statistics.quantiles(values, n=4,
-# method="exclusive"), rounded to 4 significant digits.
+# written by scripts/metrics/; route_* from route_metrics.py, see
+# levels/balance.py): statistics.quantiles(values, n=4, method="exclusive"),
+# rounded to 4 significant digits.
 DOOM2 = {
     "walkable_area": (4.681e+06, 8.382e+06, 1.144e+07),
     "frac_width_le96": (0.02797, 0.06135, 0.1148),
@@ -44,6 +47,10 @@ DOOM2 = {
     "count_ratio_medium_hard": (0.6538, 0.7, 0.7648),
     "ambush_share_hard": (0.2278, 0.4235, 0.6635),
     "nearest_monster_dist_hard": (231, 299.5, 515.2),
+    "route_min_detour_ratio": (0.3217, 0.6535, 1.544),
+    "route_min_thorough_share": (-0.6893, 0.113, 0.728),
+    "route_max_long_hitscan": (0, 0, 35.5),
+    "route_health_per_khp": (9.947, 17.29, 30.7),
 }
 ULTIMATE = {
     "walkable_area": (4.803e+06, 6.386e+06, 9.306e+06),
@@ -66,6 +73,10 @@ ULTIMATE = {
     "count_ratio_medium_hard": (0.661, 0.749, 0.8188),
     "ambush_share_hard": (0.1915, 0.3245, 0.6545),
     "nearest_monster_dist_hard": (250, 365.5, 560.5),
+    "route_min_detour_ratio": (0.5897, 0.8885, 1.566),
+    "route_min_thorough_share": (-0.4617, 0.009, 0.5358),
+    "route_max_long_hitscan": (0, 10, 21.5),
+    "route_health_per_khp": (16.66, 22.02, 45.44),
 }
 LABELS = {
     "walkable_area": "walkable area (units^2)",
@@ -88,6 +99,10 @@ LABELS = {
     "count_ratio_medium_hard": "HMP / UV monsters",
     "ambush_share_hard": "deaf share (UV)",
     "nearest_monster_dist_hard": "nearest monster to the start (UV)",
+    "route_min_detour_ratio": "lowest ammo ratio near the route (UV)",
+    "route_min_thorough_share": "lowest ammo left / HP, taking everything",
+    "route_max_long_hitscan": "long-range hitscan peak per second (UV)",
+    "route_health_per_khp": "health per 1000 HP the route affords",
 }
 
 
@@ -171,7 +186,11 @@ def measure(level, lines, found):
     if key not in _textures:
         _textures[key] = sm.texture_info(IWADS[level.game], level.resources)
     m, md, res = found.reach
-    row = {**sm.analyse((m, _textures[key])), **cm.map_metrics(m, {})[0], **pm.analyse(md, res)[0]}
+    prog, route = pm.analyse(md, res)
+    bal = route_balance(m, md, res, route["legs"], names=list(level.sectors))
+    rate = health_rate(bal)
+    row = {**sm.analyse((m, _textures[key])), **cm.map_metrics(m, {})[0], **prog, **bal.summary,
+           "route_health_per_khp": "" if rate is None else 1000 * rate}
     out = []
     slips = rule1_slips(level, lines)
     if slips:
@@ -189,7 +208,8 @@ def measure(level, lines, found):
             continue
         flag = "  below" if v < q1 else "  above" if v > q3 else ""
         out.append(f"{LABELS[k]:<44} {fmt(v):>9}   {fmt(med)} [{fmt(q1)}-{fmt(q3)}]{flag}")
-    return out
+    lines, warnings = report(bal, level.game)
+    return out + lines + [f"warning: {w}" for w in warnings]
 
 
 def fmt(v):
