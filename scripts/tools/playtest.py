@@ -867,10 +867,10 @@ class Run:
             else:
                 want = target
             turn = (self.var("ANGLE") - want + 180) % 360 - 180   # positive turns right
-            look = 0.0 if pitch is None else pitch - (-self.var("PITCH"))
+            look = 0.0 if pitch is None else pitch - self.var("PITCH")   # PITCH is positive looking down
             if abs(turn) < 0.5 and abs(look) < 0.5:
                 return
-            self.tic(turn=turn, look=-look if pitch is not None else 0.0)
+            self.tic(turn=turn, look=-look if pitch is not None else 0.0)   # a positive delta looks up
 
     def drive(self, target, ln, final):
         """Run at target; on the last leg brake to stop within ARRIVE units.
