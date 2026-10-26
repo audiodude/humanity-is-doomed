@@ -69,7 +69,7 @@ ped_c = (1120, 1728, 1184, 1792)
 # The blue key stands on a narrow column, high enough to show through the hot side's window.
 ped_b, ring_b = (272, 1008, 304, 1040), rect(240, 976, 336, 1072)
 
-arena = [(-704, 1280), (256, 1280), (256, 1440), (704, 1440), (704, 1984), (128, 1984), (128, 1856),
+arena = [(-704, 1344), (256, 1344), (256, 1440), (704, 1440), (704, 1984), (128, 1984), (128, 1856),
          (-128, 1856), (-128, 1984), (-704, 1984)]
 arena_pillars = [rect(-448, 1472, -320, 1600), rect(320, 1536, 448, 1664), rect(-224, 1696, -96, 1760),
                  rect(160, 1664, 256, 1760)]
@@ -180,7 +180,12 @@ SECTORS = [
     # ---- The arena ----
     # Its floor sits 8 below the hot door's threshold, so you can walk back out that way.
     Sector("arena", [arena], 32, SKYC, "FLOOR5_4", SKY, 192, "STONE3", pillars=arena_pillars),
-    Sector("balcony", [rect(256, 1280, 704, 1440)], 96, SKYC, C_FLOOR, SKY, 192, "STONE3", lower="SILVER3"),
+    Sector("balcony", [rect(256, 1344, 704, 1440)], 96, SKYC, C_FLOOR, SKY, 192, "STONE3", lower="SILVER3"),
+    # The strips inside each arena door: crossing their far edge opens the closets. That
+    # edge is 88 units from the door, out of use range: vanilla's use stops at the first
+    # line with an action, so a trigger nearer the door would swallow presses meant for it.
+    Sector("a_entry", [rect(-704, 1280, 256, 1344)], 32, SKYC, "FLOOR5_4", SKY, 192, "STONE3"),
+    Sector("b_entry", [rect(256, 1280, 704, 1344)], 96, SKYC, C_FLOOR, SKY, 192, "STONE3", lower="SILVER3"),
     window("a_win", (-128, 1264, 128, 1280), 80, 160, "STONE3", 176),
     Sector("dais", [rect(-128, 1856, 128, 1984)], 56, SKYC, "FLOOR0_1", SKY, 224, "STONE3", lower="SUPPORT2",
            special=LIGHT_GLOW),
@@ -197,8 +202,8 @@ SPECIAL_BETWEEN = {
     ("w_end", "ped_r"): Special(W1_DOOR_OPEN, TAG_WKEY),          # red key: a closet behind you
     ("e_end", "ring_b"): Special(W1_DOOR_OPEN, TAG_EKEY),          # blue key: a closet behind you
     ("e_sump", "ped_c"): Special(W1_LIGHT_255, TAG_LIGHTS),       # cold super shotgun: lights on
-    ("d_blue2_far", "arena"): Special(W1_DOOR_OPEN, TAG_ARENA),   # into the arena: its closets
-    ("d_red2_far", "balcony"): Special(W1_DOOR_OPEN, TAG_ARENA),
+    ("a_entry", "arena"): Special(W1_DOOR_OPEN, TAG_ARENA),       # into the arena: its closets
+    ("b_entry", "balcony"): Special(W1_DOOR_OPEN, TAG_ARENA),
 }
 SPECIAL_WALLS = {
     # The wall you face on leaving the start room: lava on the hot side, computers on the cold.

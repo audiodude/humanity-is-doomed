@@ -117,7 +117,7 @@ expect floor 384 540 == -16
 # Holding both keys: back up the cold shortcut, through the red door onto the balcony.
 walk 384 600 384 760 384 850 384 900 480 1190
 open 480 1240
-walk 480 1320
+walk 480 1376
 wait 70
 expect ceil -712 1888 > 100      # entering opened the arena closets
 expect ceil 712 1600 > 100

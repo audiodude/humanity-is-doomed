@@ -8,7 +8,10 @@
 
 ViZDoom (pip install vizdoom) runs a ZDoom-based engine as a Python library.
 The script drives the player with real inputs, as fast as the machine runs
-the game: a minute of play takes a few seconds, with no window.
+the game: a minute of play takes a few seconds, with no window. ZDoom's strict
+Doom compatibility is on, so it plays by vanilla rules where ZDoom can: pressing
+use stops at the first line with an action, even a walk-over one, and monsters
+are infinitely tall.
 
 SCRIPT is a text file, one step per line, `#` starts a comment. Coordinates
 are map units; a line is named by any point within 8 units of it (use its
@@ -93,6 +96,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 from levels.wad import IWAD as DEFAULT_IWAD  # noqa: E402  DOOM2_WAD from .env or the environment
 CACHE = os.path.expanduser("~/.cache/playtest")
 WIDTH, HEIGHT = 640, 480
+# ZDoom's "Doom (strict)" compatibility (compatmode 2), flag by flag: `+compatmode 2`
+# on the command line sets that cvar but not the flags it stands for.
+VANILLA = ("badangles corpsegibs crossdropoff dehhealth floormove hitscan invisibility light limitpain "
+           "maskedmidtex missileclip nodoorlight nopassover notossdrops pointonline shorttex soundtarget "
+           "spritesort stairs trace useblocking wallrun").split()
+VANILLA_ARGS = " ".join(f"+compat_{f} 1" for f in VANILLA)
 OPS = {"==": lambda a, b: a == b, "!=": lambda a, b: a != b, "<": lambda a, b: a < b,
        "<=": lambda a, b: a <= b, ">": lambda a, b: a > b, ">=": lambda a, b: a >= b}
 COUNTERS = {"secrets": "SECRETCOUNT", "kills": "KILLCOUNT", "items": "ITEMCOUNT"}
@@ -581,7 +590,7 @@ class Run:
                      "ARMOR", "HEALTH", "DAMAGE_TAKEN", "SELECTED_WEAPON", *COUNTERS.values(), *AMMO.values(),
                      *(f"WEAPON{n}" for n in range(1, 8))]
         g.set_available_game_variables([getattr(V, v) for v in self.vars])
-        g.add_game_args("+sv_cheats 1")
+        g.add_game_args("+sv_cheats 1 " + VANILLA_ARGS)
         g.init()
         self.recording = None
         if args.fight:
@@ -1221,6 +1230,7 @@ def replay(args, vzd):
     g.set_screen_format(vzd.ScreenFormat.RGB24)
     g.set_render_hud(True)
     g.set_mode(vzd.Mode.PLAYER)
+    g.add_game_args(VANILLA_ARGS)
     g.init()
     g.replay_episode(path)
     enc = tmp = None
