@@ -64,12 +64,28 @@ OPEN = {
 # LITE5 strip beside secret 3's panel.
 NORTH_PTS = {"a0_b3": [224], "a1_b3": [672], "ap_b3": [1616]}
 
+# The drain gutter: a 64-wide strip of nukage along the foot of the gallery,
+# down the west side of A0 from R1 to the north wall.
+GUTTER_X = 256
+
 
 def cell(x, y):
     (x1, x2), (y1, y2) = XB[x], YB[y]
+    if x == "a0" and y != "b0":
+        x1 = GUTTER_X
     loop = rect(x1, y1, x2, y2)
-    pts = NORTH_PTS.get(f"{x}_{y}", [])
+    if x == "a0" and y == "b0":
+        loop = loop[:3] + [(GUTTER_X, y2)] + loop[3:]   # the (x2, y2) -> (x1, y2) edge meets the gutter's corner
+    pts = [px for px in NORTH_PTS.get(f"{x}_{y}", []) if x1 < px < x2]
     return loop[:3] + [(px, y2) for px in sorted(pts, reverse=True)] + loop[3:]
+
+
+# The gutter's west edge meets the gallery stair's parapets (every 48 from 192
+# to 528) and the gallery rail; its east edge meets each A0 cell's corners.
+_gutter_e = [(GUTTER_X, y) for y in (192, 448, 576, 832, 1024, 1280, 1472)] + [(224, 1472)]   # 224: shutter jamb
+_gutter_w = [(192, 1472)] + [(192, y) for y in range(528, 191, -48)]
+gutter = Sector("gutter", [_gutter_e + _gutter_w], -16, HALL_C, "NUKAGE1", C_AISLE, 176, HALL_WALL,
+                lower="NUKEDGE1", special=DAMAGE_5)
 
 
 def block(x, y):
@@ -77,7 +93,9 @@ def block(x, y):
     return rect(x1, y1, x2, y2)
 
 
-aisles = [Sector(f"{x}_{y}", [cell(x, y)], 0, HALL_C, F_AISLE, C_AISLE, L_AISLE, HALL_WALL)
+# A0's cells show NUKEDGE1 on the gutter's riser, the only place they stand above a neighbour.
+aisles = [Sector(f"{x}_{y}", [cell(x, y)], 0, HALL_C, F_AISLE, C_AISLE, L_AISLE, HALL_WALL,
+                 lower="NUKEDGE1" if x == "a0" else None)
           for y, xs in OPEN.items() for x in xs]
 
 
@@ -88,7 +106,14 @@ def cask(name, loop, top, *, wall=HALL_WALL, pillars=(), lower=CASK, ftex=F_TOP,
 
 
 def cell_sector(name, box):
-    return Sector(name, [rect(*box)], 0, HALL_C, F_AISLE, C_CASK, 128, HALL_WALL)
+    return Sector(name, [rect(*box)], 0, HALL_C, F_AISLE, C_CASK, 128, HALL_WALL, lower="NUKEDGE1")
+
+
+def leak(name, box, inset=24):
+    """The pool a leaking cask left in its cell, 16 deep; the mancubus stands in it."""
+    x1, y1, x2, y2 = box
+    return Sector(f"{name}_leak", [rect(x1 + inset, y1 + inset, x2 - inset, y2 - inset)], -16, HALL_C,
+                  "NUKAGE1", C_CASK, 160, HALL_WALL, lower="NUKEDGE1", special=DAMAGE_5)
 
 
 P1, P2, P3, P4 = (rect(448, 256, 576, 384), rect(1280, 256, 1408, 384), rect(448, 640, 576, 768),
@@ -175,11 +200,14 @@ SECTORS = [
                      (-704, -240)]], 0, YARD_C, "FLAT10", SKY, 192, "BIGBRIK2"),
     Sector("ry_e", [[(-320, -32), (-144, -32), (-144, -48), (-112, -48), (-112, -32), (384, -32), (512, -32),
                      (592, -32), (592, -48), (752, -48), (752, -32), (896, -32), (896, -448), (-320, -448)],
-                    rail_blob, truck], 0, YARD_C, "FLAT10", SKY, 192, HALL_WALL),
+                    rail_blob, truck], 0, YARD_C, "FLAT10", SKY, 192, HALL_WALL, lower="NUKEDGE1"),
     Sector("tk_lo", [rect(0, -256, 64, -96)], 64, YARD_C, "CRATOP1", SKY, 192, "CRATE1"),
     Sector("tk_hi", [rect(64, -256, 192, -96)], 128, YARD_C, "CRATOP1", SKY, 192, "CRATE1"),
-    Sector("rb_w", [rect(-304, -416, 128, -352)], -8, YARD_C, "MFLR8_1", SKY, 192, "BIGBRIK2", lower="METAL"),
-    Sector("rb_e", [rect(512, -416, 880, -352)], -8, YARD_C, "MFLR8_1", SKY, 192, "BIGBRIK2", lower="METAL"),
+    # The rail bed: the flatcars have been leaking along it for years.
+    Sector("rb_w", [rect(-304, -416, 128, -352)], -8, YARD_C, "NUKAGE1", SKY, 192, "BIGBRIK2", lower="NUKEDGE1",
+           special=DAMAGE_5),
+    Sector("rb_e", [rect(512, -416, 880, -352)], -8, YARD_C, "NUKAGE1", SKY, 192, "BIGBRIK2", lower="NUKEDGE1",
+           special=DAMAGE_5),
     Sector("fc_w", [rect(128, -432, 256, -336)], 24, YARD_C, "SLIME15", SKY, 192, "BIGBRIK2", lower="METAL"),
     Sector("fc_e", [rect(384, -432, 512, -336)], 24, YARD_C, "SLIME15", SKY, 192, "BIGBRIK2", lower="METAL"),
     # The flatcar's cask: hollow, with a SILVER3 hatch in its north face that sinks on use (secret 1).
@@ -230,6 +258,8 @@ SECTORS = [
     *aisles,
     *casks,
     *[cell_sector(n, b) for n, b in CELLS.items()],
+    *[leak(n, b) for n, b in CELLS.items()],
+    gutter,
     *gs, *gs_rail,
     Sector("gl_s", [rect(0, 528, 176, 896)], 192, HALL_C, "FLAT1", C_CASK, 176, HALL_WALL),
     Sector("gl_m", [rect(0, 896, 176, 1088)], 192, HALL_C, "FLAT1", C_CASK, 176, HALL_WALL),
@@ -256,6 +286,9 @@ SECTORS = [
            special=LIGHT_BLINK_FAST),
     *stairs("dst", (256, 1600, 640, 1696), "n", 2, 24, 24, 256, "SLIME16", "CEIL5_1", 160, "STARTAN3", "SUPPORT3"),
     Sector("dd", [dd_loop], 64, 256, "SLIME16", "CEIL5_1", 160, "STARTAN3"),
+    # A nukage trench across the dock's east half; the third arachnotron stands in it.
+    Sector("dtr", [rect(704, 1744, 864, 1984)], 40, 256, "NUKAGE1", "CEIL5_1", 176, "STARTAN3",
+           lower="NUKEDGE1", special=DAMAGE_5),
     Sector("cr1", [rect(192, 1856, 320, 1984)], 128, 256, "CRATOP2", "CEIL5_1", 160, "STARTAN3", lower="CRATE2"),
     Sector("cr2", [rect(896, 1760, 1024, 1888)], 192, 256, "CRATOP2", "CEIL5_1", 160, "STARTAN3",
            lower="CRATWIDE"),
@@ -390,6 +423,8 @@ OVERRIDES = dict([
     (((416, SIGN_Y), (480, SIGN_Y)), Line(front=Side(upper="EXITSIGN"))),
     (((608, 2032), (672, 2032)), Line(front=Side(upper="EXITSIGN"))),
     *[t for _, trims in _jambs for t in trims],
+    # NUKEDGE1 risers round the dock trench (keyed with the trench on the right).
+    *[((q, p), Line(front=Side(lower="NUKEDGE1"))) for p, q in edges(rect(704, 1744, 864, 1984))],
 ])
 
 MUST_REACH = ["c1", "c2", "c3", "c4", "c5", "c6", "k2r2", "b2h12", "kt", "kr", "kc_w", "kc_e", "tsc", "tc",

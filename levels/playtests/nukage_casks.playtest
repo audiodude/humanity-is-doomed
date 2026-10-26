@@ -31,6 +31,9 @@ expect secrets == 1
 expect has Backpack
 expect has ShellBox
 expect has ClipBox
+walk 640 -320
+look 200 25
+shot rail_bed
 walk 320 -300 -512 -96
 look 90
 shot yard
@@ -60,6 +63,8 @@ look 0 8
 shot gallery
 look 30 4
 shot gallery_ne
+look 0 45
+shot gutter
 walk 96 1200 96 1296
 expect has Chaingun
 
@@ -107,6 +112,8 @@ walk 1500 96
 
 # The maze: north up A0, east along B2, north up A1, east along B3 to the stack's foot.
 walk 288 300 288 928
+look 90 20
+shot gutter_a0
 walk 704 928
 walk 704 1376 992 1376
 look 270 4
@@ -184,6 +191,8 @@ shot shutters
 
 # Dispatch: apron, steps, the dock among the crates.
 walk 448 1560 448 1760 1040 1744 960 1952 160 2016 640 1960
+look 0 15
+shot dock_trench
 look 90
 shot dock
 open 640 2064

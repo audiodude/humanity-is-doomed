@@ -123,9 +123,9 @@ You cross the turbine hall on a railed gantry along its north wall, looking down
 | Nearest monster to the start | 511 | 300 |
 
 ### Nukage Casks (`nukage_casks`)
-MAP07: 179 sectors, 30/54/75 monsters on easy/medium/hard, four secrets, and the first pain elemental.
+MAP07: 187 sectors, 30/54/75 monsters on easy/medium/hard, four secrets, and the first pain elemental.
 
-You look over a spent-fuel store from a gallery: a maze of steel casks under lit aisles, the yellow key on a blue-lit cask stack, the control tower's window high in the far wall, and blast shutters under an EXIT sign. You thread the maze at floor level to the tower, and the switch in its cab sinks every cask into the floor at once. The maze becomes an open hall, and the six mancubi sealed among the casks are standing in it. DOOM II's own MAP07 rule opens the way out: the shutters drop when the last mancubus dies.
+You look over a spent-fuel store from a gallery: a maze of steel casks under lit aisles, the yellow key on a blue-lit cask stack, the control tower's window high in the far wall, and blast shutters under an EXIT sign. You thread the maze at floor level to the tower, and the switch in its cab sinks every cask into the floor at once. The maze becomes an open hall, and the six mancubi sealed among the casks are standing in it, each in the nukage its cask leaked. DOOM II's own MAP07 rule opens the way out: the shutters drop when the last mancubus dies.
 
 | Measure | MAP07 | DOOM II median |
 |---|---|---|
