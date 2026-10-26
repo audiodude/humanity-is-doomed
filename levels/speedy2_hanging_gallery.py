@@ -47,7 +47,7 @@ SECTORS = [
              track="DOORBLU", action=DR_BLUE, far_alcove=16, flat="FLOOR0_1", alcove_flat="FLAT5_4", far_flat="FLOOR0_1"),
     Sector("tech", [rect(1088, 576, 1600, 1216)], 0, 256, "FLOOR0_1", "CEIL3_6", 160, "TEKWALL4",
            pillars=[rect(1280, 832, 1344, 896)]),
-    lift("lift_t", (1088, 1216, 1216, 1344), 128, 256, TAG_LIFT, "CEIL3_6", 176, "TEKWALL4", ftex="FLAT14"),
+    lift("lift_t", (1088, 1216, 1216, 1344), 128, 256, TAG_LIFT, "CEIL3_6", 176, "TEKWALL4", ftex="FLAT14", walk_on=True),
     Sector("ledge", [rect(1216, 1216, 1600, 1408)], 128, 256, "FLAT14", "CEIL3_6", 208, "TEKWALL4",
            lower="SUPPORT2"),
     *doorway("d_sec", (1600, 800), "e", face="TEKWALL4", track="TEKWALL4", flat="FLOOR0_1"),

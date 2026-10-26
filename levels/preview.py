@@ -4,21 +4,9 @@ from html import escape
 
 from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, HEALTH_PICKUPS, KEY_OF, PLAYERS,
                     SECRET_AREA)
-from .model import DOOR, LIFT
+from .model import DOOR, LIFT, label_point
 
 KEY_COLORS = {"blue": "#2255ff", "yellow": "#e0c000", "red": "#e02020"}
-
-
-def label_point(sec):
-    """A point inside the sector near its bounding-box centre."""
-    xs = [x for x, _ in sec.loops[0]]
-    ys = [y for _, y in sec.loops[0]]
-    cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
-    if sec.contains((cx, cy)):
-        return cx, cy
-    grid = [(x, y) for x in range(min(xs) + 8, max(xs), 16) for y in range(min(ys) + 8, max(ys), 16)
-            if sec.contains((x, y))]
-    return min(grid, key=lambda p: (p[0] - cx) ** 2 + (p[1] - cy) ** 2) if grid else (cx, cy)
 
 
 def write_svg(level, lines, path, scale=0.4, pad=96):

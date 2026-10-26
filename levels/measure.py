@@ -9,6 +9,8 @@ import os
 import sys
 from collections import Counter
 
+from .model import label_point
+
 METRICS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts", "metrics")
 
 # DOOM II MAP01-MAP32 quartiles (q1, median, q3) of each metric, from the
@@ -61,7 +63,6 @@ def check_sector_overlaps(level):
     """No sector lies inside another that doesn't have it as a hole. (Sectors
     whose edges cross are caught when lines are built, so a sector inside
     another is the remaining way two can overlap.)"""
-    from .preview import label_point
     errors = []
     for s in level.sectors.values():
         p = label_point(s)

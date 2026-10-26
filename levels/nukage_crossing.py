@@ -132,7 +132,7 @@ SECTORS = [
                        (384, 1216), (320, 1216)], rect(*ped_s)], 8, SKYC, "FLAT5_4", SKY, 224, "SILVER2",
            lower="METAL", special=SECRET_AREA),
     pedestal("ped_s", ped_s, 32, SKYC, "SILVER2", SKY),
-    lift("lift_i", (384, 1152, 512, 1216), 96, SKYC, TAG_ILIFT, SKY, 208, "SILVER2", ftex="FLAT23"),
+    lift("lift_i", (384, 1152, 512, 1216), 96, SKYC, TAG_ILIFT, SKY, 208, "SILVER2", ftex="FLAT23", walk_on=True),
     Sector("pier", [rect(384, 1216, 512, 1408)], 96, SKYC, "FLAT23", SKY, 208, "SILVER2", lower="SUPPORT3"),
 
     # North bank, with the silver control tower on its plinth as the landmark,

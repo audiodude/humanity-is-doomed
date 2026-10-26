@@ -130,9 +130,9 @@ Requirements:
 
 ### What every build checks
 
-- Geometry: lines only meet at shared vertices. A sector outline that crosses itself, sectors and free lines that cut through each other, or a sector lying inside another that doesn't have it as a hole, is an error.
+- Geometry: lines only meet at shared vertices. A sector outline that crosses itself, or sectors and free lines that cut through each other, is an error. A sector standing free inside another (a pedestal, a crate, a pool) is cut out of it automatically; one touching the other's outline has to be listed as a hole by hand.
 - Every thing is inside a sector, clear of walls, bars and fences, and not overlapping another monster or player on a skill they share.
-- Progression: starting from the player start, it works out which keys, door specials and tagged switches and triggers open what, follows teleporters, and fails if any `MUST_REACH` sector can't be reached. Bars block the way.
+- Progression: starting from the player start, it works out which keys, door specials and tagged switches and triggers open what, follows teleporters, and fails if any `MUST_REACH` sector can't be reached. Bars block the way, and so do openings 32 units wide or less. An opening is measured whole, so a ledge beside a staircase is reachable however shallow the steps.
 - 100% kills and secrets: every secret sector can be reached, and every monster can either be reached or walk (or fly) to somewhere the player can go. A sniper the player can only shoot at fails this too.
 - No nukage softlocks: from every damaging floor the player can get onto, the exit can still be reached.
 - Damaging floors sit lower than every neighbouring floor that isn't damaging.
@@ -151,16 +151,16 @@ Sectors are polygons: an outer loop, holes that other sectors fill, and solid `p
 
 Lines that aren't sector edges go in `FREE_LINES`, keyed by their two endpoints: `{((384, 32), (384, 480)): Special(W1_DOOR_OPEN, 5)}` is a walk-over trigger across the middle of a room, so you don't have to split the room into two sectors for it. Give a `Special` a `texture` to hang bars or a fence: on a free line it stands inside one room (`Special(texture="MIDGRATE")`). In `SPECIAL_BETWEEN` it fills every opening between two sectors, such as bars between a cage and the room around it. These lines are impassable, and the texture stands on the floor. A free fence doesn't split its sector for the progression check, so to wall off part of a room with bars, make that part its own sector.
 
-Helpers in `levels/model.py` build the common shapes. `doorway()` makes a door with optional recesses, plus its use action; its `alcove_flat`/`far_flat`, and `door()`'s `flat`, set the recess and threshold floors so they can match the rooms (Romero's rule 1: floor texture changes only with a height change). `stairs()` makes a run of steps, and `lift()` makes a lift whose SR/WR actions are added automatically.
+Helpers in `levels/model.py` build the common shapes. `doorway()` makes a door with optional recesses, plus its use action; its `alcove_flat`/`far_flat`, and `door()`'s `flat`, set the recess and threshold floors so they can match the rooms (Romero's rule 1: floor texture changes only with a height change). A door face is a picture that must fit its wall, so a room taller than the face (128 for `BIGDOOR*`, 72 for `EXITDOOR`) needs a recess that tall on its side of the door: `alcove` before it, `far_alcove` after it. The doorway runs `alcove + thickness + far_alcove` from its wall. `stairs()` makes a run of steps. `lift()` makes a lift used (`SR_LIFT`) from below and from its top; `walk_on=True` makes it lower when walked onto from the top instead (`WR_LIFT`), which monsters can set off and ride too.
 
 There are helpers for the rooms most maps repeat, sized so they pass the texture checks:
 - `closet()`: a monster closet behind a door disguised as the wall, opened only by its tag.
-- `pedestal()`: a glowing, metal-sided pedestal for a key or item. Put a W1 trigger on its edge in `SPECIAL_BETWEEN` to spring a trap when the item is taken.
+- `pedestal()`: a glowing, metal-sided pedestal for a key or item. Stand it clear of the walls and the build cuts it out of the room. Put a W1 trigger on its edge in `SPECIAL_BETWEEN` to spring a trap when the item is taken.
 - `switch_niche()`: a recess whose back wall is a switch, sized to the switch picture (64 × 128, or 32 × 72 for `SW1EXIT`). It returns the sector and the `SPECIAL_WALLS` entry for the switch. Make it deep (a booth) to fire a W1 trigger on its entrance just before the switch is used.
 - `lit_ledge()`: a brightly lit ledge with an unlit strip against the wall behind it, so the wall isn't lit up too.
 - `window()`: an opening between rooms. Walking monsters can't climb a sill more than 24 above their floor, and fliers need at least 56 of height.
 
-Floors can move both ways for the progression check: the lowering actions (`S1_FLOOR_LOWEST` and kin) drop a tagged floor to its lowest neighbour, and the raise-and-change actions (`S1_RAISE_CHANGE` and kin) lift it to the next higher neighbouring floor, taking the floor texture of the trigger line's front sector and clearing the sector's special. MAP05 uses that to raise walkways out of damaging nukage and leave them dry.
+Floors can move both ways for the progression check: the lowering actions (`S1_FLOOR_LOWEST` and kin) drop a tagged floor to its lowest neighbour, and the raise actions lift it to the next higher neighbouring floor, so a rising bridge stops level with the nearest higher floor around it. The raise-and-change actions (`S1_RAISE_CHANGE` and kin) take the floor texture of the trigger line's front sector and clear the sector's special, which dries a walkway raised out of nukage (MAP05 does this), but they move at 0.5 units a tic: 96 units take 5.5 s. The fast raises (`S1_RAISE_FAST` and kin) move at 4 units a tic and keep the floor's texture and special, so use them for bridges out of a pit or the dark.
 
 ### Code layout
 

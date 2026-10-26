@@ -26,7 +26,7 @@ class Sector:
     shows on neighbours' lower parts (step risers, crate and lift sides),
     default wall. face: a door's face texture. action: line action put on
     every line this sector shares with another, unless SPECIAL_BETWEEN
-    overrides it (doors use this)."""
+    overrides it (doors use this). walk_on: see lift()."""
     name: str
     loops: list[Loop]
     floor: int
@@ -42,6 +42,7 @@ class Sector:
     kind: str = ROOM
     action: int = 0
     pillars: list[Loop] = field(default_factory=list)
+    walk_on: bool = False
 
     def __post_init__(self):
         self.lower = self.lower or self.wall
@@ -147,10 +148,27 @@ def load(module) -> Level:
         must_reach=list(getattr(module, "MUST_REACH", ())),
         umapinfo=dict(getattr(module, "UMAPINFO", {})),
     )
+    cut_free_standing(list(sectors.values()))
     named = {n for pair in level.special_between for n in pair} | set(level.secret_doors) | set(level.must_reach)
     if unknown := named - sectors.keys():
         raise LevelError(f"unknown sector names: {sorted(unknown)}")
     return level
+
+
+def cut_free_standing(sectors):
+    """Make each sector standing free inside another (a pedestal, a crate, a
+    pool) a hole in it, so levels don't have to list it twice. Free means its
+    outline is clear of the other's: one touching a wall or another hole must
+    be cut out by hand."""
+    for s in sectors:
+        outer = s.loops[0]
+        around = [o for o in sectors if o is not s
+                  and all(point_in_loop(p, o.loops[0]) and not on_loop(p, o.loops[0]) for p in outer)]
+        if not around:
+            continue
+        o = min(around, key=lambda o: abs(area2(o.loops[0])))   # the innermost
+        if o.contains(label_point(s)) and not any(on_loop(p, loop) for p in outer for loop in o.loops + o.pillars):
+            o.loops = o.loops + [outer]
 
 
 # Secret doors' faces are shifted off the surrounding wall pattern by this much,
@@ -202,6 +220,11 @@ def on_segment(p, a, b):
     return min(ax, bx) <= px <= max(ax, bx) and min(ay, by) <= py <= max(ay, by) and p not in (a, b)
 
 
+def on_loop(p, loop):
+    """p is a vertex of loop or lies on one of its edges."""
+    return p in loop or any(on_segment(p, a, b) for a, b in edges(loop))
+
+
 def point_in_loop(p, loop):
     x, y = p
     inside = False
@@ -230,6 +253,18 @@ def seg_dist(p, a, b):
 
 def sector_at(level, p):
     return next((s for s in level.sectors.values() if s.contains(p)), None)
+
+
+def label_point(sec):
+    """A point inside the sector near its bounding-box centre."""
+    xs = [x for x, _ in sec.loops[0]]
+    ys = [y for _, y in sec.loops[0]]
+    cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+    if sec.contains((cx, cy)):
+        return cx, cy
+    grid = [(x, y) for x in range(min(xs) + 8, max(xs), 16) for y in range(min(ys) + 8, max(ys), 16)
+            if sec.contains((x, y))]
+    return min(grid, key=lambda p: (p[0] - cx) ** 2 + (p[1] - cy) ** 2) if grid else (cx, cy)
 
 
 def neighbours(sec, lines):
@@ -307,11 +342,14 @@ def doorway(name, at, facing, width=128, *, alcove=0, far_alcove=0, alcove_wall=
             alcove_height=128, alcove_flat="FLAT1", far_flat=None, thickness=16, floor=0,
             **door_kw) -> list[Sector]:
     """A door through a wall. `at` is the centre of the opening on the wall
-    you come from and `facing` (n/s/e/w) points through it. Optional
-    recesses 32 wider than the door sit before it (`alcove` deep, floor
-    `alcove_flat`) and after it (`far_alcove` deep, floor `far_flat`, default
-    `alcove_flat`); keep `alcove_height` at the face texture's height so the
-    face isn't tiled. door_kw goes to door(). Returns the sectors:
+    you come from and `facing` (n/s/e/w) points through it. A door face is a
+    picture shown whole, so a room on either side taller than the face (128
+    for BIGDOOR*, 72 for EXITDOOR) needs a recess on that side: `alcove` deep
+    before the door, floor `alcove_flat`, and `far_alcove` deep after it,
+    floor `far_flat` (default `alcove_flat`). Recesses are 32 wider than the
+    door and `alcove_height` tall: keep that at the face's height. The whole
+    doorway runs alcove + thickness + far_alcove from `at`, so the room
+    beyond starts there. door_kw goes to door(). Returns the sectors:
     <name>_alcove, <name>, <name>_far."""
     out = []
     if alcove:
@@ -337,8 +375,9 @@ def closet(name, at, facing, tag, *, face, flat, wall, floor=0, width=160, depth
 
 def pedestal(name, box, floor, ceil, wall, ctex, *, flat="TLITE6_1", glow=True) -> Sector:
     """A lit pedestal for a key, weapon or power-up, with metal sides; its
-    top is `floor`. Put a W1 trigger on its edge (SPECIAL_BETWEEN) to make
-    taking the item spring a trap."""
+    top is `floor`. Stand it clear of the room's walls and build() cuts it
+    out of the room. Put a W1 trigger on its edge (SPECIAL_BETWEEN with the
+    room) to make taking the item spring a trap."""
     return Sector(name, [rect(*box)], floor, ceil, flat, ctex, 240, wall, lower="METAL",
                   special=LIGHT_GLOW if glow else 0)
 
@@ -405,8 +444,11 @@ def stairs(name, box, facing, steps, floor, rise, ceil, ftex, ctex, light, wall,
     return out
 
 
-def lift(name, box, floor, ceil, tag, ctex, light, wall, ftex="STEP1", side="PLAT1") -> Sector:
+def lift(name, box, floor, ceil, tag, ctex, light, wall, ftex="STEP1", side="PLAT1", *, walk_on=False) -> Sector:
     """A lift resting at `floor` (its top) that lowers to its lowest
-    neighbour. build() puts SR_LIFT on lines from lower neighbours and
-    WR_LIFT on lines from neighbours at its top."""
-    return Sector(name, [rect(*box)], floor, ceil, ftex, ctex, light, wall, lower=side, tag=tag, kind=LIFT)
+    neighbour. build() puts SR_LIFT (use) on lines from lower neighbours, and
+    on lines from neighbours at its top too: walk-over lifts can be set off
+    by monsters, which then ride them. walk_on=True makes the top lines
+    WR_LIFT, so walking onto the lift takes you down, monsters included."""
+    return Sector(name, [rect(*box)], floor, ceil, ftex, ctex, light, wall, lower=side, tag=tag, kind=LIFT,
+                  walk_on=walk_on)

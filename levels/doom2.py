@@ -69,9 +69,15 @@ USE_DOORS = {DR_DOOR: None, DR_BLUE: "blue", DR_YELLOW: "yellow", DR_RED: "red",
 TAG_DOOR_OPENERS = {W1_DOOR_OPEN, S1_DOOR_OPEN, SR_DOOR_OPEN, WR_DOOR_OPEN}
 FLOOR_LOWERERS = {S1_FLOOR_LOWEST, W1_FLOOR_LOWEST, SR_FLOOR_LOWEST, WR_FLOOR_LOWEST}
 # Raise to the next higher neighbouring floor, taking the floor texture of the
-# trigger line's front sector and clearing the sector's special (e.g. nukage damage).
+# trigger line's front sector and clearing the sector's special (e.g. nukage
+# damage). Slow: 0.5 units a tic, so a 96-unit rise takes 5.5 s.
 S1_RAISE_CHANGE, W1_RAISE_CHANGE, SR_RAISE_CHANGE, WR_RAISE_CHANGE = 20, 22, 68, 95
-FLOOR_RAISERS = {S1_RAISE_CHANGE, W1_RAISE_CHANGE, SR_RAISE_CHANGE, WR_RAISE_CHANGE}
+# Raise to the next higher neighbouring floor fast: 4 units a tic (96 units in
+# 0.7 s), keeping the floor's texture and special. For a bridge out of a pit
+# or the dark; one hidden in nukage needs the raise-and-change kind to dry off.
+S1_RAISE_FAST, W1_RAISE_FAST, SR_RAISE_FAST, WR_RAISE_FAST = 131, 130, 132, 129
+FLOOR_RAISERS = {S1_RAISE_CHANGE, W1_RAISE_CHANGE, SR_RAISE_CHANGE, WR_RAISE_CHANGE,
+                 S1_RAISE_FAST, W1_RAISE_FAST, SR_RAISE_FAST, WR_RAISE_FAST}
 
 # -------------------------------------------------------- sector specials ---
 LIGHT_BLINK_RANDOM, LIGHT_GLOW, DAMAGE_5, SECRET_AREA, LIGHT_FLICKER = 1, 8, 7, 9, 17

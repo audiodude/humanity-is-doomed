@@ -27,9 +27,9 @@ The dataclasses and shape helpers (doorway, stairs, lift) are in model.
 Sectors are polygons: an outer loop, holes that other sectors fill, and
 solid pillars. Edges two sectors share become two-sided linedefs; the rest
 become walls. Doors get their Sector.action on every line into them, and
-lifts get SR_LIFT from below (facing the player: vanilla uses a line only from its
-front) and WR_LIFT from above, unless SPECIAL_BETWEEN
-says otherwise.
+lifts get SR_LIFT on lines from every neighbour, facing the neighbour
+(vanilla uses a line only from its front); a walk_on lift gets WR_LIFT from
+neighbours at its top instead. SPECIAL_BETWEEN overrides both.
 
 Textures are placed so walls read as continuous: x offsets run along each
 sector's outline, and the wall above or below an opening uses the room's own
@@ -192,8 +192,9 @@ def assign_specials(level, lines):
                 lft, nb = (b, f) if b.kind == LIFT else (f, b)
                 if not lft.tag:
                     raise LevelError(f"lift {lft.name} needs a tag")
-                l.action, l.tag = (WR_LIFT if nb.floor >= lft.floor else SR_LIFT), lft.tag
-                if l.action == SR_LIFT and l.front is not nb:
+                walk = lft.walk_on and nb.floor >= lft.floor
+                l.action, l.tag = (WR_LIFT if walk else SR_LIFT), lft.tag
+                if not walk and l.front is not nb:
                     face(l, l.v2)   # vanilla uses a line only from its front: face where the player stands
             if l.texture:
                 l.flags |= ML_BLOCKING | ML_DONTPEGBOTTOM   # bars or fence, standing on the floor

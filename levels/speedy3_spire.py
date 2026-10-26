@@ -84,7 +84,7 @@ SECTORS = [
     Sector("ledge1", [quad(1, F(3, 4), 1, 0, F(1, 4))], F1, 320, "FLOOR4_8", "CEIL5_1", 144, "BROWN1",
            lower="SUPPORT3"),
     Sector("lift1", [quad(1, F(3, 4), 1, F(1, 4), 1)], F1, 320, "FLOOR4_8", "CEIL5_1", 144, "BROWN1",
-           lower="PLAT1", tag=TAG_L1, kind=LIFT),
+           lower="PLAT1", tag=TAG_L1, kind=LIFT, walk_on=True),
 
     # First gallery: north and north-west.
     Sector("s2", [quad(2, 0, 1)], F1, F1 + 192, "FLOOR4_8", "CEIL3_5", 176, "STONE2"),
@@ -111,7 +111,7 @@ SECTORS = [
     Sector("ledge2", [quad(6, F(3, 4), 1, 0, F(1, 4))], TOP, TOP + 160, "FLOOR7_2", "CEIL1_2", 160, "BRICK7",
            lower="SUPPORT3"),
     Sector("lift2", [quad(6, F(3, 4), 1, F(1, 4), 1)], TOP, TOP + 160, "FLOOR7_2", "CEIL1_2", 160, "BRICK7",
-           lower="PLAT1", tag=TAG_L2, kind=LIFT),
+           lower="PLAT1", tag=TAG_L2, kind=LIFT, walk_on=True),
 
     # Top ledge: south-east, high above the start.
     Sector("s7", [quad(7, 0, 1)], TOP, TOP + 160, "FLOOR7_2", SKY, 192, "METAL", lower="SUPPORT3"),

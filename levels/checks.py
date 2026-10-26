@@ -2,6 +2,7 @@
 textures) and the balance report. Check functions return lists of messages;
 build() decides what fails."""
 from collections import defaultdict, deque
+from math import gcd
 
 from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, DAMAGE_PER_AMMO, DAMAGING, DROPS, EXITS,
                     FLOOR_LOWERERS, FLOOR_RAISERS, HEALTH_PICKUPS, KEY_OF, PLAYER1, PLAYERS, SECRET_AREA, START_AMMO,
@@ -70,6 +71,7 @@ def explore(level, lines):
     if start is None:
         return None
     player = ACTORS[PLAYER1]
+    width = opening_widths(lines)
     adj = defaultdict(list)
     for l in lines:
         if l.back:
@@ -97,7 +99,7 @@ def explore(level, lines):
     def passable(a, b, line, actor, keys, opened, moved):
         if line is None:
             return True
-        if line.length <= 2 * actor.radius or line.flags & ML_BLOCKING:   # bars and fences block
+        if line.flags & ML_BLOCKING or width[id(line)] <= 2 * actor.radius:   # bars and fences block
             return False
         if b.kind == DOOR and b.tag not in opened:
             if line.action not in USE_DOORS:
@@ -122,6 +124,40 @@ def explore(level, lines):
             break
         state = new
     return seen, adj, lambda a, b, line, actor: passable(a, b, line, actor, *state)
+
+
+def opening_widths(lines):
+    """{id(two-sided line): width of the opening it is part of}. build_lines
+    splits an edge at every vertex on it, so the side of a ledge that a stair
+    runs along is one short line per step. An actor gets through wherever the
+    opening as a whole is wide enough, so collinear lines that meet end to end
+    and share a sector count as one opening; heights are checked per line."""
+    on_axis = defaultdict(list)
+    for l in lines:
+        if l.back and l.back is not l.front:
+            (x1, y1), (x2, y2) = l.v1, l.v2
+            g = gcd(x2 - x1, y2 - y1)
+            dx, dy = (x2 - x1) // g, (y2 - y1) // g
+            if dx < 0 or (dx == 0 and dy < 0):
+                dx, dy = -dx, -dy
+            on_axis[(dx, dy, dx * y1 - dy * x1)].append(l)
+    width = {}
+    for (dx, dy, _), group in on_axis.items():
+        def span(l):
+            a, b = l.v1[0] * dx + l.v1[1] * dy, l.v2[0] * dx + l.v2[1] * dy
+            return min(a, b), max(a, b)
+        group.sort(key=span)
+        runs = [[group[0]]]
+        for l in group[1:]:
+            prev = runs[-1][-1]
+            if span(l)[0] == span(prev)[1] and {prev.front, prev.back} & {l.front, l.back}:
+                runs[-1].append(l)
+            else:
+                runs.append([l])
+        for run in runs:
+            w = sum(l.length for l in run)
+            width.update((id(l), w) for l in run)
+    return width
 
 
 def flood(start, adj, ok):
@@ -194,18 +230,23 @@ def check_textures(level, lines, sides, iwad):
         for sd in line_sides:
             me, other = sd.sector, (l.other(sd.sector) if l.back else None)
             if other is None:
-                parts = [(sd.mid, me.ceil - me.floor)]
+                parts = [(sd.mid, me.ceil - me.floor, False)]
             else:
-                top = other.floor if other.kind == DOOR else other.ceil   # closed door: whole face shows
+                is_door = other.kind == DOOR
+                top = other.floor if is_door else other.ceil   # closed door: whole face shows
                 span = (floor_range(other, lines, movers)[1] - floor_range(me, lines, movers)[0])
-                parts = [(sd.upper, me.ceil - top), (sd.lower, span)]
+                parts = [(sd.upper, me.ceil - top, is_door), (sd.lower, span, False)]
                 if sd.mid != NO_TEX and (found := mid_fit(sd.mid, textures, medusa)):
                     problems[(sd.mid, *found)].append(f"{me.name} {l.v1}-{l.v2}")
-            for tex, h in parts:
+            for tex, h, door_face in parts:
                 if tex == NO_TEX or h <= 0:
                     continue
                 if found := texture_fit(tex, h, l.length, textures):
-                    problems[(tex, *found)].append(f"{me.name} {l.v1}-{l.v2}")
+                    msg, is_error = found
+                    if door_face and is_error and tex in textures and h > textures[tex][1]:
+                        msg += (f"; give the door a recess {textures[tex][1]} tall on this side "
+                                "(doorway()'s alcove or far_alcove, with alcove_height)")
+                    problems[(tex, msg, is_error)].append(f"{me.name} {l.v1}-{l.v2}")
     warnings = []
     for (tex, msg, is_error), places in problems.items():
         more = f" (+{len(places) - 1} more)" if len(places) > 1 else ""

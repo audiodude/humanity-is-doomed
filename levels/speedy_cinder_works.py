@@ -64,7 +64,7 @@ SECTORS = [
            "CEIL5_1", 128, "METAL5", lower="METAL"),
     Sector("vat", [rect(1088, 512, 1344, 768)], -24, 288, "LAVA1", "CEIL5_1", 224, "METAL5",
            lower="ROCKRED1", special=DAMAGE_10),
-    lift("flift", (960, 960, 1088, 1088), 128, 288, TAG_FLIFT, "CEIL5_1", 160, "METAL5", ftex="FLAT14"),
+    lift("flift", (960, 960, 1088, 1088), 128, 288, TAG_FLIFT, "CEIL5_1", 160, "METAL5", ftex="FLAT14", walk_on=True),
     Sector("deck", [rect(1088, 960, 1472, 1152), rect(1376, 1040, 1440, 1104)], 128, 288, "FLAT14", "CEIL5_1",
            176, "METAL5", lower="SUPPORT3"),
     pedestal("redpad", (1376, 1040, 1440, 1104), 144, 288, "METAL5", "CEIL5_1"),
