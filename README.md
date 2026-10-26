@@ -162,6 +162,16 @@ There are helpers for the rooms most maps repeat, sized so they pass the texture
 
 Floors can move both ways for the progression check: the lowering actions (`S1_FLOOR_LOWEST` and kin) drop a tagged floor to its lowest neighbour, and the raise-and-change actions (`S1_RAISE_CHANGE` and kin) lift it to the next higher neighbouring floor, taking the floor texture of the trigger line's front sector and clearing the sector's special. MAP05 uses that to raise walkways out of damaging nukage and leave them dry.
 
+### Agent skills
+
+Three skills in `.claude/skills/` take an agent through a new map in order, each ending where the next begins:
+
+- `design-doom-ii-level`: pitch five structurally different concepts, pick one, and write a design doc to `levels/designs/<module>.md` (route, sketch, secrets, measurement targets).
+- `build-doom-ii-level`: turn the doc into a level module that builds clean and matches it, with the builder's known gotchas.
+- `test-doom-ii-level`: route script, wiring run, screenshots, and combat-bot runs on three seeds, with each death cluster called as a map or bot problem.
+
+They came out of four timed rounds of agents building maps from scratch: the six maps in `SPEEDY1.WAD`, built from feature checklists, all came out as the same hub with a wing per key, while the six in `SPEEDY2.WAD`, each built around a layout idea, didn't.
+
 ### Code layout
 
 - `levels/model.py`: the dataclasses levels are written in (`Sector`, `Special`, `Thing`) and the shape helpers.
