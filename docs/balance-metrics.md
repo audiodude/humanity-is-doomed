@@ -1,6 +1,6 @@
 # Balance metrics without the bot
 
-Status: design, not built. Covers a static resource curve and static exposure checks, both run at build time, and a `--fight` bot that fails fast and labels its own deaths.
+Status: built (`levels/balance.py`, `scripts/metrics/route_metrics.py`, `scripts/tools/playtest.py --fight`). The design below is as first written; "As built" at the end records where the build departs from it and why. Covers a static resource curve and static exposure checks, both run at build time, and a `--fight` bot that fails fast and labels its own deaths.
 
 ## Why
 
@@ -146,3 +146,57 @@ The changes are to `--fight` only. Wiring runs keep failing hard on a stuck step
 - The spend model uses one damage pool. Per-type spending (shells before bullets, say) would be more accurate, at the cost of a weapon-choice model. Start with the pool.
 - Nearest-next order within a wave is a heuristic. A map whose intended order differs could set it explicitly with an optional `ROUTE = ["blue key", ...]` in its module. Add that only if a map needs it.
 - Multiplayer-only and skill-flagged things follow `balance_report`'s rules.
+
+## As built
+
+Calibrating on the id maps (`route_metrics.py`, 68 maps, about 40 s) overturned several of the design's absolute rules. The id maps are the reference for what a playable map looks like, so the rules follow them.
+
+**Route.** The legs come from `progression_metrics.analyse`, which already computed this critical path: required keys and triggers by disabling each one, then the best order within a wave (all permutations up to 6), not nearest-next. It now also returns the legs.
+
+**Engagement** needed three changes to stop it from engaging nearly the whole map on the first leg:
+
+- Monsters move with manual doors shut: a monster that hasn't been woken doesn't open doors. Before this change, MAP06's sump spectres "reached" the hall floor through a DR door and engaged on the first leg.
+- Demons and spectres engage only by walking to the path. Sight engagement is for monsters that shoot.
+- Sight engagement counts from anywhere the monster can walk, but only within `ENGAGE_RANGE` (1024). A monster that can only hit the route from farther away is a nuisance, and the hitscan check covers it.
+
+Also, the last leg of each wave is checked under the next wave's state too, because triggers fired in a wave (closets, a sinking floor) are sprung while walking it.
+
+**Carry caps** are applied after each leg's fights rather than at each pickup. Pickups and fights interleave within a leg, and capping at pickup made long single-leg id maps starve.
+
+**No errors.** A quarter of the DOOM II maps run short on the thorough curve too (median lowest thorough share 0.11, lower quartile −0.69), and 9 of 32 DOOM II maps (18 of 36 Ultimate Doom maps) have a monster that can shoot the start and faces it. Every finding is a warning, and the two curve summaries, the hitscan peak and the health rate go into the measurement table with id's quartiles:
+
+| measure | DOOM II quartiles | Ultimate Doom quartiles |
+|---|---|---|
+| lowest ammo ratio near the route (detour) | 0.32 / 0.65 / 1.54 | 0.59 / 0.89 / 1.57 |
+| lowest ammo left / HP, taking everything | −0.69 / 0.11 / 0.73 | −0.46 / 0.01 / 0.54 |
+| long-range hitscan peak per second | 0 / 0 / 35.5 | 0 / 10 / 21.5 |
+| health per 1000 HP the route affords | 9.9 / 17.3 / 30.7 | 16.7 / 22.0 / 45.4 |
+
+Warnings fire on legs below the id maps' 10th percentile of the detour ratio (0.147 DOOM II, 0.402 Ultimate), above the 90th percentile of the hitscan peak (88.4 and 46), on any leg where the thorough curve runs short, on traps that release more HP than the ammo in hand, and on starts under fire.
+
+**Health.** The cost per HP is the DOOM II median of the highest rate each map's detour route can afford (17.3 per 1000 HP). So the column reads "health left if the fights cost what the median id map's route can afford". That rate, per map, is the new "health per 1000 HP the route affords" measure.
+
+**Side rooms** are listed but don't warn: the id maps routinely have closets that cost more ammo than they hold.
+
+**Traps.** "Ammo in hand" is the pool after the trigger leg's pickups and before its fights, an optimistic figure, so a warning means the trap is short even then. Lifts aren't counted as traps. For "no way back", `reach.run` now also snapshots current heights (`snap_now`), because `base` keeps every height a sector has ever had, so a sunk floor would still look climbable.
+
+**Not calibrated:** `DETOUR` stays 1024. `HITSCAN_DPS` is rough, but only its ratios matter, because the threshold is calibrated with it.
+
+**Bot (part C).** Built as specified, with two exceptions:
+
+- Not built: "stop shooting at a monster it hasn't damaged in 3 s". ViZDoom's state has no monster health, so the existing 5-second give-up stays. The no-bullets-beyond-768 rule is in.
+- `starved` deaths aren't checked against the curve automatically, because script sections don't map onto curve legs. The report prints a reminder to check the build's curve instead.
+
+### Validation
+
+- **MAP06 without the two shell boxes added during its playtest.** The curve shows the shell boxes weren't needed. The detour curve reaches the boiler passage with 2,970 ammo damage in hand. It then has 3,890 left after the return fight (1,760 HP) and 2,740 at the exit, a lowest detour ratio of 1.17, above id's median. The bot's ammo trouble was its own waste. The build also flags a start under fire: the HMP/UV cacodemon over the gantry break (864,560) faces the start booth's window exactly side-on (90°, which vanilla counts as in view).
+- **MAP06 fights, same WAD, the script without its bot workarounds.** All three seeds ran to the exit, in 72–83 s of wall time each, run in parallel.
+
+  | Seed | Deaths | Labels | Steps skipped |
+  |---|---|---|---|
+  | 1 | 36 | 26 starved, 6 combat, 3 stuck, 1 unseen | 9 |
+  | 2 | 10 | 7 combat, 3 starved | 2 |
+  | 3 | 21 | 9 combat, 7 starved, 5 stuck | 3 |
+
+  Before these changes the same map's runs failed outright or took 9 minutes to fail in a 503-death loop.
+- **Tests.** `tests/test_balance.py` covers detour versus thorough pickup, start under fire by facing, and engaged HP paid from the pool.
