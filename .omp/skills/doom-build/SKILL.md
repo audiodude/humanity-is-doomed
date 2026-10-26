@@ -1,9 +1,9 @@
 ---
-name: build-doom-ii-level
+name: doom-build
 description: Build a designed DOOM II level as a level module with this repo's builder, through every build check. Use when writing or changing a `levels/*.py` map, or fixing its build errors.
 ---
 
-Turn a design doc (`levels/designs/<module>.md`, from `design-doom-ii-level`) into `levels/<module>.py` that builds clean and matches the doc. No doc yet: run `design-doom-ii-level` first. Playtesting is `test-doom-ii-level`.
+Turn a design doc (`levels/designs/<module>.md`, from `doom-design`) into `levels/<module>.py` that builds clean and matches the doc. No doc yet: run `doom-design` first. Playtesting is `doom-test`.
 
 ## 1. Read
 

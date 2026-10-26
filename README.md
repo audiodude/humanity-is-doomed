@@ -177,11 +177,11 @@ Anything the builder infers can be overridden line by line in `OVERRIDES`, keyed
 
 ### Agent skills
 
-Three skills in `.claude/skills/` take an agent through a new map in order, each ending where the next begins:
+Three skills in `.omp/skills/` (linked as `.claude/skills/` for Claude Code) take an agent through a new map in order, each ending where the next begins:
 
-- `design-doom-ii-level`: pitch five structurally different concepts, pick one, and write a design doc to `levels/designs/<module>.md` (route, sketch, materials, secrets, measurement targets).
-- `build-doom-ii-level`: turn the doc into a level module that builds clean and matches it, with the builder's known gotchas.
-- `test-doom-ii-level`: route script, wiring run, screenshots, and combat-bot runs on three seeds, with each death cluster called as a map or bot problem.
+- `doom-design`: pitch five structurally different concepts, pick one, and write a design doc to `levels/designs/<module>.md` (route, sketch, materials, secrets, measurement targets).
+- `doom-build`: turn the doc into a level module that builds clean and matches it, with the builder's known gotchas.
+- `doom-test`: route script, wiring run, screenshots, and combat-bot runs on three seeds, with each death cluster called as a map or bot problem.
 
 They came out of four timed rounds of agents building maps from scratch: the six maps in `SPEEDY1.WAD`, built from feature checklists, all came out as the same hub with a wing per key, while the six in `SPEEDY2.WAD`, each built around a layout idea, didn't.
 
