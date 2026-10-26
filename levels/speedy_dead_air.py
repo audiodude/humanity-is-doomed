@@ -75,7 +75,7 @@ SECTORS = [
              alcove_flat=YARD_FLAT, flat=YARD_FLAT),
     Sector("ctrl", [rect(1088, 768, 1488, 1216)], 8, 256, "FLOOR1_6", "CEIL3_6", 176, "TEKWALL4",
            tag=TAG_DARK, pillars=[rect(1184, 960, 1248, 1024), rect(1328, 960, 1392, 1024)]),
-    lift("lift_c", (1360, 1216, 1488, 1344), 128, 256, TAG_LIFT, "CEIL3_6", 176, "TEKWALL4", ftex="FLAT14"),
+    lift("lift_c", (1360, 1216, 1488, 1344), 128, 256, TAG_LIFT, "CEIL3_6", 176, "TEKWALL4", ftex="FLAT14", walk_on=True),
     Sector("ledge", [rect(1040, 1216, 1360, 1344), rect(1088, 1248, 1152, 1312)], 128, 256, "FLAT14",
            "CEIL3_6", 176, "TEKWALL4", lower="SUPPORT2", tag=TAG_DARK),
     pedestal("keyped", (1088, 1248, 1152, 1312), 136, 256, "TEKWALL4", "CEIL3_6"),

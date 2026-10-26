@@ -1271,6 +1271,7 @@ SPECIAL_NAMES = {
     10: "W1 lift", 103: "S1 door open", 2: "W1 door open", 61: "SR door open", 86: "WR door open",
     23: "S1 floor lowest", 38: "W1 floor lowest", 60: "SR floor lowest", 82: "WR floor lowest",
     20: "S1 raise & change", 22: "W1 raise & change", 68: "SR raise & change", 95: "WR raise & change",
+    131: "S1 raise fast", 130: "W1 raise fast", 132: "SR raise fast", 129: "WR raise fast",
     13: "W1 light 255", 35: "W1 light 35", 46: "GR door open", 24: "G1 floor raise", 47: "G1 floor raise",
 }
 THING_NAMES = {1: "player 1 start", 5: "blue keycard", 6: "yellow keycard", 13: "red keycard",

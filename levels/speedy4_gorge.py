@@ -141,7 +141,7 @@ SECTORS = [
     Sector("secret2", [[(1952, 1040), (2080, 1040), (2144, 1120), (2128, 1280), (2000, 1312), (1904, 1248),
                         (1888, 1104)]], 160, 272, "MFLR8_4", "RROCK10", 112, "ASHWALL4", special=SECRET_AREA),
     outdoor("ravine", [rect(2176, 640, 2816, 768)], 160, "MFLR8_4", 120, wall="ASHWALL7"),
-    lift("lift_p", (2176, 832, 2304, 960), 352, SKYC, T_LIFTP, SKY, 192, "ASHWALL3"),
+    lift("lift_p", (2176, 832, 2304, 960), 352, SKYC, T_LIFTP, SKY, 192, "ASHWALL3", walk_on=True),
 
     # The plateau: the final fight, in the open.
     outdoor("plateau", [[(2176, 768), (2816, 768), (2944, 768), (3072, 768), (3136, 928), (3072, 1024),

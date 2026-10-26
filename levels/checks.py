@@ -224,18 +224,23 @@ def check_textures(level, lines, sides, iwad, found):
         for sd in line_sides:
             me, other = sd.sector, (l.other(sd.sector) if l.back else None)
             if other is None:
-                parts = [(sd.mid, me.ceil - me.floor)]
+                parts = [(sd.mid, me.ceil - me.floor, False)]
             else:
-                top = other.floor if other.kind == DOOR else other.ceil   # closed door: whole face shows
+                is_door = other.kind == DOOR
+                top = other.floor if is_door else other.ceil   # closed door: whole face shows
                 span = (floor_range(other, lines, movers)[1] - floor_range(me, lines, movers)[0])
-                parts = [(sd.upper, me.ceil - top), (sd.lower, span)]
+                parts = [(sd.upper, me.ceil - top, is_door), (sd.lower, span, False)]
                 if sd.mid != NO_TEX and (problem := mid_fit(sd.mid, textures, medusa)):
                     problems[(sd.mid, *problem)].append(f"{me.name} {l.v1}-{l.v2}")
-            for tex, h in parts:
+            for tex, h, door_face in parts:
                 if tex == NO_TEX or h <= 0:
                     continue
                 if problem := texture_fit(tex, h, l.length, textures):
-                    problems[(tex, *problem)].append(f"{me.name} {l.v1}-{l.v2}")
+                    msg, kind = problem
+                    if door_face and kind == "style" and tex in textures and h > textures[tex][1]:
+                        msg += (f"; give the door a recess {textures[tex][1]} tall on this side "
+                                "(doorway()'s alcove or far_alcove, with alcove_height)")
+                    problems[(tex, msg, kind)].append(f"{me.name} {l.v1}-{l.v2}")
     for (tex, msg, kind), places in problems.items():
         if kind == "playability":   # one per place, so KNOWN_ISSUES stays valid when other lines change
             found.playability += [f"{tex}: {msg}, at {p}" for p in places]

@@ -72,7 +72,7 @@ SECTORS = [
            special=DAMAGE_10),
     Sector("forge_n", [rect(-64, 1584, 576, 1840)], 0, 224, "FLOOR1_7", "CEIL1_3", 144, "SP_HOT1",
            special=LIGHT_FLICKER),
-    lift("flift", (576, 1712, 704, 1840), 128, 224, TAG_FLIFT, "CEIL1_3", 160, "SP_HOT1"),
+    lift("flift", (576, 1712, 704, 1840), 128, 224, TAG_FLIFT, "CEIL1_3", 160, "SP_HOT1", walk_on=True),
     Sector("ledge", [rect(704, 1584, 896, 1840)], 128, 224, "FLOOR1_6", "CEIL1_3", 200, "SP_HOT1",
            lower="SUPPORT3"),
     *closet("fcl", (128, 1840), "n", TAG_FORGE, face="SP_HOT1", flat="FLOOR1_7", wall="FIREBLU1",

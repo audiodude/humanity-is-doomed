@@ -161,7 +161,8 @@ ACTION_NAMES = {v: k for k, v in dict(globals()).items()
 MONSTER_DOORS = {DR_DOOR}   # the only manual door a monster opens (never an ML_SECRET line)
 # The builder's guesses (model.floor_movers): what moves a tagged floor.
 FLOOR_LOWERERS = {S1_FLOOR_LOWEST, W1_FLOOR_LOWEST, SR_FLOOR_LOWEST, WR_FLOOR_LOWEST}
-FLOOR_RAISERS = {S1_RAISE_CHANGE, W1_RAISE_CHANGE, SR_RAISE_CHANGE, WR_RAISE_CHANGE}
+FLOOR_RAISERS = {S1_RAISE_CHANGE, W1_RAISE_CHANGE, SR_RAISE_CHANGE, WR_RAISE_CHANGE,
+                 S1_FLOOR_NEXT_FAST, W1_FLOOR_NEXT_FAST, SR_FLOOR_NEXT_FAST, WR_FLOOR_NEXT_FAST}
 
 
 @dataclass(frozen=True)

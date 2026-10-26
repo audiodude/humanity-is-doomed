@@ -50,7 +50,7 @@ SECTORS = [
     Sector("ledge", [[(-1152, 1280), (-576, 1280), (-576, 1408), (-800, 1408), (-928, 1408),
                       (-1152, 1408)]], 96, 224, "FLOOR7_1", "CEIL5_1", 160, "BROWNGRN",
            lower="SUPPORT2"),
-    lift("lift_w", (-576, 1280, -448, 1408), 96, 224, TAG_WLIFT, "CEIL5_1", 160, "BROWNGRN"),
+    lift("lift_w", (-576, 1280, -448, 1408), 96, 224, TAG_WLIFT, "CEIL5_1", 160, "BROWNGRN", walk_on=True),
     # Secret: fake wall in the warehouse west wall.
     *doorway("d_secret", (-1152, 1024), "w", face="BROWNGRN", track="BROWNGRN"),
     Sector("secret", [rect(-1360, 928, -1168, 1120)], 0, 128, "FLOOR0_1", "CEIL3_3", 112, "BROWN1",
@@ -63,7 +63,7 @@ SECTORS = [
     Sector("lab", [[(1168, 768), (1680, 768), (1680, 1216), (1424, 1216), (1424, 1280), (1296, 1280),
                     (1296, 1408), (1168, 1408)]], 0, 256, "FLOOR1_6", "CEIL3_6", 160, "TEKWALL4",
            pillars=[rect(1296, 896, 1360, 960), rect(1488, 896, 1552, 960)]),
-    lift("lift_l", (1296, 1280, 1424, 1408), 128, 256, TAG_LLIFT, "CEIL3_6", 160, "TEKWALL4"),
+    lift("lift_l", (1296, 1280, 1424, 1408), 128, 256, TAG_LLIFT, "CEIL3_6", 160, "TEKWALL4", walk_on=True),
     Sector("plat1", [rect(1424, 1216, 1552, 1408)], 128, 256, "FLAT14", "CEIL3_6", 192, "TEKWALL4",
            lower="SUPPORT2"),
     Sector("plat2", [rect(1552, 1216, 1680, 1408)], 128, 256, "FLAT14", "CEIL3_6", 208, "TEKWALL4",

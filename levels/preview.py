@@ -5,30 +5,10 @@ from html import escape
 
 from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, HEALTH_PICKUPS, KEY_OF, PLAYERS,
                     SECRET_AREA)
-from .model import DOOR, LIFT, edges, point_in_loop
+from .model import DOOR, LIFT, label_point
 
 KEY_COLORS = {"blue": "#2255ff", "yellow": "#e0c000", "red": "#e02020"}
 
-
-def label_point(sec, loop):
-    """A point inside the sector and its outer loop `loop`, near the loop's
-    bounding-box centre: the centre, else the nearest point of a 16-unit
-    grid, else (a sector too thin for the grid) the nearest point 1 unit off
-    an edge's midpoint. None if there's none."""
-    xs = [x for x, _ in loop]
-    ys = [y for _, y in loop]
-    cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
-    if sec.contains((cx, cy)) and point_in_loop((cx, cy), loop):
-        return cx, cy
-    grid = [(x, y) for x in range(min(xs) + 8, max(xs), 16) for y in range(min(ys) + 8, max(ys), 16)]
-    if not any(sec.contains(p) and point_in_loop(p, loop) for p in grid):
-        grid = []
-        for (x1, y1), (x2, y2) in edges(loop):
-            n = math.hypot(x2 - x1, y2 - y1)
-            for k in (1, -1):
-                grid.append(((x1 + x2) / 2 + k * (y2 - y1) / n, (y1 + y2) / 2 - k * (x2 - x1) / n))
-    grid = [p for p in grid if sec.contains(p) and point_in_loop(p, loop)]
-    return min(grid, key=lambda p: (p[0] - cx) ** 2 + (p[1] - cy) ** 2, default=None)
 
 
 def write_svg(level, lines, path, scale=0.4, pad=96):

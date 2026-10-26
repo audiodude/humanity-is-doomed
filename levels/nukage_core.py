@@ -121,7 +121,7 @@ SECTORS = [
     # Secret: a ledge on the core's south face, seen from the start window, and a lift up from the moat.
     Sector("ledge", [rect(-96, 928, 96, 992)], 96, SKYC, "FLAT5_4", SKY, 224, CORE_WALL, lower="METAL",
            special=SECRET_AREA),
-    lift("lift_core", (-32, 864, 32, 928), 96, SKYC, TAG_CLIFT, SKY, 224, CORE_WALL, ftex="FLAT5_4"),
+    lift("lift_core", (-32, 864, 32, 928), 96, SKYC, TAG_CLIFT, SKY, 224, CORE_WALL, ftex="FLAT5_4", walk_on=True),
     # The crown: the exit room on top of the core, opened when you step onto the core.
     door("d_crown", rect(112, 1216, 128, 1344), face="METAL2", track="METAL2", tag=TAG_CROWN, floor=CORE,
          light=208, flat=F_CORE),
@@ -224,7 +224,7 @@ SECTORS = [
     Sector("ctrl", [rect(800, 1024, 1120, 1472)], GE, 368, "FLAT14", "TLITE6_5", 224, "COMPBLUE"),
     window("window_c", (768, 1248, 800, 1376), GE + 40, GE + 104, "COMPBLUE", 208),
     # Lift from the east gallery down to the terrace, behind a shutter that the same switch raises.
-    lift("lift_se", (592, 576, 720, 704), GE, SKYC, TAG_SELIFT, SKY, 192, OUT_E, ftex=F_GE),
+    lift("lift_se", (592, 576, 720, 704), GE, SKYC, TAG_SELIFT, SKY, 192, OUT_E, ftex=F_GE, walk_on=True),
     door("d_shut", rect(576, 592, 592, 688), face="SUPPORT3", track="SUPPORT3", tag=TAG_GATE, light=192,
          flat=F_TER),
 ]
