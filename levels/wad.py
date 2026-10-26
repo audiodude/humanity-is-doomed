@@ -3,7 +3,28 @@ import os
 import re
 import struct
 
-IWAD = os.environ.get("DOOM2_WAD", os.path.expanduser("~/.local/share/dsda-doom/doom2.wad"))
+ENV_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+
+
+def read_env(path=ENV_FILE):
+    """KEY=VALUE settings from the repo's .env (see .env.example), with
+    variables already set in the environment taking precedence. Blank lines
+    and # comments are skipped; quotes around a value are dropped."""
+    env = {}
+    if os.path.exists(path):
+        with open(path) as f:
+            for line in f:
+                key, sep, value = line.strip().partition("=")
+                if sep and not key.startswith("#"):
+                    env[key.strip()] = value.strip().strip("\"'")
+    return {**env, **os.environ}
+
+
+# IWAD paths by game, None if unset: DOOM_WAD (Ultimate Doom) and DOOM2_WAD.
+IWAD_VARS = {"doom": "DOOM_WAD", "doom2": "DOOM2_WAD"}
+_env = read_env()
+IWADS = {game: os.path.expanduser(_env[var]) if _env.get(var) else None for game, var in IWAD_VARS.items()}
+IWAD = IWADS["doom2"]
 
 
 def name8(s):
@@ -52,14 +73,23 @@ def map_lumps(level, lines, sides_per_line):
             ("SECTORS", sectors), ("REJECT", b""), ("BLOCKMAP", b"")]
 
 
+def umapinfo_body(info: dict[str, str]) -> str:
+    """The UMAPINFO entry body a {key: value} dict is written as."""
+    return "\n" + "".join(f'  {k} = "{v}"\n' for k, v in info.items())
+
+
 def umapinfo_lump(level):
-    body = "".join(f'  {k} = "{v}"\n' for k, v in level.umapinfo.items())
-    return f"MAP {level.map}\n{{\n{body}}}\n".encode()
+    """level's UMAPINFO entry: a dict's values are written quoted, a string
+    is the body between the braces, written as it is."""
+    info = level.umapinfo
+    body = info if isinstance(info, str) else umapinfo_body(info)
+    return f"MAP {level.map}\n{{{body}}}\n".encode()
 
 
 MAP_MARKER = re.compile(r"MAP\d\d|E\dM\d")
+# Lumps after a map marker that belong to the map (Doom, Hexen and UDMF formats).
 MAP_LUMPS = {"THINGS", "LINEDEFS", "SIDEDEFS", "VERTEXES", "SEGS", "SSECTORS", "NODES", "SECTORS",
-             "REJECT", "BLOCKMAP", "BEHAVIOR"}
+             "REJECT", "BLOCKMAP", "BEHAVIOR", "TEXTMAP", "ZNODES", "DIALOGUE", "ENDMAP"}
 UMAPINFO_ENTRY = re.compile(r"MAP\s+(\w+)\s*\{[^}]*\}", re.IGNORECASE)
 
 
@@ -93,22 +123,32 @@ def replace_map(lumps, slot, map_lumps, umapinfo=None):
     return out
 
 
-def iwad_textures(path=IWAD):
+FLAT_MARKER = re.compile(r"F[F1-3]?_(START|END)")
+
+
+def iwad_textures(path, resources=()):
     """({texture: (width, height)}, {flat names}, {medusa textures}) from an
-    IWAD, or None if the file is missing. A medusa texture has a column where
-    patches overlap; vanilla can't draw those on two-sided lines."""
-    if not os.path.exists(path):
+    IWAD and the PWADs `resources` loaded after it, or None if the path is
+    unset or missing. As with vanilla -file, a later TEXTURE1, TEXTURE2,
+    PNAMES or patch lump replaces an earlier one; flats (between F_START and
+    F_END, or FF_START and FF_END) add up. A medusa texture has a column
+    where patches overlap; vanilla can't draw those on two-sided lines."""
+    if not path or not os.path.exists(path):
         return None
-    lumps = read_wad(path)
-    by_name = {name.upper(): data for name, data in lumps}
+    by_name, flats = {}, set()
+    for wad in (path, *resources):
+        lumps = read_wad(wad)
+        by_name.update((name.upper(), data) for name, data in lumps)
+        names = [n.upper() for n, _ in lumps]
+        for start, end in (("F_START", "F_END"), ("FF_START", "FF_END")):
+            if start in names and end in names:
+                flats |= {n for n in names[names.index(start) + 1:names.index(end)] if not FLAT_MARKER.fullmatch(n)}
     pnames = by_name["PNAMES"]
     patches = [pnames[4 + 8 * i:12 + 8 * i].split(b"\0")[0].decode().upper()
                for i in range(struct.unpack_from("<i", pnames)[0])]
     patch_width = [struct.unpack_from("<h", by_name[p])[0] if p in by_name else 0 for p in patches]
     textures, medusa = {}, set()
-    for name, data in lumps:
-        if name not in ("TEXTURE1", "TEXTURE2"):
-            continue
+    for data in (by_name[n] for n in ("TEXTURE1", "TEXTURE2") if n in by_name):
         for i in range(struct.unpack_from("<i", data)[0]):
             o = struct.unpack_from("<i", data, 4 + 4 * i)[0]
             tex = data[o:o + 8].split(b"\0")[0].decode().upper()
@@ -116,10 +156,9 @@ def iwad_textures(path=IWAD):
             cover = [0] * w
             for k in range(struct.unpack_from("<h", data, o + 20)[0]):
                 x, _, patch = struct.unpack_from("<hhh", data, o + 22 + 10 * k)
-                for c in range(max(0, x), min(w, x + patch_width[patch])):
+                pw = patch_width[patch] if patch < len(patch_width) else 0   # not in PNAMES: draws nothing
+                for c in range(max(0, x), min(w, x + pw)):
                     cover[c] += 1
             if max(cover) > 1:
                 medusa.add(tex)
-    names = [n for n, _ in lumps]
-    flats = set(names[names.index("F_START") + 1:names.index("F_END")])
-    return textures, flats - {"F1_START", "F1_END", "F2_START", "F2_END", "F3_START", "F3_END"}, medusa
+    return textures, flats, medusa

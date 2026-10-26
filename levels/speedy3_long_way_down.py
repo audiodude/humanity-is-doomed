@@ -32,7 +32,7 @@ SECTORS = [
     # 2. The shaft: a landing, a lift that drops 256 into the dark.
     Sector("landing", [rect(48, -176, 208, -48)], 512, 768, "FLOOR7_1", "CEIL5_1", 144, "BROWN1",
            lower="SUPPORT2"),
-    lift("lift", (48, -304, 208, -176), 512, 768, TAG_LIFT, "CEIL5_1", 144, "BROWN1"),
+    lift("lift", (48, -304, 208, -176), 512, 768, TAG_LIFT, "CEIL5_1", 144, "BROWN1", walk_on=True),
     Sector("shaft", [[(-64, -48), (48, -48), (48, -176), (48, -304), (208, -304), (208, -176), (208, -48),
                       (320, -48), (320, -240), (320, -400), (240, -480), (16, -480), (-64, -400)]],
            256, 768, "FLOOR5_2", "CEIL5_1", 96, "BROWN1", lower="SUPPORT2", special=LIGHT_FLICKER),

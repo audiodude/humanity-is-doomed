@@ -93,7 +93,7 @@ SECTORS = [
     # Secret: a hinted panel in the hot fork, a landing and a lift down to the pit's island.
     door("d_pit", rect(-192, 576, -128, 592), face=HOT, track=HOT, floor=-16, light=176, flat=H_FLOOR),
     Sector("p_land", [rect(-192, 592, -112, 640)], -16, 112, H_FLOOR, H_CEIL, 96, HOT),
-    lift("p_lift", (-192, 640, -112, 720), -16, SKYC, TAG_PLIFT, SKY, 160, "SUPPORT3", ftex="FLAT23"),
+    lift("p_lift", (-192, 640, -112, 720), -16, SKYC, TAG_PLIFT, SKY, 160, "SUPPORT3", ftex="FLAT23", walk_on=True),
     Sector("p_isle", [rect(-192, 720, -112, 816), rect(*ped_s)], -40, SKYC, "FLAT5_4", SKY, 208, "SUPPORT3",
            lower="METAL", special=SECRET_AREA),
     pedestal("p_ped", ped_s, -24, SKYC, "SUPPORT3", SKY),
@@ -153,7 +153,7 @@ SECTORS = [
     *doorway("d_ls", (832, 1408), "n", 64, face=COMP, track=COMP, floor=16, flat="FLOOR1_1"),
     Sector("e_sec", [rect(768, 1424, 896, 1504)], 16, 128, "FLOOR1_1", C_CEIL, 160, COMP, special=SECRET_AREA),
     # Optional sump: dark until you take the super shotgun.
-    lift("e_lift", (1024, 1408, 1152, 1472), 16, 192, TAG_ELIFT, C_CEIL, 160, COLD, ftex="FLAT23"),
+    lift("e_lift", (1024, 1408, 1152, 1472), 16, 192, TAG_ELIFT, C_CEIL, 160, COLD, ftex="FLAT23", walk_on=True),
     Sector("e_sump", [rect(896, 1472, 1408, 1856), rect(*ped_c)] + s_pools, -48, 192, "FLOOR1_1", C_CEIL, 48, COLD,
            tag=TAG_LIGHTS),
     *[Sector(f"s_pool{i}", [p], -64, 192, "NUKAGE1", C_CEIL, 48, COLD, lower="NUKEDGE1", special=DAMAGE_5,

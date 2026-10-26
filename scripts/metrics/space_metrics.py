@@ -15,8 +15,9 @@ Run from the repo root (stdlib only, uses all cores, ~2 min on 16 cores):
 Method notes (full definitions in research/facets/10-quant-space.md):
 * Space is sampled on a G=8-unit grid whose cell centres sit on multiples of
   8 (Doom's construction grid). Each centre is assigned the sector found by
-  a +x ray cast (same rule as doomwad.Map.sector_of_point), row by row, with
-  the scanline nudged up by 1/1024 so it never passes through a vertex.
+  a +x ray cast (same rule as levels.wadmap.Map.sector_of_point), row by
+  row, with the scanline nudged up by 1/1024 so it never passes through a
+  vertex.
 * A sector is *walkable* if ceil-floor >= 56 or it is a door sector.
 * A line is a *movement wall* if it is one-sided, flagged ML_BLOCKING, or a
   two-sided line where one side is not walkable, the opening is < 56 (doors
@@ -162,7 +163,7 @@ class Grid:
 def rasterise_sectors(m, grid):
     """rows[j][i] = sector index or -1 (void): per row, a +x ray from each
     centre takes the facing side of the nearest crossed line (the rule of
-    doomwad.Map.sector_of_point). The scanline is nudged up by EPS."""
+    levels.wadmap.Map.sector_of_point). The scanline is nudged up by EPS."""
     crossings = [[] for _ in range(grid.h)]
     for ln in m.lines:
         (x1, y1), (x2, y2) = m.verts[ln.v1], m.verts[ln.v2]
@@ -363,15 +364,19 @@ def symmetry(rows, grid, walkable, clear):
     return res
 
 
-def texture_info(path):
+def texture_info(path, resources=()):
     """{texture: (width, height, h_period, v_period)}. Widths/heights come from
     levels.wad.iwad_textures; periods from compositing each texture's patches
     (PNAMES + patch posts): the smallest horizontal shift (dividing the width)
     and vertical shift (dividing 128, the vanilla row wrap; the texture height
     if it is shorter than 128) under which the composed pixels repeat. Walls
-    that differ by a multiple of the period look seamless."""
-    sizes = iwad_textures(path)[0]
-    lumps = dict(read_wad(path))
+    that differ by a multiple of the period look seamless. resources: PWADs
+    loaded after the IWAD at path (a later lump of the same name wins, as
+    with -file)."""
+    sizes = iwad_textures(path, resources)[0]
+    lumps = {}
+    for p in (path, *resources):
+        lumps.update(read_wad(p))
     pn = lumps["PNAMES"]
     pnames = [pn[4 + 8 * i:12 + 8 * i].split(b"\0")[0].decode().upper()
               for i in range(struct.unpack_from("<i", pn)[0])]

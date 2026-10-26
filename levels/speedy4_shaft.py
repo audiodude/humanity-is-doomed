@@ -62,7 +62,7 @@ SECTORS = [
     Sector("pump", [[(512, -576), (736, -576), (832, -480), (832, -224), (512, -224)], pump_trough],
            F0, 208, FL0, "CEIL5_1", 128, W0, pillars=[pump_pillar]),
     Sector("trough", [pump_trough], POOL, 208, "NUKAGE1", "CEIL5_1", 160, W0, special=DAMAGE_5),
-    lift("lift1", (640, -224, 768, -96), F1, 272, TAG_LIFT1, "CEIL5_1", 160, W0),
+    lift("lift1", (640, -224, 768, -96), F1, 272, TAG_LIFT1, "CEIL5_1", 160, W0, walk_on=True),
     # Secret: a hinted panel in the sump gallery's west wall.
     *doorway("d_secret", (-480, -304), "w", face=W0, track=W0, floor=F0, flat=FL0),
     Sector("secret", [rect(-688, -400, -496, -208)], F0, 144, "FLOOR0_1", "CEIL3_3", 112, "BROWN96",
@@ -90,7 +90,7 @@ SECTORS = [
                       (-224, 608)]] + crates, F2, 528, FL2, "CEIL3_5", 112, W2),
     *[Sector(f"crate{i}", [c], F2 + 64, 528, "CRATOP1", "CEIL3_5", 112, W2, lower="CRATE1")
       for i, c in enumerate(crates)],
-    lift("lift2", (-352, 480, -224, 608), F3, 528, TAG_LIFT2, "CEIL3_5", 144, W2),
+    lift("lift2", (-352, 480, -224, 608), F3, 528, TAG_LIFT2, "CEIL3_5", 144, W2, walk_on=True),
 
     # ---- Top floor (F3, west): north-west bay and west gallery, the bridge
     # switch booth, two closets that open when you step into it.

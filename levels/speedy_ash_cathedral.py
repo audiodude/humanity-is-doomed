@@ -51,7 +51,7 @@ SECTORS = [
              face="BIGDOOR5", flat=NAR_F),
     *doorway("d_cpass", (0, 64), "w", face="BIGDOOR5", flat=NAR_F),
     Sector("cpass", [rect(-64, 0, -16, 128)], 0, 128, NAR_F, "CEIL3_5", 128, NAR_W),
-    lift("clift", (-128, 0, -64, 128), 0, 128, T_CLIFT, "CEIL3_5", 128, CRYPT_W, ftex=NAR_F),
+    lift("clift", (-128, 0, -64, 128), 0, 128, T_CLIFT, "CEIL3_5", 128, CRYPT_W, ftex=NAR_F, walk_on=True),
     # Secret 2: a misaligned panel in the narthex east wall.
     *doorway("d_sec2", (512, 160), "e", 64, face=NAR_W, track=NAR_W, flat=NAR_F),
     Sector("sec2", [rect(528, 96, 688, 224)], 0, 128, NAR_F, "TLITE6_1", 208, "MARBLE2", special=SECRET_AREA),
@@ -88,7 +88,7 @@ SECTORS = [
              far_flat=LIB_F, face="BIGDOOR7", track="DOORBLU", action=DR_BLUE, flat=NAVE_F),
     Sector("library", [[(-1088, 624), (-432, 624), (-432, 1136), (-960, 1136), (-960, 1008), (-1088, 1008)]],
            0, 256, LIB_F, "CEIL1_1", 128, LIB_W, pillars=shelves),
-    lift("llift", (-1088, 1008, -960, 1136), 128, 256, T_LLIFT, "CEIL1_1", 144, LIB_W, ftex="FLAT5_2"),
+    lift("llift", (-1088, 1008, -960, 1136), 128, 256, T_LLIFT, "CEIL1_1", 144, LIB_W, ftex="FLAT5_2", walk_on=True),
     Sector("balcony", [rect(-1088, 1136, -432, 1328), rect(-672, 1232, -608, 1296)], 128, 256, "FLAT5_2",
            "CEIL1_1", 160, LIB_W, lower="WOOD1"),
     pedestal("yped", (-672, 1232, -608, 1296), 152, 256, LIB_W, "CEIL1_1"),

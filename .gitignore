@@ -14,3 +14,10 @@ docs/combat-bot/
 
 # omp harness config (local agent definitions)
 .omp/
+
+# Local settings: IWAD paths (see .env.example)
+.env
+
+# Decompiled id maps (levels.decompile): never committed
+levels/imported/
+wads/imported/

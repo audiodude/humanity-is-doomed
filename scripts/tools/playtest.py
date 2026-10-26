@@ -89,7 +89,8 @@ import tempfile
 import time
 import zlib
 
-DEFAULT_IWAD = os.environ.get("DOOM2_WAD", os.path.expanduser("~/.local/share/dsda-doom/doom2.wad"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+from levels.wad import IWAD as DEFAULT_IWAD  # noqa: E402  DOOM2_WAD from .env or the environment
 CACHE = os.path.expanduser("~/.cache/playtest")
 WIDTH, HEIGHT = 640, 480
 OPS = {"==": lambda a, b: a == b, "!=": lambda a, b: a != b, "<": lambda a, b: a < b,
@@ -1270,6 +1271,7 @@ SPECIAL_NAMES = {
     10: "W1 lift", 103: "S1 door open", 2: "W1 door open", 61: "SR door open", 86: "WR door open",
     23: "S1 floor lowest", 38: "W1 floor lowest", 60: "SR floor lowest", 82: "WR floor lowest",
     20: "S1 raise & change", 22: "W1 raise & change", 68: "SR raise & change", 95: "WR raise & change",
+    131: "S1 raise fast", 130: "W1 raise fast", 132: "SR raise fast", 129: "WR raise fast",
     13: "W1 light 255", 35: "W1 light 35", 46: "GR door open", 24: "G1 floor raise", 47: "G1 floor raise",
 }
 THING_NAMES = {1: "player 1 start", 5: "blue keycard", 6: "yellow keycard", 13: "red keycard",
@@ -1305,7 +1307,7 @@ def main():
     p.add_argument("wad", nargs="+", help="PWAD(s) to load, then the map, e.g. wads/X.WAD MAP02")
     p.add_argument("--script", help="step script (or give it as the last positional argument)")
     p.add_argument("--describe", action="store_true", help="list the map's start, keys and special lines")
-    p.add_argument("--iwad", default=DEFAULT_IWAD)
+    p.add_argument("--iwad", default=DEFAULT_IWAD, help="DOOM II IWAD (default: DOOM2_WAD from .env)")
     p.add_argument("--skill", type=int, default=4, help="1 ITYTD .. 4 UV, 5 NM (default 4)")
     p.add_argument("--shots", help="screenshot directory (default /tmp/playtest-shots/MAP)")
     p.add_argument("--from", dest="start_from", metavar="NAME", help="start at `checkpoint NAME` (see above)")
@@ -1317,6 +1319,8 @@ def main():
     p.add_argument("--hd", action="store_true", help="with --replay: render at 1920x1080 (widescreen) instead of 640x480")
     p.add_argument("--seed", type=int, default=1, help="random seed (default 1): the same seed plays the same way")
     args = p.parse_args()
+    if not args.iwad and not args.describe:
+        p.error("no IWAD: set DOOM2_WAD in .env (see .env.example) or pass --iwad")
     pos = args.wad
     if args.replay:
         args.watch = True

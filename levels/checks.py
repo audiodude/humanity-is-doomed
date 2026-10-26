@@ -1,173 +1,201 @@
-"""Level validation (thing placement, progression, kills, secrets, hazards,
-textures) and the balance report. Check functions return lists of messages;
-build() decides what fails."""
+"""Level validation and the balance report. findings() runs every check on a
+compiled level and sorts the messages: playability (the map is broken: lines
+crossing, things stuck or in the void, unreachable exit, secrets or monsters,
+softlocks, unknown textures), style (house rules: sunken hazards, whole
+pictures, no medusa, no running jump to the exit) and warnings. build()
+decides what fails. Messages name sectors and coordinates, so they stay the
+same across rebuilds (level modules list known ones in KNOWN_ISSUES).
+
+Reachability comes from levels.reach, run once on the map lumps as built."""
 from collections import defaultdict, deque
+from dataclasses import dataclass, field
 
-from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, DAMAGE_PER_AMMO, DAMAGING, DROPS, EXITS,
-                    FLOOR_LOWERERS, FLOOR_RAISERS, HEALTH_PICKUPS, KEY_OF, PLAYER1, PLAYERS, SECRET_AREA, START_AMMO,
-                    TAG_DOOR_OPENERS, TELEPORT_DEST, USE_DOORS, WR_TELEPORT, is_decal)
-from .model import (ALL, DOOR, LIFT, ML_BLOCKING, NO_TEX, floor_movers, floor_range, moved_floor,
-                    neighbours, open_ceil,
-                    sector_at, seg_dist)
+from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, BOSSBRAIN, DAMAGE_PER_AMMO, DAMAGING, DROPS,
+                    HEALTH_PICKUPS, KEEN, LINE_SPECIALS, MAX_STEP, MONSTERS, PLAYER1, PLAYERS, SECRET_AREA,
+                    START_AMMO, THING_GAMES, THING_NAMES, is_decal)
+from .measure import check_sector_overlaps
+from .model import ALL, DOOR, NO_TEX, THING_BITS, crossings, floor_movers, floor_range, seg_dist
+from .reach import solve
+from .wad import IWAD_VARS, IWADS, iwad_textures
+from .wadmap import ML_BLOCKING, ML_BLOCKMONSTERS, MULTI_ONLY, parse
+
+GAMES = {"doom": "DOOM", "doom2": "DOOM II"}
 
 
-def check_things(level, lines):
-    """Things sit inside a sector, don't clip walls, ledges or each other,
-    and fit."""
+@dataclass
+class Findings:
+    playability: list[str] = field(default_factory=list)
+    style: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    # (wadmap.Map, reach.Model, its run) for the measurements; None without a player 1 start.
+    reach: tuple | None = field(default=None, repr=False, compare=False)
+
+
+_iwads = {}
+
+
+def level_textures(level):
+    """iwad_textures of the level's game IWAD plus its RESOURCES (cached), or
+    None if that IWAD isn't set."""
+    key = (level.game, tuple(level.resources))
+    if key not in _iwads:
+        _iwads[key] = iwad_textures(IWADS[level.game], level.resources)
+    return _iwads[key]
+
+
+def findings(level, compiled) -> Findings:
+    """Every check on a level and its compile_level() output."""
+    found = Findings()
+    m = parse(level.game, level.map, dict(compiled.lumps[1:]))
+    names = list(level.sectors)   # SECTORS lump order
+    found.playability += (crossings(compiled.lines) + check_sector_overlaps(level)
+                          + check_things(m, names))
+    check_types(m, found)
+    iwad = level_textures(level)
+    if iwad is None:
+        found.warnings.append(f"no {level.game}.wad at {IWAD_VARS[level.game]}={IWADS[level.game]} "
+                              "(set it in .env, see .env.example); skipping texture checks")
+    else:
+        check_textures(level, compiled.lines, compiled.sides, iwad, found)
+    p1 = next((t for t in m.things if t.type == PLAYER1), None)
+    if p1 is None or m.sector_of_point(p1.x, p1.y) is None:
+        found.playability.append("no player 1 start inside a sector")
+    else:
+        sizes = iwad[0] if iwad else {}
+        md, res = solve(m, (sizes, next(iter(sizes.values()))[1] if sizes else 0))
+        found.reach = (m, md, res)
+        check_reach(level, md, res, names, found)
+    found.style += check_hazards(level, compiled.lines)
+    return found
+
+
+def _thing(t):
+    return f"{THING_NAMES.get(t.type, t.type)} at {t.x},{t.y}"
+
+
+def _sector_of(m, x, y):
+    """Sector index at (x, y); a point on a line counts as on its front side."""
+    o = m.sector_of_point(x, y)
+    if o is None:
+        o = next((m.sides[l.front].sector for l in m.lines
+                  if seg_dist((x, y), m.verts[l.v1], m.verts[l.v2]) == 0), None)
+    return o
+
+
+def _skills(t):
+    return "" if t.flags & MULTI_ONLY else "".join(sk for sk in ALL if t.flags & THING_BITS[sk])
+
+
+def check_things(m, names):
+    """Things sit inside a sector; actors fit under its ceiling (a closed
+    door has no room), don't clip walls, steps or closed doors, and don't
+    overlap each other."""
     errors = []
-    for t in level.things:
-        where = f"thing {t.type} at {t.x},{t.y}"
-        s = sector_at(level, (t.x, t.y))
-        if s is None:
-            errors.append(f"{where} is in the void")
+    lines = [(m.verts[l.v1], m.verts[l.v2], l.flags, *m.line_sectors(l)) for l in m.lines]
+    for t in m.things:
+        o = _sector_of(m, t.x, t.y)
+        if o is None:
+            errors.append(f"{_thing(t)} is in the void")
             continue
-        if s.kind == DOOR:
-            errors.append(f"{where} inside door {s.name}")
         actor = ACTORS.get(t.type)
         if actor is None:
             continue
-        if not actor.flies and s.ceil - s.floor < actor.height:
-            errors.append(f"{where} lacks headroom in {s.name}")
-        for l in lines:
-            d = seg_dist((t.x, t.y), l.v1, l.v2)
-            if d >= actor.radius:
+        s = m.sectors[o]
+        if s.ceil - s.floor < actor.height:
+            errors.append(f"{_thing(t)} lacks headroom in {names[o]}")
+        block = ML_BLOCKING if t.type in PLAYERS else ML_BLOCKING | ML_BLOCKMONSTERS
+        for p, q, flags, f, b in lines:
+            d = seg_dist((t.x, t.y), p, q)
+            if d >= actor.radius or f == b:
                 continue
-            if l.back is None or l.flags & ML_BLOCKING:
-                errors.append(f"{where} clips wall {l.v1}-{l.v2} ({d:.0f}<{actor.radius})")
-            else:
-                o = l.other(s)
-                if o.floor - s.floor > 24 or o.kind == DOOR:
-                    errors.append(f"{where} clips step/door {l.v1}-{l.v2}")
-    return errors + check_overlaps(level)
+            if b is None or flags & block:
+                errors.append(f"{_thing(t)} clips wall {p}-{q} ({d:.0f}<{actor.radius})")
+                continue
+            n = m.sectors[b if f == o else f]
+            if (not actor.flies and n.floor - s.floor > MAX_STEP
+                    or min(n.ceil, s.ceil) - max(n.floor, s.floor) < actor.height):
+                errors.append(f"{_thing(t)} clips step/door {p}-{q}")
+    return errors + check_overlaps(m)
 
 
-def check_overlaps(level):
+def check_overlaps(m):
     """Actors that appear on a common skill don't overlap. Doom blocks
     actors as squares (|dx| and |dy| both under the summed radii), and
     overlapping ones start stuck."""
-    actors = [t for t in level.things if t.type in ACTORS]
+    actors = [t for t in m.things if t.type in ACTORS]
     errors = []
     for i, a in enumerate(actors):
         for b in actors[i + 1:]:
-            shared = "".join(sk for sk in ALL if sk in a.skills and sk in b.skills)
+            shared = "".join(sk for sk in _skills(a) if sk in _skills(b))
             reach = ACTORS[a.type].radius + ACTORS[b.type].radius
             if shared and abs(a.x - b.x) < reach and abs(a.y - b.y) < reach:
-                errors.append(f"thing {a.type} at {a.x},{a.y} overlaps thing {b.type} at "
-                              f"{b.x},{b.y} on skills {shared}")
+                errors.append(f"{_thing(a)} overlaps {_thing(b)} on skills {shared}")
     return errors
 
 
-def explore(level, lines):
-    """Flood-fill from the player 1 start, picking up keys and firing tagged
-    triggers as their sectors become reachable, until nothing changes.
-    Returns (reached sectors, adjacency, move), or None without a player 1
-    start. adjacency maps a sector to [(sector, line)], line None for a
-    teleport. move(a, b, line, actor) says whether `actor` (an Actor) can
-    cross from a to b once the player has every key, door and floor they can
-    get; only the player opens keyed doors."""
-    p1 = next((t for t in level.things if t.type == PLAYER1), None)
-    start = p1 and sector_at(level, (p1.x, p1.y))
-    if start is None:
-        return None
-    player = ACTORS[PLAYER1]
-    adj = defaultdict(list)
-    for l in lines:
-        if l.back:
-            adj[l.front].append((l.back, l))
-            adj[l.back].append((l.front, l))
-    dests = defaultdict(list)   # tag -> sectors holding a teleport destination
-    for t in level.things:
-        s = t.type == TELEPORT_DEST and sector_at(level, (t.x, t.y))
-        if s and s.tag:
-            dests[s.tag].append(s)
-    for l in lines:
-        if l.action == WR_TELEPORT:   # fires crossing from the front side
-            adj[l.front] += [(d, None) for d in dests[l.tag]]
-    keys_at = [(KEY_OF[t.type], sector_at(level, (t.x, t.y))) for t in level.things if t.type in KEY_OF]
-    # (tag, action, sectors the player can trigger it from)
-    triggers = [(l.tag, l.action, (l.front,) if l.back is None else (l.front, l.back))
-                for l in lines if l.tag and l.action in TAG_DOOR_OPENERS | FLOOR_LOWERERS | FLOOR_RAISERS]
-    movers = floor_movers(lines)
-
-    def heights(s, moved):
-        floor = moved_floor(s, lines, {t: k for t, k in movers.items() if t in moved})
-        ceil = open_ceil(s, lines) if s.kind == DOOR else s.ceil
-        return floor, ceil
-
-    def passable(a, b, line, actor, keys, opened, moved):
-        if line is None:
-            return True
-        if line.length <= 2 * actor.radius or line.flags & ML_BLOCKING:   # bars and fences block
-            return False
-        if b.kind == DOOR and b.tag not in opened:
-            if line.action not in USE_DOORS:
-                return False
-            key = USE_DOORS[line.action]
-            if key and (actor is not player or key not in keys):
-                return False
-        fa, ca = heights(a, moved)
-        fb, cb = heights(b, moved)
-        if not actor.flies and fb - fa > 24 and LIFT not in (a.kind, b.kind):
-            return False
-        return min(ca, cb) - max(fa, fb) >= actor.height
-
-    state = (set(), set(), set())   # keys, opened door tags, moved floor tags
-    while True:
-        seen = flood({start}, adj, lambda a, b, line: passable(a, b, line, player, *state))
-        fired = {(tag, action) for tag, action, secs in triggers if any(s in seen for s in secs)}
-        new = ({k for k, s in keys_at if s in seen},
-               {tag for tag, action in fired if action in TAG_DOOR_OPENERS},
-               {tag for tag, action in fired if action in FLOOR_LOWERERS | FLOOR_RAISERS})
-        if new == state:
-            break
-        state = new
-    return seen, adj, lambda a, b, line, actor: passable(a, b, line, actor, *state)
+def check_types(m, found):
+    """Thing types exist in the map's game; non-vanilla thing types and line
+    actions are warnings (the checks don't know what they do)."""
+    for t in m.things:
+        if t.type not in THING_NAMES:
+            found.warnings.append(f"thing type {t.type} at {t.x},{t.y} isn't a vanilla thing")
+        elif m.game not in THING_GAMES[t.type]:
+            found.playability.append(f"{_thing(t)} doesn't exist in {GAMES[m.game]}")
+    unknown = defaultdict(list)
+    for ln in m.lines:
+        if ln.special and ln.special not in LINE_SPECIALS:
+            unknown[ln.special].append(f"{m.verts[ln.v1]}-{m.verts[ln.v2]}")
+    for action, places in sorted(unknown.items()):
+        more = f" (+{len(places) - 1} more)" if len(places) > 1 else ""
+        found.warnings.append(f"line action {action} isn't vanilla, at {places[0]}{more}")
 
 
-def flood(start, adj, ok):
-    """Sectors reachable from `start` over edges where ok(a, b, line)."""
-    seen = set(start)
-    q = deque(start)
-    while q:
-        a = q.popleft()
-        for b, line in adj[a]:
-            if b not in seen and ok(a, b, line):
-                seen.add(b)
-                q.append(b)
-    return seen
-
-
-def check_reach(level, lines):
-    """Every MUST_REACH sector and every secret can be reached, every monster
-    can be reached or walk (fly) to where the player can go (100% kills; a
-    sniper the player can only shoot at fails this too), and the exit can
-    still be reached from every damaging floor the player can get onto (no
-    softlock in a pit of nukage)."""
-    found = explore(level, lines)
-    if found is None:
-        return ["no player 1 start inside a sector"]
-    seen, adj, move = found
-    names = {s.name for s in seen}
-    errors = [f"unreachable: {n}" for n in level.must_reach if n not in names]
-    errors += [f"secret {s.name} is unreachable" for s in level.sectors.values()
-               if s.special == SECRET_AREA and s not in seen]
-    for t in level.things:
-        s = sector_at(level, (t.x, t.y))
-        if t.type in PLAYERS or t.type not in ACTORS or s is None or s in seen:
+def check_reach(level, md, res, names, found):
+    """With the reach model's run: every MUST_REACH sector, secret and the
+    exit can be reached (a running jump to the exit is a style finding);
+    every monster can be reached or walk (fly) to where the player can go,
+    firing the walk lines monsters fire (100% kills; a sniper the player can
+    only shoot at fails this too; the boss brain and Keen are shot); and
+    the exit can still be reached from every damaging floor the player can
+    get onto (no softlock in a pit of nukage)."""
+    R = res["R"]
+    reached = {md.nsec[r] for r in R}
+    found.playability += [f"unreachable: {n}" for n in level.must_reach if names.index(n) not in reached]
+    found.playability += [f"secret {names[o]} is unreachable" for o, s in enumerate(md.m.sectors)
+                          if s.special == SECRET_AREA and o not in reached]
+    base, man, keys = md.final_state(res)
+    for t in md.m.things:
+        if t.type not in MONSTERS or t.type in (BOSSBRAIN, KEEN) or not _skills(t):   # shot, never met
             continue
-        actor = ACTORS[t.type]
-        if not seen & flood({s}, adj, lambda a, b, line: move(a, b, line, actor)):
-            errors.append(f"thing {t.type} at {t.x},{t.y} in {s.name} can't be reached and can't come "
-                          f"to the player")
-    exits = {s for l in lines if l.action in EXITS for s in (l.front, l.back) if s}
-    if not exits:
-        return errors + ["no exit line"]
-    exits |= {n for s in exits for n in neighbours(s, lines)}   # exit switches sit in niches
-    player = ACTORS[PLAYER1]
-    for s in sorted((s for s in seen if s.special in DAMAGING), key=lambda s: s.name):
-        if not exits & flood({s}, adj, lambda a, b, line: move(a, b, line, player)):
-            errors.append(f"damaging floor {s.name} is a softlock: the exit can't be reached from it")
-    return errors
+        r = md.region_of_point(t.x, t.y)
+        if r is None or r in R:
+            continue
+        if not R & md.monster_closure(res, r, ACTORS[t.type]):
+            found.playability.append(f"{_thing(t)} in {names[md.nsec[r]]} can't be reached and can't "
+                                     f"come to the player")
+    if not (any(kind == "exit" for kind, _, _ in md.exits) or md.exit_sectors
+            or any(act == "exit" for _, act, _ in md.boss)):
+        found.playability.append("no exit")
+        return
+    ex = md.normal_exit(res)
+    if ex is None:
+        found.playability.append("the exit can't be reached")
+        return
+    if md.use_jumps:
+        found.style.append(f"the exit (from {names[md.nsec[ex[1]]]}) can only be reached with a running jump")
+    # Regions the exit can be reached from at the end, by walking back from it.
+    into = defaultdict(set)
+    for a in R:
+        for b, _, _ in md.moves(a, base, man, keys):
+            into[b].add(a)
+    out, q = {ex[1]}, deque([ex[1]])
+    while q:
+        for a in into[q.popleft()] - out:
+            out.add(a)
+            q.append(a)
+    pits = {md.nsec[r] for r in R - out if md.sec(r).special in DAMAGING}
+    found.playability += [f"damaging floor {names[o]} is a softlock: the exit can't be reached from it"
+                          for o in sorted(pits, key=lambda o: names[o])]
 
 
 def check_hazards(level, lines):
@@ -182,79 +210,89 @@ def check_hazards(level, lines):
     return [f"damaging floor {h} ({hf}) isn't below its neighbour {n} ({nf})" for h, hf, n, nf in sorted(bad)]
 
 
-def check_textures(level, lines, sides, iwad):
-    """Every texture and flat exists, and textures fit the walls they're on.
-    Returns (errors, warnings); each is one message per texture and problem."""
+def check_textures(level, lines, sides, iwad, found):
+    """Every texture and flat exists (playability), pictures fit their walls
+    and two-sided middle textures have no medusa (style), and textures tile
+    cleanly (warnings). One message per place for a missing texture, else
+    one per texture and problem."""
     textures, flats, medusa = iwad
-    errors = [f"{s.name}: unknown flat {f}" for s in level.sectors.values()
-              for f in (s.ftex, s.ctex) if f not in flats]
+    found.playability += [f"{s.name}: unknown flat {f}" for s in level.sectors.values()
+                          for f in (s.ftex, s.ctex) if f not in flats]
     movers = floor_movers(lines)
-    problems = defaultdict(list)   # (texture, message, is_error) -> places
+    problems = defaultdict(list)   # (texture, message, Findings field) -> places
     for l, line_sides in zip(lines, sides):
         for sd in line_sides:
             me, other = sd.sector, (l.other(sd.sector) if l.back else None)
             if other is None:
-                parts = [(sd.mid, me.ceil - me.floor)]
+                parts = [(sd.mid, me.ceil - me.floor, False)]
             else:
-                top = other.floor if other.kind == DOOR else other.ceil   # closed door: whole face shows
+                is_door = other.kind == DOOR
+                top = other.floor if is_door else other.ceil   # closed door: whole face shows
                 span = (floor_range(other, lines, movers)[1] - floor_range(me, lines, movers)[0])
-                parts = [(sd.upper, me.ceil - top), (sd.lower, span)]
-                if sd.mid != NO_TEX and (found := mid_fit(sd.mid, textures, medusa)):
-                    problems[(sd.mid, *found)].append(f"{me.name} {l.v1}-{l.v2}")
-            for tex, h in parts:
+                parts = [(sd.upper, me.ceil - top, is_door), (sd.lower, span, False)]
+                if sd.mid != NO_TEX and (problem := mid_fit(sd.mid, textures, medusa)):
+                    problems[(sd.mid, *problem)].append(f"{me.name} {l.v1}-{l.v2}")
+            for tex, h, door_face in parts:
                 if tex == NO_TEX or h <= 0:
                     continue
-                if found := texture_fit(tex, h, l.length, textures):
-                    problems[(tex, *found)].append(f"{me.name} {l.v1}-{l.v2}")
-    warnings = []
-    for (tex, msg, is_error), places in problems.items():
-        more = f" (+{len(places) - 1} more)" if len(places) > 1 else ""
-        (errors if is_error else warnings).append(f"{tex}: {msg}, at {places[0]}{more}")
-    return errors, warnings
+                if problem := texture_fit(tex, h, l.length, textures):
+                    msg, kind = problem
+                    if door_face and kind == "style" and tex in textures and h > textures[tex][1]:
+                        msg += (f"; give the door a recess {textures[tex][1]} tall on this side "
+                                "(doorway()'s alcove or far_alcove, with alcove_height)")
+                    problems[(tex, msg, kind)].append(f"{me.name} {l.v1}-{l.v2}")
+    for (tex, msg, kind), places in problems.items():
+        if kind == "playability":   # one per place, so KNOWN_ISSUES stays valid when other lines change
+            found.playability += [f"{tex}: {msg}, at {p}" for p in places]
+        else:
+            more = f" (+{len(places) - 1} more)" if len(places) > 1 else ""
+            getattr(found, kind).append(f"{tex}: {msg}, at {places[0]}{more}")
 
 
 def mid_fit(tex, textures, medusa):
-    """(message, is_error) if `tex` can't hang in a two-sided line, else None.
-    Vanilla draws it once, never tiled vertically, so its height is free: a
-    short one leaves a gap above, a tall one is cut off at the ceiling."""
+    """(message, Findings field) if `tex` can't hang in a two-sided line, else
+    None. Vanilla draws it once, never tiled vertically, so its height is
+    free: a short one leaves a gap above, a tall one is cut off at the
+    ceiling."""
     if tex not in textures:
-        return "unknown texture", True
+        return "unknown texture", "playability"
     if tex in medusa:
         return ("has columns made of several patches, which vanilla draws as garbage "
-                "(the medusa effect) on a two-sided line"), True
+                "(the medusa effect) on a two-sided line"), "style"
     w = textures[tex][0]
     if w & (w - 1):
-        return f"width {w} isn't a power of two; vanilla repeats only part of it", False
+        return f"width {w} isn't a power of two; vanilla repeats only part of it", "warnings"
     return None
 
 
 def texture_fit(tex, h, length, textures):
-    """(message, is_error) if `tex` doesn't fit a wall part `h` tall on a
-    line `length` long, else None."""
+    """(message, Findings field) if `tex` doesn't fit a wall part `h` tall on
+    a line `length` long, else None."""
     if tex not in textures:
-        return "unknown texture", True
+        return "unknown texture", "playability"
     w, th = textures[tex]
     if is_decal(tex):
         if round(length) != w:
-            return f"{w} wide but the line is {length:.0f}; a picture must be shown whole", True
+            return f"{w} wide but the line is {length:.0f}; a picture must be shown whole", "style"
         if not th - 8 <= h <= th:
-            return f"{th} tall but the wall is {h}; a picture must be shown whole", True
+            return f"{th} tall but the wall is {h}; a picture must be shown whole", "style"
         return None
     if w & (w - 1):
-        return f"width {w} isn't a power of two; vanilla repeats only part of it", False
+        return f"width {w} isn't a power of two; vanilla repeats only part of it", "warnings"
     if h > th and th != 128:
-        return f"{th} tall on a {h}-tall wall; vanilla only tiles 128-tall textures cleanly", False
+        return f"{th} tall on a {h}-tall wall; vanilla only tiles 128-tall textures cleanly", "warnings"
     return None
 
 
 def balance_report(level):
     """Per-skill monster health against ammo damage, health and armor. Ammo
     counts the pistol start, pickups and monster drops; damage per unit is a
-    rough average for hits (see DAMAGE_PER_AMMO). ITYTD doubles ammo."""
+    rough average for hits (see DAMAGE_PER_AMMO). ITYTD doubles ammo.
+    Multiplayer-only things don't count."""
     rows = ["skill  monsters  monster HP  ammo damage  ratio  health  armor"]
     for sk, label in zip(ALL, ("easy", "medium", "hard")):
-        things = [t for t in level.things if sk in t.skills]
-        monsters = [t for t in things if t.type in ACTORS and t.type not in PLAYERS]
+        things = [t for t in level.things if sk in t.skills and "n" not in t.skills]
+        monsters = [t for t in things if t.type in MONSTERS]
         hp = sum(ACTORS[t.type].health for t in monsters)
         ammo = defaultdict(int, START_AMMO)
         for t in things:
