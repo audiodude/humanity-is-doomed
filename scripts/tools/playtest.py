@@ -52,17 +52,25 @@ The player has god mode and notarget, so tests check wiring, not balance.
 --fight plays the route for real, to test balance: no god mode, and the
 monsters stay alive (`killall` and `checkpoint` are skipped). Between steps
 the bot fights the nearest monster on screen with the best weapon it has ammo
-for at that range, strafes onto safe floor only, backs away from melee
-monsters, turns to look when hit from out of sight, and detours for nearby
-health, armor and ammo when it's low. It plays in buddha mode: when it would
-die, the death is counted with its place and time and it's healed, so one run
-covers the whole map. At the end it reports each section of the script (each
-comment block starts one): time, kills, damage taken, deaths, health and
-armor, and ammo fired. The bot is a weaker player than a person: its deaths
-show where a map is hard, or where the bot is stuck, and the footage says
-which. Results vary with --seed (default 1; the same seed plays the same way),
-so try several. Every --fight run is recorded to ~/.cache/playtest/recordings/,
-one recording per WAD, map, skill and seed (the latest run replaces it).
+for at that range (no bullets beyond 768 units), strafes onto safe floor only,
+backs away from melee monsters, turns to look when hit from out of sight, and
+detours for nearby health, armor and ammo when it's low. It plays in buddha
+mode: when it would die, the death is counted with its place, time and a
+label, and it's healed, so one run covers the whole map. Labels: hazard (on a
+damaging floor), starved (no ammo for any weapon but the pistol), unseen (no
+monster on screen in the last second), stuck (moved under 32 units in 2 s),
+else combat. A fight measures the map, not the bot, so it doesn't stop for the
+bot: a step it gets stuck on, or 3 deaths within 128 units and 30 s (a loop),
+is listed as skipped and the player is warped to where the step was going.
+--max-time MIN (default 15) stops the run when the game clock passes it. At
+the end it reports each section of the script (each comment block starts
+one): time, kills, damage taken, deaths, health and armor, and ammo fired;
+then the deaths with their labels and the skipped steps. Check starved deaths
+against the build's resource curve (levels/balance.py): with ammo to spare
+there, the bot wasted it. Results vary with --seed (default 1; the same seed
+plays the same way). Every --fight run is recorded to
+~/.cache/playtest/recordings/, one recording per WAD, map, skill and seed
+(the latest run replaces it).
 
 --watch shows the game in a window at normal speed. --replay plays back the
 last --fight recording of MAP at --skill and --seed (or --recording FILE) in a window;
@@ -70,9 +78,9 @@ add --video FILE.mp4 to render it, with sound, using ffmpeg instead (--hd: at 19
 widescreen, instead of 640x480). A recording only plays
 back right with the WAD it was made with.
 
-Exit status: 0 all checks passed, 1 a check failed or the bot got stuck, 2 the
-engine or script broke. Deaths in a --fight run are in its report, not its
-exit status.
+Exit status: 0 all checks passed, 1 a check failed, the wiring run got stuck
+or a fight hit --max-time, 2 the engine or script broke. Deaths and skipped
+steps in a --fight run are in its report, not its exit status.
 """
 import argparse
 import hashlib
@@ -105,6 +113,8 @@ DAMAGING = {4, 5, 7, 11, 16}
 LIFTS = {10, 21, 62, 88, 120, 121, 122, 123}   # lift specials: their tagged sectors move up and down
 USE_DOORS = {1, 26, 27, 28, 31, 32, 33, 34, 117, 118}   # doors the player opens by using them
 STUCK_TICS, ARRIVE, PASS_BY = 70, 3, 24
+LOOP_DEATHS, LOOP_RADIUS, LOOP_TICS = 3, 128, 30 * 35   # this many deaths this close together is a loop
+BULLET_RANGE = 768     # the bot doesn't spend bullets on monsters farther away than this
 MONSTERS = {"Zombieman", "ShotgunGuy", "ChaingunGuy", "WolfensteinSS", "DoomImp", "Demon", "Spectre", "LostSoul",
             "Cacodemon", "HellKnight", "BaronOfHell", "Revenant", "Fatso", "Arachnotron", "PainElemental", "Archvile",
             "Cyberdemon", "SpiderMastermind"}
@@ -138,6 +148,14 @@ class Abort(Exception):
 
 class Died(Exception):
     """The player was killed (only with --fight)."""
+
+
+class Loop(Exception):
+    """--fight: the bot keeps dying in one place; skip to the next step."""
+
+
+class TimeUp(Exception):
+    """--fight: the game clock passed --max-time."""
 
 
 # ------------------------------------------------------------------ map ---
@@ -593,7 +611,11 @@ class Run:
             g.new_episode(self.recording_part)   # record the run, for --replay
         self.ignore = {}      # monster id -> tic until which the bot stops trying to hit it
         self.skip = set()     # pickups the bot couldn't get to
-        self.deaths = []      # (section, x, y, tic) where the player would have died
+        self.deaths = []      # (section, x, y, tic, label) where the player would have died
+        self.skipped = []     # (section, step line, x, y, tic, why): stuck or looping steps --fight skipped
+        self.loop_from = 0    # deaths before this index are already part of a reported loop
+        self.trail = []       # (tic, x, y) of the last 2 s, for the stuck label
+        self.saw_monster = -1   # tic a monster was last on screen
         self.spent = {k: 0.0 for k in AMMO}   # ammo fired so far
         self._vars = []
         self.hurt_at = -1     # tic the player last took damage
@@ -625,16 +647,51 @@ class Run:
                 for kind, v in AMMO.items():
                     i = self.vars.index(v)
                     self.spent[kind] += max(0.0, prev[i] - self._vars[i])
-            if self.args.fight and self.var("HEALTH") <= 1:
-                # Buddha mode stopped a kill: count the death and carry on, so one run
-                # covers the whole map.
-                x, y = self.pos()
-                self.deaths.append((self.section[0] if self.section else "start", x, y, self.tics))
-                self.say(f"  DEATH {len(self.deaths)} at {x:.0f},{y:.0f} ({clock(self.tics)}); healed to carry on")
-                g.send_game_command("give health")
-                self._state = None
+            if self.args.fight:
+                self.fight_bookkeeping()
         if not g.is_episode_finished():
             self.watch()
+
+    def fight_bookkeeping(self):
+        """--fight, after each tic: count and label a death (buddha mode stopped
+        it; the bot is healed so one run covers the whole map), and stop at a
+        death loop or the time cap."""
+        x, y = self.pos()
+        self.trail = [p for p in self.trail if p[0] > self.tics - STUCK_TICS] + [(self.tics, x, y)]
+        if any(lb.object_name in MONSTERS for lb in self.state().labels):
+            self.saw_monster = self.tics
+        if self.var("HEALTH") <= 1:
+            label = self.death_label(x, y)
+            self.deaths.append((self.section[0] if self.section else "start", x, y, self.tics, label))
+            self.say(f"  DEATH {len(self.deaths)} ({label}) at {x:.0f},{y:.0f} ({clock(self.tics)}); "
+                     "healed to carry on")
+            self.game.send_game_command("give health")
+            self._state = None
+            recent = self.deaths[max(self.loop_from, len(self.deaths) - LOOP_DEATHS):]
+            if len(recent) == LOOP_DEATHS and recent[-1][3] - recent[0][3] <= LOOP_TICS and all(
+                    math.hypot(d[1] - x, d[2] - y) <= LOOP_RADIUS for d in recent):
+                self.loop_from = len(self.deaths)
+                span = (recent[-1][3] - recent[0][3]) / 35
+                raise Loop(f"{LOOP_DEATHS} deaths within {LOOP_RADIUS} units in {span:.0f} s")
+        if self.tics > self.args.max_time * 60 * 35:
+            raise TimeUp(f"the game clock passed --max-time {self.args.max_time:g} min")
+
+    def death_label(self, x, y):
+        """Why the bot probably died: hazard (on a damaging floor), starved (no
+        ammo for any weapon but the pistol), unseen (no monster on screen in the
+        last second), stuck (moved under 32 units in 2 s), else combat."""
+        s = self.geo.sector_at((x, y))
+        if s is not None and s in self.geo.damaging:
+            return "hazard"
+        v = self.var
+        if not any(v(f"WEAPON{w}") > 0 and v(AMMO[a]) > 0
+                   for w, a in ((3, "shells"), (4, "bullets"), (5, "rockets"), (6, "cells"), (7, "cells"))):
+            return "starved"
+        if self.tics - self.saw_monster > 35:
+            return "unseen"
+        if len(self.trail) > STUCK_TICS - 5 and max(math.hypot(px - x, py - y) for _, px, py in self.trail) < 32:
+            return "stuck"
+        return "combat"
 
     def state(self):
         """The game state after the last tic (fetched once: it copies the screen)."""
@@ -698,7 +755,9 @@ class Run:
         order += [(4, "bullets"), (3, "shells"), (6, "cells"), (2, "bullets")]
         if d > 192:
             order += [(5, "rockets")]
-        return next((slot for slot, ammo in order if have(slot, ammo)), 1)
+        if d > BULLET_RANGE:   # bullets miss at range: don't spend them there
+            order = [o for o in order if o[1] != "bullets"]
+        return next((slot for slot, ammo in order if have(slot, ammo)), None if d > BULLET_RANGE else 1)
 
     def fight(self):
         """Fight while a monster is on screen; if hit with none in sight, look for
@@ -732,6 +791,9 @@ class Run:
             want = math.degrees(math.atan2(t.object_position_y - y, t.object_position_x - x))
             err = (self.var("ANGLE") - want + 180) % 360 - 180
             slot = self.weapon_for(t.object_name, d)
+            if slot is None:   # nothing worth firing from here: get on with the route
+                self.ignore[t.object_id] = self.tics + 105
+                continue
             switch = slot if int(self.var("SELECTED_WEAPON")) != slot else 0
             side, back = self.dodge(), 0
             if t.object_name in MELEE and d < 192 and self.safe(180):
@@ -842,7 +904,7 @@ class Run:
     def report(self):
         self.say("")
         per = {}
-        for title, _x, _y, _t in self.deaths:
+        for title, *_ in self.deaths:
             per[title] = per.get(title, 0) + 1
         self.say(f"{'section':<46} {'time':>5} {'kills':>5} {'hurt':>5} {'deaths':>6} {'health':>6} {'armor':>5}"
                  "  ammo fired")
@@ -851,8 +913,18 @@ class Run:
             self.say(f"{title[:46]:<46} {secs:>4.0f}s {kills:>5} {dmg:>5} {per.get(title, 0) or '':>6} {health:>6}"
                      f" {armor:>5}  {ammo}"
                      + (f"   DIED at {died[0]:.0f},{died[1]:.0f} ({clock(self.tics)})" if died else ""))
-        self.say(f"deaths: {len(self.deaths)}"
-                 + "".join(f"\n  {clock(tic)} {t} at {x:.0f},{y:.0f}" for t, x, y, tic in self.deaths))
+        labels = {}
+        for d in self.deaths:
+            labels[d[4]] = labels.get(d[4], 0) + 1
+        self.say(f"deaths: {len(self.deaths)}" + (" (" + ", ".join(f"{n} {k}" for k, n in labels.items()) + ")"
+                                                   if labels else "")
+                 + "".join(f"\n  {clock(tic)} {label:<7} {t} at {x:.0f},{y:.0f}" for t, x, y, tic, label in self.deaths))
+        if labels.get("starved"):
+            self.say("  starved: check the build's resource curve for that part of the route; if it has ammo to"
+                     " spare, the bot wasted it")
+        if self.skipped:
+            self.say(f"skipped (bot problems): {len(self.skipped)}" + "".join(
+                f"\n  {clock(tic)} line {ln} {why} at {x:.0f},{y:.0f} ({t})" for t, ln, x, y, tic, why in self.skipped))
         if self._vars:
             self.say("ammo left: " + ", ".join(f"{int(self.var(v))} {k}" for k, v in AMMO.items())
                      + f"; kills {int(self.var('KILLCOUNT'))}")
@@ -1127,7 +1199,38 @@ class Run:
             if self.args.fight:
                 self.enter(self.titles.get(ln, "start"))
             self.say(f"STEP {ln}: {line}")
-            self.step(ln, cmd, a, line)
+            if not self.args.fight:
+                self.step(ln, cmd, a, line)
+                continue
+            try:
+                self.step(ln, cmd, a, line)
+            except (Abort, Loop) as e:
+                # A fight measures the map, not the bot: note where the bot couldn't
+                # go on, put it where the step was going, and carry on.
+                if isinstance(e, Abort) and self.game.is_episode_finished():
+                    raise
+                x, y = self.pos()
+                why = f"{'LOOP' if isinstance(e, Loop) else 'STUCK'}: {e}"
+                self.skipped.append((self.section[0] if self.section else "start", ln, x, y, self.tics, why))
+                self.say(f"  {why}; skipping to the step's target")
+                self.skip_to(cmd, a)
+
+    def skip_to(self, cmd, a):
+        """Warp the player to where a step was going (a walk's last point, the
+        near side of an open/use line), so a stuck --fight run can carry on."""
+        if cmd not in ("walk", "open", "use", "exit", "shoot"):
+            return
+        x, y = float(a[-2]), float(a[-1])
+        if cmd != "walk":
+            i = self.geo.line_near((x, y))
+            if i is not None:
+                (x1, y1), (x2, y2) = self.geo.lines[i][:2]
+                nx, ny = (y2 - y1), -(x2 - x1)
+                n = math.hypot(nx, ny) or 1
+                sign = 1 if self.side_of(i, self.pos()) == 0 else -1
+                x, y = x + sign * nx / n * 40, y + sign * ny / n * 40
+        self.game.send_game_command(f"warp {x:g} {y:g}")
+        self.tic()
 
 
 def run(args):
@@ -1162,6 +1265,10 @@ def run(args):
     except Died:
         r.close_section(died=(r.var("POSITION_X"), r.var("POSITION_Y")))
         r.say("DIED")
+        status = 1
+    except TimeUp as e:
+        r.say(f"STOPPED: {e}")
+        r.close_section()
         status = 1
     except Abort as e:
         r.fails += 1
@@ -1318,6 +1425,8 @@ def main():
     p.add_argument("--video", metavar="FILE", help="with --replay: render it to an MP4 instead (needs ffmpeg)")
     p.add_argument("--hd", action="store_true", help="with --replay: render at 1920x1080 (widescreen) instead of 640x480")
     p.add_argument("--seed", type=int, default=1, help="random seed (default 1): the same seed plays the same way")
+    p.add_argument("--max-time", type=float, default=15, metavar="MIN",
+                   help="with --fight: stop when the game clock passes this many minutes (default 15)")
     args = p.parse_args()
     if not args.iwad and not args.describe:
         p.error("no IWAD: set DOOM2_WAD in .env (see .env.example) or pass --iwad")
