@@ -1,9 +1,9 @@
 ---
-name: design-doom-ii-level
+name: doom-design
 description: Design a DOOM II level for this repo's level builder before any code is written. Use when asked to make, create, or plan a new map or set of maps.
 ---
 
-Produce a **design doc** for one map (or one per map, for a set): the shape a player will remember, the route through it, and enough layout to build from. No level code in this skill; `build-doom-ii-level` takes the doc from here.
+Produce a **design doc** for one map (or one per map, for a set): the shape a player will remember, the route through it, and enough layout to build from. No level code in this skill; `doom-build` takes the doc from here.
 
 A map is remembered by its **shape**: a descent, a tower around a shaft, a canyon crossed by climbing, a loop that floods behind you. Features (keys, a lift, a secret, a trap) serve the shape. Left to defaults, every map converges on the **template**: start room, central hub, one wing per key, key door off the hub, exit room. Six speed-built maps here came out as that template, so treat it as the shape to beat.
 
@@ -43,6 +43,6 @@ Save to `levels/designs/<module>.md` (`<module>` is the level module name the bu
   Write it as a table: area, wall family (with the textures used), trim, flats, reason.
 - **Secrets**: where, the hint a player gets, the reward.
 - **Targets**, from the build's measurement table (DOOM II medians in brackets): optional share of area ≥ 0.3 [0.5], distinct floor heights ≥ 15 [23], secrets ≥ 2 [4], light-effect sectors ≥ 3 [9], deaf share (UV) ≥ 0.2 [0.42], most-used wall texture 0.2–0.45 [0.3] (below id's range means no material holds the map together; above it, monotexture), rule-2 seams with a border texture ≥ 0.5 [0.31; Romero 0.75; DOOM's best-liked third 0.57 against 0.18 for its worst]. Say where each comes from in the plan; a small map may miss area or monster counts, not these.
-- **Build risks**: mechanisms the shape depends on that are slow or fragile in this builder (rising floors, lifts, long drops, wide-open sightlines). `build-doom-ii-level` lists the known gotchas.
+- **Build risks**: mechanisms the shape depends on that are slow or fragile in this builder (rising floors, lifts, long drops, wide-open sightlines). `doom-build` lists the known gotchas.
 
 Done when every section is filled, the sketch accounts for every space in the route, each target names the spaces that meet it, and every space in the route has a row in the materials table.

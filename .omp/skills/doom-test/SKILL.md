@@ -1,9 +1,9 @@
 ---
-name: test-doom-ii-level
+name: doom-test
 description: Playtest a DOOM II level in this repo with ViZDoom: route script, wiring run, combat-bot balance runs, screenshots. Use after building or changing a map, or when asked whether a map works or is balanced.
 ---
 
-Prove the map plays: the intended route works end to end, and a fight through it is survivable with the health and ammo the map provides. The map comes from `build-doom-ii-level`; its design doc (`levels/designs/<module>.md`) says what the route is.
+Prove the map plays: the intended route works end to end, and a fight through it is survivable with the health and ammo the map provides. The map comes from `doom-build`; its design doc (`levels/designs/<module>.md`) says what the route is.
 
 The runner is `scripts/tools/playtest.py`; its docstring is the script language and option reference, and `README.md` "Playtests" shows the commands. ViZDoom comes from `uv run -q --with vizdoom`, never system Python. Run headless (no `--watch`).
 
@@ -25,7 +25,7 @@ Done when it reports 0 fails.
 
 ## 3. Look
 
-Read every screenshot the run wrote. Check what the doc promises a player sees (the reveal, a goal visible across a gap) actually shows, and nothing looks broken: missing textures, bleeding sectors, a room lit like a corridor. Check the walls look like the doc's materials table: each area reads as one place, and where two materials meet in view there is a trim or a reason. A wall that looks picked at random goes back to `build-doom-ii-level`.
+Read every screenshot the run wrote. Check what the doc promises a player sees (the reveal, a goal visible across a gap) actually shows, and nothing looks broken: missing textures, bleeding sectors, a room lit like a corridor. Check the walls look like the doc's materials table: each area reads as one place, and where two materials meet in view there is a trim or a reason. A wall that looks picked at random goes back to `doom-build`.
 
 ## 4. Fight runs
 

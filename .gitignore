@@ -12,8 +12,9 @@ wads/SFPC*
 # Combat bot video script and footage: kept locally
 docs/combat-bot/
 
-# omp harness config (local agent definitions)
-.omp/
+# omp harness config: local agent definitions stay local; skills are shared
+.omp/*
+!.omp/skills/
 
 # Local settings: IWAD paths (see .env.example)
 .env
