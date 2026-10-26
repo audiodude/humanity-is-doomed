@@ -135,7 +135,7 @@ You look over a spent-fuel store from a gallery: a maze of steel casks under lit
 | Most-used wall texture | 30% | 30% |
 | Optional share of the reachable area | 67% | 50% |
 | Heavy-monster share (UV) | 20% | 10% |
-| UV ammo per monster HP (pistol start) | 1.9 | 1.8 |
+| UV ammo per monster HP (pistol start) | 2.4 | 1.8 |
 | Health per 1000 monster HP | 44 | 40 |
 | Easy/UV and HMP/UV monster ratios | 0.40 / 0.72 | 0.33 / 0.70 |
 | Nearest monster to the start | 488 | 300 |

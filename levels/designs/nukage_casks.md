@@ -294,7 +294,7 @@ Notes for the build:
 
 | # | Where | Hint | Reward |
 |---|---|---|---|
-| 1 | Inside the cask on the yard's flatcar (CK), through a hatch in its north face | It's the only cask with a SILVER3 access panel, and it's in view from the start window. | backpack, box of shells |
+| 1 | Inside the cask on the yard's flatcar (CK), through a hatch in its north face | It's the only cask with a SILVER3 access panel, and it's in view from the start window. | backpack, box of shells, box of bullets |
 | 2 | The filing room behind the records office's north wall (S2) | A PANEL6 panel is shifted half a panel out of line, with a LITE5 strip beside it. | **rocket launcher**, leaked a whole maze early; box of rockets |
 | 3 | The inspection bay behind the hall's north wall, at the north-east dead end of the maze (S3) | The spur leads nowhere else. The CEMENT6 panel at its end is shifted, with a LITE5 strip beside it. | plasma rifle, cell pack |
 | 4 | The tower roof (TR), through a COMPTALL screen shifted out of line in the cab's east wall | The blinking beacon and the soulsphere on the roof's edge are in view from the cooling pond yard, 256 below. | soulsphere, box of rockets |
@@ -332,7 +332,7 @@ Measured by the build (`levels/nukage_casks.py`, 179 sectors, monsters 30/54/75)
 | Deaf share (UV) | 0.84 |
 | Most-used wall texture | 0.30 |
 | Rule-2 seams with a border | 0.95; the build lists no unbordered seam |
-| Ammo ratio (UV, pistol start) | 1.92 |
+| Ammo ratio (UV, pistol start) | 2.44 (1.92 as first built; raised after a human playtest, below) |
 | Health per 1,000 monster HP | 44.3 |
 | Easy/UV, HMP/UV | 0.40, 0.72 |
 | Nearest monster to the start | 488; the shotgun is 56 from the start |
@@ -347,6 +347,7 @@ Changes from the plan above, and why:
 - **Heights**: GH is 16/144, and LN, UC, GP and RO are 192/320, so that the 128-high door faces fit; the WS steps' ceilings rise with them. TRS has a 320 ceiling instead of sky, so the secret screen door's back fits too.
 - **Pond**: a sector has one special, so the damaging pond can't also glow; the island glows instead.
 - **Ammo trims** to bring the ratio from 2.52 to 1.92, all in side rooms and the dock: cask hatch shells (not a box), B1 spur shells (not a box), secret 3 and the dock a cell (not a cell pack), the cooling yard one rocket box and a rocket, the roof a rocket, the dock one rocket box and a rocket. Health: the B1 spur and cooling yard medikits are stimpacks, RO's second stimpack and the tower stair's are health bonuses.
+- **Ammo restored after a human playtest**, who ran dry before the cask drop and had to scavenge (and punched a baron to death). On the main route before the drop, four single pickups became boxes: the lockers' and the corridor's shells, the B0/A0 shells and bullets, the B1 spur's shells. Secret 1 now holds a backpack, a box of shells and a box of bullets instead of a backpack and 4 shells. The ratio went from 1.92 to 2.44, and the printed curve's first leg (which merges everything up to the cask drop) went from a detour ratio of 0.68 to 1.02.
 - **The A2/B1 group** (chaingunner, 2 shotgun guys, hell knight) stands in A2 just south of B1, behind K2R2, so none is in B1's 1000-long sightline back to the gallery.
 - **The cask switch's trap** isn't in the build's trap list, which counts only triggers that open doors; it releases the 6 mancubi (3,600 HP) and the stair closet (revenant, 2 imps).
 - **The reach model and the cells**: `reach.shoot_site` counts a level shot into a sector as a hit, without the target's height, so it says the mancubi can be shot from the gallery and the key stack before the drop. It fires the boss rule in wave 0, and the route curve has two legs (`boss @ kr`, exit) with no cask-switch leg. A 3D ray test over the pre-drop floors (gallery eye 233, every stack sector, the cab) finds no line to any mancubus's top (64) or eye (48) that clears the rings, so in the game the switch is still the way. The same approximation makes the long-range hitscan figure 60/s (the A2/B1 group and B0's shotgun guys from the gallery's north end, GP and the RO door); the casks block those lines too. Below the 88.4 warning threshold, so it's left as is.

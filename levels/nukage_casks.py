@@ -406,18 +406,18 @@ THINGS = [Thing(*t) for t in [
     (ZOMBIE, 40, -320, 0, "emha"), (ZOMBIE, 168, -296, 0, "mha"), (ZOMBIE, 232, -296, 0, "ha"),
     (IMP, 624, -96, 0, "emha"), (IMP, 720, -96, 0, "mha"),
     (SHELLS, -400, -160), (CLIP, -400, -96), (ABONUS, -640, -96), (ABONUS, -600, -96),
-    (BACKPACK, 320, -400), (SHELLS, 320, -368),                                     # secret 1: the cask
+    (BACKPACK, 320, -400), (SHELLBOX, 304, -368), (AMMOBOX, 336, -368),          # secret 1: the cask
     # lockers: 3 imps (2, 1), a demon (1, 1); the super shotgun on a bench
     (IMP, -320, 256, 180, "emh"), (IMP, -320, 64, 180, "mh"), (IMP, -640, 272, 270, "h"),
     (DEMON, -352, 176, 180, "emh"),
-    (SSG, -480, 176), (MEDI, -672, 288), (SHELLS, -672, 160),
+    (SSG, -480, 176), (MEDI, -672, 288), (SHELLBOX, -672, 160),
     # decon corridor: 2 spectres (2, 1), a chaingunner (1, 0) at the north end
     (SPECTRE, -624, 480, 90, "emh"), (SPECTRE, -608, 688, 270, "mh"), (CHAINGUY, -608, 784, 270, "mha"),
     (GREENARMOR, -656, 400), (SHELLS, -656, 624), (STIM, -656, 752),
     # landing and corridor
     (IMP, -400, 1264, 180, "emh"), (IMP, -240, 1264, 180, "mh"),
     (SARGE, -224, 912, 90, "mh"),
-    (STIM, -224, 1120), (SHELLS, -224, 816),
+    (STIM, -224, 1120), (SHELLBOX, -224, 816),
     # records office (optional): 2 zombiemen (2, 1), a shotgun guy (1, 0)
     (ZOMBIE, -96, 1552, 270, "emh"), (ZOMBIE, -272, 1552, 270, "mh"), (SARGE, -160, 1472, 0, "mh"),
     (STIM, -288, 1376), (HBONUS, -64, 1568), (ABONUS, -272, 1440), (ABONUS, -272, 1472), (ABONUS, -272, 1504),
@@ -440,9 +440,9 @@ THINGS = [Thing(*t) for t in [
     (CHAINGUY, 1072, 720, 90, "mha"), (SARGE, 1176, 608, 180, "emha"), (SARGE, 1072, 624, 90, "ha"),
     (KNIGHT, 1168, 752, 270, "ha"),
     (REVENANT, 1568, 704, 180, "mha"), (IMP, 1568, 704, 180, "ea"),
-    (SHELLS, 288, 320), (CLIP, 288, 960), (MEDI, 704, 928),
+    (SHELLBOX, 288, 320), (AMMOBOX, 288, 960), (MEDI, 704, 928),
     # B1 spur: 2 imps (1, 1), medikit, box of shells
-    (IMP, 896, 528, 0, "emha"), (IMP, 832, 496, 0, "ha"), (STIM, 688, 512), (SHELLS, 720, 544),
+    (IMP, 896, 528, 0, "emha"), (IMP, 832, 496, 0, "ha"), (STIM, 688, 512), (SHELLBOX, 720, 544),
     # north-east spur: 3 imps (2, 1), medikit, box of rockets
     (IMP, 1568, 928, 180, "emha"), (IMP, 1568, 1152, 270, "mha"), (IMP, 1520, 1376, 270, "ha"),
     (MEDI, 1616, 1424), (ROCKETBOX, 1520, 1424),
