@@ -1,7 +1,7 @@
-# Nukage Turbine (MAP06) wiring test: over the hall on the gantry, the annex and
+# Nukage Undercurrent (MAP06) wiring test: over the hall on the gantry, the annex and
 # the blue key, the generator house and the sinking cradle, the lower wing, back
 # under the gantry, the floodgate, all four secrets, the lift loop and the exit.
-#   uv run -q --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP06 levels/playtests/nukage_turbine.playtest
+#   uv run -q --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP06 levels/playtests/nukage_undercurrent.playtest
 
 killall
 look 0 8

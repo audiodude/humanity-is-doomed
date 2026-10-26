@@ -20,7 +20,7 @@
 
 ## Included WAD - NUKAGE.WAD
 
-`wads/NUKAGE.WAD` holds six generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), and MAP06, [Nukage Turbine](#nukage-turbine-nukage_turbine). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP06.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
+`wads/NUKAGE.WAD` holds six generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), and MAP06, [Nukage Undercurrent](#nukage-undercurrent-nukage_undercurrent). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP06.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
 
 ### Nukage Junction (`nukage_junction`)
 A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/medium/hard, one secret.
@@ -104,8 +104,8 @@ You start on the only dry catwalk of a reservoir full of nukage, with the exit v
 
 It has fewer floor heights than most id maps because the reservoir is one flat pool; symmetry is high because it's a square reservoir with a pump house off each side.
 
-### Nukage Turbine (`nukage_turbine`)
-MAP06: 116 sectors, 26/46/64 monsters on easy/medium/hard, four secrets, and the first arachnotrons. Its design doc is `levels/designs/nukage_turbine.md`.
+### Nukage Undercurrent (`nukage_undercurrent`)
+MAP06: 120 sectors, 26/46/64 monsters on easy/medium/hard, four secrets, and the first arachnotrons. Its design doc is `levels/designs/nukage_undercurrent.md`.
 
 You cross the turbine hall on a railed gantry along its north wall, looking down at the exit door, the turbines and a floodgate across the floor. At the far end, taking the yellow key sinks the platform you're standing on into a pit of demons, and the only way back is along the hall floor, under the gantry, where arachnotrons now walk.
 
@@ -136,7 +136,7 @@ python3 -m levels nukage_crossing          # same for MAP02
 python3 -m levels nukage_core              # same for MAP03
 python3 -m levels nukage_divided            # same for MAP04
 python3 -m levels nukage_drain              # same for MAP05
-python3 -m levels nukage_turbine            # same for MAP06
+python3 -m levels nukage_undercurrent       # same for MAP06
 python3 -m levels nukage_junction --check  # check only
 ```
 

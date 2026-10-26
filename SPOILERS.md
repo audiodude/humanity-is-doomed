@@ -36,7 +36,7 @@ Route: tech start room → courtyard hub with a nukage pool → warehouse (lift 
 - **In the nukage:** a soulsphere in the far corner behind the pillar, a berserk pack, a chaingun, two rocket boxes, and a trail of armor bonuses round the pillar.
 - **Secrets:** a lit ledge on the pillar's north face, out of sight until you wade round it (blue armor, rockets); shifted panels in the west corridor (green armor), the north lobby (shells, a medikit) and the east boiler hall (backpack).
 
-## MAP06: Nukage Turbine
+## MAP06: Nukage Undercurrent
 
 - **Idea:** one hall crossed twice, over it and then under it. The start booth looks down a railed gantry along the turbine hall's north wall to the blue door at the far end; from the balcony beside it you look straight down at the yellow exit door.
 - **Set piece:** the yellow key sits on a red-lit cradle at the end of the generator gallery. Reaching for it sinks the cradle and its parapet 160 units into the well, where demons and spectres are waiting, and a door at its foot opens onto the boiler room. There's no way back up.
