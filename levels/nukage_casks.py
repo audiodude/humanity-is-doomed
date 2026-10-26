@@ -406,7 +406,7 @@ THINGS = [Thing(*t) for t in [
     (ZOMBIE, 40, -320, 0, "emha"), (ZOMBIE, 168, -296, 0, "mha"), (ZOMBIE, 232, -296, 0, "ha"),
     (IMP, 624, -96, 0, "emha"), (IMP, 720, -96, 0, "mha"),
     (SHELLS, -400, -160), (CLIP, -400, -96), (ABONUS, -640, -96), (ABONUS, -600, -96),
-    (BACKPACK, 320, -400), (SHELLBOX, 304, -368), (AMMOBOX, 336, -368),          # secret 1: the cask
+    (BACKPACK, 320, -392), (SHELLBOX, 312, -380), (AMMOBOX, 328, -380),          # secret 1: the cask (clear of its walls)
     # lockers: 3 imps (2, 1), a demon (1, 1); the super shotgun on a bench
     (IMP, -320, 256, 180, "emh"), (IMP, -320, 64, 180, "mh"), (IMP, -640, 272, 270, "h"),
     (DEMON, -352, 176, 180, "emh"),

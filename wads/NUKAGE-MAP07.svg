@@ -1020,9 +1020,9 @@
 <circle cx="172.8" cy="1001.6" r="2.5" fill="#1f6fd0"/>
 <circle cx="76.8" cy="1001.6" r="2.5" fill="#1f6fd0"/>
 <circle cx="92.8" cy="1001.6" r="2.5" fill="#1f6fd0"/>
-<circle cx="460.8" cy="1123.2" r="2.5" fill="#1f6fd0"/>
-<circle cx="454.4" cy="1110.4" r="2.5" fill="#1f6fd0"/>
-<circle cx="467.2" cy="1110.4" r="2.5" fill="#1f6fd0"/>
+<circle cx="460.8" cy="1120.0" r="2.5" fill="#1f6fd0"/>
+<circle cx="457.6" cy="1115.2" r="2.5" fill="#1f6fd0"/>
+<circle cx="464.0" cy="1115.2" r="2.5" fill="#1f6fd0"/>
 <circle cx="204.8" cy="860.8" r="8.0" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 3001 skills emh</title></circle>
 <circle cx="204.8" cy="937.6" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3001 skills mh</title></circle>
 <circle cx="76.8" cy="854.4" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3001 skills h</title></circle>

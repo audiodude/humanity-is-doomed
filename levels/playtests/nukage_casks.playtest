@@ -29,6 +29,8 @@ expect floor 320 -344 == 0
 walk 320 -390
 expect secrets == 1
 expect has Backpack
+expect has ShellBox
+expect has ClipBox
 walk 320 -300 -512 -96
 look 90
 shot yard
