@@ -3,7 +3,7 @@
 # the vault (its trap opens the lobby closets), the lobby shutter, the exit.
 #   uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP08 levels/playtests/nukage_lockdown.playtest
 
-# Lobby: the exit switch through the bars, the basin through the north window.
+# Lobby: the exit switch and its EXIT sign through the window, the basin through the north window.
 look 0
 shot start
 look 90 4
@@ -163,11 +163,11 @@ wait 40
 expect ceil 1256 312 > 0
 expect ceil 1360 312 > 0
 look 180
-shot vault_bars
+shot vault_window
 use 1488 304
 wait 70
 expect ceil 1416 384 > 0
-walk 1584 660
-look 90
+walk 1456 576
+look 0
 shot exit
-exit 1584 696
+exit 1504 576

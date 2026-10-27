@@ -4,7 +4,7 @@
 
 A loop away from the exit you can see, closed by wading back through the
 spill. You start in the lobby on the hot side of the plant's decontamination
-line, with the exit switch in view through bars, 16 units away on the clean
+line, with the exit switch in view through a window, 16 units away on the clean
 side. The plant's storage tank has burst and its nukage pours down a channel
 into an open-air basin in the middle of the plant; the route runs right
 round the basin through the buildings on its banks, seeing it through
@@ -20,7 +20,7 @@ tank hall (rocket launcher) -> up the tank stair and round the rim to the
 blue key beside the rupture (taking it opens two closets in the hall) ->
 blue door -> filter house -> east bank (radiation suit) -> the wade ->
 culvert -> decon hall (the arch-vile) -> exit vault. Crossing into the vault
-opens the lobby's closets, behind the bars; a switch in the vault opens the
+opens the lobby's closets, across the window; a switch in the vault opens the
 lobby shutter and closes the loop through the start.
 
 Secrets: a shifted panel in the lobby (backpack); a lift faced in SILVER3 up
@@ -100,17 +100,19 @@ sw_ad_niche, sw_ad = switch_niche("sw_ad", (2688, 576), "e", Special(S1_DOOR_OPE
                                   floor=0, flat="FLAT5_4", wall="SUPPORT2", ctex="CEIL3_5", light=176, height=72)
 sw_bl_niche, sw_bl = switch_niche("sw_bl", (1488, 320), "s", Special(S1_DOOR_OPEN, TAG_BL, "SW1COMM"),
                                   floor=0, flat="FLOOR1_7", wall="SUPPORT2", ctex="TLITE6_5", light=224, height=72)
-sw_exit_niche, sw_exit = switch_niche("sw_exit", (1584, 688), "n", Special(S1_EXIT, 0, "SW1EXIT"), floor=0,
-                                      flat="FLOOR1_7", wall="SHAWN2", ctex="TLITE6_5", light=240, width=32,
-                                      height=72, depth=8)
+# The exit switch is on a lit console in the vault, facing the lobby through
+# the window under a hanging EXIT sign, so the start shows what the room is.
+# Its face is 112 east of the window: out of use range from the lobby.
+EXIT_FACE = ((1504, 592), (1504, 560))   # the console's west face, SW1EXIT
+EXIT_SIGN = ((1472, 608), (1472, 544))   # the sign's west face
 
 SECTORS = [
     # ------------------------------------------------ lobby (start)
     Sector("lb", [rect(1024, 320, 1392, 688)], 0, 128, "FLOOR0_3", "CEIL5_1", 176, BASE),
-    # The red lockdown lamp along the east wall, in front of the shutter and the bars.
+    # The red lockdown lamp along the east wall, in front of the shutter and the window.
     Sector("lb_lamp", [rect(1392, 320, 1408, 688)], 0, 128, "FLOOR0_3", "TLITE6_5", 176, BASE,
            special=LIGHT_BLINK_SLOW),
-    Sector("lb_bars", [rect(1408, 512, 1424, 640)], 32, 128, "FLOOR1_7", "TLITE6_5", 208, "SUPPORT2",
+    Sector("lb_sill", [rect(1408, 512, 1424, 640)], 32, 128, "FLOOR1_7", "TLITE6_5", 208, "SUPPORT2",
            lower="SUPPORT2"),
     *shutter("bl", (1408, 352, 1424, 480), TAG_BL, floor=0, flat="FLOOR0_3", track="SUPPORT2"),
     window("lb_win", (1088, 688, 1344, 704), 32, 112, BASE, 176, flat="FLOOR0_3", ctex="CEIL5_1", lower=BASE),
@@ -241,25 +243,26 @@ SECTORS = [
     Sector("ev", [rect(1424, 320, 1728, 688)], 0, 128, "FLOOR1_7", "TLITE6_5", 224, "SHAWN2",
            special=LIGHT_GLOW),
     sw_bl_niche,
-    sw_exit_niche,
+    Sector("ev_console", [rect(1504, 560, 1520, 592)], 72, 128, "TLITE6_5", "TLITE6_5", 255, "LITE5"),
+    Sector("ev_sign", [rect(1472, 544, 1488, 608)], 0, 112, "FLOOR1_7", "TLITE6_5", 255, "SHAWN2"),
 ]
 
 SPECIAL_BETWEEN = {
-    ("lb_lamp", "lb_bars"): Special(texture="MIDGRATE"),          # the bars between the lobby and the vault
     ("lb_win", "sb"): Special(texture="MIDGRATE"),                # the lobby window is barred: cacodemons
                                                                   # chasing you round the loop can't fly in
     ("ch", "ch_w"): Special(texture="MIDGRATE"),                  # the grate the falls channel leaves by
     ("ch_strip", "ch_w"): Special(texture="MIDGRATE"),
     ("pp", "ssg_ped"): Special(W1_DOOR_OPEN, TAG_PCL),           # taking the super shotgun opens the pit closet
 }
-SPECIAL_WALLS = {**sw_bd1, **sw_ad, **sw_bl, **sw_exit}
+SPECIAL_WALLS = {**sw_bd1, **sw_ad, **sw_bl}
 # The blue key's W1 ring on the rim opens the hall's two closets; the line
 # across the vault opens the lobby's.
 KEY = (1152, 2192)
 FREE_LINES = {
     **{(p, q): Special(W1_DOOR_OPEN, TAG_BK)
        for p, q in edges(rect(KEY[0] - 24, KEY[1] - 24, KEY[0] + 24, KEY[1] + 24))},
-    ((1712, 320), (1712, 688)): Special(W1_DOOR_OPEN, TAG_LC),
+    # Only south of the exit switch: a walk-over line in front of a switch would take its use.
+    ((1712, 320), (1712, 512)): Special(W1_DOOR_OPEN, TAG_LC),
 }
 SECRET_DOORS = {"d_s1", "d_s3", "d_s4"}
 
@@ -314,8 +317,10 @@ for _s in SECTORS:
 SOUND_BLOCKS = [((1088, 688), (1344, 688))] + [((x, y), (x, y + 64)) for x in (704, 768) for y in (896, 1088, 1216, 1536, 1728)]
 
 OVERRIDES = dict([
+    (EXIT_SIGN, Line(front=Side(upper="EXITSIGN"))),
+    (EXIT_FACE, Line(action=S1_EXIT, front=Side(lower="SW1EXIT"))),
     *[t for _, trims in _jambs for t in trims],
-    # The lobby shutter and the bars, framed in SUPPORT2 on both sides of the wall.
+    # The lobby shutter and the window, framed in SUPPORT2 on both sides of the wall.
     *[trim(p, q, "SUPPORT2") for p, q in [((1408, 352), (1408, 320)), ((1408, 512), (1408, 480)),
                                           ((1408, 688), (1408, 640)), ((1424, 320), (1424, 352)),
                                           ((1424, 480), (1424, 512)), ((1424, 640), (1424, 688))]],
@@ -341,7 +346,7 @@ MUST_REACH = ["s1", "lc1", "lc2", "pcl", "s2", "al", "ac1", "ac2", "na", "loft",
 # (type, x, y, angle=0, skills="emh"); "a" = ambush (deaf). Counts in the
 # comments are UV (HMP, easy).
 THINGS = [Thing(*t) for t in [
-    # lobby: start facing east at the bars, the exit switch beyond them
+    # lobby: start facing east at the window, the exit switch beyond it
     (PLAYER1, 1120, 544, 0), (PLAYER2, 1120, 480, 0), (PLAYER3, 1120, 608, 0), (PLAYER4, 1088, 544, 0),
     (SHOTGUN, 1216, 544), (SHELLBOX, 1312, 400), (STIM, 1312, 640),
     (BACKPACK, 1056, 240), (GREENARMOR, 1120, 240),                                    # secret 1

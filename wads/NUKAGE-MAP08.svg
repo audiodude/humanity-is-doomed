@@ -2,7 +2,7 @@
 <rect width="100%" height="100%" fill="#fbfbf7"/>
 <path d="M492.8,1100.8 L505.6,1100.8 L531.2,1100.8 L572.8,1100.8 L598.4,1100.8 L614.4,1100.8 L640.0,1100.8 L640.0,953.6 L620.8,953.6 L518.4,953.6 L492.8,953.6 L492.8,992.0 L492.8,998.4 L492.8,1049.6 L492.8,1056.0 Z" fill="rgb(178,178,178)" fill-rule="evenodd"><title>lb: floor 0 ceil 128 FLOOR0_3/CEIL5_1 light 176</title></path>
 <path d="M640.0,1100.8 L646.4,1100.8 L646.4,1088.0 L646.4,1062.4 L646.4,1036.8 L646.4,1024.0 L646.4,972.8 L646.4,953.6 L640.0,953.6 Z" fill="rgb(178,178,178)" fill-rule="evenodd"><title>lb_lamp: floor 0 ceil 128 FLOOR0_3/TLITE6_5 light 176</title></path>
-<path d="M646.4,1024.0 L652.8,1024.0 L652.8,972.8 L646.4,972.8 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>lb_bars: floor 32 ceil 128 FLOOR1_7/TLITE6_5 light 208</title></path>
+<path d="M646.4,1024.0 L652.8,1024.0 L652.8,972.8 L646.4,972.8 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>lb_sill: floor 32 ceil 128 FLOOR1_7/TLITE6_5 light 208</title></path>
 <path d="M646.4,1088.0 L652.8,1088.0 L652.8,1062.4 L652.8,1036.8 L646.4,1036.8 L646.4,1062.4 Z" fill="#a0703c" fill-rule="evenodd"><title>bl: floor 0 ceil 0 FLOOR0_3/FLAT20 light 144 tag 9</title></path>
 <path d="M518.4,953.6 L620.8,953.6 L620.8,947.2 L518.4,947.2 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>lb_win: floor 32 ceil 112 FLOOR0_3/CEIL5_1 light 176</title></path>
 <path d="M572.8,1107.2 L598.4,1107.2 L598.4,1100.8 L572.8,1100.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_lc1: floor 0 ceil 0 FLOOR0_3/FLAT20 light 144 tag 8</title></path>
@@ -120,9 +120,10 @@
 <path d="M1158.4,1011.2 L1164.8,1011.2 L1164.8,985.6 L1158.4,985.6 Z" fill="rgb(178,178,178)" fill-rule="evenodd"><title>sw_ad: floor 0 ceil 72 FLAT5_4/CEIL3_5 light 176</title></path>
 <path d="M780.8,1094.4 L787.2,1094.4 L787.2,1030.4 L780.8,1030.4 L780.8,1036.8 L780.8,1088.0 Z" fill="rgb(178,178,178)" fill-rule="evenodd"><title>vd_alcove: floor 0 ceil 128 FLAT5_4/CEIL5_1 light 176</title></path>
 <path d="M774.4,1088.0 L780.8,1088.0 L780.8,1036.8 L774.4,1036.8 Z" fill="#a0703c" fill-rule="evenodd"><title>vd: floor 0 ceil 0 FLAT5_4/FLAT20 light 144</title></path>
-<path d="M652.8,1100.8 L665.6,1100.8 L691.2,1100.8 L768.0,1100.8 L774.4,1100.8 L774.4,1094.4 L774.4,1088.0 L774.4,1036.8 L774.4,1030.4 L774.4,953.6 L768.0,953.6 L723.2,953.6 L710.4,953.6 L652.8,953.6 L652.8,972.8 L652.8,1024.0 L652.8,1036.8 L652.8,1062.4 L652.8,1088.0 Z" fill="rgb(178,178,178)" fill-rule="evenodd"><title>ev: floor 0 ceil 128 FLOOR1_7/TLITE6_5 light 224</title></path>
+<path d="M652.8,1100.8 L665.6,1100.8 L691.2,1100.8 L768.0,1100.8 L774.4,1100.8 L774.4,1094.4 L774.4,1088.0 L774.4,1036.8 L774.4,1030.4 L774.4,953.6 L652.8,953.6 L652.8,972.8 L652.8,1024.0 L652.8,1036.8 L652.8,1062.4 L652.8,1088.0 Z M684.8,1004.8 L691.2,1004.8 L691.2,992.0 L684.8,992.0 Z M672.0,1011.2 L678.4,1011.2 L678.4,985.6 L672.0,985.6 Z" fill="rgb(178,178,178)" fill-rule="evenodd"><title>ev: floor 0 ceil 128 FLOOR1_7/TLITE6_5 light 224</title></path>
 <path d="M665.6,1107.2 L691.2,1107.2 L691.2,1100.8 L665.6,1100.8 Z" fill="rgb(178,178,178)" fill-rule="evenodd"><title>sw_bl: floor 0 ceil 72 FLOOR1_7/TLITE6_5 light 224</title></path>
-<path d="M710.4,953.6 L723.2,953.6 L723.2,950.4 L710.4,950.4 Z" fill="rgb(178,178,178)" fill-rule="evenodd"><title>sw_exit: floor 0 ceil 72 FLOOR1_7/TLITE6_5 light 240</title></path>
+<path d="M684.8,1004.8 L691.2,1004.8 L691.2,992.0 L684.8,992.0 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>ev_console: floor 72 ceil 128 TLITE6_5/TLITE6_5 light 255</title></path>
+<path d="M672.0,1011.2 L678.4,1011.2 L678.4,985.6 L672.0,985.6 Z" fill="rgb(178,178,178)" fill-rule="evenodd"><title>ev_sign: floor 0 ceil 112 FLOOR1_7/TLITE6_5 light 255</title></path>
 <line x1="492.8" y1="1056.0" x2="492.8" y2="1049.6" stroke="#111" stroke-width="1.6"/>
 <line x1="492.8" y1="1049.6" x2="492.8" y2="998.4" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
 <line x1="492.8" y1="998.4" x2="492.8" y2="992.0" stroke="#111" stroke-width="1.6"/>
@@ -140,7 +141,7 @@
 <line x1="492.8" y1="1100.8" x2="492.8" y2="1056.0" stroke="#111" stroke-width="1.6"/>
 <line x1="640.0" y1="953.6" x2="646.4" y2="953.6" stroke="#111" stroke-width="1.6"/>
 <line x1="646.4" y1="953.6" x2="646.4" y2="972.8" stroke="#111" stroke-width="1.6"/>
-<line x1="646.4" y1="972.8" x2="646.4" y2="1024.0" stroke="#111" stroke-width="1.6" stroke-dasharray="4 2"><title>MIDGRATE</title></line>
+<line x1="646.4" y1="972.8" x2="646.4" y2="1024.0" stroke="#777" stroke-width="0.6"/>
 <line x1="646.4" y1="1024.0" x2="646.4" y2="1036.8" stroke="#111" stroke-width="1.6"/>
 <line x1="646.4" y1="1036.8" x2="646.4" y2="1062.4" stroke="#777" stroke-width="0.6"/>
 <line x1="646.4" y1="1062.4" x2="646.4" y2="1088.0" stroke="#777" stroke-width="0.6"/>
@@ -699,10 +700,7 @@
 <line x1="774.4" y1="1036.8" x2="774.4" y2="1088.0" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
 <line x1="652.8" y1="1036.8" x2="652.8" y2="1024.0" stroke="#111" stroke-width="1.6"/>
 <line x1="652.8" y1="972.8" x2="652.8" y2="953.6" stroke="#111" stroke-width="1.6"/>
-<line x1="652.8" y1="953.6" x2="710.4" y2="953.6" stroke="#111" stroke-width="1.6"/>
-<line x1="710.4" y1="953.6" x2="723.2" y2="953.6" stroke="#777" stroke-width="0.6"/>
-<line x1="723.2" y1="953.6" x2="768.0" y2="953.6" stroke="#111" stroke-width="1.6"/>
-<line x1="768.0" y1="953.6" x2="774.4" y2="953.6" stroke="#111" stroke-width="1.6"/>
+<line x1="652.8" y1="953.6" x2="774.4" y2="953.6" stroke="#111" stroke-width="1.6"/>
 <line x1="774.4" y1="953.6" x2="774.4" y2="1030.4" stroke="#111" stroke-width="1.6"/>
 <line x1="774.4" y1="1030.4" x2="774.4" y2="1036.8" stroke="#111" stroke-width="1.6"/>
 <line x1="774.4" y1="1088.0" x2="774.4" y2="1094.4" stroke="#111" stroke-width="1.6"/>
@@ -712,17 +710,22 @@
 <line x1="691.2" y1="1100.8" x2="665.6" y2="1100.8" stroke="#777" stroke-width="0.6"/>
 <line x1="665.6" y1="1100.8" x2="652.8" y2="1100.8" stroke="#111" stroke-width="1.6"/>
 <line x1="652.8" y1="1100.8" x2="652.8" y2="1088.0" stroke="#111" stroke-width="1.6"/>
+<line x1="684.8" y1="1004.8" x2="691.2" y2="1004.8" stroke="#777" stroke-width="0.6"/>
+<line x1="691.2" y1="1004.8" x2="691.2" y2="992.0" stroke="#777" stroke-width="0.6"/>
+<line x1="691.2" y1="992.0" x2="684.8" y2="992.0" stroke="#777" stroke-width="0.6"/>
+<line x1="684.8" y1="992.0" x2="684.8" y2="1004.8" stroke="#d0201a" stroke-width="2.5"><title>action 11 tag 0</title></line>
+<line x1="672.0" y1="1011.2" x2="678.4" y2="1011.2" stroke="#777" stroke-width="0.6"/>
+<line x1="678.4" y1="1011.2" x2="678.4" y2="985.6" stroke="#777" stroke-width="0.6"/>
+<line x1="678.4" y1="985.6" x2="672.0" y2="985.6" stroke="#777" stroke-width="0.6"/>
+<line x1="672.0" y1="985.6" x2="672.0" y2="1011.2" stroke="#777" stroke-width="0.6"/>
 <line x1="691.2" y1="1100.8" x2="691.2" y2="1107.2" stroke="#111" stroke-width="1.6"/>
 <line x1="691.2" y1="1107.2" x2="665.6" y2="1107.2" stroke="#d0201a" stroke-width="2.5"><title>action 103 tag 9</title></line>
 <line x1="665.6" y1="1107.2" x2="665.6" y2="1100.8" stroke="#111" stroke-width="1.6"/>
-<line x1="710.4" y1="950.4" x2="723.2" y2="950.4" stroke="#d0201a" stroke-width="2.5"><title>action 11 tag 0</title></line>
-<line x1="723.2" y1="950.4" x2="723.2" y2="953.6" stroke="#111" stroke-width="1.6"/>
-<line x1="710.4" y1="953.6" x2="710.4" y2="950.4" stroke="#111" stroke-width="1.6"/>
 <line x1="534.4" y1="361.6" x2="553.6" y2="361.6" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 4</title></line>
 <line x1="553.6" y1="361.6" x2="553.6" y2="342.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 4</title></line>
 <line x1="553.6" y1="342.4" x2="534.4" y2="342.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 4</title></line>
 <line x1="534.4" y1="342.4" x2="534.4" y2="361.6" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 4</title></line>
-<line x1="768.0" y1="1100.8" x2="768.0" y2="953.6" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 8</title></line>
+<line x1="768.0" y1="1100.8" x2="768.0" y2="1024.0" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 8</title></line>
 <text x="566.4" y="1027.2" font-size="9" text-anchor="middle" fill="#333">lb 0</text>
 <text x="585.6" y="1129.6" font-size="9" text-anchor="middle" fill="#333">lc1 0</text>
 <text x="627.2" y="1129.6" font-size="9" text-anchor="middle" fill="#333">lc2 0</text>
