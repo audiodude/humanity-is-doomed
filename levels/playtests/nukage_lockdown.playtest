@@ -34,20 +34,23 @@ look 90
 shot gallery_shutter
 expect ceil 576 1352 == 72         # BD1 is shut
 
-# Down the lift into the pump pit.
-use 448 1216
-wait 45
-walk 416 1216 320 1216
-expect floor 416 1216 <= 0
+# The super shotgun on the lit pump column, a running jump off the lift's top:
+# taking it drops the column, and you with it, into the pit. The runner can't
+# plan a jump, so it's landed by teleport where a run of a few tics off the
+# lift's west edge lands (it clears the 64 gap and the 16 drop).
+walk 416 1216
+look 180 10
+shot column
+expect floor 300 1200 == 56
+teleport 304 1248 180
+walk 256 1248
+expect has SuperShotgun
+wait 35
+expect floor 300 1200 == -64
+expect floor 416 1216 == 72        # the lift stays up: you fell, not rode
 walk 336 1250 336 1440
 look 90
 shot pit
-
-# The super shotgun on its plinth: taking it opens the closet in the west wall.
-walk 320 1488
-expect has SuperShotgun
-wait 40
-expect ceil -8 1488 > -72
 
 # Secret 2: the SILVER3 pump-lift up to the lit ledge.
 walk 64 1600
@@ -63,7 +66,10 @@ expect has BlueArmor
 # Pit stair up to the landing and the gallery's north half; the switch opens BD1 behind you.
 walk 64 1664
 wait 140
-walk 160 1600 288 1600 288 1860 520 1860 640 1440
+walk 160 1600 288 1600 288 1700
+wait 40
+expect ceil 320 1928 > 72          # halfway up the stair: the hell knight's closet on the landing opens
+walk 288 1860 520 1860 640 1440
 use 720 1440
 wait 70
 expect ceil 576 1352 > 72
