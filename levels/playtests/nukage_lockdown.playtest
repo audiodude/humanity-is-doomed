@@ -1,0 +1,173 @@
+# Nukage Lockdown (MAP08) wiring test: the loop round the spill basin, every
+# shutter, lift, key trap and secret on the way, the wade, the decon hall,
+# the vault (its trap opens the lobby closets), the lobby shutter, the exit.
+#   uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP08 levels/playtests/nukage_lockdown.playtest
+
+# Lobby: the exit switch through the bars, the basin through the north window.
+look 0
+shot start
+look 90 4
+shot lobby_window
+expect ceil 1416 384 == 0          # the lobby shutter is shut
+expect ceil 1256 312 == 0          # the lobby closets are shut
+killall
+walk 1216 544
+expect has Shotgun
+# Secret 1: the shifted panel in the south wall.
+open 1088 320
+walk 1088 240 1056 240
+expect secrets == 1
+expect has Backpack
+walk 1120 400
+open 1024 512
+
+# Ready room, then up the steps onto the gallery.
+walk 900 512 576 600 576 700
+walk 576 864
+expect has Chaingun
+
+# Gallery, the basin reveal through the windows; the shutter BD1 cuts it.
+walk 600 1100
+look 0 6
+shot gallery_basin
+look 90
+shot gallery_shutter
+expect ceil 576 1352 == 72         # BD1 is shut
+
+# Down the lift into the pump pit.
+use 448 1216
+wait 45
+walk 416 1216 320 1216
+expect floor 416 1216 <= 0
+walk 336 1250 336 1440
+look 90
+shot pit
+
+# The super shotgun on its plinth: taking it opens the closet in the west wall.
+walk 320 1488
+expect has SuperShotgun
+wait 40
+expect ceil -8 1488 > -72
+
+# Secret 2: the SILVER3 pump-lift up to the lit ledge.
+walk 64 1600
+use 64 1632
+wait 40
+walk 64 1664
+wait 150
+expect floor 64 1664 == 24
+walk 64 1776
+expect secrets == 2
+expect has BlueArmor
+
+# Pit stair up to the landing and the gallery's north half; the switch opens BD1 behind you.
+walk 64 1664
+wait 140
+walk 160 1600 288 1600 288 1860 520 1860 640 1440
+use 720 1440
+wait 70
+expect ceil 576 1352 > 72
+walk 576 1300 576 1500
+
+# Tank hall: the burst tank, its falls, the blue key on the rim.
+walk 576 1900 576 2060 800 2100
+look 40 -4
+shot tank_hall
+walk 608 2600 608 2656
+expect has RocketLauncher
+
+# Up the tank stair and round the rim to the key beside the rupture.
+walk 1008 2140 1008 2520 1088 2520
+look 270 10
+shot rim
+walk 1088 2300 1152 2192
+expect has BlueCard
+wait 40
+expect ceil 672 2760 > 0
+expect ceil 896 2760 > 0
+walk 1088 2520 1008 2520 1008 2140 1232 2060
+look 90 -10
+shot rupture
+
+# Secret 3: the north annex, the shifted screen, the lift up to the alcove.
+walk 1300 2700 1792 2700
+open 1792 2752
+walk 1792 2880 1640 2912
+open 1616 2912
+walk 1500 2912
+use 1472 2880
+wait 40
+walk 1408 2880
+wait 150
+expect floor 1408 2880 == 192
+walk 1408 2800
+expect secrets == 3
+expect has PlasmaRifle
+look 270 20
+shot alcove
+
+# Blue door, filter house, the loft.
+teleport 1792 2400 0
+open 2064 2240
+walk 2200 2240 2432 2240
+look 270
+shot filter_house
+walk 2880 1520 2880 2300
+expect has Berserk
+walk 2880 1520 2624 1520
+open 2624 1464
+
+# East bank: the sampling shed and secret 4, then the radiation suit.
+# The suit comes last, just before the wade: it lasts a minute.
+walk 2624 1300 2700 1088
+open 2768 1088
+walk 2880 1088
+open 2928 1088
+walk 3008 1088
+expect secrets == 4
+expect has Soulsphere
+walk 2700 1088 2432 900
+look 180 4
+shot east_bank
+walk 2432 832
+expect has PowerIronFeet
+
+# The wade: the island and its megasphere, then the culvert.
+walk 2700 1088 2400 1300 2200 1300 1568 1312
+expect has Megasphere
+look 270 6
+shot wade
+walk 1856 800 1856 600
+look 270
+shot culvert
+
+# Decon hall: the arch-vile's dais beyond the pool.
+walk 1856 480 2048 470
+look 270 4
+shot decon_hall
+
+# Airlock: its switch opens the shutter onto the east bank.
+walk 2300 384
+open 2384 384
+walk 2640 576
+use 2704 576
+wait 70
+expect ceil 2560 648 > 0
+walk 2560 680
+
+# Exit vault: crossing in opens the lobby closets; its switch opens the lobby shutter.
+walk 2560 600 2300 384 1800 416
+open 1744 416
+walk 1680 416 1600 500
+wait 40
+expect ceil 1256 312 > 0
+expect ceil 1360 312 > 0
+look 180
+shot vault_bars
+use 1488 304
+wait 70
+expect ceil 1416 384 > 0
+walk 1584 660
+look 90
+shot exit
+exit 1584 696

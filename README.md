@@ -20,7 +20,7 @@
 
 ## Included WAD - NUKAGE.WAD
 
-`wads/NUKAGE.WAD` holds seven generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), MAP06, [Nukage Undercurrent](#nukage-undercurrent-nukage_undercurrent), and MAP07, [Nukage Storage](#nukage-storage-nukage_storage). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP07.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
+`wads/NUKAGE.WAD` holds eight generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), MAP06, [Nukage Undercurrent](#nukage-undercurrent-nukage_undercurrent), MAP07, [Nukage Storage](#nukage-storage-nukage_storage), and MAP08, [Nukage Lockdown](#nukage-lockdown-nukage_lockdown). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP08.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
 
 ### Nukage Junction (`nukage_junction`)
 A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/medium/hard, one secret.
@@ -141,9 +141,30 @@ You look over a spent-fuel store from a gallery: a maze of steel casks under lit
 | Nearest monster to the start | 488 | 300 |
 | Whole-map symmetry | 0.59 | 0.54 |
 
+### Nukage Lockdown (`nukage_lockdown`)
+MAP08: 123 sectors, 34/55/78 monsters on easy/medium/hard, four secrets, and the first arch-vile. Its design doc is `levels/designs/nukage_lockdown.md`, with the playtest results; the route script is `levels/playtests/nukage_lockdown.playtest`.
+
+You start in a locked-down lobby looking through bars at the exit switch, and the only way out leads away from it. The route circles the plant's nukage spill basin, through buildings on its banks, past the burst storage tank pouring nukage down a channel into it, and closes by wading the basin in a radiation suit, through the drainage culvert into the decontamination hall where the arch-vile waits. Every lockdown shutter opens only from its far side.
+
+| Measure | MAP08 | DOOM II median |
+|---|---|---|
+| Distinct floor heights | 25 | 23 |
+| Light SD / light-effect sectors | 25 / 15 | 23 / 9 |
+| Most-used wall texture | 27% | 30% |
+| Wall material changes with a border texture | 99% | 31% |
+| Optional share of the reachable area | 43% | 50% |
+| UV ammo per monster HP (pistol start) | 2.30 | 1.81 |
+| Health per 1000 monster HP | 45 | 40 |
+| Easy/UV and HMP/UV monster ratios | 0.44 / 0.70 | 0.33 / 0.70 |
+| Deaf monsters | 100% | 42% |
+| Nearest monster to the start | 304 | 300 |
+| Whole-map symmetry | 0.70 | 0.54 |
+
+Symmetry is high because the loop runs round a square basin; each bank is its own material, height and light.
+
 ## The level builder
 
-`levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All seven maps in `NUKAGE.WAD` came out of it, and the [decompiler](#decompiling-existing-maps) turns any Doom-format map back into this form.
+`levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All eight maps in `NUKAGE.WAD` came out of it, and the [decompiler](#decompiling-existing-maps) turns any Doom-format map back into this form.
 
 ### Building a map
 
@@ -157,6 +178,7 @@ python3 -m levels nukage_divided            # same for MAP04
 python3 -m levels nukage_drain              # same for MAP05
 python3 -m levels nukage_undercurrent       # same for MAP06
 python3 -m levels nukage_storage            # same for MAP07
+python3 -m levels nukage_lockdown           # same for MAP08
 python3 -m levels nukage_junction --check  # check only
 ```
 
