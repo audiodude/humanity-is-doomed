@@ -24,7 +24,6 @@ open 1024 512
 # Ready room, then up the steps onto the gallery.
 walk 900 512 576 600 576 700
 walk 576 864
-expect has Chaingun
 
 # Gallery, the basin reveal through the windows; the shutter BD1 cuts it.
 walk 600 1100
@@ -152,14 +151,10 @@ walk 1856 480 2048 470
 look 270 4
 shot decon_hall
 
-# Airlock: its switch opens the shutter onto the east bank.
+# Storeroom off the decon hall (optional).
 walk 2300 384
 open 2384 384
 walk 2640 576
-use 2704 576
-wait 70
-expect ceil 2560 648 > 0
-walk 2560 680
 
 # Exit vault: crossing in opens the lobby closets; its switch opens the lobby shutter.
 walk 2560 600 2300 384 1800 416
