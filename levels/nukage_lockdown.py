@@ -371,14 +371,16 @@ THINGS = [Thing(*t) for t in [
     (IMP, 880, 128, 180, "emha"), (IMP, 480, 352, 180, "mha"),
     (SARGE, 880, 352, 180, "emha"), (SARGE, 480, 224, 0, "ha"),
     (GREENARMOR, 352, 96), (SHELLBOX, 928, 96), (STIM, 928, 608),
-    # gallery south: 2 imps (2, 1), a zombieman (1, 1)
+    # gallery south: 2 imps (2, 1), a shotgun guy (1, 1)
     (IMP, 520, 1040, 270, "emha"), (IMP, 640, 1200, 270, "mha"),
-    (ZOMBIE, 640, 1000, 270, "emha"),
+    (SARGE, 640, 1000, 270, "emha"),
     (CHAINGUN, 576, 864), (AMMOBOX, 640, 864),
     # 2 cacodemons (1, 1) in the basin's north-west, facing away from the lobby window
     (CACO, 960, 1760, 180, "emha"), (CACO, 1088, 1600, 180, "ha"),
-    # pump pit: a demon (1, 1), a spectre (1, 0), an imp (1, 1) on the stair
+    # pump pit: a demon (1, 1), a spectre (1, 0), an imp (1, 1) on the stair; and waiting in
+    # the dark where the column lands, a demon and a spectre (1, 0)
     (DEMON, 320, 976, 90, "emha"), (SPECTRE, 64, 992, 90, "mha"), (IMP, 288, 1712, 270, "emha"),
+    (DEMON, 80, 1200, 0, "mha"), (SPECTRE, 80, 1296, 0, "ha"),
     (SSG, *SSG_AT), (MEDI, 40, 1440), (SHELLBOX, 336, 928),
     # the landing closet, opened halfway up the pit stair: a hell knight (1, 0; easy: an imp)
     (KNIGHT, 320, 1984, 270, "mha"), (IMP, 320, 1984, 270, "ea"),

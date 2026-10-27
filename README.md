@@ -142,7 +142,7 @@ You look over a spent-fuel store from a gallery: a maze of steel casks under lit
 | Whole-map symmetry | 0.59 | 0.54 |
 
 ### Nukage Lockdown (`nukage_lockdown`)
-MAP08: 123 sectors, 32/51/69 monsters on easy/medium/hard, four secrets, and the first arch-vile. Its design doc is `levels/designs/nukage_lockdown.md`, with the playtest results; the route script is `levels/playtests/nukage_lockdown.playtest`.
+MAP08: 123 sectors, 32/52/71 monsters on easy/medium/hard, four secrets, and the first arch-vile. Its design doc is `levels/designs/nukage_lockdown.md`, with the playtest results; the route script is `levels/playtests/nukage_lockdown.playtest`.
 
 You start in a locked-down lobby looking through a window at the exit switch under its EXIT sign, and the only way out leads away from it. The route circles the plant's nukage spill basin, through buildings on its banks, past the burst storage tank pouring nukage down a channel into it, and closes by wading the basin in a radiation suit, through the drainage culvert into the decontamination hall where the arch-vile waits. Every lockdown shutter opens only from its far side.
 
