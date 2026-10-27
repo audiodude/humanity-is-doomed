@@ -20,7 +20,7 @@
 
 ## Included WAD - NUKAGE.WAD
 
-`wads/NUKAGE.WAD` holds seven generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), MAP06, [Nukage Undercurrent](#nukage-undercurrent-nukage_undercurrent), and MAP07, [Nukage Casks](#nukage-casks-nukage_casks). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP07.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
+`wads/NUKAGE.WAD` holds seven generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), MAP06, [Nukage Undercurrent](#nukage-undercurrent-nukage_undercurrent), and MAP07, [Nukage Storage](#nukage-storage-nukage_storage). It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP07.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
 
 ### Nukage Junction (`nukage_junction`)
 A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/medium/hard, one secret.
@@ -122,7 +122,7 @@ You cross the turbine hall on a railed gantry along its north wall, looking down
 | Deaf monsters | 42% | 42% |
 | Nearest monster to the start | 511 | 300 |
 
-### Nukage Casks (`nukage_casks`)
+### Nukage Storage (`nukage_storage`)
 MAP07: 187 sectors, 30/54/75 monsters on easy/medium/hard, four secrets, and the first pain elemental.
 
 You look over a spent-fuel store from a gallery: a maze of steel casks under lit aisles, the yellow key on a blue-lit cask stack, the control tower's window high in the far wall, and blast shutters under an EXIT sign. You thread the maze at floor level to the tower, and the switch in its cab sinks every cask into the floor at once. The maze becomes an open hall, and the six mancubi sealed among the casks are standing in it, each in the nukage its cask leaked. DOOM II's own MAP07 rule opens the way out: the shutters drop when the last mancubus dies.
@@ -156,7 +156,7 @@ python3 -m levels nukage_core              # same for MAP03
 python3 -m levels nukage_divided            # same for MAP04
 python3 -m levels nukage_drain              # same for MAP05
 python3 -m levels nukage_undercurrent       # same for MAP06
-python3 -m levels nukage_casks              # same for MAP07
+python3 -m levels nukage_storage            # same for MAP07
 python3 -m levels nukage_junction --check  # check only
 ```
 

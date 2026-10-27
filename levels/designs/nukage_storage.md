@@ -1,4 +1,4 @@
-# Nukage Casks (`nukage_casks`)
+# Nukage Storage (`nukage_storage`)
 
 ## Concept
 
@@ -8,7 +8,7 @@
 - **Theme:** the plant's spent-fuel store. Rows of steel casks stand in a concrete hall 384 high, under lamps that light the aisles between them. A staff wing with a decontamination corridor leads up to an observation gallery along the hall's west wall. The control tower stands outside the east wall, and its cab looks in through a window. The dispatch dock is behind blast shutters in the north wall, under an EXIT sign.
 - **Gate to the exit: DOOM II's own MAP07 rule.** When the last mancubus on the map dies, every sector tagged 666 lowers to its lowest neighbour. That works by slot in vanilla and in the ports, and `levels/reach.py` models it (`BOSS["MAP07"]`). Here, tag 666 is on the dispatch shutters. DOOM II's Dead Simple is built on the same rule. This map uses the rule without copying that map's arena.
 - **Difficulty:** hard, a step up from MAP06. About 30/54/75 monsters on easy/HMP/UV, and about 12,600 monster HP on UV, which is about 30% more than MAP06. The heavy share is about 23%: 6 mancubi, 3 arachnotrons, a baron, 2 hell knights, 2 revenants, 2 cacodemons and a pain elemental. It's the first fight in the set against six heavies at once. **Debut: the pain elemental**, alone in the open air over the cask field.
-- **Slot:** MAP07 of `NUKAGE.WAD`. UMAPINFO: `levelname "Nukage Casks"`, `music "D_SHAWN"` (the slot's own track), no `next` (slot order follows), and **no `bossaction`**. Any `bossaction` replaces the slot's default boss behaviour and would remove the exit gate.
+- **Slot:** MAP07 of `NUKAGE.WAD`. UMAPINFO: `levelname "Nukage Storage"`, `music "D_SHAWN"` (the slot's own track), no `next` (slot order follows), and **no `bossaction`**. Any `bossaction` replaces the slot's default boss behaviour and would remove the exit gate. (Built as Nukage Casks, and renamed.)
 
 How it differs from the set:
 
@@ -19,8 +19,8 @@ How it differs from the set:
 | MAP03 Nukage Core | a spiral climb around a reactor to the crown |
 | MAP04 Nukage Divided | a fork into two wings that never meet, keys crossed |
 | MAP05 Nukage Drain | a ring of walkways raised one by one out of a flooded reservoir |
-| MAP06 Nukage Turbine | one hall crossed twice: over it, then under it |
-| **MAP07 Nukage Casks** | **one hall in two states: a maze on the way in, an arena once you sink it** |
+| MAP06 Nukage Undercurrent | one hall crossed twice: over it, then under it |
+| **MAP07 Nukage Storage** | **one hall in two states: a maze on the way in, an arena once you sink it** |
 
 None of these changes the shape of a whole space. MAP03's pens and MAP06's floodgate each drop one wall. MAP06 crosses its hall twice, while this map crosses its hall once and then changes it.
 
@@ -322,7 +322,7 @@ Balance targets for the build:
 
 ### As built
 
-Measured by the build (`levels/nukage_casks.py`, 179 sectors, monsters 30/54/75): every target above is met.
+Measured by the build (`levels/nukage_storage.py`, 179 sectors, monsters 30/54/75): every target above is met.
 
 | Target | Built |
 |---|---|
@@ -355,7 +355,7 @@ Changes from the plan above, and why:
 - **The reach model and the cells**: `reach.shoot_site` counts a level shot into a sector as a hit, without the target's height, so it says the mancubi can be shot from the gallery and the key stack before the drop. It fires the boss rule in wave 0, and the route curve has two legs (`boss @ kr`, exit) with no cask-switch leg. A 3D ray test over the pre-drop floors (gallery eye 233, every stack sector, the cab) finds no line to any mancubus's top (64) or eye (48) that clears the rings, so in the game the switch is still the way. The same approximation makes the long-range hitscan figure 60/s (the A2/B1 group and B0's shotgun guys from the gallery's north end, GP and the RO door); the casks block those lines too. Below the 88.4 warning threshold, so it's left as is.
 - **The cells in the game**: the playtest confirms the ray test. Screenshots with every mancubus alive, from the gallery (south end, middle, north end), the key top (towards C3, C4, C5, C6), the stack's bottom step and the cab, show no mancubus over any ring, so the cask switch is required. With a monster's height (64) added to the reach model's shot test, for analysis only, the curve has the legs the route has (thorough / detour ratio): yellow key 1.94 / 1.20, cask switch 1.58 / 1.07, last mancubus 1.84 / 1.40, exit 1.95 / 1.51. Health never falls below 75 and is 200 at the exit, the long-range hitscan peak is 20/s, and the cask switch releases 4,020 HP against 5,690 ammo damage carried on the detour curve. Nothing is short, and the lowest detour ratio (1.07, at the cask switch) is above the DOOM II median low point (0.65).
 - **Views the plan promised that come out partial.** Column P4 (in K3R3) stands on the line between the cab window and the middle of the field. From the cab it fills the middle of the view west, so the drop is watched on either side of it. From the gallery the cab window shows only beside P4, from the south and north thirds, and from the key top it's hidden. The gallery's 32-high parapet hides the aisles within about 400 of the rail; past that, the cask tops, the key stack, the pain elemental and the far aisles show.
-- **Playtest** (`levels/playtests/nukage_casks.playtest`, UV): the wiring run passes with 29 checks and no fails. Its `killall` comes first, because monsters left standing block its walks in the yard, lockers and decon corridor. That kills the mancubi too, so the run checks the shutters at 128 before it and at 0 after the arena, which shows ZDoom applying MAP07's boss rule to this PWAD. The three fight seeds died 31, 42 and 45 times, 15 to 24 of them `starved`, and killed 73, 77 and 73 (lost souls included). None killed all six mancubi, so each was warped past the shut shutters into the dispatch bay. Every cluster is the bot's, and the curve above is nowhere short. Before the cooling pond yard each seed had spent 48–64 shells, 100–136 bullets and 8 rockets on about 2,000 HP; the 8 rockets went point blank at the records office's zombies. It then fought the yard's cacodemons dry, standing in the pond. In the footage, starved, it fled the key trap's baron into the north-east spur's dead end. At the yellow door it met the mancubi converging on it, and it died in the tower base with a few shells left. The `unseen` deaths are the bot at low health facing a door or wall, not hidden ambushes. No map change came out of the playtest.
+- **Playtest** (`levels/playtests/nukage_storage.playtest`, UV): the wiring run passes with 29 checks and no fails. Its `killall` comes first, because monsters left standing block its walks in the yard, lockers and decon corridor. That kills the mancubi too, so the run checks the shutters at 128 before it and at 0 after the arena, which shows ZDoom applying MAP07's boss rule to this PWAD. The three fight seeds died 31, 42 and 45 times, 15 to 24 of them `starved`, and killed 73, 77 and 73 (lost souls included). None killed all six mancubi, so each was warped past the shut shutters into the dispatch bay. Every cluster is the bot's, and the curve above is nowhere short. Before the cooling pond yard each seed had spent 48–64 shells, 100–136 bullets and 8 rockets on about 2,000 HP; the 8 rockets went point blank at the records office's zombies. It then fought the yard's cacodemons dry, standing in the pond. In the footage, starved, it fled the key trap's baron into the north-east spur's dead end. At the yellow door it met the mancubi converging on it, and it died in the tower base with a few shells left. The `unseen` deaths are the bot at low health facing a door or wall, not hidden ambushes. No map change came out of the playtest.
 
 ## Build risks
 
@@ -379,7 +379,7 @@ Changes from the plan above, and why:
 - **The fight bot.** The exit needs all six mancubi dead. A fight run that doesn't kill them will skip the dispatch steps and warp, so read that as bot, not map, unless the curve is short there.
 - **Set bookkeeping.**
   - Add MAP07 sections to README "Included WAD" and SPOILERS, and the preview `wads/NUKAGE-MAP07.svg`.
-  - This worktree's `wads/NUKAGE.WAD` has no MAP06, which lives on branch `map06`. Build into a scratch WAD while iterating. Write the real WAD only on top of a NUKAGE.WAD that has MAP06, and never merge the binary: rebuild it with `python3 -m levels nukage_casks`.
+  - This worktree's `wads/NUKAGE.WAD` has no MAP06, which lives on branch `map06`. Build into a scratch WAD while iterating. Write the real WAD only on top of a NUKAGE.WAD that has MAP06, and never merge the binary: rebuild it with `python3 -m levels nukage_storage`.
 
 ## Concepts considered
 
