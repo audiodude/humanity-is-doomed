@@ -1,0 +1,221 @@
+# Nukage Meltdown (MAP09) wiring test: down the cascade shelf by shelf, every
+# door, the red key and its closet, the pump station lift, the breach drop,
+# the floodgate switch and the drop over the open gate (which opens the
+# dome's hatch), every secret, and the exit in the reactor hall.
+#   uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP09 levels/playtests/nukage_meltdown.playtest
+
+# Operations deck: the reveal from the start, down the whole cascade to the lake.
+look 270
+shot start
+look 270 12
+shot start_down
+expect ceil 1024 -352 == 16        # the dome's hatch is shut
+expect floor 1024 520 == 368       # the floodgate is up
+expect ceil 2056 1592 == 496       # the key-trap closet is shut
+walk 1024 2600
+expect has Shotgun
+look 270 20
+shot balcony
+look 263 10
+shot balcony_cyberdemon            # at the rail: the Cyberdemon over the dam, right of centre
+killall
+
+# Outfall valve room, and secret 1 behind the shifted panel in its east wall.
+open 1424 2816
+walk 1520 2880
+open 1904 2816
+walk 1984 2816
+expect secrets == 1
+expect has Backpack
+walk 1600 2816
+open 1440 2816
+
+# Corridor and stairwell down to the landing.
+walk 1024 2880
+open 624 2880
+walk 400 2880 -256 2880 -256 2500 -224 2400
+look 0
+shot landing
+open -48 2400
+
+# Shelf 1: along the bank, the outfall's falls behind it, shelf 2 below the railing.
+walk 64 2400 600 2400
+look 270 15
+shot shelf1_over_rail
+walk 1300 2400
+look 60
+shot outfall
+walk 1952 2400
+open 2080 2400
+
+# Sluice house: the super shotgun on the gallery desk, the stair down to the machine room.
+walk 2200 2400
+look 0
+shot sluice_gallery
+walk 2752 2432
+expect has SuperShotgun
+walk 2720 2250 2720 1800 2688 1696 2400 1696
+look 90
+shot machine_room
+open 2096 1888
+
+# Shelf 2: the red door at the bank's far end, the valve tower out in the pond.
+walk 1952 1888
+look 180
+shot shelf2
+walk 1408 1820
+look 270
+shot footbridge
+walk 1408 1700 1408 1620
+look 0
+shot valve_tower
+walk 1472 1600
+expect has RedCard
+wait 70
+expect ceil 2056 1592 > 496        # taking the key opens the closet in the pond's east wall
+walk 1408 1580
+look 270 6
+shot tower_window
+
+# The key trap: hold the tower's doorway while the closet's monsters wade across the pond.
+walk 1408 1640
+look 0
+wait 350
+
+# Secret 2: the shifted SILVER3 panel lowers the pillar outside; ride it up.
+use 1296 1600
+wait 40
+expect floor 1248 1632 == 496
+walk 1408 1640 1408 1700 1300 1700 1248 1632
+wait 150
+expect floor 1248 1632 == 640
+expect secrets == 2
+expect has PlasmaRifle
+look 300 10
+shot pillar_top
+walk 1300 1720 1408 1760 1408 1840
+
+# Red door into the pump station.
+walk 200 1888
+open -32 1888
+walk -128 1888
+look 180
+shot pump_hall
+walk -368 1712
+expect has RocketLauncher
+walk -448 1930
+expect has Berserk
+
+# The lift down to the lower gallery.
+walk -192 1690
+use -192 1664
+walk -192 1600
+wait 40
+expect floor -192 1600 == 384
+walk -192 1480 -100 1376
+open -48 1376
+
+# Shelf 3: along the bank to the breach, the gap in the railing, the dam below.
+walk 64 1376 800 1376
+look 315 10
+shot breach
+walk 1200 1300 1900 1376
+look 180
+shot shelf3_east
+
+# Settling house (optional, the second way down): secret 3 behind the shifted panel in its north wall.
+open 2080 1376
+walk 2200 1376
+look 0
+shot settling_house
+walk 2272 1344
+open 2624 1472
+walk 2624 1520
+expect secrets == 3
+expect has BlueArmor
+walk 2624 1420 2200 1376
+open 2096 1376
+walk 1900 1376
+
+# The breach: wade to the broken lip and drop onto shelf 4.
+walk 1200 1300 1024 1200 1024 1060
+look 270 15
+shot breach_lip
+walk 1024 990
+expect pos 1024 990 24
+expect floor 1024 990 == 240
+
+# Shelf 4, the dam: the lake over the railing, the floodgate in the lip.
+walk 1024 880
+look 270 6
+shot crest
+# The settling house's landing at the crest's east end.
+walk 1950 848
+open 2080 848
+walk 2688 832
+walk 2400 848
+open 2096 848
+walk 1900 848
+
+# Gatehouse: the BFG on its pedestal, the window down the pond at the floodgate.
+walk 100 880
+open -32 880
+walk -128 880
+look 180
+shot gatehouse
+walk -384 832
+expect has BFG9000
+# The armory off its south wall.
+open -576 560
+walk -576 448
+walk -576 600
+walk -112 752
+use -48 752
+walk -96 640
+look 354
+shot floodgate_window             # the gate sinking, seen end-on at the window's edge
+wait 70
+shot floodgate_sinking
+expect floor 1024 520 < 368
+
+# The floodgate: back east along the crest, the radiation suit, over the gap into the lake.
+open -48 880
+walk 200 900 1216 900 1216 816
+expect has PowerIronFeet
+walk 1024 800
+wait 35
+expect floor 1024 520 == 0
+walk 1024 640
+look 270 15
+shot gap
+walk 1024 400
+wait 70
+expect floor 1024 400 == 0
+expect ceil 1024 -352 > 16         # crossing into the gap opened the dome's hatch
+
+# The lake: the east island's cells and suit, secret 4 in the cooling tower, the west island.
+look 270
+shot lake
+walk 1792 -160 2112 -96
+look 90
+shot dam_from_lake
+walk 1300 -240 420 -224
+use 384 -224
+wait 80
+expect floor 352 -224 == 0
+walk 160 -224
+expect secrets == 4
+expect has Soulsphere
+walk 64 -864
+
+# The dome: through the hatch to the exit console in front of the melted core.
+walk 1024 -260
+look 270
+shot hatch
+walk 1024 -440
+look 270 6
+shot reactor_hall
+walk 1024 -540
+look 270 20
+shot exit
+exit 1024 -592
