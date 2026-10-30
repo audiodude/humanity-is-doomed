@@ -12,6 +12,9 @@ wads/SFPC*
 # Combat bot video script and footage: kept locally
 docs/combat-bot/
 
+# Door-stuck demo footage (docs/door-stuck.md): kept locally
+docs/door-stuck/*.mp4
+
 # omp harness config: local agent definitions stay local; skills are shared
 .omp/*
 !.omp/skills/

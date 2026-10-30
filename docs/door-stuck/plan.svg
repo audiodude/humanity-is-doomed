@@ -1,0 +1,61 @@
+<svg viewBox="0 0 880 610" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#e07b00"/>
+    </marker>
+  </defs>
+  <rect width="880" height="610" fill="#ffffff"/>
+  <text x="20" y="32" font-size="15" font-weight="700" fill="#222">MAP09 as played: recess 160 wide, door 128</text>
+  <text x="460" y="32" font-size="15" font-weight="700" fill="#222">id's shape: recess as wide as the door</text>
+  <!-- floor: bank, near recess, door, far recess, machine room (2 px per map unit) -->
+  <g fill="#e6e6e6">
+    <rect x="20" y="50" width="128" height="448"/><rect x="148" y="114" width="64" height="320"/>
+    <rect x="212" y="146" width="32" height="256"/><rect x="244" y="114" width="32" height="320"/>
+    <rect x="276" y="50" width="128" height="448"/>
+    <rect x="460" y="50" width="128" height="448"/><rect x="588" y="146" width="64" height="256"/>
+    <rect x="652" y="146" width="32" height="256"/><rect x="684" y="146" width="32" height="256"/>
+    <rect x="716" y="50" width="128" height="448"/>
+  </g>
+  <g font-size="13" fill="#555">
+    <text x="28" y="70">bank</text><text x="284" y="70">machine room</text>
+    <text x="468" y="70">bank</text><text x="724" y="70">machine room</text>
+    <text x="300" y="488">to you ↘</text><text x="740" y="488">to you ↘</text>
+  </g>
+  <!-- walls -->
+  <g fill="none" stroke="#222" stroke-width="3">
+    <path d="M148 50 V114 H212"/><path d="M212 146 H244"/><path d="M244 114 H276 V50"/>
+    <path d="M148 498 V434 H212"/><path d="M212 402 H244"/><path d="M244 434 H276 V498"/>
+    <path d="M588 50 V146 H716 V50"/><path d="M588 498 V402 H716 V498"/>
+  </g>
+  <!-- stubs: wall in the door's own plane -->
+  <g stroke="#d62728" stroke-width="5">
+    <path d="M212 114 V146"/><path d="M244 114 V146"/><path d="M212 402 V434"/><path d="M244 402 V434"/>
+  </g>
+  <!-- door lines -->
+  <g stroke="#1f77b4" stroke-width="2" stroke-dasharray="6 4">
+    <path d="M212 146 V402"/><path d="M244 146 V402"/><path d="M652 146 V402"/><path d="M684 146 V402"/>
+  </g>
+  <!-- cacodemon collision boxes (62 units square) -->
+  <g stroke="#e07b00" stroke-width="2" fill="#e07b00" fill-opacity="0.18">
+    <rect x="90" y="310" width="124" height="124"/><rect x="610" y="278" width="124" height="124"/>
+  </g>
+  <g font-size="13" fill="#222"><text x="90" y="302">caco</text><text x="610" y="270">caco</text></g>
+  <g stroke="#e07b00" stroke-width="3" marker-end="url(#ah)">
+    <path d="M152 372 L194 414"/><path d="M672 340 L708 376"/>
+  </g>
+  <g stroke="#d62728" stroke-width="3">
+    <path d="M198 418 l12 12 M210 418 l-12 12"/><path d="M710 382 l12 12 M722 382 l-12 12"/>
+  </g>
+  <g font-size="13" fill="#444">
+    <text x="20" y="524">Its box is over the door line and its diagonal step</text>
+    <text x="20" y="542">hits the stub: it "uses" the door and freezes.</text>
+    <text x="460" y="524">No stubs, but halfway through, a diagonal step into</text>
+    <text x="460" y="542">the passage wall does the same: frozen, less often.</text>
+  </g>
+  <path d="M20 584 H44" stroke="#d62728" stroke-width="5"/>
+  <text x="50" y="589" font-size="13" fill="#222">wall stub in the door's plane</text>
+  <path d="M260 584 H284" stroke="#1f77b4" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="290" y="589" font-size="13" fill="#222">door line (what gets "used")</text>
+  <rect x="520" y="576" width="16" height="16" stroke="#e07b00" stroke-width="2" fill="#e07b00" fill-opacity="0.18"/>
+  <text x="542" y="589" font-size="13" fill="#222">collision box; arrow: the step it keeps trying</text>
+</svg>
