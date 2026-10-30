@@ -1,23 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1197" height="1266" font-family="sans-serif">
 <rect width="100%" height="100%" fill="#fbfbf7"/>
 <path d="M518.4,870.4 L723.2,870.4 L723.2,704.0 L518.4,704.0 Z M556.8,780.8 L582.4,780.8 L582.4,755.2 L556.8,755.2 Z M659.2,780.8 L684.8,780.8 L684.8,755.2 L659.2,755.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>start: floor 0 ceil 192 FLOOR7_1/CEIL5_2 light 144</title></path>
-<path d="M588.8,704.0 L652.8,704.0 L652.8,697.6 L588.8,697.6 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_start_alcove: floor 0 ceil 128 FLOOR7_1/CEIL5_1 light 176</title></path>
+<path d="M595.2,704.0 L646.4,704.0 L646.4,697.6 L595.2,697.6 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_start_alcove: floor 0 ceil 128 FLOOR7_1/CEIL5_1 light 176</title></path>
 <path d="M595.2,697.6 L646.4,697.6 L646.4,691.2 L595.2,691.2 Z" fill="#a0703c" fill-rule="evenodd"><title>d_start: floor 0 ceil 0 FLOOR7_1/FLAT20 light 144</title></path>
-<path d="M588.8,691.2 L652.8,691.2 L652.8,684.8 L588.8,684.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_start_far: floor 0 ceil 128 RROCK09/CEIL5_1 light 176</title></path>
+<path d="M595.2,691.2 L646.4,691.2 L646.4,684.8 L595.2,684.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_start_far: floor 0 ceil 128 RROCK09/CEIL5_1 light 176</title></path>
 <path d="M723.2,793.6 L729.6,793.6 L729.6,742.4 L723.2,742.4 Z" fill="#a0703c" fill-rule="evenodd"><title>d_secret: floor 0 ceil 0 FLOOR7_1/FLAT20 light 144</title></path>
 <path d="M729.6,806.4 L806.4,806.4 L806.4,729.6 L729.6,729.6 Z" fill="#c9a0f0" fill-rule="evenodd"><title>secret: floor 0 ceil 128 FLOOR7_1/CEIL5_2 light 224</title></path>
 <path d="M313.6,684.8 L928.0,684.8 L928.0,332.8 L313.6,332.8 Z M569.6,563.2 L672.0,563.2 L672.0,460.8 L569.6,460.8 Z M390.4,614.4 L416.0,614.4 L416.0,588.8 L390.4,588.8 Z M825.6,614.4 L851.2,614.4 L851.2,588.8 L825.6,588.8 Z M390.4,409.6 L416.0,409.6 L416.0,384.0 L390.4,384.0 Z M825.6,409.6 L851.2,409.6 L851.2,384.0 L825.6,384.0 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>hub: floor 0 ceil 320 RROCK09/F_SKY1 light 192</title></path>
 <path d="M569.6,563.2 L672.0,563.2 L672.0,460.8 L569.6,460.8 Z" fill="rgb(175,175,175)" fill-rule="evenodd"><title>anvil: floor 24 ceil 320 FLAT5_3/F_SKY1 light 208</title></path>
-<path d="M307.2,540.8 L313.6,540.8 L313.6,476.8 L307.2,476.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_lib_alcove: floor 0 ceil 128 RROCK09/CEIL5_1 light 176</title></path>
+<path d="M307.2,534.4 L313.6,534.4 L313.6,483.2 L307.2,483.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_lib_alcove: floor 0 ceil 128 RROCK09/CEIL5_1 light 176</title></path>
 <path d="M300.8,534.4 L307.2,534.4 L307.2,483.2 L300.8,483.2 Z" fill="#a0703c" fill-rule="evenodd"><title>d_lib: floor 0 ceil 0 RROCK09/FLAT20 light 144</title></path>
-<path d="M294.4,540.8 L300.8,540.8 L300.8,476.8 L294.4,476.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_lib_far: floor 0 ceil 128 FLOOR7_2/CEIL5_1 light 176</title></path>
+<path d="M294.4,534.4 L300.8,534.4 L300.8,483.2 L294.4,483.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_lib_far: floor 0 ceil 128 FLOOR7_2/CEIL5_1 light 176</title></path>
 <path d="M57.6,588.8 L294.4,588.8 L294.4,428.8 L57.6,428.8 Z M83.2,521.6 L108.8,521.6 L108.8,496.0 L83.2,496.0 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>library: floor 0 ceil 160 FLOOR7_2/CEIL5_2 light 96</title></path>
 <path d="M83.2,521.6 L108.8,521.6 L108.8,496.0 L83.2,496.0 Z" fill="rgb(175,175,175)" fill-rule="evenodd"><title>ped_blue: floor 24 ceil 160 TLITE6_1/CEIL5_2 light 240</title></path>
 <path d="M156.8,428.8 L208.0,428.8 L208.0,422.4 L156.8,422.4 Z" fill="#a0703c" fill-rule="evenodd"><title>d_libcl: floor 0 ceil 0 FLOOR7_2/FLAT20 light 144 tag 1</title></path>
 <path d="M150.4,422.4 L214.4,422.4 L214.4,358.4 L150.4,358.4 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>libcl: floor 0 ceil 128 FLOOR7_2/CEIL5_1 light 96</title></path>
-<path d="M928.0,540.8 L940.8,540.8 L940.8,476.8 L928.0,476.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_blue_alcove: floor 0 ceil 128 RROCK09/CEIL5_1 light 176</title></path>
+<path d="M928.0,534.4 L940.8,534.4 L940.8,483.2 L928.0,483.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_blue_alcove: floor 0 ceil 128 RROCK09/CEIL5_1 light 176</title></path>
 <path d="M940.8,534.4 L947.2,534.4 L947.2,483.2 L940.8,483.2 Z" fill="#a0703c" fill-rule="evenodd"><title>d_blue: floor 0 ceil 0 FLOOR5_2/FLAT20 light 144</title></path>
-<path d="M947.2,540.8 L953.6,540.8 L953.6,476.8 L947.2,476.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_blue_far: floor 0 ceil 128 FLOOR5_2/CEIL5_1 light 176</title></path>
+<path d="M947.2,534.4 L953.6,534.4 L953.6,483.2 L947.2,483.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_blue_far: floor 0 ceil 128 FLOOR5_2/CEIL5_1 light 176</title></path>
 <path d="M953.6,588.8 L1158.4,588.8 L1158.4,428.8 L953.6,428.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>crypt: floor 0 ceil 256 FLOOR5_2/CEIL5_1 light 128</title></path>
 <path d="M1004.8,428.8 L1081.6,428.8 L1081.6,409.6 L1004.8,409.6 Z" fill="rgb(170,170,170)" fill-rule="evenodd"><title>cstep1: floor 16 ceil 256 FLOOR5_2/CEIL5_1 light 144</title></path>
 <path d="M1004.8,409.6 L1081.6,409.6 L1081.6,390.4 L1004.8,390.4 Z" fill="rgb(180,180,180)" fill-rule="evenodd"><title>cstep2: floor 32 ceil 256 FLOOR5_2/CEIL5_1 light 144</title></path>
@@ -29,9 +29,9 @@
 <path d="M966.4,659.2 L1030.4,659.2 L1030.4,595.2 L966.4,595.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>crcl_w: floor 0 ceil 128 FLOOR5_2/CEIL5_1 light 96</title></path>
 <path d="M1081.6,595.2 L1132.8,595.2 L1132.8,588.8 L1081.6,588.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_crcl_e: floor 0 ceil 0 FLOOR5_2/FLAT20 light 144 tag 2</title></path>
 <path d="M1075.2,659.2 L1139.2,659.2 L1139.2,595.2 L1075.2,595.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>crcl_e: floor 0 ceil 128 FLOOR5_2/CEIL5_1 light 96</title></path>
-<path d="M588.8,332.8 L652.8,332.8 L652.8,320.0 L588.8,320.0 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_yel_alcove: floor 0 ceil 128 RROCK09/CEIL5_1 light 176</title></path>
+<path d="M595.2,332.8 L646.4,332.8 L646.4,320.0 L595.2,320.0 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_yel_alcove: floor 0 ceil 128 RROCK09/CEIL5_1 light 176</title></path>
 <path d="M595.2,320.0 L646.4,320.0 L646.4,313.6 L595.2,313.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_yel: floor 0 ceil 0 FLOOR1_7/FLAT20 light 144</title></path>
-<path d="M588.8,313.6 L652.8,313.6 L652.8,307.2 L588.8,307.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_yel_far: floor 0 ceil 128 FLOOR1_7/CEIL5_1 light 176</title></path>
+<path d="M595.2,313.6 L646.4,313.6 L646.4,307.2 L595.2,307.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_yel_far: floor 0 ceil 128 FLOOR1_7/CEIL5_1 light 176</title></path>
 <path d="M492.8,307.2 L748.8,307.2 L748.8,236.8 L492.8,236.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>forge_s: floor 0 ceil 224 FLOOR1_7/CEIL1_3 light 176</title></path>
 <path d="M492.8,236.8 L595.2,236.8 L595.2,211.2 L492.8,211.2 Z" fill="#7ccf4a" fill-rule="evenodd"><title>lava_w: floor -16 ceil 224 LAVA1/CEIL1_3 light 255</title></path>
 <path d="M595.2,236.8 L646.4,236.8 L646.4,211.2 L595.2,211.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>bridge: floor 0 ceil 224 FLOOR1_7/CEIL1_3 light 208</title></path>
@@ -41,9 +41,9 @@
 <path d="M800.0,211.2 L876.8,211.2 L876.8,108.8 L800.0,108.8 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>ledge: floor 128 ceil 224 FLOOR1_6/CEIL1_3 light 200</title></path>
 <path d="M544.0,108.8 L595.2,108.8 L595.2,102.4 L544.0,102.4 Z" fill="#a0703c" fill-rule="evenodd"><title>d_fcl: floor 0 ceil 0 FLOOR1_7/FLAT20 light 144 tag 3</title></path>
 <path d="M531.2,102.4 L608.0,102.4 L608.0,38.4 L531.2,38.4 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>fcl: floor 0 ceil 128 FLOOR1_7/CEIL5_1 light 96</title></path>
-<path d="M384.0,697.6 L448.0,697.6 L448.0,684.8 L384.0,684.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_red_alcove: floor 0 ceil 128 RROCK09/CEIL5_1 light 176</title></path>
+<path d="M390.4,697.6 L441.6,697.6 L441.6,684.8 L390.4,684.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_red_alcove: floor 0 ceil 128 RROCK09/CEIL5_1 light 176</title></path>
 <path d="M390.4,704.0 L441.6,704.0 L441.6,697.6 L390.4,697.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_red: floor 0 ceil 0 FLOOR6_1/FLAT20 light 144</title></path>
-<path d="M384.0,710.4 L448.0,710.4 L448.0,704.0 L384.0,704.0 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_red_far: floor 0 ceil 128 FLOOR6_1/CEIL5_1 light 176</title></path>
+<path d="M390.4,710.4 L441.6,710.4 L441.6,704.0 L390.4,704.0 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_red_far: floor 0 ceil 128 FLOOR6_1/CEIL5_1 light 176</title></path>
 <path d="M108.8,1100.8 L492.8,1100.8 L492.8,710.4 L108.8,710.4 Z M262.4,985.6 L339.2,985.6 L339.2,908.8 L262.4,908.8 Z M185.6,896.0 L211.2,896.0 L211.2,870.4 L185.6,870.4 Z M390.4,896.0 L416.0,896.0 L416.0,870.4 L390.4,870.4 Z M185.6,1024.0 L211.2,1024.0 L211.2,998.4 L185.6,998.4 Z M390.4,1024.0 L416.0,1024.0 L416.0,998.4 L390.4,998.4 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>arena: floor 0 ceil 288 FLOOR6_1/CEIL1_2 light 160</title></path>
 <path d="M262.4,985.6 L339.2,985.6 L339.2,908.8 L262.4,908.8 Z" fill="rgb(175,175,175)" fill-rule="evenodd"><title>altar: floor 24 ceil 288 GATE3/CEIL1_2 light 224</title></path>
 <path d="M102.4,844.8 L108.8,844.8 L108.8,793.6 L102.4,793.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_arcl_w: floor 0 ceil 0 FLOOR6_1/FLAT20 light 144 tag 4</title></path>
@@ -52,14 +52,14 @@
 <path d="M38.4,1036.8 L102.4,1036.8 L102.4,960.0 L38.4,960.0 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>arcl_sw: floor 0 ceil 128 FLOOR6_1/CEIL5_1 light 96</title></path>
 <path d="M377.6,1107.2 L454.4,1107.2 L454.4,1100.8 L377.6,1100.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_arcl_s: floor 0 ceil 0 FLOOR6_1/FLAT20 light 144 tag 4</title></path>
 <path d="M364.8,1184.0 L467.2,1184.0 L467.2,1107.2 L364.8,1107.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>arcl_s: floor 0 ceil 128 FLOOR6_1/CEIL5_1 light 96</title></path>
-<path d="M268.8,1107.2 L332.8,1107.2 L332.8,1100.8 L268.8,1100.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_exit_alcove: floor 0 ceil 128 FLOOR6_1/CEIL5_1 light 176</title></path>
+<path d="M275.2,1107.2 L326.4,1107.2 L326.4,1100.8 L275.2,1100.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_exit_alcove: floor 0 ceil 128 FLOOR6_1/CEIL5_1 light 176</title></path>
 <path d="M275.2,1113.6 L326.4,1113.6 L326.4,1107.2 L275.2,1107.2 Z" fill="#a0703c" fill-rule="evenodd"><title>d_exit: floor 0 ceil 0 FLOOR6_1/FLAT20 light 144</title></path>
-<path d="M268.8,1120.0 L332.8,1120.0 L332.8,1113.6 L268.8,1113.6 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_exit_far: floor 0 ceil 128 FLOOR7_1/CEIL5_1 light 176</title></path>
+<path d="M275.2,1120.0 L326.4,1120.0 L326.4,1113.6 L275.2,1113.6 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_exit_far: floor 0 ceil 128 FLOOR7_1/CEIL5_1 light 176</title></path>
 <path d="M275.2,1184.0 L326.4,1184.0 L326.4,1120.0 L275.2,1120.0 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>exitrm: floor 0 ceil 128 FLOOR7_1/CEIL5_2 light 208</title></path>
 <path d="M294.4,1187.2 L307.2,1187.2 L307.2,1184.0 L294.4,1184.0 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>exit_niche: floor 0 ceil 72 FLOOR7_1/CEIL5_2 light 208</title></path>
-<line x1="518.4" y1="704.0" x2="588.8" y2="704.0" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="704.0" x2="652.8" y2="704.0" stroke="#777" stroke-width="0.6"/>
-<line x1="652.8" y1="704.0" x2="723.2" y2="704.0" stroke="#111" stroke-width="1.6"/>
+<line x1="518.4" y1="704.0" x2="595.2" y2="704.0" stroke="#111" stroke-width="1.6"/>
+<line x1="595.2" y1="704.0" x2="646.4" y2="704.0" stroke="#777" stroke-width="0.6"/>
+<line x1="646.4" y1="704.0" x2="723.2" y2="704.0" stroke="#111" stroke-width="1.6"/>
 <line x1="723.2" y1="704.0" x2="723.2" y2="742.4" stroke="#111" stroke-width="1.6"/>
 <line x1="723.2" y1="742.4" x2="723.2" y2="793.6" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
 <line x1="723.2" y1="793.6" x2="723.2" y2="870.4" stroke="#111" stroke-width="1.6"/>
@@ -73,19 +73,15 @@
 <line x1="684.8" y1="780.8" x2="684.8" y2="755.2" stroke="#111" stroke-width="1.6"/>
 <line x1="684.8" y1="755.2" x2="659.2" y2="755.2" stroke="#111" stroke-width="1.6"/>
 <line x1="659.2" y1="755.2" x2="659.2" y2="780.8" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="697.6" x2="595.2" y2="697.6" stroke="#111" stroke-width="1.6"/>
 <line x1="595.2" y1="697.6" x2="646.4" y2="697.6" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
-<line x1="646.4" y1="697.6" x2="652.8" y2="697.6" stroke="#111" stroke-width="1.6"/>
-<line x1="652.8" y1="697.6" x2="652.8" y2="704.0" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="704.0" x2="588.8" y2="697.6" stroke="#111" stroke-width="1.6"/>
+<line x1="646.4" y1="697.6" x2="646.4" y2="704.0" stroke="#111" stroke-width="1.6"/>
+<line x1="595.2" y1="704.0" x2="595.2" y2="697.6" stroke="#111" stroke-width="1.6"/>
 <line x1="646.4" y1="691.2" x2="595.2" y2="691.2" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
 <line x1="646.4" y1="691.2" x2="646.4" y2="697.6" stroke="#111" stroke-width="1.6"/>
 <line x1="595.2" y1="697.6" x2="595.2" y2="691.2" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="684.8" x2="652.8" y2="684.8" stroke="#777" stroke-width="0.6"/>
-<line x1="652.8" y1="684.8" x2="652.8" y2="691.2" stroke="#111" stroke-width="1.6"/>
-<line x1="652.8" y1="691.2" x2="646.4" y2="691.2" stroke="#111" stroke-width="1.6"/>
-<line x1="595.2" y1="691.2" x2="588.8" y2="691.2" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="691.2" x2="588.8" y2="684.8" stroke="#111" stroke-width="1.6"/>
+<line x1="595.2" y1="684.8" x2="646.4" y2="684.8" stroke="#777" stroke-width="0.6"/>
+<line x1="646.4" y1="684.8" x2="646.4" y2="691.2" stroke="#111" stroke-width="1.6"/>
+<line x1="595.2" y1="691.2" x2="595.2" y2="684.8" stroke="#111" stroke-width="1.6"/>
 <line x1="723.2" y1="742.4" x2="729.6" y2="742.4" stroke="#111" stroke-width="1.6"/>
 <line x1="729.6" y1="793.6" x2="729.6" y2="742.4" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
 <line x1="729.6" y1="793.6" x2="723.2" y2="793.6" stroke="#111" stroke-width="1.6"/>
@@ -94,19 +90,19 @@
 <line x1="806.4" y1="806.4" x2="729.6" y2="806.4" stroke="#111" stroke-width="1.6"/>
 <line x1="729.6" y1="806.4" x2="729.6" y2="793.6" stroke="#111" stroke-width="1.6"/>
 <line x1="729.6" y1="742.4" x2="729.6" y2="729.6" stroke="#111" stroke-width="1.6"/>
-<line x1="313.6" y1="332.8" x2="588.8" y2="332.8" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="332.8" x2="652.8" y2="332.8" stroke="#777" stroke-width="0.6"/>
-<line x1="652.8" y1="332.8" x2="928.0" y2="332.8" stroke="#111" stroke-width="1.6"/>
-<line x1="928.0" y1="332.8" x2="928.0" y2="476.8" stroke="#111" stroke-width="1.6"/>
-<line x1="928.0" y1="476.8" x2="928.0" y2="540.8" stroke="#777" stroke-width="0.6"/>
-<line x1="928.0" y1="540.8" x2="928.0" y2="684.8" stroke="#111" stroke-width="1.6"/>
-<line x1="928.0" y1="684.8" x2="652.8" y2="684.8" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="684.8" x2="448.0" y2="684.8" stroke="#111" stroke-width="1.6"/>
-<line x1="448.0" y1="684.8" x2="384.0" y2="684.8" stroke="#777" stroke-width="0.6"/>
-<line x1="384.0" y1="684.8" x2="313.6" y2="684.8" stroke="#111" stroke-width="1.6"/>
-<line x1="313.6" y1="684.8" x2="313.6" y2="540.8" stroke="#111" stroke-width="1.6"/>
-<line x1="313.6" y1="540.8" x2="313.6" y2="476.8" stroke="#777" stroke-width="0.6"/>
-<line x1="313.6" y1="476.8" x2="313.6" y2="332.8" stroke="#111" stroke-width="1.6"/>
+<line x1="313.6" y1="332.8" x2="595.2" y2="332.8" stroke="#111" stroke-width="1.6"/>
+<line x1="595.2" y1="332.8" x2="646.4" y2="332.8" stroke="#777" stroke-width="0.6"/>
+<line x1="646.4" y1="332.8" x2="928.0" y2="332.8" stroke="#111" stroke-width="1.6"/>
+<line x1="928.0" y1="332.8" x2="928.0" y2="483.2" stroke="#111" stroke-width="1.6"/>
+<line x1="928.0" y1="483.2" x2="928.0" y2="534.4" stroke="#777" stroke-width="0.6"/>
+<line x1="928.0" y1="534.4" x2="928.0" y2="684.8" stroke="#111" stroke-width="1.6"/>
+<line x1="928.0" y1="684.8" x2="646.4" y2="684.8" stroke="#111" stroke-width="1.6"/>
+<line x1="595.2" y1="684.8" x2="441.6" y2="684.8" stroke="#111" stroke-width="1.6"/>
+<line x1="441.6" y1="684.8" x2="390.4" y2="684.8" stroke="#777" stroke-width="0.6"/>
+<line x1="390.4" y1="684.8" x2="313.6" y2="684.8" stroke="#111" stroke-width="1.6"/>
+<line x1="313.6" y1="684.8" x2="313.6" y2="534.4" stroke="#111" stroke-width="1.6"/>
+<line x1="313.6" y1="534.4" x2="313.6" y2="483.2" stroke="#777" stroke-width="0.6"/>
+<line x1="313.6" y1="483.2" x2="313.6" y2="332.8" stroke="#111" stroke-width="1.6"/>
 <line x1="569.6" y1="563.2" x2="672.0" y2="563.2" stroke="#777" stroke-width="0.6"/>
 <line x1="672.0" y1="563.2" x2="672.0" y2="460.8" stroke="#777" stroke-width="0.6"/>
 <line x1="672.0" y1="460.8" x2="569.6" y2="460.8" stroke="#777" stroke-width="0.6"/>
@@ -127,24 +123,20 @@
 <line x1="851.2" y1="409.6" x2="851.2" y2="384.0" stroke="#111" stroke-width="1.6"/>
 <line x1="851.2" y1="384.0" x2="825.6" y2="384.0" stroke="#111" stroke-width="1.6"/>
 <line x1="825.6" y1="384.0" x2="825.6" y2="409.6" stroke="#111" stroke-width="1.6"/>
-<line x1="307.2" y1="476.8" x2="313.6" y2="476.8" stroke="#111" stroke-width="1.6"/>
-<line x1="313.6" y1="540.8" x2="307.2" y2="540.8" stroke="#111" stroke-width="1.6"/>
-<line x1="307.2" y1="540.8" x2="307.2" y2="534.4" stroke="#111" stroke-width="1.6"/>
+<line x1="307.2" y1="483.2" x2="313.6" y2="483.2" stroke="#111" stroke-width="1.6"/>
+<line x1="313.6" y1="534.4" x2="307.2" y2="534.4" stroke="#111" stroke-width="1.6"/>
 <line x1="307.2" y1="534.4" x2="307.2" y2="483.2" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
-<line x1="307.2" y1="483.2" x2="307.2" y2="476.8" stroke="#111" stroke-width="1.6"/>
 <line x1="300.8" y1="483.2" x2="307.2" y2="483.2" stroke="#111" stroke-width="1.6"/>
 <line x1="307.2" y1="534.4" x2="300.8" y2="534.4" stroke="#111" stroke-width="1.6"/>
 <line x1="300.8" y1="483.2" x2="300.8" y2="534.4" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
-<line x1="294.4" y1="476.8" x2="300.8" y2="476.8" stroke="#111" stroke-width="1.6"/>
-<line x1="300.8" y1="476.8" x2="300.8" y2="483.2" stroke="#111" stroke-width="1.6"/>
-<line x1="300.8" y1="534.4" x2="300.8" y2="540.8" stroke="#111" stroke-width="1.6"/>
-<line x1="300.8" y1="540.8" x2="294.4" y2="540.8" stroke="#111" stroke-width="1.6"/>
-<line x1="294.4" y1="540.8" x2="294.4" y2="476.8" stroke="#777" stroke-width="0.6"/>
+<line x1="294.4" y1="483.2" x2="300.8" y2="483.2" stroke="#111" stroke-width="1.6"/>
+<line x1="300.8" y1="534.4" x2="294.4" y2="534.4" stroke="#111" stroke-width="1.6"/>
+<line x1="294.4" y1="534.4" x2="294.4" y2="483.2" stroke="#777" stroke-width="0.6"/>
 <line x1="57.6" y1="428.8" x2="156.8" y2="428.8" stroke="#111" stroke-width="1.6"/>
 <line x1="156.8" y1="428.8" x2="208.0" y2="428.8" stroke="#777" stroke-width="0.6"/>
 <line x1="208.0" y1="428.8" x2="294.4" y2="428.8" stroke="#111" stroke-width="1.6"/>
-<line x1="294.4" y1="428.8" x2="294.4" y2="476.8" stroke="#111" stroke-width="1.6"/>
-<line x1="294.4" y1="540.8" x2="294.4" y2="588.8" stroke="#111" stroke-width="1.6"/>
+<line x1="294.4" y1="428.8" x2="294.4" y2="483.2" stroke="#111" stroke-width="1.6"/>
+<line x1="294.4" y1="534.4" x2="294.4" y2="588.8" stroke="#111" stroke-width="1.6"/>
 <line x1="294.4" y1="588.8" x2="57.6" y2="588.8" stroke="#111" stroke-width="1.6"/>
 <line x1="57.6" y1="588.8" x2="57.6" y2="428.8" stroke="#111" stroke-width="1.6"/>
 <line x1="83.2" y1="521.6" x2="108.8" y2="521.6" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 1</title></line>
@@ -159,19 +151,15 @@
 <line x1="214.4" y1="422.4" x2="208.0" y2="422.4" stroke="#111" stroke-width="1.6"/>
 <line x1="156.8" y1="422.4" x2="150.4" y2="422.4" stroke="#111" stroke-width="1.6"/>
 <line x1="150.4" y1="422.4" x2="150.4" y2="358.4" stroke="#111" stroke-width="1.6"/>
-<line x1="928.0" y1="476.8" x2="940.8" y2="476.8" stroke="#111" stroke-width="1.6"/>
-<line x1="940.8" y1="476.8" x2="940.8" y2="483.2" stroke="#111" stroke-width="1.6"/>
+<line x1="928.0" y1="483.2" x2="940.8" y2="483.2" stroke="#111" stroke-width="1.6"/>
 <line x1="940.8" y1="483.2" x2="940.8" y2="534.4" stroke="#d0201a" stroke-width="2.5"><title>action 26 tag 0</title></line>
-<line x1="940.8" y1="534.4" x2="940.8" y2="540.8" stroke="#111" stroke-width="1.6"/>
-<line x1="940.8" y1="540.8" x2="928.0" y2="540.8" stroke="#111" stroke-width="1.6"/>
+<line x1="940.8" y1="534.4" x2="928.0" y2="534.4" stroke="#111" stroke-width="1.6"/>
 <line x1="940.8" y1="483.2" x2="947.2" y2="483.2" stroke="#111" stroke-width="1.6"/>
 <line x1="947.2" y1="534.4" x2="947.2" y2="483.2" stroke="#d0201a" stroke-width="2.5"><title>action 26 tag 0</title></line>
 <line x1="947.2" y1="534.4" x2="940.8" y2="534.4" stroke="#111" stroke-width="1.6"/>
-<line x1="947.2" y1="476.8" x2="953.6" y2="476.8" stroke="#111" stroke-width="1.6"/>
-<line x1="953.6" y1="476.8" x2="953.6" y2="540.8" stroke="#777" stroke-width="0.6"/>
-<line x1="953.6" y1="540.8" x2="947.2" y2="540.8" stroke="#111" stroke-width="1.6"/>
-<line x1="947.2" y1="540.8" x2="947.2" y2="534.4" stroke="#111" stroke-width="1.6"/>
-<line x1="947.2" y1="483.2" x2="947.2" y2="476.8" stroke="#111" stroke-width="1.6"/>
+<line x1="947.2" y1="483.2" x2="953.6" y2="483.2" stroke="#111" stroke-width="1.6"/>
+<line x1="953.6" y1="483.2" x2="953.6" y2="534.4" stroke="#777" stroke-width="0.6"/>
+<line x1="953.6" y1="534.4" x2="947.2" y2="534.4" stroke="#111" stroke-width="1.6"/>
 <line x1="953.6" y1="428.8" x2="1004.8" y2="428.8" stroke="#111" stroke-width="1.6"/>
 <line x1="1004.8" y1="428.8" x2="1081.6" y2="428.8" stroke="#777" stroke-width="0.6"/>
 <line x1="1081.6" y1="428.8" x2="1158.4" y2="428.8" stroke="#111" stroke-width="1.6"/>
@@ -181,8 +169,8 @@
 <line x1="1081.6" y1="588.8" x2="1024.0" y2="588.8" stroke="#111" stroke-width="1.6"/>
 <line x1="1024.0" y1="588.8" x2="972.8" y2="588.8" stroke="#777" stroke-width="0.6"/>
 <line x1="972.8" y1="588.8" x2="953.6" y2="588.8" stroke="#111" stroke-width="1.6"/>
-<line x1="953.6" y1="588.8" x2="953.6" y2="540.8" stroke="#111" stroke-width="1.6"/>
-<line x1="953.6" y1="476.8" x2="953.6" y2="428.8" stroke="#111" stroke-width="1.6"/>
+<line x1="953.6" y1="588.8" x2="953.6" y2="534.4" stroke="#111" stroke-width="1.6"/>
+<line x1="953.6" y1="483.2" x2="953.6" y2="428.8" stroke="#111" stroke-width="1.6"/>
 <line x1="1004.8" y1="409.6" x2="1081.6" y2="409.6" stroke="#777" stroke-width="0.6"/>
 <line x1="1081.6" y1="409.6" x2="1081.6" y2="428.8" stroke="#111" stroke-width="1.6"/>
 <line x1="1004.8" y1="428.8" x2="1004.8" y2="409.6" stroke="#111" stroke-width="1.6"/>
@@ -220,25 +208,21 @@
 <line x1="1139.2" y1="595.2" x2="1139.2" y2="659.2" stroke="#111" stroke-width="1.6"/>
 <line x1="1139.2" y1="659.2" x2="1075.2" y2="659.2" stroke="#111" stroke-width="1.6"/>
 <line x1="1075.2" y1="659.2" x2="1075.2" y2="595.2" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="320.0" x2="595.2" y2="320.0" stroke="#111" stroke-width="1.6"/>
 <line x1="595.2" y1="320.0" x2="646.4" y2="320.0" stroke="#d0201a" stroke-width="2.5"><title>action 27 tag 0</title></line>
-<line x1="646.4" y1="320.0" x2="652.8" y2="320.0" stroke="#111" stroke-width="1.6"/>
-<line x1="652.8" y1="320.0" x2="652.8" y2="332.8" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="332.8" x2="588.8" y2="320.0" stroke="#111" stroke-width="1.6"/>
+<line x1="646.4" y1="320.0" x2="646.4" y2="332.8" stroke="#111" stroke-width="1.6"/>
+<line x1="595.2" y1="332.8" x2="595.2" y2="320.0" stroke="#111" stroke-width="1.6"/>
 <line x1="646.4" y1="313.6" x2="595.2" y2="313.6" stroke="#d0201a" stroke-width="2.5"><title>action 27 tag 0</title></line>
 <line x1="646.4" y1="313.6" x2="646.4" y2="320.0" stroke="#111" stroke-width="1.6"/>
 <line x1="595.2" y1="320.0" x2="595.2" y2="313.6" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="307.2" x2="652.8" y2="307.2" stroke="#777" stroke-width="0.6"/>
-<line x1="652.8" y1="307.2" x2="652.8" y2="313.6" stroke="#111" stroke-width="1.6"/>
-<line x1="652.8" y1="313.6" x2="646.4" y2="313.6" stroke="#111" stroke-width="1.6"/>
-<line x1="595.2" y1="313.6" x2="588.8" y2="313.6" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="313.6" x2="588.8" y2="307.2" stroke="#111" stroke-width="1.6"/>
+<line x1="595.2" y1="307.2" x2="646.4" y2="307.2" stroke="#777" stroke-width="0.6"/>
+<line x1="646.4" y1="307.2" x2="646.4" y2="313.6" stroke="#111" stroke-width="1.6"/>
+<line x1="595.2" y1="313.6" x2="595.2" y2="307.2" stroke="#111" stroke-width="1.6"/>
 <line x1="492.8" y1="236.8" x2="595.2" y2="236.8" stroke="#777" stroke-width="0.6"/>
 <line x1="595.2" y1="236.8" x2="646.4" y2="236.8" stroke="#777" stroke-width="0.6"/>
 <line x1="646.4" y1="236.8" x2="748.8" y2="236.8" stroke="#777" stroke-width="0.6"/>
 <line x1="748.8" y1="236.8" x2="748.8" y2="307.2" stroke="#111" stroke-width="1.6"/>
-<line x1="748.8" y1="307.2" x2="652.8" y2="307.2" stroke="#111" stroke-width="1.6"/>
-<line x1="588.8" y1="307.2" x2="492.8" y2="307.2" stroke="#111" stroke-width="1.6"/>
+<line x1="748.8" y1="307.2" x2="646.4" y2="307.2" stroke="#111" stroke-width="1.6"/>
+<line x1="595.2" y1="307.2" x2="492.8" y2="307.2" stroke="#111" stroke-width="1.6"/>
 <line x1="492.8" y1="307.2" x2="492.8" y2="236.8" stroke="#111" stroke-width="1.6"/>
 <line x1="492.8" y1="211.2" x2="595.2" y2="211.2" stroke="#777" stroke-width="0.6"/>
 <line x1="595.2" y1="211.2" x2="595.2" y2="236.8" stroke="#777" stroke-width="0.6"/>
@@ -270,27 +254,23 @@
 <line x1="608.0" y1="102.4" x2="595.2" y2="102.4" stroke="#111" stroke-width="1.6"/>
 <line x1="544.0" y1="102.4" x2="531.2" y2="102.4" stroke="#111" stroke-width="1.6"/>
 <line x1="531.2" y1="102.4" x2="531.2" y2="38.4" stroke="#111" stroke-width="1.6"/>
-<line x1="448.0" y1="684.8" x2="448.0" y2="697.6" stroke="#111" stroke-width="1.6"/>
-<line x1="448.0" y1="697.6" x2="441.6" y2="697.6" stroke="#111" stroke-width="1.6"/>
+<line x1="441.6" y1="684.8" x2="441.6" y2="697.6" stroke="#111" stroke-width="1.6"/>
 <line x1="441.6" y1="697.6" x2="390.4" y2="697.6" stroke="#d0201a" stroke-width="2.5"><title>action 28 tag 0</title></line>
-<line x1="390.4" y1="697.6" x2="384.0" y2="697.6" stroke="#111" stroke-width="1.6"/>
-<line x1="384.0" y1="697.6" x2="384.0" y2="684.8" stroke="#111" stroke-width="1.6"/>
+<line x1="390.4" y1="697.6" x2="390.4" y2="684.8" stroke="#111" stroke-width="1.6"/>
 <line x1="441.6" y1="697.6" x2="441.6" y2="704.0" stroke="#111" stroke-width="1.6"/>
 <line x1="390.4" y1="704.0" x2="441.6" y2="704.0" stroke="#d0201a" stroke-width="2.5"><title>action 28 tag 0</title></line>
 <line x1="390.4" y1="704.0" x2="390.4" y2="697.6" stroke="#111" stroke-width="1.6"/>
-<line x1="384.0" y1="704.0" x2="390.4" y2="704.0" stroke="#111" stroke-width="1.6"/>
-<line x1="441.6" y1="704.0" x2="448.0" y2="704.0" stroke="#111" stroke-width="1.6"/>
-<line x1="448.0" y1="704.0" x2="448.0" y2="710.4" stroke="#111" stroke-width="1.6"/>
-<line x1="384.0" y1="710.4" x2="448.0" y2="710.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 4</title></line>
-<line x1="384.0" y1="710.4" x2="384.0" y2="704.0" stroke="#111" stroke-width="1.6"/>
-<line x1="108.8" y1="710.4" x2="384.0" y2="710.4" stroke="#111" stroke-width="1.6"/>
-<line x1="448.0" y1="710.4" x2="492.8" y2="710.4" stroke="#111" stroke-width="1.6"/>
+<line x1="441.6" y1="704.0" x2="441.6" y2="710.4" stroke="#111" stroke-width="1.6"/>
+<line x1="390.4" y1="710.4" x2="441.6" y2="710.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 4</title></line>
+<line x1="390.4" y1="710.4" x2="390.4" y2="704.0" stroke="#111" stroke-width="1.6"/>
+<line x1="108.8" y1="710.4" x2="390.4" y2="710.4" stroke="#111" stroke-width="1.6"/>
+<line x1="441.6" y1="710.4" x2="492.8" y2="710.4" stroke="#111" stroke-width="1.6"/>
 <line x1="492.8" y1="710.4" x2="492.8" y2="1100.8" stroke="#111" stroke-width="1.6"/>
 <line x1="492.8" y1="1100.8" x2="454.4" y2="1100.8" stroke="#111" stroke-width="1.6"/>
 <line x1="454.4" y1="1100.8" x2="377.6" y2="1100.8" stroke="#777" stroke-width="0.6"/>
-<line x1="377.6" y1="1100.8" x2="332.8" y2="1100.8" stroke="#111" stroke-width="1.6"/>
-<line x1="332.8" y1="1100.8" x2="268.8" y2="1100.8" stroke="#777" stroke-width="0.6"/>
-<line x1="268.8" y1="1100.8" x2="108.8" y2="1100.8" stroke="#111" stroke-width="1.6"/>
+<line x1="377.6" y1="1100.8" x2="326.4" y2="1100.8" stroke="#111" stroke-width="1.6"/>
+<line x1="326.4" y1="1100.8" x2="275.2" y2="1100.8" stroke="#777" stroke-width="0.6"/>
+<line x1="275.2" y1="1100.8" x2="108.8" y2="1100.8" stroke="#111" stroke-width="1.6"/>
 <line x1="108.8" y1="1100.8" x2="108.8" y2="1024.0" stroke="#111" stroke-width="1.6"/>
 <line x1="108.8" y1="1024.0" x2="108.8" y2="972.8" stroke="#777" stroke-width="0.6"/>
 <line x1="108.8" y1="972.8" x2="108.8" y2="844.8" stroke="#111" stroke-width="1.6"/>
@@ -340,21 +320,15 @@
 <line x1="467.2" y1="1107.2" x2="467.2" y2="1184.0" stroke="#111" stroke-width="1.6"/>
 <line x1="467.2" y1="1184.0" x2="364.8" y2="1184.0" stroke="#111" stroke-width="1.6"/>
 <line x1="364.8" y1="1184.0" x2="364.8" y2="1107.2" stroke="#111" stroke-width="1.6"/>
-<line x1="332.8" y1="1100.8" x2="332.8" y2="1107.2" stroke="#111" stroke-width="1.6"/>
-<line x1="332.8" y1="1107.2" x2="326.4" y2="1107.2" stroke="#111" stroke-width="1.6"/>
+<line x1="326.4" y1="1100.8" x2="326.4" y2="1107.2" stroke="#111" stroke-width="1.6"/>
 <line x1="326.4" y1="1107.2" x2="275.2" y2="1107.2" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
-<line x1="275.2" y1="1107.2" x2="268.8" y2="1107.2" stroke="#111" stroke-width="1.6"/>
-<line x1="268.8" y1="1107.2" x2="268.8" y2="1100.8" stroke="#111" stroke-width="1.6"/>
+<line x1="275.2" y1="1107.2" x2="275.2" y2="1100.8" stroke="#111" stroke-width="1.6"/>
 <line x1="326.4" y1="1107.2" x2="326.4" y2="1113.6" stroke="#111" stroke-width="1.6"/>
 <line x1="275.2" y1="1113.6" x2="326.4" y2="1113.6" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
 <line x1="275.2" y1="1113.6" x2="275.2" y2="1107.2" stroke="#111" stroke-width="1.6"/>
-<line x1="268.8" y1="1113.6" x2="275.2" y2="1113.6" stroke="#111" stroke-width="1.6"/>
-<line x1="326.4" y1="1113.6" x2="332.8" y2="1113.6" stroke="#111" stroke-width="1.6"/>
-<line x1="332.8" y1="1113.6" x2="332.8" y2="1120.0" stroke="#111" stroke-width="1.6"/>
-<line x1="332.8" y1="1120.0" x2="326.4" y2="1120.0" stroke="#111" stroke-width="1.6"/>
+<line x1="326.4" y1="1113.6" x2="326.4" y2="1120.0" stroke="#111" stroke-width="1.6"/>
 <line x1="326.4" y1="1120.0" x2="275.2" y2="1120.0" stroke="#777" stroke-width="0.6"/>
-<line x1="275.2" y1="1120.0" x2="268.8" y2="1120.0" stroke="#111" stroke-width="1.6"/>
-<line x1="268.8" y1="1120.0" x2="268.8" y2="1113.6" stroke="#111" stroke-width="1.6"/>
+<line x1="275.2" y1="1120.0" x2="275.2" y2="1113.6" stroke="#111" stroke-width="1.6"/>
 <line x1="326.4" y1="1120.0" x2="326.4" y2="1184.0" stroke="#111" stroke-width="1.6"/>
 <line x1="326.4" y1="1184.0" x2="307.2" y2="1184.0" stroke="#111" stroke-width="1.6"/>
 <line x1="307.2" y1="1184.0" x2="294.4" y2="1184.0" stroke="#777" stroke-width="0.6"/>

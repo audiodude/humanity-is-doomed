@@ -4,7 +4,7 @@
 <path d="M275.2,582.4 L352.0,582.4 L352.0,576.0 L275.2,576.0 Z" fill="rgb(153,153,153)" fill-rule="evenodd"><title>arch0: floor 16 ceil 128 FLOOR4_8/CEIL5_1 light 176</title></path>
 <path d="M121.6,435.2 L121.6,576.0 L505.6,576.0 L505.6,435.2 L441.6,435.2 L364.8,512.0 L262.4,512.0 L185.6,435.2 Z M153.6,556.8 L179.2,556.8 L179.2,531.2 L153.6,531.2 Z M448.0,556.8 L473.6,556.8 L473.6,531.2 L448.0,531.2 Z" fill="rgb(153,153,153)" fill-rule="evenodd"><title>g0: floor 16 ceil 144 FLOOR4_8/CEIL5_2 light 144</title></path>
 <path d="M505.6,531.2 L512.0,531.2 L512.0,480.0 L505.6,480.0 Z" fill="#a0703c" fill-rule="evenodd"><title>d_pump: floor 16 ceil 16 FLOOR4_8/FLAT20 light 144</title></path>
-<path d="M512.0,537.6 L518.4,537.6 L518.4,473.6 L512.0,473.6 Z" fill="rgb(153,153,153)" fill-rule="evenodd"><title>d_pump_far: floor 16 ceil 144 FLOOR4_8/CEIL5_1 light 176</title></path>
+<path d="M512.0,531.2 L518.4,531.2 L518.4,480.0 L512.0,480.0 Z" fill="rgb(153,153,153)" fill-rule="evenodd"><title>d_pump_far: floor 16 ceil 144 FLOOR4_8/CEIL5_1 light 176</title></path>
 <path d="M518.4,614.4 L608.0,614.4 L646.4,576.0 L646.4,473.6 L518.4,473.6 Z M537.6,601.6 L614.4,601.6 L614.4,576.0 L537.6,576.0 Z M550.4,550.4 L576.0,550.4 L576.0,524.8 L550.4,524.8 Z" fill="rgb(153,153,153)" fill-rule="evenodd"><title>pump: floor 16 ceil 208 FLOOR4_8/CEIL5_1 light 128</title></path>
 <path d="M537.6,601.6 L614.4,601.6 L614.4,576.0 L537.6,576.0 Z" fill="#7ccf4a" fill-rule="evenodd"><title>trough: floor 0 ceil 208 NUKAGE1/CEIL5_1 light 160</title></path>
 <path d="M569.6,473.6 L620.8,473.6 L620.8,422.4 L569.6,422.4 Z" fill="#e8c547" fill-rule="evenodd"><title>lift1: floor 144 ceil 272 STEP1/CEIL5_1 light 160 tag 1</title></path>
@@ -25,7 +25,7 @@
 <path d="M364.8,256.0 L384.0,256.0 L384.0,192.0 L364.8,192.0 Z" fill="rgb(207,207,207)" fill-rule="evenodd"><title>ne2_4: floor 256 ceil 400 FLOOR5_2/CEIL5_1 light 160</title></path>
 <path d="M262.4,256.0 L364.8,256.0 L364.8,192.0 L262.4,192.0 Z" fill="rgb(211,211,211)" fill-rule="evenodd"><title>n_gal: floor 272 ceil 400 FLOOR5_2/CEIL3_5 light 160</title></path>
 <path d="M288.0,192.0 L339.2,192.0 L339.2,185.6 L288.0,185.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_north: floor 272 ceil 272 FLOOR5_2/FLAT20 light 144</title></path>
-<path d="M281.6,185.6 L345.6,185.6 L345.6,179.2 L281.6,179.2 Z" fill="rgb(211,211,211)" fill-rule="evenodd"><title>d_north_far: floor 272 ceil 400 FLOOR5_2/CEIL5_1 light 176</title></path>
+<path d="M288.0,185.6 L339.2,185.6 L339.2,179.2 L288.0,179.2 Z" fill="rgb(211,211,211)" fill-rule="evenodd"><title>d_north_far: floor 272 ceil 400 FLOOR5_2/CEIL5_1 light 176</title></path>
 <path d="M224.0,179.2 L454.4,179.2 L454.4,89.6 L403.2,38.4 L172.8,38.4 L172.8,140.8 L224.0,140.8 Z M352.0,140.8 L403.2,140.8 L403.2,89.6 L352.0,89.6 Z M236.8,102.4 L288.0,102.4 L288.0,64.0 L236.8,64.0 Z M377.6,76.8 L403.2,76.8 L403.2,51.2 L377.6,51.2 Z" fill="rgb(211,211,211)" fill-rule="evenodd"><title>north: floor 272 ceil 528 FLOOR5_2/CEIL3_5 light 112</title></path>
 <path d="M352.0,140.8 L403.2,140.8 L403.2,89.6 L352.0,89.6 Z" fill="rgb(225,225,225)" fill-rule="evenodd"><title>crate0: floor 336 ceil 528 CRATOP1/CEIL3_5 light 112</title></path>
 <path d="M236.8,102.4 L288.0,102.4 L288.0,64.0 L236.8,64.0 Z" fill="rgb(225,225,225)" fill-rule="evenodd"><title>crate1: floor 336 ceil 528 CRATOP1/CEIL3_5 light 112</title></path>
@@ -76,18 +76,17 @@
 <line x1="505.6" y1="480.0" x2="512.0" y2="480.0" stroke="#111" stroke-width="1.6"/>
 <line x1="512.0" y1="531.2" x2="512.0" y2="480.0" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
 <line x1="512.0" y1="531.2" x2="505.6" y2="531.2" stroke="#111" stroke-width="1.6"/>
-<line x1="512.0" y1="473.6" x2="518.4" y2="473.6" stroke="#111" stroke-width="1.6"/>
-<line x1="518.4" y1="473.6" x2="518.4" y2="537.6" stroke="#777" stroke-width="0.6"/>
-<line x1="518.4" y1="537.6" x2="512.0" y2="537.6" stroke="#111" stroke-width="1.6"/>
-<line x1="512.0" y1="537.6" x2="512.0" y2="531.2" stroke="#111" stroke-width="1.6"/>
-<line x1="512.0" y1="480.0" x2="512.0" y2="473.6" stroke="#111" stroke-width="1.6"/>
+<line x1="512.0" y1="480.0" x2="518.4" y2="480.0" stroke="#111" stroke-width="1.6"/>
+<line x1="518.4" y1="480.0" x2="518.4" y2="531.2" stroke="#777" stroke-width="0.6"/>
+<line x1="518.4" y1="531.2" x2="512.0" y2="531.2" stroke="#111" stroke-width="1.6"/>
 <line x1="518.4" y1="473.6" x2="569.6" y2="473.6" stroke="#111" stroke-width="1.6"/>
 <line x1="569.6" y1="473.6" x2="620.8" y2="473.6" stroke="#d0201a" stroke-width="2.5"><title>action 62 tag 1</title></line>
 <line x1="620.8" y1="473.6" x2="646.4" y2="473.6" stroke="#111" stroke-width="1.6"/>
 <line x1="646.4" y1="473.6" x2="646.4" y2="576.0" stroke="#111" stroke-width="1.6"/>
 <line x1="646.4" y1="576.0" x2="608.0" y2="614.4" stroke="#111" stroke-width="1.6"/>
 <line x1="608.0" y1="614.4" x2="518.4" y2="614.4" stroke="#111" stroke-width="1.6"/>
-<line x1="518.4" y1="614.4" x2="518.4" y2="537.6" stroke="#111" stroke-width="1.6"/>
+<line x1="518.4" y1="614.4" x2="518.4" y2="531.2" stroke="#111" stroke-width="1.6"/>
+<line x1="518.4" y1="480.0" x2="518.4" y2="473.6" stroke="#111" stroke-width="1.6"/>
 <line x1="537.6" y1="601.6" x2="614.4" y2="601.6" stroke="#777" stroke-width="0.6"/>
 <line x1="614.4" y1="601.6" x2="614.4" y2="576.0" stroke="#777" stroke-width="0.6"/>
 <line x1="614.4" y1="576.0" x2="537.6" y2="576.0" stroke="#777" stroke-width="0.6"/>
@@ -163,18 +162,16 @@
 <line x1="339.2" y1="185.6" x2="288.0" y2="185.6" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
 <line x1="339.2" y1="185.6" x2="339.2" y2="192.0" stroke="#111" stroke-width="1.6"/>
 <line x1="288.0" y1="192.0" x2="288.0" y2="185.6" stroke="#111" stroke-width="1.6"/>
-<line x1="281.6" y1="179.2" x2="345.6" y2="179.2" stroke="#777" stroke-width="0.6"/>
-<line x1="345.6" y1="179.2" x2="345.6" y2="185.6" stroke="#111" stroke-width="1.6"/>
-<line x1="345.6" y1="185.6" x2="339.2" y2="185.6" stroke="#111" stroke-width="1.6"/>
-<line x1="288.0" y1="185.6" x2="281.6" y2="185.6" stroke="#111" stroke-width="1.6"/>
-<line x1="281.6" y1="185.6" x2="281.6" y2="179.2" stroke="#111" stroke-width="1.6"/>
+<line x1="288.0" y1="179.2" x2="339.2" y2="179.2" stroke="#777" stroke-width="0.6"/>
+<line x1="339.2" y1="179.2" x2="339.2" y2="185.6" stroke="#111" stroke-width="1.6"/>
+<line x1="288.0" y1="185.6" x2="288.0" y2="179.2" stroke="#111" stroke-width="1.6"/>
 <line x1="224.0" y1="140.8" x2="172.8" y2="140.8" stroke="#d0201a" stroke-width="2.5"><title>action 62 tag 3</title></line>
 <line x1="172.8" y1="140.8" x2="172.8" y2="38.4" stroke="#111" stroke-width="1.6"/>
 <line x1="172.8" y1="38.4" x2="403.2" y2="38.4" stroke="#111" stroke-width="1.6"/>
 <line x1="403.2" y1="38.4" x2="454.4" y2="89.6" stroke="#111" stroke-width="1.6"/>
 <line x1="454.4" y1="89.6" x2="454.4" y2="179.2" stroke="#111" stroke-width="1.6"/>
-<line x1="454.4" y1="179.2" x2="345.6" y2="179.2" stroke="#111" stroke-width="1.6"/>
-<line x1="281.6" y1="179.2" x2="224.0" y2="179.2" stroke="#111" stroke-width="1.6"/>
+<line x1="454.4" y1="179.2" x2="339.2" y2="179.2" stroke="#111" stroke-width="1.6"/>
+<line x1="288.0" y1="179.2" x2="224.0" y2="179.2" stroke="#111" stroke-width="1.6"/>
 <line x1="224.0" y1="179.2" x2="224.0" y2="140.8" stroke="#d0201a" stroke-width="2.5"><title>action 62 tag 3</title></line>
 <line x1="352.0" y1="140.8" x2="403.2" y2="140.8" stroke="#777" stroke-width="0.6"/>
 <line x1="403.2" y1="140.8" x2="403.2" y2="89.6" stroke="#777" stroke-width="0.6"/>

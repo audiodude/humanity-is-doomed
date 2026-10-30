@@ -177,5 +177,5 @@ id used DR as the default and D1 deliberately. Counting two-sided door lines: DO
 ## Status
 
 - **`model.doorway()`** builds every recess exactly as wide as its door, and every NUKAGE map is rebuilt with them. Of the 114 door faces monsters can use in MAP01–09 (secret doors left out, since monsters never use those), the share with a stub at both ends fell from 89% to 17%; 82% now have none, against 86–91% for id's maps. The 21 faces left are door sides with no recess at all, set flush in a wall: MAP01's and MAP02's start doors, for example, and MAP07's staff-wing doors.
-- **SPEEDY1.WAD and SPEEDY2.WAD** are records of timed build experiments and weren't rebuilt. Their modules now build door-width recesses too.
+- **SPEEDY1.WAD and SPEEDY2.WAD** are rebuilt with door-width recesses too; nothing else in them changed. Of their 48 door faces monsters can use, the share with a stub at both ends fell from 92% to 19%, and again what's left is door sides with no recess.
 - **Door types:** every plain door is DR. MAP09's red door is DR with a key (type 28), which monsters can't use, and secret doors are `ML_SECRET`. Which doors, if any, should be D1 is left for a later analysis.
