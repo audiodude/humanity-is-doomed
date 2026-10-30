@@ -15,7 +15,7 @@ from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, BOSSBRAIN, DAMAGE_PER_A
                     START_AMMO, THING_GAMES, THING_NAMES, is_decal)
 from .measure import check_sector_overlaps
 from .model import ALL, DOOR, NO_TEX, THING_BITS, crossings, floor_movers, floor_range, seg_dist
-from .reach import solve
+from .reach import solve, umapinfo_boss
 from .wad import IWAD_VARS, IWADS, iwad_textures
 from .wadmap import ML_BLOCKING, ML_BLOCKMONSTERS, MULTI_ONLY, parse
 
@@ -62,7 +62,12 @@ def findings(level, compiled) -> Findings:
         found.playability.append("no player 1 start inside a sector")
     else:
         sizes = iwad[0] if iwad else {}
-        md, res = solve(m, (sizes, next(iter(sizes.values()))[1] if sizes else 0))
+        try:
+            boss = umapinfo_boss(level.umapinfo)
+        except ValueError as e:
+            found.playability.append(f"UMAPINFO {e}")
+            boss = None
+        md, res = solve(m, (sizes, next(iter(sizes.values()))[1] if sizes else 0), boss)
         found.reach = (m, md, res)
         check_reach(level, md, res, names, found)
     found.style += check_hazards(level, compiled.lines)

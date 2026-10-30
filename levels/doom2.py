@@ -81,6 +81,15 @@ LABELS = {
     INVULN: "invulnerability", BERSERK: "berserk", INVIS: "invisibility", RADSUIT: "radsuit",
     COMPMAP: "computermap", VISOR: "lightamp", SOUL: "soulsphere", MEGA: "megasphere", BACKPACK: "backpack",
 }
+# UMAPINFO's names for the monsters a `bossaction` can name (the spec's doom
+# thingtypes, from ZDoom's classes); ports compare them ignoring case.
+UMAPINFO_ACTORS = {
+    "ZombieMan": ZOMBIE, "ShotgunGuy": SARGE, "Archvile": ARCHVILE, "Revenant": REVENANT, "Fatso": FATSO,
+    "ChaingunGuy": CHAINGUY, "DoomImp": IMP, "Demon": DEMON, "Spectre": SPECTRE, "Cacodemon": CACO,
+    "BaronOfHell": BARON, "HellKnight": KNIGHT, "LostSoul": LOSTSOUL, "SpiderMastermind": SPIDER,
+    "Arachnotron": ARACHNO, "Cyberdemon": CYBER, "PainElemental": PAIN, "WolfensteinSS": SS,
+    "CommanderKeen": KEEN, "BossBrain": BOSSBRAIN,
+}
 WEAPONS = (CHAINSAW, SHOTGUN, SSG, CHAINGUN, LAUNCHER, PLASMA, BFG)
 POWERUPS = (INVULN, BERSERK, INVIS, RADSUIT, COMPMAP, VISOR, SOUL, MEGA, BACKPACK)
 

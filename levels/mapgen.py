@@ -27,8 +27,10 @@ A level module is plain data, read as module attributes:
     MUST_REACH      sector names the progression check must reach    [optional]
     UMAPINFO        {key: value} for the map's UMAPINFO entry, values
                     written quoted; or a string, the entry's body between
-                    the braces written as it is (decompiled maps whose entry
-                    has repeated keys or unquoted values)             [optional]
+                    the braces written as it is (unquoted values, lists,
+                    repeated keys). A string's `bossaction` lines replace
+                    the slot's boss deaths in the progression check
+                    (reach.umapinfo_boss)                             [optional]
     OVERRIDES       {(point, point): model.Line} changing a built line, keyed
                     by its exact endpoints after edges are split at vertices,
                     sector edges and free lines alike. The front is on the
@@ -36,8 +38,9 @@ A level module is plain data, read as module attributes:
                     two-sided line built the other way is flipped, a wall
                     must be keyed the way it was built. A Line/Side field that
                     isn't None replaces the builder's value (flags: the whole
-                    word). Applied last; a key matching no line, or back= on
-                    a one-sided line, is an error                    [optional]
+                    word); a picture (switch, sign) set without x starts at
+                    x offset 0. Applied last; a key matching no line, or back=
+                    on a one-sided line, is an error                 [optional]
     IMPORTED        True for decompiled maps                         [optional]
     KNOWN_ISSUES    playability findings and warnings it accepts     [optional]
     RESOURCES       PWAD paths (absolute, ~, or relative to the repo root)
@@ -292,10 +295,15 @@ def apply_overrides(level, lines, sides):
             if k >= len(sides[i]):
                 problems.append(f"override {p}-{q} sets back= on a one-sided line")
                 continue
+            sd = sides[i][k]
             for name, attr in (("upper", "upper"), ("lower", "lower"), ("mid", "mid"), ("x", "x_offset"),
                                ("y", "y_offset")):
                 if getattr(s, name) is not None:
-                    setattr(sides[i][k], attr, getattr(s, name))
+                    setattr(sd, attr, getattr(s, name))
+            # A picture starts at offset 0, as line_sides places them (x_offset).
+            if (s.x is None and any(getattr(s, n) for n in ("upper", "lower", "mid"))
+                    and any(is_decal(t) for t in (sd.upper, sd.lower, sd.mid))):
+                sd.x_offset = 0
     if problems:
         raise LevelError("\n".join(problems))
 

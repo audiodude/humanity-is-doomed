@@ -54,6 +54,16 @@ def test_override_keeps_unset_fields_and_replaces_flags_whole():
                            (plain.sides[a.front], plain.sides[a.back]))
 
 
+def test_override_picture_starts_at_offset_zero_unless_x_given():
+    key = ((256, 0), (0, 0))   # a's south wall: its place on a's outline gives it a non-zero offset
+    off = {}
+    for name, side in (("wall", Side(mid="COMPSTA2")), ("picture", Side(mid="SW1EXIT")),
+                       ("given", Side(mid="SW1EXIT", x=8))):
+        _, m = built(SECTORS=two_rooms(), OVERRIDES={key: Line(front=side)})
+        off[name] = m.sides[line_between(m, *key).front].x_offset
+    assert off["wall"] != 0 and off["picture"] == 0 and off["given"] == 8
+
+
 def test_override_that_matches_no_line_is_an_error():
     with pytest.raises(LevelError, match="matches no line"):
         built(SECTORS=two_rooms(), OVERRIDES={((0, 0), (999, 999)): Line(tag=1)})

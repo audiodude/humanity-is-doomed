@@ -7,6 +7,9 @@ describes the model in full).
     md = Model(m, textures)   # textures: ({name: (width, height)}, height of the first)
     res = md.run()            # res["R"]: regions the player reaches
 
+Boss deaths are the slot's vanilla ones (BOSS), or a UMAPINFO entry's
+`bossaction`s in their place (umapinfo_boss; pass them as Model's boss).
+
 Movement takes an actor: None is the player; a doom2.Actor is a monster of
 that size (no keys, no running jumps, opens only DR_DOOR lines that aren't
 ML_SECRET, blocked by ML_BLOCKMONSTERS, no step limit if it flies, uses
@@ -15,10 +18,11 @@ lines vanilla lets a monster cross (MONSTER_WALK) as the monster goes.
 """
 import itertools
 import math
+import re
 from collections import defaultdict, deque
 
 from .doom2 import (ACTORS, KEY_OF, LINE_SPECIALS, MAX_STEP, MONSTER_DOORS, MONSTERS, PLAYER1,
-                    TELEPORT_DEST)
+                    TELEPORT_DEST, UMAPINFO_ACTORS)
 from .wadmap import HARD, ML_BLOCKING, ML_BLOCKMONSTERS, ML_SECRET, ML_TWOSIDED
 
 MIN_GAP = 32       # player is 32 units wide
@@ -93,6 +97,34 @@ BOSS = {
     "MAP32": [({72}, "door_open", 666)],
 }
 EXIT_SECTOR_SPECIAL = 11   # E1M8: damage, end level below 11% health
+
+
+def umapinfo_boss(info):
+    """The boss deaths a UMAPINFO entry's body defines, as [(types, action,
+    tag)] like BOSS, or None if it has no `bossaction` (the slot's vanilla
+    ones apply). `bossaction = clear` drops the ones before it. Each entry
+    fires when every monster of its type is dead. A dict entry (values written
+    quoted) can't hold one. Raises ValueError for a monster name, line special
+    or form it can't read."""
+    if not isinstance(info, str):
+        return None
+    names = {n.lower(): t for n, t in UMAPINFO_ACTORS.items()}
+    out = None
+    for value in re.findall(r"(?im)^\s*bossaction\s*=\s*(.*?)\s*$", info):
+        if value.lower() == "clear":
+            out = []
+            continue
+        parts = [v.strip() for v in value.split(",")]
+        if len(parts) != 3 or not parts[1].isdigit() or not parts[2].isdigit():
+            raise ValueError(f"bossaction = {value}: expected `thingtype, linespecial, tag`")
+        name, special, tag = parts[0], int(parts[1]), int(parts[2])
+        if name.lower() not in names:
+            raise ValueError(f"bossaction = {value}: unknown monster {name}")
+        act = "exit" if EXITS.get(special) == "exit" else ACTION.get(special)
+        if act is None or (act != "exit" and not tag):
+            raise ValueError(f"bossaction = {value}: line special {special} with tag {tag} isn't modelled")
+        out = (out or []) + [({names[name.lower()]}, act, tag)]
+    return out
 
 
 def _limits(actor):
@@ -281,10 +313,11 @@ class Model:
     barrier). Heights stay per sector: every action moves all regions of a
     sector together, using the vanilla searches over the whole sector."""
 
-    def __init__(self, m, textures, use_jumps=True):
+    def __init__(self, m, textures, use_jumps=True, boss=None):
         self.m = m
         self.slot = m.slot
         self.use_jumps = use_jumps
+        self._boss = boss
         self.ns = len(m.sectors)
         self.osecs_of_line = [m.line_sectors(ln) for ln in m.lines]
         # Sector line lists in line order (P_GroupLines) for the vanilla
@@ -772,7 +805,7 @@ class Model:
                     self.connectors.update(regions(ln.tag))
         self.groups = sorted({t["group"] for t in self.triggers})
         self.exit_sectors = [r for r in range(self.n) if self.sec(r).special == EXIT_SECTOR_SPECIAL]
-        self.boss = BOSS.get(self.slot, [])
+        self.boss = BOSS.get(self.slot, []) if self._boss is None else self._boss
         self._shots = {}
         for types, act, tag in self.boss:
             if act in CONNECTOR_ACTIONS:
@@ -1060,8 +1093,11 @@ class Model:
         return base, res["final_man"], res["keys"]
 
     # ------------------------------------------------------- trigger sites --
-    def use_site(self, i, R):
-        """Sector from which line i can be used (front side), or None."""
+    def use_site(self, i, R, base, man):
+        """Sector from which line i can be used (front side), or None: its
+        front sector, or a reached neighbour within USE_RANGE of it across a
+        line with an opening. A use stops at a two-sided line with no gap
+        (PTR_UseTraverse), so a switch behind a closed door can't be used."""
         f, _ = self.secs_of_line[i]
         if f in R:
             return f
@@ -1074,7 +1110,9 @@ class Model:
             x = bs if fs == f else fs
             if x in R and x != f:
                 l2 = self.m.lines[j]
-                if seg_dist(p1, p2, self.m.verts[l2.v1], self.m.verts[l2.v2]) <= USE_RANGE:
+                if (seg_dist(p1, p2, self.m.verts[l2.v1], self.m.verts[l2.v2]) <= USE_RANGE
+                        and any(min(cf, cx) > max(ff, fx) for ff, cf in self._states(f, base, man)
+                                for fx, cx in self._states(x, base, man))):
                     return x
         return None
 
@@ -1145,7 +1183,7 @@ class Model:
             return None
         trig = t["trig"]
         if trig[0] in "SD":
-            return self.use_site(t["line"], R)
+            return self.use_site(t["line"], R, base, man)
         if trig[0] == "W":
             return self.walk_site(t["line"], R, base, man, keys)
         if trig[0] == "G":
@@ -1199,7 +1237,7 @@ class Model:
             changed = False
             # exits
             for kind, i, trig in self.exits:
-                site = (self.use_site(i, R) if trig[0] == "S"
+                site = (self.use_site(i, R, base, man) if trig[0] == "S"
                         else self.walk_site(i, R, base, man, keys))
                 if site is not None and ("line", i) not in res["exit_wave"]:
                     res["exit_wave"][("line", i)] = wave
@@ -1303,14 +1341,15 @@ class Model:
         return best
 
 
-def solve(m, textures):
+def solve(m, textures, boss=None):
     """(model, run with snapshots) of a map. The conservative model first
     (walking, trench/ledge straddling, no running jumps); running jumps only
     if the exit can't be reached without them, since jumps also open
-    unintended sequence breaks. md.use_jumps says which."""
-    md = Model(m, textures, use_jumps=False)
+    unintended sequence breaks. md.use_jumps says which. boss: UMAPINFO boss
+    deaths in place of the slot's vanilla ones (see umapinfo_boss)."""
+    md = Model(m, textures, use_jumps=False, boss=boss)
     res = md.run(snapshots=True)
     if md.normal_exit(res) is None:
-        md = Model(m, textures, use_jumps=True)
+        md = Model(m, textures, use_jumps=True, boss=boss)
         res = md.run(snapshots=True)
     return md, res
