@@ -446,18 +446,20 @@ def doorway(name, at, facing, width=128, *, alcove=0, far_alcove=0, alcove_wall=
     picture shown whole, so a room on either side taller than the face (128
     for BIGDOOR*, 72 for EXITDOOR) needs a recess on that side: `alcove` deep
     before the door, floor `alcove_flat`, and `far_alcove` deep after it,
-    floor `far_flat` (default `alcove_flat`). Recesses are 32 wider than the
-    door and `alcove_height` tall: keep that at the face's height. The whole
+    floor `far_flat` (default `alcove_flat`). Recesses are as wide as the
+    door, as id's are: a wider one leaves a stub of wall beside the door, in
+    its plane, where vanilla monsters freeze (docs/door-stuck.md). They are
+    `alcove_height` tall: keep that at the face's height. The whole
     doorway runs alcove + thickness + far_alcove from `at`, so the room
     beyond starts there. door_kw goes to door(). Returns the sectors:
     <name>_alcove, <name>, <name>_far."""
     out = []
     if alcove:
-        out.append(Sector(f"{name}_alcove", [strip(at, facing, 0, alcove, width + 32)], floor,
+        out.append(Sector(f"{name}_alcove", [strip(at, facing, 0, alcove, width)], floor,
                           floor + alcove_height, alcove_flat, "CEIL5_1", 176, alcove_wall))
     out.append(door(name, strip(at, facing, alcove, thickness, width), floor=floor, **door_kw))
     if far_alcove:
-        out.append(Sector(f"{name}_far", [strip(at, facing, alcove + thickness, far_alcove, width + 32)],
+        out.append(Sector(f"{name}_far", [strip(at, facing, alcove + thickness, far_alcove, width)],
                           floor, floor + alcove_height, far_flat or alcove_flat, "CEIL5_1", 176, alcove_wall))
     return out
 

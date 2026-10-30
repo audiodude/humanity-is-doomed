@@ -73,14 +73,14 @@ id's maps have this bug too. The Doom Wiki covers it in [Monsters stuck in doort
 
 ![Plan view of MAP09's west door as played and with a door-width recess](door-stuck/plan.svg)
 
-`model.doorway()` builds every recess 32 units wider than its door. That leaves a 16-unit stub of wall on each side of the door, in the door's own plane. You get the trap above whenever two things hold:
+`model.doorway()` used to build every recess 32 units wider than its door. That left a 16-unit stub of wall on each side of the door, in the door's own plane. You get the trap above whenever two things hold:
 
 - you're off to one side of the doorway;
 - a monster comes at the door off-centre and presses its box into a stub while the box is over the door line.
 
 id's doors mostly don't have stubs: the passage is exactly as wide as the door. The table counts every door face monsters can use (types 1 and 32–34), taking each door line from the room it faces:
 
-| Wall stub in the door's plane | DOOM II | DOOM | MAP09 as played | MAP01–08 |
+| Wall stub in the door's plane | DOOM II | DOOM | MAP09 as played | MAP01–08 before the fix |
 |---|---|---|---|---|
 | At neither end | 86% | 91% | 4% | 0–15% |
 | At one end | 7% | 4% | 0% | 0–7% |
@@ -159,11 +159,23 @@ Two more ideas, both ruled out:
 - **Line order.** Whether a blocked step collects the door line at all depends on the order the engine checks lines: cell by cell through the 128-unit blockmap, then by line number within a cell. A map could perhaps arrange that, but the result changes with the monster's direction and with where the door sits on the grid, so it's too fragile to rely on.
 - **A compatibility level.** A `COMPLVL` lump asking for MBF rules turns the fix on in ports that read the lump. Whether the 2024 re-release reads it is unverified, and MBF rules change other behaviour too.
 
+### Choosing DR or D1 per door
+
+Fixing the freeze isn't the only thing the door type changes. Each type makes a room harder in its own way:
+
+| | DR | D1 |
+|---|---|---|
+| Before you open it | Monsters behind it can open it and come for you | Unvisited rooms stay sealed |
+| After you open it | It shuts again, cutting off sight and sound | It stays open: chasers follow you, and every later shot carries through it and wakes more monsters |
+| Retreating | It's shut behind you after about 6 s, and reopening it costs up to 0.8 s facing the door | The way back stays open |
+| Your tools | Use an open DR door to slam it shut behind you | You can't close it |
+
+The door timings are vanilla's for a 128-tall door: 2 units per tic, open at 1.8 s, closing from 6.1 s, too low to pass at about 7 s.
+
+id used DR as the default and D1 deliberately. Counting two-sided door lines: DOOM II has 220 type 1 lines in 19 of its 32 maps and 45 type 31 in 15; DOOM has 327 type 1 in 27 of 36 maps and 89 type 31 in 25.
+
 ## Status
 
-- **MAP09:** `door_kw()` makes every plain door D1, with two exceptions:
-  - The deck's door to the corridor stays DR, so it closes behind you and keeps the landing's gunfire off the balcony.
-  - The red door is DR with a key (type 28), which monsters can't use.
-
-  The secret doors are `ML_SECRET`.
-- **`model.doorway()`** still builds recesses 32 wider than the door on every map. MAP01–08 keep their DR doors and stubs.
+- **`model.doorway()`** builds every recess exactly as wide as its door, and every NUKAGE map is rebuilt with them. Of the 114 door faces monsters can use in MAP01–09 (secret doors left out, since monsters never use those), the share with a stub at both ends fell from 89% to 17%; 82% now have none, against 86–91% for id's maps. The 21 faces left are door sides with no recess at all, set flush in a wall: MAP01's and MAP02's start doors, for example, and MAP07's staff-wing doors.
+- **SPEEDY1.WAD and SPEEDY2.WAD** are records of timed build experiments and weren't rebuilt. Their modules now build door-width recesses too.
+- **Door types:** every plain door is DR. MAP09's red door is DR with a key (type 28), which monsters can't use, and secret doors are `ML_SECRET`. Which doors, if any, should be D1 is left for a later analysis.
