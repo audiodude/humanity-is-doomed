@@ -153,6 +153,8 @@ shot crest
 walk 1950 848
 open 2080 848
 walk 2688 832
+look 90 -6
+shot spillway                      # the settling hall's 128 drop: one way, and it looks it
 walk 2400 848
 open 2096 848
 walk 1900 848
@@ -208,14 +210,19 @@ expect secrets == 4
 expect has Soulsphere
 walk 64 -864
 
-# The dome: through the hatch to the exit console in front of the melted core.
+# The dome: through the hatch, across the reactor hall to the exit alcove at its back,
+# walled in the melted core's falls, where the arch-vile waited. The shutter over the exit
+# console opens when the Cyberdemon dies: a UMAPINFO bossaction, which ViZDoom doesn't read.
+# So: check it's shut, then warp into it to use the console.
 walk 1024 -260
 look 270
 shot hatch
-walk 1024 -440
-look 270 6
+walk 1024 -600
+look 270
 shot reactor_hall
-walk 1024 -540
+walk 1024 -1000
 look 270 20
 shot exit
-exit 1024 -592
+expect ceil 1024 -1048 == 24       # the shutter is shut
+teleport 1024 -1048 270
+exit 1024 -1056

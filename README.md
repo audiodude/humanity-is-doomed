@@ -20,7 +20,22 @@
 
 ## Included WAD - NUKAGE.WAD
 
-`wads/NUKAGE.WAD` holds nine generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), MAP06, [Nukage Undercurrent](#nukage-undercurrent-nukage_undercurrent), MAP07, [Nukage Storage](#nukage-storage-nukage_storage), MAP08, [Nukage Lockdown](#nukage-lockdown-nukage_lockdown), and MAP09, [Nukage Meltdown](#nukage-meltdown-nukage_meltdown), the last. It needs `doom2.wad` and works in the DOOM + DOOM II (2024) re-release as well as in source ports such as dsda-doom (`dsda-doom -iwad doom2 -file wads/NUKAGE.WAD`, add `-warp 2` and so on for the later maps) and GZDoom. Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP09.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
+*NUKAGE: A nuclear meltdown at a UAC power plant opens a gate to hell.*
+
+`wads/NUKAGE.WAD` holds nine generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), MAP06, [Nukage Undercurrent](#nukage-undercurrent-nukage_undercurrent), MAP07, [Nukage Storage](#nukage-storage-nukage_storage), MAP08, [Nukage Lockdown](#nukage-lockdown-nukage_lockdown), and MAP09, [Nukage Meltdown](#nukage-meltdown-nukage_meltdown), the last. It needs `doom2.wad`; to play it in dsda-doom, `dsda-doom -iwad doom2 -file wads/NUKAGE.WAD` (add `-warp 2` and so on for the later maps). Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP09.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
+
+### Compatibility
+
+**Play it in a port that reads UMAPINFO.** MAP09's exit is sealed behind a shutter that opens only when the Cyberdemon dies, and that rule lives in the WAD's `UMAPINFO` lump (a `bossaction`). Without UMAPINFO the shutter never opens and MAP09 can't be finished.
+
+| Port | MAP09's exit | Level names, the ending's text and cast call |
+|---|---|---|
+| DOOM + DOOM II (2024 re-release) | opens when the Cyberdemon dies | yes |
+| GZDoom 4.6 and later | opens | yes |
+| dsda-doom, Woof | opens | yes |
+| `doom2.exe`, Chocolate Doom, and any port without UMAPINFO | never opens | no: DOOM II's own names, and MAP09 leads to MAP10 |
+
+MAP01–MAP08 don't depend on UMAPINFO. Every map is checked against vanilla rules (see [Playtests](#playtests)), and MAP09 has been played through in the 2024 re-release. The bossaction gate came after that playthrough and hasn't yet been tried in any of these ports.
 
 ### Nukage Junction (`nukage_junction`)
 A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/medium/hard, one secret.
@@ -163,17 +178,16 @@ You start in a locked-down lobby looking through a window at the exit switch und
 Symmetry is high because the loop runs round a square basin; each bank is its own material, height and light.
 
 ### Nukage Meltdown (`nukage_meltdown`)
-MAP09, the last map: 140 sectors, 40/63/84 monsters on easy/medium/hard, four secrets, and the Cyberdemon. Its design doc is `levels/designs/nukage_meltdown.md`, with the playtest results; the route script is `levels/playtests/nukage_meltdown.playtest`. Ports that read UMAPINFO show an end text after it and then the cast call; others carry on to DOOM II's MAP10.
+MAP09, the last map: 137 sectors, 40/63/84 monsters on easy/medium/hard, four secrets, and the Cyberdemon. Its design doc is `levels/designs/nukage_meltdown.md`, with the playtest results; the route script is `levels/playtests/nukage_meltdown.playtest`. Its exit opens only when the Cyberdemon dies, which needs a port that reads UMAPINFO (see [Compatibility](#compatibility)); those ports also show an end text after it and then the cast call. The end text is the `intertext` list in the module's `UMAPINFO`.
 
-From the operations balcony at the start you see the whole map: the plant's outfall runs down a canyon in four terraced shelves, each pond pouring over a railed lip onto the next, down to the reactor's cooling lake, where the Cyberdemon wades with his back to you in front of the cracked dome. You go down it shelf by shelf, through the buildings at each bank's end, drop through a breach in the third shelf, open the floodgate from the gatehouse and ride the dam's falls into the lake. The exit is in the dome, behind him.
+From the operations balcony at the start you see the whole map: the plant's outfall runs down a canyon in four terraced shelves, each pond pouring over a railed lip onto the next, down to the reactor's cooling lake and the cracked dome in it. Something huge is down there: you hear it more than see it. You go down shelf by shelf, through the buildings at each bank's end, drop through a breach in the third shelf, open the floodgate from the gatehouse and ride the dam's falls into the lake, where the Cyberdemon wades. As you land, the dome's hatch opens, and the arch-vile is waiting in the exit alcove at its back.
 
 | Measure | MAP09 | DOOM II median |
 |---|---|---|
-| Distinct floor heights | 39 | 23 |
+| Distinct floor heights | 36 | 23 |
 | Light SD / light-effect sectors | 40 / 11 | 23 / 9 |
-| Most-used wall texture | 21% | 30% |
-| Wall material changes with a border texture | 95% | 31% |
-| Optional share of the reachable area | 65% | 50% |
+| Wall material changes with a border texture | 96% | 31% |
+| Optional share of the reachable area | 66% | 50% |
 | UV ammo per monster HP (pistol start) | 2.27 | 1.81 |
 | Health per 1000 monster HP | 42 | 40 |
 | Easy/UV and HMP/UV monster ratios | 0.48 / 0.75 | 0.33 / 0.70 |
@@ -216,7 +230,7 @@ Requirements:
 Findings come in two kinds. **Playability** findings fail every build:
 - Geometry: lines only meet at shared vertices. A sector outline that crosses itself, or sectors and free lines that cut through each other, is an error. A sector standing free inside another (a pedestal, a crate, a pool) is cut out of it automatically; one touching the other's outline has to be listed as a hole by hand.
 - Every thing is inside a sector with room for its height (a closed door has none), clear of walls, bars, fences and steps it can't climb, and not overlapping another monster or player on a skill they share. Thing types must exist in the map's game.
-- Progression, worked out by the reach model in `levels/reach.py` on the built map, the way the engine does it: every vanilla line action (doors, floors, ceilings, lifts, stairs, donuts, teleporters, exits, boss deaths), keys, and the height each moving sector can reach. The exit, every `MUST_REACH` sector and every secret must be reachable from the player start.
+- Progression, worked out by the reach model in `levels/reach.py` on the built map, the way the engine does it: every vanilla line action (doors, floors, ceilings, lifts, stairs, donuts, teleporters, exits, boss deaths, and a `UMAPINFO` string's `bossaction`s in place of the slot's own boss deaths), keys, and the height each moving sector can reach. A switch can be used across a thin sector within use range, but not through a closed door. The exit, every `MUST_REACH` sector and every secret must be reachable from the player start.
 - 100% kills: every monster can either be reached or walk (or fly) to somewhere the player can go, by monster rules: no keys, only plain use doors, blocked by monster-blocking lines. A sniper the player can only shoot at fails this too.
 - No softlocks: from every damaging floor the player can get onto, the exit can still be reached.
 - Every texture and flat exists in the IWAD (plus the module's `RESOURCES`).
@@ -254,7 +268,7 @@ There are helpers for the rooms most maps repeat, sized so they pass the texture
 
 Floors can move both ways for the progression check: the lowering actions (`S1_FLOOR_LOWEST` and kin) drop a tagged floor to its lowest neighbour, and the raise actions lift it to the next higher neighbouring floor, so a rising bridge stops level with the nearest higher floor around it. The raise-and-change actions (`S1_RAISE_CHANGE` and kin) take the floor texture of the trigger line's front sector and clear the sector's special, which dries a walkway raised out of nukage (MAP05 does this), but they move at 0.5 units a tic: 96 units take 5.5 s. The fast raises (`S1_FLOOR_NEXT_FAST` and kin) move at 4 units a tic and keep the floor's texture and special, so use them for bridges out of a pit or the dark.
 
-Anything the builder infers can be overridden line by line in `OVERRIDES`, keyed by a line's two endpoints with its front on the right going from the first to the second: `{((1088, -3648), (1024, -3648)): Line(flags=ML_BLOCKING | ML_BLOCKMONSTERS, front=Side(mid="COMPSTA2", x=16))}`. Only the fields given replace the builder's choice; a key that matches no line is an error. Decompiled maps use this for every difference from what the builder would make.
+Anything the builder infers can be overridden line by line in `OVERRIDES`, keyed by a line's two endpoints with its front on the right going from the first to the second: `{((1088, -3648), (1024, -3648)): Line(flags=ML_BLOCKING | ML_BLOCKMONSTERS, front=Side(mid="COMPSTA2", x=16))}`. Only the fields given replace the builder's choice (a picture such as a switch or sign set without `x` starts at x offset 0); a key that matches no line is an error. Decompiled maps use this for every difference from what the builder would make.
 
 `Thing` skills are any of `e`, `m`, `h`, plus `a` for ambush (deaf) and `n` for multiplayer only; `extra` holds other flag bits. `RESOURCES` lists PWADs whose textures, flats and patches the checks and measurements load after the IWAD (for remixes of community maps; they aren't copied into the built WAD).
 
