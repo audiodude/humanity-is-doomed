@@ -1,27 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1402" height="1032" font-family="sans-serif">
 <rect width="100%" height="100%" fill="#fbfbf7"/>
-<path d="M524.8,953.6 L729.6,953.6 L729.6,838.4 L678.4,838.4 L672.0,838.4 L524.8,838.4 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>start: floor 0 ceil 128 FLOOR4_8/CEIL3_5 light 160</title></path>
+<path d="M524.8,953.6 L729.6,953.6 L729.6,838.4 L524.8,838.4 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>start: floor 0 ceil 128 FLOOR4_8/CEIL3_5 light 160</title></path>
 <path d="M550.4,838.4 L652.8,838.4 L652.8,825.6 L550.4,825.6 Z" fill="rgb(198,198,198)" fill-rule="evenodd"><title>window_s: floor 25 ceil 104 FLAT5_4/CEIL3_5 light 176</title></path>
 <path d="M678.4,838.4 L729.6,838.4 L729.6,832.0 L678.4,832.0 Z" fill="#a0703c" fill-rule="evenodd"><title>d_start: floor 8 ceil 8 MFLR8_1/FLAT20 light 144</title></path>
 <path d="M678.4,832.0 L729.6,832.0 L729.6,825.6 L678.4,825.6 Z" fill="rgb(191,191,191)" fill-rule="evenodd"><title>d_start_far: floor 8 ceil 136 MFLR8_1/CEIL5_1 light 176</title></path>
 <path d="M518.4,908.8 L524.8,908.8 L524.8,883.2 L518.4,883.2 Z" fill="#a0703c" fill-rule="evenodd"><title>d_sec1: floor 0 ceil 0 FLOOR4_8/FLAT20 light 144</title></path>
 <path d="M454.4,921.6 L518.4,921.6 L518.4,870.4 L454.4,870.4 Z" fill="#c9a0f0" fill-rule="evenodd"><title>sec1: floor 0 ceil 96 FLOOR4_8/CEIL3_5 light 128</title></path>
-<path d="M448.0,825.6 L896.0,825.6 L921.6,800.0 L921.6,601.6 L422.4,601.6 L422.4,800.0 Z M768.0,748.8 L793.6,748.8 L793.6,723.2 L768.0,723.2 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>yard_s: floor 0 ceil 256 MFLR8_1/F_SKY1 light 192</title></path>
-<path d="M768.0,748.8 L793.6,748.8 L793.6,723.2 L768.0,723.2 Z" fill="rgb(214,214,214)" fill-rule="evenodd"><title>housing: floor 64 ceil 256 CRATOP1/F_SKY1 light 176</title></path>
+<path d="M448.0,825.6 L896.0,825.6 L921.6,800.0 L921.6,601.6 L422.4,601.6 L422.4,800.0 Z M780.8,761.6 L806.4,736.0 L780.8,710.4 L755.2,736.0 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>yard_s: floor 0 ceil 256 MFLR8_1/F_SKY1 light 192</title></path>
+<path d="M780.8,761.6 L806.4,736.0 L780.8,710.4 L755.2,736.0 Z" fill="rgb(217,217,217)" fill-rule="evenodd"><title>housing: floor 72 ceil 256 CEIL5_1/F_SKY1 light 176</title></path>
 <path d="M416.0,780.8 L422.4,780.8 L422.4,729.6 L416.0,729.6 Z" fill="rgb(191,191,191)" fill-rule="evenodd"><title>d_pump_alcove: floor 8 ceil 136 MFLR8_1/CEIL5_1 light 176</title></path>
 <path d="M409.6,780.8 L416.0,780.8 L416.0,729.6 L409.6,729.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_pump: floor 8 ceil 8 MFLR8_1/FLAT20 light 144</title></path>
-<path d="M217.6,780.8 L409.6,780.8 L409.6,729.6 L217.6,729.6 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>corr1: floor 0 ceil 128 FLOOR5_2/CEIL5_2 light 96</title></path>
-<path d="M166.4,780.8 L217.6,780.8 L217.6,697.6 L166.4,697.6 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>corr2: floor 0 ceil 128 FLOOR5_2/CEIL5_2 light 112</title></path>
+<path d="M217.6,780.8 L409.6,780.8 L409.6,729.6 L217.6,729.6 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>corr1: floor 0 ceil 128 FLOOR0_3/CEIL5_2 light 96</title></path>
+<path d="M166.4,780.8 L217.6,780.8 L217.6,697.6 L166.4,697.6 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>corr2: floor 0 ceil 128 FLOOR0_3/CEIL5_2 light 112</title></path>
 <path d="M140.8,697.6 L409.6,697.6 L409.6,595.2 L217.6,595.2 L217.6,441.6 L115.2,441.6 L115.2,672.0 Z M294.4,672.0 L345.6,672.0 L345.6,620.8 L294.4,620.8 Z" fill="rgb(182,182,182)" fill-rule="evenodd"><title>hall_s: floor -16 ceil 256 FLOOR5_2/CEIL3_5 light 176</title></path>
 <path d="M115.2,441.6 L217.6,441.6 L217.6,428.8 L115.2,428.8 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>hstep: floor 0 ceil 256 FLOOR5_2/CEIL3_5 light 176</title></path>
 <path d="M115.2,428.8 L217.6,428.8 L217.6,441.6 L396.8,441.6 L396.8,288.0 L166.4,288.0 L115.2,339.2 Z M320.0,390.4 L371.2,390.4 L371.2,339.2 L320.0,339.2 Z M243.2,377.6 L294.4,377.6 L294.4,326.4 L243.2,326.4 Z" fill="rgb(195,195,195)" fill-rule="evenodd"><title>hall_n: floor 16 ceil 256 FLOOR5_2/CEIL3_5 light 176</title></path>
 <path d="M294.4,672.0 L345.6,672.0 L345.6,620.8 L294.4,620.8 Z" fill="rgb(207,207,207)" fill-rule="evenodd"><title>pump_s: floor 48 ceil 256 FLOOR4_8/CEIL3_5 light 176</title></path>
 <path d="M320.0,390.4 L371.2,390.4 L371.2,339.2 L320.0,339.2 Z" fill="rgb(220,220,220)" fill-rule="evenodd"><title>pump_n: floor 80 ceil 256 FLOOR4_8/CEIL3_5 light 176</title></path>
 <path d="M243.2,377.6 L294.4,377.6 L294.4,326.4 L243.2,326.4 Z" fill="rgb(204,204,204)" fill-rule="evenodd"><title>ped_b: floor 40 ceil 256 TLITE6_1/CEIL3_5 light 240</title></path>
-<path d="M256.0,595.2 L268.8,595.2 L268.8,441.6 L256.0,441.6 Z" fill="rgb(156,156,156)" fill-rule="evenodd"><title>isteps1: floor -80 ceil 256 FLOOR5_2/CEIL3_5 light 160</title></path>
-<path d="M243.2,595.2 L256.0,595.2 L256.0,441.6 L243.2,441.6 Z" fill="rgb(162,162,162)" fill-rule="evenodd"><title>isteps2: floor -64 ceil 256 FLOOR5_2/CEIL3_5 light 160</title></path>
-<path d="M230.4,595.2 L243.2,595.2 L243.2,441.6 L230.4,441.6 Z" fill="rgb(169,169,169)" fill-rule="evenodd"><title>isteps3: floor -48 ceil 256 FLOOR5_2/CEIL3_5 light 160</title></path>
-<path d="M217.6,595.2 L230.4,595.2 L230.4,441.6 L217.6,441.6 Z" fill="rgb(175,175,175)" fill-rule="evenodd"><title>isteps4: floor -32 ceil 256 FLOOR5_2/CEIL3_5 light 160</title></path>
+<path d="M256.0,595.2 L268.8,595.2 L268.8,441.6 L256.0,441.6 Z" fill="rgb(156,156,156)" fill-rule="evenodd"><title>isteps1: floor -80 ceil 256 FLOOR0_3/CEIL3_5 light 160</title></path>
+<path d="M243.2,595.2 L256.0,595.2 L256.0,441.6 L243.2,441.6 Z" fill="rgb(162,162,162)" fill-rule="evenodd"><title>isteps2: floor -64 ceil 256 FLOOR0_3/CEIL3_5 light 160</title></path>
+<path d="M230.4,595.2 L243.2,595.2 L243.2,441.6 L230.4,441.6 Z" fill="rgb(169,169,169)" fill-rule="evenodd"><title>isteps3: floor -48 ceil 256 FLOOR0_3/CEIL3_5 light 160</title></path>
+<path d="M217.6,595.2 L230.4,595.2 L230.4,441.6 L217.6,441.6 Z" fill="rgb(175,175,175)" fill-rule="evenodd"><title>isteps4: floor -32 ceil 256 FLOOR0_3/CEIL3_5 light 160</title></path>
 <path d="M268.8,595.2 L409.6,595.2 L409.6,441.6 L268.8,441.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>intake: floor -96 ceil 256 NUKAGE1/CEIL3_5 light 160</title></path>
 <path d="M409.6,595.2 L422.4,595.2 L422.4,441.6 L409.6,441.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>culvert: floor -96 ceil 32 NUKAGE1/CEIL5_2 light 128</title></path>
 <path d="M108.8,544.0 L115.2,544.0 L115.2,492.8 L108.8,492.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_hall_cl: floor -16 ceil -16 FLOOR5_2/FLAT20 light 144 tag 2</title></path>
@@ -29,9 +29,9 @@
 <path d="M396.8,364.8 L406.4,364.8 L406.4,313.6 L396.8,313.6 Z" fill="rgb(195,195,195)" fill-rule="evenodd"><title>d_blue_alcove: floor 16 ceil 144 FLOOR5_2/CEIL5_1 light 176</title></path>
 <path d="M406.4,364.8 L412.8,364.8 L412.8,313.6 L406.4,313.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_blue: floor 16 ceil 16 FLOOR5_2/FLAT20 light 144</title></path>
 <path d="M412.8,364.8 L422.4,364.8 L422.4,313.6 L412.8,313.6 Z" fill="rgb(195,195,195)" fill-rule="evenodd"><title>d_blue_far: floor 16 ceil 144 MFLR8_1/CEIL5_1 light 176</title></path>
-<path d="M422.4,595.2 L979.2,595.2 L979.2,441.6 L844.8,441.6 L780.8,441.6 L780.8,518.4 L806.4,518.4 L806.4,569.6 L704.0,569.6 L704.0,518.4 L729.6,518.4 L729.6,441.6 L678.4,441.6 L601.6,441.6 L601.6,467.2 L524.8,467.2 L524.8,441.6 L422.4,441.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>river_w: floor -96 ceil 256 NUKAGE1/F_SKY1 light 192</title></path>
-<path d="M1043.2,595.2 L1216.0,595.2 L1216.0,518.4 L1292.8,518.4 L1292.8,441.6 L1043.2,441.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>river_e: floor -96 ceil 256 NUKAGE1/F_SKY1 light 192</title></path>
-<path d="M1216.0,595.2 L1292.8,595.2 L1292.8,518.4 L1216.0,518.4 Z" fill="#7ccf4a" fill-rule="evenodd"><title>river_e_lip: floor -96 ceil 256 NUKAGE1/F_SKY1 light 192</title></path>
+<path d="M422.4,595.2 L979.2,595.2 L979.2,441.6 L780.8,441.6 L780.8,518.4 L806.4,518.4 L806.4,569.6 L704.0,569.6 L704.0,518.4 L729.6,518.4 L729.6,441.6 L601.6,441.6 L601.6,467.2 L524.8,467.2 L524.8,441.6 L422.4,441.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>river_w: floor -96 ceil 256 NUKAGE1/F_SKY1 light 160</title></path>
+<path d="M1043.2,595.2 L1216.0,595.2 L1216.0,518.4 L1292.8,518.4 L1292.8,441.6 L1043.2,441.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>river_e: floor -96 ceil 256 NUKAGE1/F_SKY1 light 160</title></path>
+<path d="M1216.0,595.2 L1292.8,595.2 L1292.8,518.4 L1216.0,518.4 Z" fill="#7ccf4a" fill-rule="evenodd"><title>river_e_lip: floor -96 ceil 256 NUKAGE1/F_SKY1 light 160</title></path>
 <path d="M422.4,601.6 L979.2,601.6 L979.2,595.2 L422.4,595.2 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>par_s: floor 32 ceil 256 FLAT5_4/F_SKY1 light 192</title></path>
 <path d="M1043.2,601.6 L1267.2,601.6 L1267.2,595.2 L1043.2,595.2 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>par_se: floor 32 ceil 256 FLAT5_4/F_SKY1 light 192</title></path>
 <path d="M1267.2,601.6 L1292.8,601.6 L1292.8,595.2 L1267.2,595.2 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>par_gag: floor 32 ceil 256 FLAT5_4/F_SKY1 light 192 tag 6</title></path>
@@ -41,10 +41,10 @@
 <path d="M979.2,595.2 L985.6,595.2 L985.6,441.6 L979.2,441.6 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>rail_w: floor 32 ceil 256 FLAT5_4/F_SKY1 light 192</title></path>
 <path d="M1036.8,595.2 L1043.2,595.2 L1043.2,441.6 L1036.8,441.6 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>rail_e: floor 32 ceil 256 FLAT5_4/F_SKY1 light 192</title></path>
 <path d="M985.6,595.2 L1036.8,595.2 L1036.8,441.6 L985.6,441.6 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>bridge: floor 128 ceil 256 FLAT23/F_SKY1 light 176 tag 1</title></path>
-<path d="M524.8,467.2 L601.6,467.2 L601.6,448.0 L524.8,448.0 Z" fill="#c9a0f0" fill-rule="evenodd"><title>ledge: floor -72 ceil 256 FLAT5_4/F_SKY1 light 240</title></path>
-<path d="M524.8,448.0 L601.6,448.0 L601.6,441.6 L524.8,441.6 Z" fill="rgb(159,159,159)" fill-rule="evenodd"><title>ledge_back: floor -72 ceil 256 FLAT5_4/F_SKY1 light 192</title></path>
-<path d="M704.0,569.6 L806.4,569.6 L806.4,518.4 L780.8,518.4 L780.8,544.0 L729.6,544.0 L729.6,518.4 L704.0,518.4 Z M742.4,566.4 L768.0,566.4 L768.0,547.2 L742.4,547.2 Z" fill="#c9a0f0" fill-rule="evenodd"><title>island: floor 8 ceil 256 FLAT23/F_SKY1 light 224</title></path>
-<path d="M742.4,566.4 L768.0,566.4 L768.0,547.2 L742.4,547.2 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>ped_s: floor 32 ceil 256 FLAT23/F_SKY1 light 240</title></path>
+<path d="M524.8,467.2 L601.6,467.2 L601.6,448.0 L524.8,448.0 Z" fill="#c9a0f0" fill-rule="evenodd"><title>ledge: floor -72 ceil 256 FLAT5_4/F_SKY1 light 208</title></path>
+<path d="M524.8,448.0 L601.6,448.0 L601.6,441.6 L524.8,441.6 Z" fill="rgb(159,159,159)" fill-rule="evenodd"><title>ledge_back: floor -72 ceil 256 FLAT5_4/F_SKY1 light 160</title></path>
+<path d="M704.0,569.6 L806.4,569.6 L806.4,518.4 L780.8,518.4 L780.8,544.0 L729.6,544.0 L729.6,518.4 L704.0,518.4 Z M742.4,566.4 L768.0,566.4 L768.0,547.2 L742.4,547.2 Z" fill="#c9a0f0" fill-rule="evenodd"><title>island: floor 8 ceil 256 FLAT5_4/F_SKY1 light 224</title></path>
+<path d="M742.4,566.4 L768.0,566.4 L768.0,547.2 L742.4,547.2 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>ped_s: floor 32 ceil 256 TLITE6_1/F_SKY1 light 240</title></path>
 <path d="M729.6,544.0 L780.8,544.0 L780.8,518.4 L729.6,518.4 Z" fill="#e8c547" fill-rule="evenodd"><title>lift_i: floor 96 ceil 256 FLAT23/F_SKY1 light 208 tag 5</title></path>
 <path d="M729.6,518.4 L780.8,518.4 L780.8,441.6 L729.6,441.6 Z" fill="rgb(227,227,227)" fill-rule="evenodd"><title>pier: floor 96 ceil 256 FLAT23/F_SKY1 light 208</title></path>
 <path d="M422.4,435.2 L665.6,435.2 L665.6,243.2 L857.6,243.2 L857.6,435.2 L979.2,435.2 L979.2,441.6 L1043.2,441.6 L1043.2,435.2 L1292.8,435.2 L1292.8,230.4 L1004.8,230.4 L1004.8,185.6 L473.6,185.6 L422.4,236.8 Z M1075.2,358.4 L1100.8,358.4 L1100.8,332.8 L1075.2,332.8 Z M908.8,326.4 L934.4,326.4 L934.4,300.8 L908.8,300.8 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>yard_n: floor 0 ceil 256 MFLR8_1/F_SKY1 light 192</title></path>
@@ -52,24 +52,24 @@
 <path d="M908.8,326.4 L934.4,326.4 L934.4,300.8 L908.8,300.8 Z" fill="rgb(214,214,214)" fill-rule="evenodd"><title>crate_n1: floor 64 ceil 256 CRATOP1/F_SKY1 light 192</title></path>
 <path d="M1004.8,230.4 L1292.8,230.4 L1292.8,217.6 L1004.8,217.6 Z" fill="rgb(196,196,196)" fill-rule="evenodd"><title>tstep: floor 20 ceil 256 FLOOR5_1/F_SKY1 light 192</title></path>
 <path d="M1004.8,217.6 L1292.8,217.6 L1292.8,185.6 L1004.8,185.6 Z" fill="rgb(204,204,204)" fill-rule="evenodd"><title>terrace: floor 40 ceil 256 FLOOR5_1/F_SKY1 light 200</title></path>
-<path d="M665.6,435.2 L672.0,435.2 L672.0,249.6 L851.2,249.6 L851.2,435.2 L857.6,435.2 L857.6,243.2 L665.6,243.2 Z" fill="rgb(191,191,191)" fill-rule="evenodd"><title>plinth: floor 8 ceil 256 MFLR8_1/F_SKY1 light 192</title></path>
+<path d="M665.6,435.2 L672.0,435.2 L672.0,249.6 L851.2,249.6 L851.2,435.2 L857.6,435.2 L857.6,243.2 L665.6,243.2 Z" fill="rgb(191,191,191)" fill-rule="evenodd"><title>plinth: floor 8 ceil 256 FLOOR5_1/F_SKY1 light 192</title></path>
 <path d="M736.0,256.0 L787.2,256.0 L787.2,249.6 L736.0,249.6 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>d_tower_alcove: floor 0 ceil 128 FLAT4/CEIL5_1 light 176</title></path>
 <path d="M736.0,262.4 L787.2,262.4 L787.2,256.0 L736.0,256.0 Z" fill="#a0703c" fill-rule="evenodd"><title>d_tower: floor 0 ceil 0 FLAT4/FLAT20 light 144</title></path>
 <path d="M736.0,268.8 L787.2,268.8 L787.2,262.4 L736.0,262.4 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>d_tower_far: floor 0 ceil 128 FLAT4/CEIL5_1 light 176</title></path>
-<path d="M678.4,307.2 L844.8,307.2 L844.8,268.8 L678.4,268.8 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>lobby: floor 0 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
-<path d="M678.4,320.0 L729.6,320.0 L729.6,307.2 L678.4,307.2 Z" fill="rgb(195,195,195)" fill-rule="evenodd"><title>tst_w1: floor 16 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
-<path d="M678.4,332.8 L729.6,332.8 L729.6,320.0 L678.4,320.0 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>tst_w2: floor 32 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
-<path d="M678.4,345.6 L729.6,345.6 L729.6,332.8 L678.4,332.8 Z" fill="rgb(207,207,207)" fill-rule="evenodd"><title>tst_w3: floor 48 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
-<path d="M678.4,358.4 L729.6,358.4 L729.6,345.6 L678.4,345.6 Z" fill="rgb(214,214,214)" fill-rule="evenodd"><title>tst_w4: floor 64 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
-<path d="M678.4,371.2 L729.6,371.2 L729.6,358.4 L678.4,358.4 Z" fill="rgb(220,220,220)" fill-rule="evenodd"><title>tst_w5: floor 80 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
-<path d="M793.6,320.0 L844.8,320.0 L844.8,307.2 L793.6,307.2 Z" fill="rgb(195,195,195)" fill-rule="evenodd"><title>tst_e1: floor 16 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
-<path d="M793.6,332.8 L844.8,332.8 L844.8,320.0 L793.6,320.0 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>tst_e2: floor 32 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
-<path d="M793.6,345.6 L844.8,345.6 L844.8,332.8 L793.6,332.8 Z" fill="rgb(207,207,207)" fill-rule="evenodd"><title>tst_e3: floor 48 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
-<path d="M793.6,358.4 L844.8,358.4 L844.8,345.6 L793.6,345.6 Z" fill="rgb(214,214,214)" fill-rule="evenodd"><title>tst_e4: floor 64 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
-<path d="M793.6,371.2 L844.8,371.2 L844.8,358.4 L793.6,358.4 Z" fill="rgb(220,220,220)" fill-rule="evenodd"><title>tst_e5: floor 80 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
-<path d="M678.4,435.2 L844.8,435.2 L844.8,428.8 L844.8,409.6 L844.8,403.2 L844.8,377.6 L844.8,371.2 L793.6,371.2 L793.6,307.2 L729.6,307.2 L729.6,371.2 L678.4,371.2 Z" fill="rgb(227,227,227)" fill-rule="evenodd"><title>control: floor 96 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
+<path d="M678.4,307.2 L844.8,307.2 L844.8,268.8 L678.4,268.8 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>lobby: floor 0 ceil 224 FLAT4/TLITE6_5 light 112</title></path>
+<path d="M678.4,320.0 L729.6,320.0 L729.6,307.2 L678.4,307.2 Z" fill="rgb(195,195,195)" fill-rule="evenodd"><title>tst_w1: floor 16 ceil 224 FLAT4/TLITE6_5 light 144</title></path>
+<path d="M678.4,332.8 L729.6,332.8 L729.6,320.0 L678.4,320.0 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>tst_w2: floor 32 ceil 224 FLAT4/TLITE6_5 light 144</title></path>
+<path d="M678.4,345.6 L729.6,345.6 L729.6,332.8 L678.4,332.8 Z" fill="rgb(207,207,207)" fill-rule="evenodd"><title>tst_w3: floor 48 ceil 224 FLAT4/TLITE6_5 light 144</title></path>
+<path d="M678.4,358.4 L729.6,358.4 L729.6,345.6 L678.4,345.6 Z" fill="rgb(214,214,214)" fill-rule="evenodd"><title>tst_w4: floor 64 ceil 224 FLAT4/TLITE6_5 light 144</title></path>
+<path d="M678.4,371.2 L729.6,371.2 L729.6,358.4 L678.4,358.4 Z" fill="rgb(220,220,220)" fill-rule="evenodd"><title>tst_w5: floor 80 ceil 224 FLAT4/TLITE6_5 light 144</title></path>
+<path d="M793.6,320.0 L844.8,320.0 L844.8,307.2 L793.6,307.2 Z" fill="rgb(195,195,195)" fill-rule="evenodd"><title>tst_e1: floor 16 ceil 224 FLAT4/TLITE6_5 light 144</title></path>
+<path d="M793.6,332.8 L844.8,332.8 L844.8,320.0 L793.6,320.0 Z" fill="rgb(201,201,201)" fill-rule="evenodd"><title>tst_e2: floor 32 ceil 224 FLAT4/TLITE6_5 light 144</title></path>
+<path d="M793.6,345.6 L844.8,345.6 L844.8,332.8 L793.6,332.8 Z" fill="rgb(207,207,207)" fill-rule="evenodd"><title>tst_e3: floor 48 ceil 224 FLAT4/TLITE6_5 light 144</title></path>
+<path d="M793.6,358.4 L844.8,358.4 L844.8,345.6 L793.6,345.6 Z" fill="rgb(214,214,214)" fill-rule="evenodd"><title>tst_e4: floor 64 ceil 224 FLAT4/TLITE6_5 light 144</title></path>
+<path d="M793.6,371.2 L844.8,371.2 L844.8,358.4 L793.6,358.4 Z" fill="rgb(220,220,220)" fill-rule="evenodd"><title>tst_e5: floor 80 ceil 224 FLAT4/TLITE6_5 light 144</title></path>
+<path d="M678.4,435.2 L844.8,435.2 L844.8,428.8 L844.8,377.6 L844.8,371.2 L793.6,371.2 L793.6,307.2 L729.6,307.2 L729.6,371.2 L678.4,371.2 Z" fill="rgb(227,227,227)" fill-rule="evenodd"><title>control: floor 96 ceil 224 FLAT4/TLITE6_5 light 176</title></path>
 <path d="M793.6,441.6 L832.0,441.6 L832.0,435.2 L793.6,435.2 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>window_t: floor 128 ceil 192 FLAT5_4/CEIL5_1 light 192</title></path>
-<path d="M844.8,428.8 L851.2,428.8 L851.2,409.6 L844.8,409.6 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>window_e: floor 128 ceil 192 FLAT5_4/CEIL5_1 light 192</title></path>
+<path d="M844.8,428.8 L851.2,428.8 L851.2,403.2 L844.8,403.2 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>window_e: floor 128 ceil 192 FLAT5_4/CEIL5_1 light 192</title></path>
 <path d="M729.6,441.6 L780.8,441.6 L780.8,435.2 L729.6,435.2 Z" fill="#a0703c" fill-rule="evenodd"><title>d_pier: floor 96 ceil 96 FLAT4/FLAT20 light 176</title></path>
 <path d="M499.2,185.6 L550.4,185.6 L550.4,179.2 L499.2,179.2 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>d_filt_alcove: floor 0 ceil 128 MFLR8_1/CEIL5_1 light 176</title></path>
 <path d="M499.2,179.2 L550.4,179.2 L550.4,172.8 L499.2,172.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_filt: floor 0 ceil 0 MFLR8_1/FLAT20 light 144</title></path>
@@ -101,8 +101,7 @@
 <path d="M1100.8,928.0 L1177.6,928.0 L1177.6,857.6 L1100.8,857.6 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>secl_s: floor 0 ceil 128 MFLR8_1/CEIL5_1 light 96</title></path>
 <line x1="524.8" y1="838.4" x2="550.4" y2="838.4" stroke="#111" stroke-width="1.6"/>
 <line x1="550.4" y1="838.4" x2="652.8" y2="838.4" stroke="#777" stroke-width="0.6"/>
-<line x1="652.8" y1="838.4" x2="672.0" y2="838.4" stroke="#111" stroke-width="1.6"/>
-<line x1="672.0" y1="838.4" x2="678.4" y2="838.4" stroke="#111" stroke-width="1.6"/>
+<line x1="652.8" y1="838.4" x2="678.4" y2="838.4" stroke="#111" stroke-width="1.6"/>
 <line x1="678.4" y1="838.4" x2="729.6" y2="838.4" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
 <line x1="729.6" y1="838.4" x2="729.6" y2="953.6" stroke="#111" stroke-width="1.6"/>
 <line x1="729.6" y1="953.6" x2="524.8" y2="953.6" stroke="#111" stroke-width="1.6"/>
@@ -138,10 +137,10 @@
 <line x1="678.4" y1="825.6" x2="652.8" y2="825.6" stroke="#111" stroke-width="1.6"/>
 <line x1="550.4" y1="825.6" x2="448.0" y2="825.6" stroke="#111" stroke-width="1.6"/>
 <line x1="448.0" y1="825.6" x2="422.4" y2="800.0" stroke="#111" stroke-width="1.6"/>
-<line x1="768.0" y1="748.8" x2="793.6" y2="748.8" stroke="#777" stroke-width="0.6"/>
-<line x1="793.6" y1="748.8" x2="793.6" y2="723.2" stroke="#777" stroke-width="0.6"/>
-<line x1="793.6" y1="723.2" x2="768.0" y2="723.2" stroke="#777" stroke-width="0.6"/>
-<line x1="768.0" y1="723.2" x2="768.0" y2="748.8" stroke="#777" stroke-width="0.6"/>
+<line x1="780.8" y1="761.6" x2="806.4" y2="736.0" stroke="#777" stroke-width="0.6"/>
+<line x1="806.4" y1="736.0" x2="780.8" y2="710.4" stroke="#777" stroke-width="0.6"/>
+<line x1="780.8" y1="710.4" x2="755.2" y2="736.0" stroke="#777" stroke-width="0.6"/>
+<line x1="755.2" y1="736.0" x2="780.8" y2="761.6" stroke="#777" stroke-width="0.6"/>
 <line x1="416.0" y1="729.6" x2="422.4" y2="729.6" stroke="#111" stroke-width="1.6"/>
 <line x1="422.4" y1="780.8" x2="416.0" y2="780.8" stroke="#111" stroke-width="1.6"/>
 <line x1="416.0" y1="780.8" x2="416.0" y2="729.6" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
@@ -228,8 +227,7 @@
 <line x1="601.6" y1="467.2" x2="601.6" y2="448.0" stroke="#777" stroke-width="0.6"/>
 <line x1="601.6" y1="448.0" x2="601.6" y2="441.6" stroke="#777" stroke-width="0.6"/>
 <line x1="601.6" y1="441.6" x2="672.0" y2="441.6" stroke="#777" stroke-width="0.6"/>
-<line x1="672.0" y1="441.6" x2="678.4" y2="441.6" stroke="#111" stroke-width="1.6"/>
-<line x1="678.4" y1="441.6" x2="729.6" y2="441.6" stroke="#111" stroke-width="1.6"/>
+<line x1="672.0" y1="441.6" x2="729.6" y2="441.6" stroke="#111" stroke-width="1.6"/>
 <line x1="729.6" y1="441.6" x2="729.6" y2="518.4" stroke="#777" stroke-width="0.6"/>
 <line x1="729.6" y1="518.4" x2="704.0" y2="518.4" stroke="#777" stroke-width="0.6"/>
 <line x1="704.0" y1="518.4" x2="704.0" y2="569.6" stroke="#777" stroke-width="0.6"/>
@@ -239,8 +237,7 @@
 <line x1="780.8" y1="518.4" x2="780.8" y2="441.6" stroke="#777" stroke-width="0.6"/>
 <line x1="780.8" y1="441.6" x2="793.6" y2="441.6" stroke="#111" stroke-width="1.6"/>
 <line x1="793.6" y1="441.6" x2="832.0" y2="441.6" stroke="#777" stroke-width="0.6"/>
-<line x1="832.0" y1="441.6" x2="844.8" y2="441.6" stroke="#111" stroke-width="1.6"/>
-<line x1="844.8" y1="441.6" x2="851.2" y2="441.6" stroke="#111" stroke-width="1.6"/>
+<line x1="832.0" y1="441.6" x2="851.2" y2="441.6" stroke="#111" stroke-width="1.6"/>
 <line x1="851.2" y1="441.6" x2="979.2" y2="441.6" stroke="#777" stroke-width="0.6"/>
 <line x1="979.2" y1="441.6" x2="979.2" y2="595.2" stroke="#777" stroke-width="0.6"/>
 <line x1="979.2" y1="595.2" x2="422.4" y2="595.2" stroke="#777" stroke-width="0.6"/>
@@ -322,8 +319,8 @@
 <line x1="1190.4" y1="185.6" x2="1292.8" y2="185.6" stroke="#111" stroke-width="1.6"/>
 <line x1="1292.8" y1="185.6" x2="1292.8" y2="217.6" stroke="#111" stroke-width="1.6"/>
 <line x1="851.2" y1="435.2" x2="851.2" y2="428.8" stroke="#111" stroke-width="1.6"/>
-<line x1="851.2" y1="428.8" x2="851.2" y2="409.6" stroke="#777" stroke-width="0.6"/>
-<line x1="851.2" y1="409.6" x2="851.2" y2="249.6" stroke="#111" stroke-width="1.6"/>
+<line x1="851.2" y1="428.8" x2="851.2" y2="403.2" stroke="#777" stroke-width="0.6"/>
+<line x1="851.2" y1="403.2" x2="851.2" y2="249.6" stroke="#111" stroke-width="1.6"/>
 <line x1="851.2" y1="249.6" x2="787.2" y2="249.6" stroke="#111" stroke-width="1.6"/>
 <line x1="787.2" y1="249.6" x2="736.0" y2="249.6" stroke="#777" stroke-width="0.6"/>
 <line x1="736.0" y1="249.6" x2="672.0" y2="249.6" stroke="#111" stroke-width="1.6"/>
@@ -376,8 +373,7 @@
 <line x1="793.6" y1="371.2" x2="793.6" y2="358.4" stroke="#777" stroke-width="0.6"/>
 <line x1="844.8" y1="371.2" x2="844.8" y2="377.6" stroke="#111" stroke-width="1.6"/>
 <line x1="844.8" y1="377.6" x2="844.8" y2="403.2" stroke="#d0201a" stroke-width="2.5"><title>action 23 tag 1</title></line>
-<line x1="844.8" y1="403.2" x2="844.8" y2="409.6" stroke="#111" stroke-width="1.6"/>
-<line x1="844.8" y1="409.6" x2="844.8" y2="428.8" stroke="#777" stroke-width="0.6"/>
+<line x1="844.8" y1="403.2" x2="844.8" y2="428.8" stroke="#777" stroke-width="0.6"/>
 <line x1="844.8" y1="428.8" x2="844.8" y2="435.2" stroke="#111" stroke-width="1.6"/>
 <line x1="844.8" y1="435.2" x2="832.0" y2="435.2" stroke="#111" stroke-width="1.6"/>
 <line x1="832.0" y1="435.2" x2="793.6" y2="435.2" stroke="#777" stroke-width="0.6"/>
@@ -387,7 +383,7 @@
 <line x1="678.4" y1="435.2" x2="678.4" y2="371.2" stroke="#111" stroke-width="1.6"/>
 <line x1="832.0" y1="435.2" x2="832.0" y2="441.6" stroke="#111" stroke-width="1.6"/>
 <line x1="793.6" y1="441.6" x2="793.6" y2="435.2" stroke="#111" stroke-width="1.6"/>
-<line x1="844.8" y1="409.6" x2="851.2" y2="409.6" stroke="#111" stroke-width="1.6"/>
+<line x1="844.8" y1="403.2" x2="851.2" y2="403.2" stroke="#111" stroke-width="1.6"/>
 <line x1="851.2" y1="428.8" x2="844.8" y2="428.8" stroke="#111" stroke-width="1.6"/>
 <line x1="780.8" y1="435.2" x2="780.8" y2="441.6" stroke="#111" stroke-width="1.6"/>
 <line x1="729.6" y1="441.6" x2="729.6" y2="435.2" stroke="#111" stroke-width="1.6"/>
@@ -508,7 +504,7 @@
 <text x="627.2" y="896.0" font-size="9" text-anchor="middle" fill="#333">start 0</text>
 <text x="486.4" y="896.0" font-size="9" text-anchor="middle" fill="#333">sec1 0</text>
 <text x="672.0" y="713.6" font-size="9" text-anchor="middle" fill="#333">yard_s 0</text>
-<text x="780.8" y="736.0" font-size="9" text-anchor="middle" fill="#333">housing 64</text>
+<text x="780.8" y="736.0" font-size="9" text-anchor="middle" fill="#333">housing 72</text>
 <text x="313.6" y="755.2" font-size="9" text-anchor="middle" fill="#333">corr1 0</text>
 <text x="192.0" y="739.2" font-size="9" text-anchor="middle" fill="#333">corr2 0</text>
 <text x="259.2" y="598.4" font-size="9" text-anchor="middle" fill="#333">hall_s -16</text>
