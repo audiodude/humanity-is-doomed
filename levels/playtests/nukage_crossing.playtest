@@ -15,9 +15,17 @@ walk -96 272 320 384
 open 320 416
 
 # South yard -> pump door -> dark corridor -> pump hall -> blue key on its pedestal.
-walk 320 470 -300 600 -370 624
+walk 320 470 320 700
+look 90
+shot yard-south     # brick basin: canal kerb, tower's silver south face, ledge
+look 180
+shot yard-south-west   # pump-wing door in its SUPPORT3 recess
+walk -300 600 -370 624
 open -400 624
-walk -450 624 -960 624 -960 800 -1024 1380 -1024 1500 -768 1632
+walk -450 624 -960 624 -960 800
+look 90
+shot pump-hall      # PIPE2 hall, PIPES pump plinths, METAL risers
+walk -1024 1380 -1024 1500 -768 1632
 expect has BlueCard
 wait 70
 expect ceil -1160 1216 > 64        # the closet behind you opened
@@ -36,6 +44,9 @@ walk -380 1664 -300 1664
 # Secret 4: filter house, hinted panel to the backpack.
 walk -128 2000 -128 2044
 open -128 2064
+walk -128 2150 128 2320
+look 180
+shot filter-house   # BROWNGRN shed; the hinted panel is on the far wall
 walk -128 2150 -330 2288
 open -352 2288
 walk -448 2288
@@ -46,6 +57,9 @@ open -128 2080
 walk -128 2000
 
 # Control tower: the switch lowers the sluice gate into a bridge.
+walk 464 2000
+look 270
+shot tower          # SILVER1 tower on its plinth, on the brick bank
 walk 464 1960 464 1892
 open 464 1872
 walk 464 1800 320 1790 320 1560 640 1536
@@ -86,6 +100,9 @@ wait 105
 expect ceil 1800 896 > 64
 expect ceil 1408 376 > 64
 expect ceil 1184 2056 > 104
+walk 1700 880
+look 0
+shot red-closet     # opened secl_e: BROWN144 inside, SUPPORT3 beside the door
 
 # Gate switch opens the way back to the start yard.
 walk 930 480
@@ -95,7 +112,10 @@ expect ceil 888 736 > 64
 walk 930 736 840 736 930 736 1088 950
 
 # Back across, up the terrace, red door, exit.
-walk 1088 1450 1472 1500 1472 1900 1472 1950 1472 2010 1472 2046
+walk 1088 1450 1472 1500 1472 1900
+look 90
+shot terrace        # terrace risers, guardroom and red door in the brick wall
+walk 1472 1950 1472 2010 1472 2046
 open 1472 2064
 walk 1472 2120 1472 2330
 shot exit

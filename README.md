@@ -43,7 +43,7 @@ A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/med
 The `UMAPINFO` lump names the level for ports that read it (dsda-doom, GZDoom). Vanilla DOOM II still calls it "entryway".
 
 ### Nukage Crossing (`nukage_crossing`)
-MAP02, designed from the [research](#research-what-makes-doom-levels-fun) below: 99 sectors, 21/43/57 monsters on easy/medium/hard, four secrets.
+MAP02, designed from the [research](#research-what-makes-doom-levels-fun) below: 99 sectors, 21/43/57 monsters on easy/medium/hard, four secrets. It was retextured after the texture research (design: `levels/designs/nukage_crossing.md`): one brick for the whole canal basin, a signature material per area, and trim where materials meet. The first version's textures are kept in `levels/nukage_crossing_original.py`, which isn't built into the WAD.
 
 Measured with the research scripts against the DOOM II maps (median in brackets):
 
@@ -57,8 +57,10 @@ Measured with the research scripts against the DOOM II maps (median in brackets)
 | Easy/UV and HMP/UV monster ratios | 0.37 / 0.75 | 0.33 / 0.70 |
 | Deaf monsters | 37% | 42% |
 | Nearest monster to the start | 487 | 300 |
+| Most-used wall texture (BRICK6) | 28% | 30% |
+| Material joins with a border texture | 81% | 31% |
 
-No monster can see the start window. Whole-map symmetry (0.82) is above the id range, because the two banks mirror each other across the canal; they are told apart by their materials and landmarks.
+No monster can see the start window. Whole-map symmetry (0.82) is above the id range, because the two banks mirror each other across the canal; they are told apart by their landmarks: the pump housing, the silver tower, the red-key platform and the terrace.
 
 ### Nukage Core (`nukage_core`)
 MAP03, also designed from the research: 111 sectors, 27/53/73 monsters on easy/medium/hard, five secrets. It introduces the mancubus.
