@@ -7,7 +7,7 @@
 - **Shape:** one long hall crossed twice, at two heights and in opposite directions: a horizontal hairpin folded vertically. On the first crossing you look down at everything you'll walk through on the second. On the second, the gantry you walked along is the arachnotrons' firing line.
 - **Theme:** the turbine hall of the nukage plant. Four turbine housings stand in a grey hall 2048 long and 384 high. A railed gantry runs the length of its north wall, and a control annex, a bronze generator house and a flooded sump open off it.
 - **Difficulty:** medium-hard. About 24/46/63 monsters on easy/HMP/UV. **Debut: the arachnotron.**
-- **Slot:** MAP06 of `NUKAGE.WAD`. No other module changes: UMAPINFO entries without `next` follow slot order, so MAP05 leads to MAP06.
+- **Slot:** MAP06 of `NUKAGE.WAD`. No other module changes: UMAPINFO entries without `next` follow slot order, so MAP05 leads to MAP06. Its UMAPINFO sets `intertext = clear`: without it, UMAPINFO ports fall back to DOOM II's own text screen after MAP06, the starport one.
 
 How it differs from the set:
 
