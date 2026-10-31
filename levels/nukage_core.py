@@ -1,4 +1,6 @@
 """Nukage Core: MAP03 of NUKAGE.WAD, designed from the level-design research (see the README).
+Retextured from levels/designs/nukage_core.md; the first version's textures
+are in levels/nukage_core_original.py.
 
     python3 -m levels nukage_core
 
@@ -28,8 +30,8 @@ south face, in plain view of the start (blue armor, rockets); a turbine
 hall panel (backpack); a stair-tower panel (soulsphere).
 """
 from .doom2 import *  # noqa: F403 - thing types, actions, sector specials
-from .model import (SKY, Sector, Special, Thing, closet, door, doorway, lift, pedestal, rect, stairs, switch_niche,
-                    window)
+from .model import (ML_DONTPEGBOTTOM, ML_DONTPEGTOP, ML_TWOSIDED, SKY, Line, Sector, Side, Special, Thing, closet,
+                    door, doorway, lift, pedestal, rect, stairs, switch_niche, window)
 
 MAP = "MAP03"
 WAD = "NUKAGE.WAD"
@@ -39,9 +41,28 @@ TAG_GATE, TAG_DARK, TAG_TANKCL, TAG_PENS, TAG_CROWN, TAG_SELIFT, TAG_CLIFT = 1, 
 
 SKYC, MOAT = 448, -48                  # atrium sky ceiling, moat bed
 GW, GN, GE, CORE = 48, 144, 240, 272   # gallery floors (west, north, east) and the core's top
-OUT_S, OUT_W, OUT_N, OUT_E = "TEKWALL4", "BROWNGRN", "BRONZE2", "SILVER3"   # atrium walls by side
-CORE_WALL = "TEKGREN2"
-F_TER, F_GW, F_GN, F_GE, F_CORE = "FLOOR4_6", "FLOOR7_1", "FLOOR5_2", "FLAT5_5", "FLOOR4_8"
+# Materials (levels/designs/nukage_core.md): one bronze cladding for the whole
+# atrium and its stair towers, SUPPORT3 trim, a signature family per area.
+BASE, TRIM, TRIM_OPS = "BRONZE2", "SUPPORT3", "SUPPORT2"
+CORE_WALL, CROWN, HATCH = "TEKGREN2", "TEKGREN5", "TEKGREN1"   # the reactor
+OPS, OPS_PLAIN = "SILVER3", "SILVER1"                          # start booth and control room
+FILTER, TANK, TURB, STORE = "BROWNGRN", "TEKWALL1", "TEKBRON1", "BROWN1"
+DOOR = "BIGDOOR4"
+F_WALK, F_CORE = "FLOOR5_2", "FLOOR4_8"   # atrium walkways and towers; the core's top
+
+
+def recessed(name, at, facing, near, far, *, far_trim=TRIM, **kw):
+    """doorway() with TRIM recesses whose 8-unit step risers are in the wall
+    of the room they face (`near`, `far`), pegged to it, rather than a strip
+    of trim under the door. far_trim: the far recess's walls."""
+    secs = doorway(name, at, facing, alcove_wall=TRIM, **kw)
+    for s in secs:
+        if s.name.endswith("_alcove"):
+            s.lower = near
+        elif s.name.endswith("_far"):
+            s.wall, s.lower = far_trim, far
+    return secs
+
 
 # The core: an octagon centred on (0, 1280). The crown on top is a walled
 # room, so the top is two C-shaped halves wrapped around it.
@@ -81,152 +102,155 @@ turbine_w, turbine_e = octagon(-288, 2400, 96, 32), octagon(288, 2400, 96, 32)
 dais = rect(-192, 2672, 192, 2864)
 PED_Y = (-32, 2784, 32, 2848)
 ped_y = rect(*PED_Y)
-# The exit switch, sized to SW1EXIT (32x72), in the crown's west wall.
+# The exit switch, sized to SW1EXIT (32x72), in the crown's west wall, framed in trim.
 niche, sw_exit = switch_niche("niche", (-112, 1280), "w", Special(S1_EXIT, 0, "SW1EXIT"), floor=CORE + 24,
-                              flat="FLOOR0_1", wall="EXITSTON", ctex="TLITE6_4", light=240, width=32, height=72,
+                              flat="FLOOR0_1", wall=TRIM_OPS, ctex="TLITE6_4", light=240, width=32, height=72,
                               depth=8)
 
 SECTORS = [
     # Start room: the window looks north across the terrace and moat at the core.
-    Sector("start", [rect(-256, 160, 256, 448)], 0, 128, "FLOOR0_6", "CEIL3_5", 160, "COMPSPAN"),
-    window("window_s", (-96, 448, 96, 512), 32, 112, "COMPSPAN", 176, ctex="CEIL3_5"),
-    *doorway("d_start", (192, 448), "n", alcove=24, far_alcove=24, alcove_wall="COMPSPAN", face="BIGDOOR2",
-             floor=8, alcove_flat=F_TER, flat=F_TER),
+    Sector("start", [rect(-256, 160, 256, 448)], 0, 128, "FLOOR0_6", "CEIL3_5", 160, OPS),
+    # Plain steel jambs and sill; the sill's terrace side is bronze (OVERRIDES).
+    window("window_s", (-96, 448, 96, 512), 32, 112, OPS_PLAIN, 176, ctex="CEIL3_5", lower=OPS_PLAIN),
+    *recessed("d_start", (192, 448), "n", OPS, BASE, alcove=24, far_alcove=24, face=DOOR, floor=8,
+              alcove_flat=F_WALK, flat=F_WALK),
 
     # South terrace, behind a rail over the moat. Steps lead down into the moat.
-    Sector("terrace", [rect(-576, 512, 576, 704)], 0, SKYC, F_TER, SKY, 192, OUT_S),
-    Sector("par_sw", [rect(-560, 704, -64, 720)], 32, SKYC, "FLAT5_4", SKY, 192, OUT_S, lower="SUPPORT3"),
-    Sector("par_se", [rect(64, 704, 560, 720)], 32, SKYC, "FLAT5_4", SKY, 192, OUT_S, lower="SUPPORT3"),
-    Sector("moat_gap", [rect(-64, 704, 64, 720)], 0, SKYC, F_TER, SKY, 192, OUT_S),
-    Sector("mstep", [rect(-64, 720, 64, 752)], -24, SKYC, "NUKAGE1", SKY, 176, OUT_S, lower="NUKEDGE1",
+    Sector("terrace", [rect(-576, 512, 576, 704)], 0, SKYC, F_WALK, SKY, 192, BASE),
+    Sector("par_sw", [rect(-560, 704, -64, 720)], 32, SKYC, "FLAT5_4", SKY, 192, BASE),
+    Sector("par_se", [rect(64, 704, 560, 720)], 32, SKYC, "FLAT5_4", SKY, 192, BASE),
+    Sector("moat_gap", [rect(-64, 704, 64, 720)], 0, SKYC, F_WALK, SKY, 192, BASE),
+    Sector("mstep", [rect(-64, 720, 64, 752)], -24, SKYC, "NUKAGE1", SKY, 176, BASE, lower="NUKEDGE1",
            special=DAMAGE_5),
     # Filter house (optional), off the terrace: filter beds of sludge, crates
     # for cover, and a hinted panel to a secret closet.
-    *doorway("d_filt", (448, 512), "s", alcove=16, far_alcove=16, alcove_wall="BRICK7", floor=8, alcove_flat=F_TER,
-             flat=F_TER),
-    Sector("filt", [rect(288, -16, 960, 464)] + beds + crates_f, 0, 192, "FLOOR1_7", "CEIL5_2", 144, "BRICK7",
+    *recessed("d_filt", (448, 512), "s", BASE, FILTER, alcove=16, far_alcove=16, face=DOOR, floor=8,
+              alcove_flat=F_WALK, flat=F_WALK),
+    Sector("filt", [rect(288, -16, 960, 464)] + beds + crates_f, 0, 192, "FLOOR1_7", "CEIL5_2", 144, FILTER,
            special=LIGHT_FLICKER),
-    *[Sector(f"bed{i}", [b], -16, 192, "NUKAGE1", "CEIL5_2", 160, "BRICK7", lower="NUKEDGE1",
+    *[Sector(f"bed{i}", [b], -16, 192, "NUKAGE1", "CEIL5_2", 160, FILTER, lower="NUKEDGE1",
              special=DAMAGE_5) for i, b in enumerate(beds)],
-    *[Sector(f"crate_f{i}", [c], 64, 192, "CRATOP1", "CEIL5_2", 144, "BRICK7", lower="CRATE1")
+    *[Sector(f"crate_f{i}", [c], 64, 192, "CRATOP1", "CEIL5_2", 144, FILTER, lower="CRATE1")
       for i, c in enumerate(crates_f)],
-    *closet("sec5", (960, 320), "e", 0, face="BRICK7", flat="FLOOR1_7", wall="BRICK7", width=128, depth=128,
+    *closet("sec5", (960, 320), "e", 0, face=FILTER, flat="FLOOR1_7", wall=FILTER, width=128, depth=128,
             ctex="CEIL5_2", light=160, special=SECRET_AREA, door_width=64),
 
     # The moat and the core. The core's sides and the parapets rise straight out of it.
-    Sector("moat", [moat], MOAT, SKYC, "NUKAGE1", SKY, 176, OUT_S, special=DAMAGE_5),
+    Sector("moat", [moat], MOAT, SKYC, "NUKAGE1", SKY, 176, BASE, special=DAMAGE_5),
     Sector("core_e", [core_e], CORE, SKYC, F_CORE, SKY, 208, CORE_WALL, lower=CORE_WALL),
     Sector("core_w", [core_w], CORE, SKYC, F_CORE, SKY, 208, CORE_WALL, lower=CORE_WALL),
-    Sector("causeway", [rect(288, 1184, 560, 1376)], 256, SKYC, "FLAT23", SKY, 192, "SUPPORT3", lower="SUPPORT3"),
+    Sector("causeway", [rect(288, 1184, 560, 1376)], 256, SKYC, "FLAT23", SKY, 192, TRIM, lower=TRIM),
     # Secret: a ledge on the core's south face, seen from the start window, and a lift up from the moat.
-    Sector("ledge", [rect(-96, 928, 96, 992)], 96, SKYC, "FLAT5_4", SKY, 224, CORE_WALL, lower="METAL",
-           special=SECRET_AREA),
-    lift("lift_core", (-32, 864, 32, 928), 96, SKYC, TAG_CLIFT, SKY, 224, CORE_WALL, ftex="FLAT5_4", walk_on=True),
-    # The crown: the exit room on top of the core, opened when you step onto the core.
-    door("d_crown", rect(112, 1216, 128, 1344), face="METAL2", track="METAL2", tag=TAG_CROWN, floor=CORE,
-         light=208, flat=F_CORE),
-    Sector("crown", [rect(-112, 1168, 112, 1392)], CORE + 8, 400, "FLOOR0_1", "TLITE6_4", 224, "EXITSTON",
+    # Both are faced in the core's own panels, so from the moat they're part of the core.
+    Sector("ledge", [rect(-96, 928, 96, 992)], 96, SKYC, "FLAT5_4", SKY, 224, CORE_WALL, special=SECRET_AREA),
+    lift("lift_core", (-32, 864, 32, 928), 96, SKYC, TAG_CLIFT, SKY, 224, CORE_WALL, ftex="FLAT5_4",
+         side=CORE_WALL, walk_on=True),
+    # The crown: the exit room on top of the core, opened when you step onto the
+    # core. Its hatch is the reactor's own hazard-striped panel.
+    door("d_crown", rect(112, 1216, 128, 1344), face=HATCH, tag=TAG_CROWN, floor=CORE, light=208, flat=F_CORE),
+    Sector("crown", [rect(-112, 1168, 112, 1392)], CORE + 8, 400, "FLOOR0_1", "TLITE6_4", 224, CROWN,
            special=LIGHT_GLOW),
     niche,
 
     # Galleries: west, north and east, each 96 above the last, behind rails.
-    Sector("gal_w", [rect(-768, 704, -576, 1856)], GW, SKYC, F_GW, SKY, 176, OUT_W),
-    Sector("par_w_s", [rect(-576, 704, -560, 1408)], GW + 32, SKYC, "FLAT5_4", SKY, 176, OUT_W, lower=OUT_W),
-    Sector("par_w_n", [rect(-576, 1536, -560, 1856)], GW + 32, SKYC, "FLAT5_4", SKY, 176, OUT_W, lower=OUT_W),
+    Sector("gal_w", [rect(-768, 704, -576, 1856)], GW, SKYC, F_WALK, SKY, 176, BASE),
+    Sector("par_w_s", [rect(-576, 704, -560, 1408)], GW + 32, SKYC, "FLAT5_4", SKY, 176, BASE),
+    Sector("par_w_n", [rect(-576, 1536, -560, 1856)], GW + 32, SKYC, "FLAT5_4", SKY, 176, BASE),
     # A pier off the west gallery, out over the moat towards the core.
-    Sector("pier", [rect(-576, 1408, -400, 1536)], GW - 8, SKYC, "FLAT23", SKY, 176, OUT_W, lower="SUPPORT3"),
-    Sector("gal_n", [rect(-768, 1856, 768, 2048)], GN, SKYC, F_GN, SKY, 200, OUT_N),
-    Sector("par_n", [rect(-560, 1840, 560, 1856)], GN + 32, SKYC, "FLAT5_4", SKY, 200, OUT_N, lower=OUT_N),
-    Sector("gal_e", [rect(576, 704, 768, 1856)], GE, SKYC, F_GE, SKY, 216, OUT_E),
-    Sector("par_e_s", [rect(560, 704, 576, 1184)], GE + 32, SKYC, "FLAT5_4", SKY, 216, OUT_E, lower=OUT_E),
-    Sector("par_e_n", [rect(560, 1376, 576, 1856)], GE + 32, SKYC, "FLAT5_4", SKY, 216, OUT_E, lower=OUT_E),
+    Sector("pier", [rect(-576, 1408, -400, 1536)], GW - 8, SKYC, "FLAT23", SKY, 176, BASE, lower=TRIM),
+    Sector("gal_n", [rect(-768, 1856, 768, 2048)], GN, SKYC, F_WALK, SKY, 200, BASE),
+    Sector("par_n", [rect(-560, 1840, 560, 1856)], GN + 32, SKYC, "FLAT5_4", SKY, 200, BASE),
+    Sector("gal_e", [rect(576, 704, 768, 1856)], GE, SKYC, F_WALK, SKY, 216, BASE),
+    Sector("par_e_s", [rect(560, 704, 576, 1184)], GE + 32, SKYC, "FLAT5_4", SKY, 216, BASE),
+    Sector("par_e_n", [rect(560, 1376, 576, 1856)], GE + 32, SKYC, "FLAT5_4", SKY, 216, BASE),
     # The shutter across the causeway, raised by the control-room switch.
-    door("d_gate", rect(560, 1184, 576, 1376), face="SUPPORT3", track="SUPPORT3", tag=TAG_GATE, floor=GE,
-         light=200, flat=F_GE),
+    door("d_gate", rect(560, 1184, 576, 1376), face=TRIM, track=TRIM, tag=TAG_GATE, floor=GE, light=200,
+         flat=F_WALK),
 
     # West wing: a dark, low pump room off the terrace, stairs up onto the west gallery.
-    *doorway("d_west", (-576, 608), "w", alcove=16, alcove_wall="SUPPORT2", floor=8, alcove_flat=F_TER, flat=F_TER),
+    *recessed("d_west", (-576, 608), "w", BASE, None, alcove=16, face=DOOR, floor=8, alcove_flat=F_WALK,
+              flat=F_WALK),
     Sector("wcorr", [rect(-768, 544, -608, 672)], 0, 128, "FLOOR3_3", "CEIL5_2", 128, "PIPE4"),
     Sector("pumps", [rect(-1344, 384, -768, 832)], 0, 112, "FLOOR3_3", "CEIL5_2", 104, "PIPE4",
            special=LIGHT_FLICKER, pillars=pump_pillars),
     *closet("sec1", (-1344, 608), "w", 0, face="PIPE4", flat="FLOOR3_3", wall="PIPE4", width=128, depth=144,
             height=96, ctex="CEIL5_2", light=144, special=SECRET_AREA, door_width=64),
-    *stairs("pst", (-1024, 832, -896, 928), "n", 3, 16, 16, 160, F_GW, "CEIL5_2", 128, "PIPE4", "STEP4"),
-    Sector("pland", [rect(-1024, 928, -768, 1056)], GW, 160, F_GW, "CEIL5_2", 144, "PIPE4"),
+    *stairs("pst", (-1024, 832, -896, 928), "n", 3, 16, 16, 160, F_WALK, "CEIL5_2", 128, "PIPE4", "STEP4"),
+    Sector("pland", [rect(-1024, 928, -768, 1056)], GW, 160, F_WALK, "CEIL5_2", 144, "PIPE4"),
 
     # Tank room, off the west gallery: the blue key on a lit pedestal between four nukage pools.
-    *doorway("d_tank", (-768, 1312), "w", alcove=16, far_alcove=16, alcove_wall="SUPPORT2", floor=GW + 8,
-             alcove_flat=F_GW, flat=F_GW),
-    Sector("tank", [rect(-1408, 1088, -816, 1536), ring_b] + pools, GW, 256, "FLAT9", "CEIL4_1", 208, "TEKWALL1",
+    *recessed("d_tank", (-768, 1312), "w", BASE, TANK, alcove=16, far_alcove=16, face=DOOR, floor=GW + 8,
+              alcove_flat=F_WALK, flat=F_WALK),
+    Sector("tank", [rect(-1408, 1088, -816, 1536), ring_b] + pools, GW, 256, "FLAT9", "CEIL4_1", 208, TANK,
            tag=TAG_DARK),
-    Sector("ring_b", [ring_b, ped_b], GW, 256, "FLAT9", "CEIL4_1", 208, "TEKWALL1", tag=TAG_DARK),
-    pedestal("ped_b", PED_B, GW + 24, 256, "TEKWALL1", "CEIL4_1"),
-    *[Sector(f"pool{i}", [p], GW - 16, 256, "NUKAGE1", "CEIL4_1", 192, "TEKWALL1", lower="NUKEDGE1",
+    Sector("ring_b", [ring_b, ped_b], GW, 256, "FLAT9", "CEIL4_1", 208, TANK, tag=TAG_DARK),
+    pedestal("ped_b", PED_B, GW + 24, 256, TANK, "CEIL4_1"),
+    *[Sector(f"pool{i}", [p], GW - 16, 256, "NUKAGE1", "CEIL4_1", 192, TANK, lower="NUKEDGE1",
              special=DAMAGE_5) for i, p in enumerate(pools)],
     *[s for at, facing, name in [((-1408, 1312), "w", "tcl_w"), ((-1248, 1088), "s", "tcl_s")]
-      for s in closet(name, at, facing, TAG_TANKCL, face="TEKWALL1", flat="FLAT9", wall="TEKWALL1", floor=GW,
+      for s in closet(name, at, facing, TAG_TANKCL, face=TANK, flat="FLAT9", wall=TANK, floor=GW,
                       ctex="CEIL4_1", special=LIGHT_FLICKER)],
 
     # Blue door -> dim stair tower -> the north gallery.
-    *doorway("d_blue", (-768, 1696), "w", alcove=16, far_alcove=16, alcove_wall="SUPPORT2", face="BIGDOOR7",
-             track="DOORBLU", action=DR_BLUE, floor=GW + 8, alcove_flat=F_GW, flat=F_GW),
-    Sector("nw_low", [rect(-1216, 1600, -816, 1792)], GW, 176, F_GN, "CEIL5_1", 112, "STONE2",
+    *recessed("d_blue", (-768, 1696), "w", BASE, BASE, alcove=16, far_alcove=16, face=DOOR, track="DOORBLU",
+              action=DR_BLUE, floor=GW + 8, alcove_flat=F_WALK, flat=F_WALK),
+    Sector("nw_low", [rect(-1216, 1600, -816, 1792)], GW, 176, F_WALK, "CEIL5_1", 112, BASE,
            special=LIGHT_BLINK_RANDOM),
-    *stairs("nwst", (-1216, 1792, -1088, 1920), "n", 4, GW + 24, 24, 272, F_GN, "CEIL5_1", 128, "STONE2",
-            "SUPPORT2"),
-    Sector("nw_top", [rect(-1216, 1920, -768, 2048)], GN, 272, F_GN, "CEIL5_1", 144, "STONE2"),
+    *stairs("nwst", (-1216, 1792, -1088, 1920), "n", 4, GW + 24, 24, 272, F_WALK, "CEIL5_1", 128, BASE, BASE),
+    Sector("nw_top", [rect(-1216, 1920, -768, 2048)], GN, 272, F_WALK, "CEIL5_1", 144, BASE),
     # Storage (optional), off the stair tower: climb the crate stack to the berserk pack.
-    *doorway("d_store", (-1024, 2048), "n", alcove=16, far_alcove=16, alcove_wall="SUPPORT2", face="BIGDOOR2",
-             floor=GN + 8, alcove_flat=F_GN, flat=F_GN),
+    *recessed("d_store", (-1024, 2048), "n", BASE, STORE, alcove=16, far_alcove=16, face=DOOR, floor=GN + 8,
+              alcove_flat=F_WALK, flat=F_WALK),
     Sector("store", [rect(-1408, 2096, -800, 2608), crate_a, crate_stack], GN, 320, "FLOOR0_5", "CEIL5_1", 176,
-           "BROWN1"),
-    Sector("crate_a", [crate_a], GN + 64, 320, "CRATOP2", "CEIL5_1", 176, "BROWN1", lower="CRATWIDE"),
-    *[Sector(f"crate_s{i + 1}", [c], GN + 24 * (i + 1), 320, "CRATOP2", "CEIL5_1", 176, "BROWN1", lower="CRATE2")
+           STORE),
+    Sector("crate_a", [crate_a], GN + 64, 320, "CRATOP2", "CEIL5_1", 176, STORE, lower="CRATWIDE"),
+    *[Sector(f"crate_s{i + 1}", [c], GN + 24 * (i + 1), 320, "CRATOP2", "CEIL5_1", 176, STORE, lower="CRATE2")
       for i, c in enumerate(crate_steps)],
 
     # Turbine hall, off the north gallery: two turbine housings for cover, the
     # mancubus on a dais at the far end with the yellow key behind it, and
     # pens behind the side walls that drop when you take the key.
-    *doorway("d_turb", (0, 2048), "n", alcove=16, far_alcove=16, alcove_wall="SUPPORT2", face="BIGDOOR2",
-             floor=GN + 8, alcove_flat=F_GN, flat=F_GN),
+    *recessed("d_turb", (0, 2048), "n", BASE, TURB, alcove=16, far_alcove=16, face=DOOR, floor=GN + 8,
+              alcove_flat=F_WALK, flat=F_WALK),
     Sector("turb", [[(-544, 2096), (544, 2096), (544, 2864), (192, 2864), (192, 2672), (-192, 2672),
                      (-192, 2864), (-544, 2864)], turbine_w, turbine_e], GN, 400, "FLOOR0_2", "CEIL5_1", 160,
-           "TEKBRON1"),
+           TURB),
     Sector("turbine_w", [turbine_w], 400, 400, "CEIL5_1", "CEIL5_1", 160, "METAL", lower="METAL"),
     Sector("turbine_e", [turbine_e], 400, 400, "CEIL5_1", "CEIL5_1", 160, "METAL", lower="METAL"),
-    Sector("dais", [dais, ped_y], GN + 24, 400, "FLOOR4_8", "CEIL5_1", 208, "TEKBRON1", lower="SUPPORT2"),
-    pedestal("ped_y", PED_Y, GN + 40, 400, "TEKBRON1", "CEIL5_1"),
-    Sector("pwall_w", [rect(-576, 2272, -544, 2688)], 400, 400, "FLOOR0_2", "CEIL5_1", 160, "TEKBRON1",
-           lower="TEKBRON1", tag=TAG_PENS),
-    Sector("pen_w", [rect(-768, 2272, -576, 2688)], GN, 272, "FLOOR0_2", "CEIL5_1", 96, "METAL1",
+    Sector("dais", [dais, ped_y], GN + 24, 400, "FLOOR4_8", "CEIL5_1", 208, TURB, lower="METAL"),
+    pedestal("ped_y", PED_Y, GN + 40, 400, TURB, "CEIL5_1"),
+    Sector("pwall_w", [rect(-576, 2272, -544, 2688)], 400, 400, "FLOOR0_2", "CEIL5_1", 160, TURB,
+           lower=TURB, tag=TAG_PENS),
+    Sector("pen_w", [rect(-768, 2272, -576, 2688)], GN, 272, "FLOOR0_2", "CEIL5_1", 96, "TEKBRON2",
            special=LIGHT_BLINK_RANDOM),
-    Sector("pwall_e", [rect(544, 2272, 576, 2528)], 400, 400, "FLOOR0_2", "CEIL5_1", 160, "TEKBRON1",
-           lower="TEKBRON1", tag=TAG_PENS),
-    Sector("pen_e", [rect(576, 2272, 768, 2528)], GN, 272, "FLOOR0_2", "CEIL5_1", 96, "METAL1",
+    Sector("pwall_e", [rect(544, 2272, 576, 2528)], 400, 400, "FLOOR0_2", "CEIL5_1", 160, TURB,
+           lower=TURB, tag=TAG_PENS),
+    Sector("pen_e", [rect(576, 2272, 768, 2528)], GN, 272, "FLOOR0_2", "CEIL5_1", 96, "TEKBRON2",
            special=LIGHT_BLINK_RANDOM),
-    *closet("sec3", (-544, 2784), "w", 0, face="TEKBRON1", flat="FLOOR0_2", wall="TEKBRON1", floor=GN, width=128,
+    *closet("sec3", (-544, 2784), "w", 0, face=TURB, flat="FLOOR0_2", wall=TURB, floor=GN, width=128,
             depth=176, height=112, light=128, special=SECRET_AREA, door_width=64),
 
     # Yellow door -> stair tower -> the east gallery.
-    *doorway("d_yel", (768, 1952), "e", alcove=16, far_alcove=16, alcove_wall="SUPPORT2", face="BIGDOOR7",
-             track="DOORYEL", action=DR_YELLOW, floor=GN + 8, alcove_flat=F_GN, flat=F_GN),
-    Sector("ne_low", [rect(816, 1856, 1152, 2048)], GN, 272, "FLOOR1_1", "CEIL3_5", 128, "STONE3"),
-    *stairs("nest", (1024, 1728, 1152, 1856), "s", 4, GN + 24, 24, 368, F_GE, "CEIL3_5", 144, "STONE3",
-            "SUPPORT2"),
-    Sector("ne_top", [rect(768, 1600, 1152, 1728)], GE, 368, F_GE, "CEIL3_5", 160, "STONE3"),
-    *closet("sec4", (976, 2048), "n", 0, face="STONE3", flat="FLOOR1_1", wall="STONE3", floor=GN, width=128,
+    *recessed("d_yel", (768, 1952), "e", BASE, BASE, alcove=16, far_alcove=16, face=DOOR, track="DOORYEL",
+              action=DR_YELLOW, floor=GN + 8, alcove_flat=F_WALK, flat=F_WALK),
+    Sector("ne_low", [rect(816, 1856, 1152, 2048)], GN, 272, F_WALK, "CEIL3_5", 128, BASE),
+    *stairs("nest", (1024, 1728, 1152, 1856), "s", 4, GN + 24, 24, 368, F_WALK, "CEIL3_5", 144, BASE, BASE),
+    Sector("ne_top", [rect(768, 1600, 1152, 1728)], GE, 368, F_WALK, "CEIL3_5", 160, BASE),
+    *closet("sec4", (976, 2048), "n", 0, face=BASE, flat=F_WALK, wall=BASE, floor=GN, width=128,
             depth=128, height=96, ctex="CEIL3_5", light=176, special=SECRET_AREA, door_width=64),
 
     # Control room off the east gallery. (800, 1184)-(800, 1248) is the
-    # shutter switch, beside the window that looks out at the shutter.
-    *doorway("d_ctrl", (768, 1120), "e", alcove=16, alcove_wall="SUPPORT2", face="BIGDOOR2", floor=GE + 8,
-             alcove_flat=F_GE, flat=F_GE),
-    Sector("ctrl", [rect(800, 1024, 1120, 1472)], GE, 368, "FLAT14", "TLITE6_5", 224, "COMPBLUE"),
-    window("window_c", (768, 1248, 800, 1376), GE + 40, GE + 104, "COMPBLUE", 208),
+    # shutter switch, between the door's recess and the window that looks out
+    # at the shutter, both framed in SUPPORT2. The door is 8 thick, so it has
+    # a recess on each side within the 32-unit wall.
+    *recessed("d_ctrl", (768, 1120), "e", BASE, TRIM_OPS, far_trim=TRIM_OPS, alcove=8, thickness=8,
+              far_alcove=16, face=DOOR, floor=GE + 8, alcove_flat=F_WALK, flat=F_WALK),
+    Sector("ctrl", [rect(800, 1024, 1120, 1472)], GE, 368, "FLAT14", "TLITE6_5", 224, OPS),
+    # Jambs in trim; the sill and lintel faces are set per side in OVERRIDES.
+    window("window_c", (768, 1248, 800, 1376), GE + 40, GE + 104, TRIM_OPS, 208, lower=TRIM_OPS),
     # Lift from the east gallery down to the terrace, behind a shutter that the same switch raises.
-    lift("lift_se", (592, 576, 720, 704), GE, SKYC, TAG_SELIFT, SKY, 192, OUT_E, ftex=F_GE, walk_on=True),
-    door("d_shut", rect(576, 592, 592, 688), face="SUPPORT3", track="SUPPORT3", tag=TAG_GATE, light=192,
-         flat=F_TER),
+    lift("lift_se", (592, 576, 720, 704), GE, SKYC, TAG_SELIFT, SKY, 192, BASE, ftex=F_WALK, walk_on=True),
+    door("d_shut", rect(576, 592, 592, 688), face=TRIM, track=TRIM, tag=TAG_GATE, light=192, flat=F_WALK),
 ]
 
 # Door and lift specials come from the sectors; these are the extra triggers.
@@ -239,6 +263,14 @@ SPECIAL_BETWEEN = {
 SPECIAL_WALLS = {
     **sw_exit,
     ((800, 1184), (800, 1248)): Special(S1_DOOR_OPEN, TAG_GATE, "SW1COMP"),
+}
+# Windows: each side's sill (and lintel) face in that side's material. The
+# bronze sills are unpegged so their panels line up with the wall around them.
+PEG_BOTH = ML_TWOSIDED | ML_DONTPEGTOP | ML_DONTPEGBOTTOM
+OVERRIDES = {
+    ((96, 512), (-96, 512)): Line(flags=PEG_BOTH, front=Side(lower=BASE)),            # start window, terrace side
+    ((768, 1376), (768, 1248)): Line(flags=PEG_BOTH, front=Side(lower=BASE)),         # control window, gallery side
+    ((800, 1248), (800, 1376)): Line(front=Side(upper=TRIM_OPS, lower=TRIM_OPS)),     # control window, frame beside the switch
 }
 SECRET_DOORS = {"d_sec1", "d_sec3", "d_sec4", "d_sec5"}
 MUST_REACH = ["sec1", "filt", "sec5", "ledge", "pier", "tcl_w", "tcl_s", "nw_top", "store", "crate_s3", "pen_w",

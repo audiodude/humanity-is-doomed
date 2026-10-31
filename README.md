@@ -80,7 +80,7 @@ Measured with the research scripts against the DOOM II maps (median in brackets)
 No monster can see the start window. Whole-map symmetry (0.82) is above the id range, because the two banks mirror each other across the canal; they are told apart by their landmarks: the pump housing, the silver tower, the red-key platform and the terrace.
 
 ### Nukage Core (`nukage_core`)
-MAP03, also designed from the research: 111 sectors, 27/53/73 monsters on easy/medium/hard, five secrets. It introduces the mancubus.
+MAP03, also designed from the research: 112 sectors, 27/53/73 monsters on easy/medium/hard, five secrets. It introduces the mancubus. It was retextured after the texture research (design: `levels/designs/nukage_core.md`): one bronze cladding for the whole atrium and its stair towers, the reactor core in green tech panels, a signature material per wing, and trim where materials meet. The first version's textures are kept in `levels/nukage_core_original.py`, which isn't built into the WAD.
 
 A reactor core stands in a nukage moat, with the exit in the crown on top; you see it from the start and climb around it to get there.
 
@@ -98,6 +98,8 @@ Measured with the research scripts against the DOOM II maps:
 | Easy/UV and HMP/UV monster ratios | 0.37 / 0.73 | 0.33 / 0.70 |
 | Deaf monsters | 48% | 42% |
 | Nearest monster to the start | 353 | 300 |
+| Most-used wall texture (BRONZE2) | 36% | 30% |
+| Material joins with a border texture | 77% | 31% |
 | Whole-map symmetry | 0.62 | 0.54 |
 
 ### Nukage Divided (`nukage_divided`)
