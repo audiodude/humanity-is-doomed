@@ -55,11 +55,11 @@ Heights are floor/ceiling. Monster counts are UV (HMP, easy), and "deaf" means t
    - **Key trap:** taking the red key (a W1 ring round it) opens the closet KC in the pond's east wall. A mancubus (1, 1), a revenant (1, 0; easy: an imp) and 2 imps (1, 1) come out, not deaf, and wade across the pond at the tower. The footbridge is the only dry way back to the bank.
    - **Pickups:** red key, medikit, box of bullets.
    - **Gate:** the red door (DR, red key).
-6. **Pump station (B2H, B2P, B2L, B2G).** The pump hall is 768×384 at 512/704 (PIPE2, light 112). In it the sump (optional, 496) holds three PIPES pumps standing in nukage, dark and flickering (light 80). A lift (128 travel) goes down to the lower gallery (384/576, light 128).
-   - **Encounter:** an arachnotron (1, 0; easy: 2 imps) at the hall's far west end puts on spatial pressure. 2 chaingunners (1, 1) on the pump plinths put on time pressure, behind PIPES columns with short sightlines. 3 imps (3, 3). In the sump, 2 spectres (1, 1); in the lower gallery, 2 shotgun guys (1, 0).
+6. **Pump station (B2H, B2P, B2L, B2G).** The pump hall is one open hall, 1088×512 at 512/768 (PIPE2, light 112). The sump (optional, 496) is a bay in its north wall, three PIPES pumps standing in nukage at its back, dark and flickering (light 80). A lift (128 travel) goes down to the lower gallery (384/576, light 128).
+   - **Encounter:** an arachnotron (1, 0; easy: 2 imps) at the hall's far west end, facing the red door down about 1,000 of open floor: spatial pressure from the moment the door opens. 2 chaingunners (1, 1) on the low pump plinths put on time pressure. 3 imps (3, 3). In the sump, 2 spectres (1, 1); in the lower gallery, 2 shotgun guys (1, 0).
    - **Pickups:** **rocket launcher** on a pump plinth in the hall; 2 rockets, box of bullets, medikit. Sump: berserk pack.
    - **Gate:** the lift (SR from both levels), then the lower gallery's east door onto shelf 3.
-7. **Shelf 3 and the breach (S3T, S3B, BRK, S3P).** Bank 384, trough and pond 368, sky 768, light 192. You arrive at the west end and walk east 896 to the breach. There, 256 of bank and railing have fallen into the pond: two rubble blocks (64², CEMENT6, top 416) lie in the nukage, and the pond pours over the broken lip with no railing.
+7. **Shelf 3 and the breach (S3T, S3B, BRK, S3P).** Bank 384, trough and pond 368, sky 768, light 192. You arrive at the west end and walk east 896 to the breach. There, 256 of bank and railing have fallen into the pond: three rubble blocks (CEMENT6, top 416) lie in the nukage, leaving a winding channel to the broken lip, and the pond pours over the lip with no railing. The breach is lit brighter (240) than the shelf, two tech lamps stand in the pond either side of the broken lip, and a trail of armor bonuses runs from the bank through the rubble to the drop: this is the main way down.
    - **Visible:** the gap in the railing. Below: the dam crest with the radiation suit glowing on its pedestal, the floodgate, the lake. Across the breach: the settling house's lit door at the east end of the bank.
    - **Gate (the fork):** step down into the breach, wade 256 south to the broken lip and drop 128 into shelf 4's trough (one-way). Or wade across the breach to the east bank and go down through the settling house (optional, below).
    - **Encounter:** 3 imps (3, 1) on the west bank; 2 cacodemons (1, 1) over the pond; a revenant (1, 0; easy: an imp) on the east bank by the settling house door, a turret firing across the breach; a mancubus (1, 0) at the east bank's far end.
@@ -67,22 +67,22 @@ Heights are floor/ceiling. Monster counts are UV (HMP, easy), and "deaf" means t
 8. **Shelf 4, the dam (S4T, S4C, S4P, FGG, RSP).** Crest 256, trough and pond 240, sky 640, light 208. The pond pours over the dam's full width into the lake, 240 below. You land in the trough below the breach, or come out of the settling house at the crest's east end.
    - **Visible:** the lake over the dam's railing; the Cyberdemon, if he's awake, wading toward the dam. Behind him the dome's hatch is shut. To the west, the cooling-tower stump has something glowing inside its ring (secret 4); beyond it the islands. In the middle of the lip stands the floodgate, a steel gate 128 above the pond. The gatehouse is at the west end of the crest.
    - **Gate:** the floodgate, opened from the gatehouse.
-   - **Encounter:** 2 hell knights (1, 1) on the crest facing the trough, to meet you where you land; 3 imps (3, 1); a pain elemental (1, 0) over the pond, in open air; an arachnotron (1, 0) at the crest's east end, facing west along it.
+   - **Encounter:** 2 hell knights (1, 1) on the crest facing the trough, to meet you where you land; 3 imps (3, 1); a pain elemental (1, 0) in a closet in the canyon's east wall at pond level (PEC), let out when you reach the shelf, off the breach or down the settling house's spillway; an arachnotron (1, 0) at the crest's east end, facing west along it.
    - **Pickups:** **radiation suit** on a lit pedestal on the crest beside the floodgate; box of rockets, medikit.
 9. **Gatehouse (B4C).** 768×512 at 256/416, GRAY7 with GRAYPOIS signs, light 176. A window in its east wall (sill 32) looks down the pond at the floodgate.
    - **Encounter:** 2 revenants (1, 0) in an enclosed room, the priority threats; 2 chaingunners (1, 0); 2 imps (1, 1; easy: one more for a revenant).
    - **Pickups:** **BFG9000** on a lit pedestal in the middle; a cell pack by the switch; medikit.
    - **Gate:** the floodgate switch beside the window. The gate sinks into the dam while you watch, leaving a 256-wide gap in the lip.
 10. **The floodgate (FGG).** Back east along the crest about 900, past the radiation suit, into the pond, and over the gap: you ride the falls 240 down into the lake. Crossing the gap (W1) opens the dome's hatch. One-way.
-11. **The lake, the final fight (L).** 2560×1664 of nukage at 0 (`DAMAGE_10`), sky 384, light 224, rising to 255 round the dome. Behind you the dam's falls run the full width of the canyon, and above them the cascade you came down, shelf over shelf.
+11. **The lake, the final fight (L).** 2560×1920 of nukage at 0 (`DAMAGE_10`), sky 384, light 224, rising to 255 round the dome. Behind you the dam's falls run the full width of the canyon, and above them the cascade you came down, shelf over shelf.
     - **Encounter:**
       - **The Cyberdemon** (all skills), deaf, about 550 south of the floodgate with his back to the dam. Gunfire on the shelves reaches him (the dam's sound-blocking lines let one crossing through), so he wakes as soon as he can see you, usually from the balcony rail or shelf 3, and you hear him from then on. He is the spatial threat: dodge his rockets, keep cover between you.
-      - **The dome group** is not deaf: the arch-vile (1, 0; easy: a hell knight) in the exit alcove at the back of the dome, and 2 hell knights (1, 1) inside the hatch. They wake when the hatch opens and they see you. Nothing stands in front of the hatch: you see the vile from where you land, about 1,500 away, beyond the 1,088 an arch-vile attacks from, so he has to come out through the dome to reach you. The vile is the time threat: kill it first, or it raises every imp and knight it reaches.
+      - **The dome group** is not deaf: the arch-vile (1, 0; easy: a hell knight) in the exit alcove at the back of the dome, and 2 hell knights (1, 1) inside the hatch. They wake when the hatch opens and they see you. Nothing stands in front of the hatch: you see the vile from where you land, about 1,950 away, beyond the 1,088 an arch-vile attacks from, so he has to come out through the dome and most of the way up the lake to reach you. The vile is the time threat: kill it first, or it raises every imp and knight it reaches.
       - **Support,** deaf and spread over the islands for the vile to raise: 6 imps (5, 2), 2 hell knights (2, 1), a revenant (1, 0) on the east island, 2 cacodemons (1, 1) over the west and east islands. The islands' outlines are sound-blocking lines, so gunfire on the shelves never reaches them: they're still spread out on their islands when you land, and wake when you fire in the lake.
       - **Infighting:** the Cyberdemon's rockets splash whatever is near you, and whatever they hit turns on him, the vile included.
     - **Cover:** the cooling-tower ring (64 high), the two tank stubs on the east island, four pylons and a dome fragment. The islands, at 16, let you stand out of the nukage.
     - **Pickups:** radiation suits on the west and east islands; a cell pack and a medikit on the east island; a box of rockets and a medikit on each of the west and south-east islands; stimpacks either side of the hatch.
-12. **The dome (DH, DI, EXR, EXD, EXC).** Through the hatch (256 wide, SPCDOOR1 in a 128-high recess) into the reactor hall: an octagon 768 across, floor 16, ceiling 320, SHAWN2 with LITE5 strips, light 255 strobing, a glowing dais (40) in the middle. At the back, on the hatch's axis, is the exit alcove: the reactor's melted core breaks through its walls in falling nukage (SFALL1), and the EXIT sign hangs on its lintel. The arch-vile waits in it. At the alcove's back a SUPPORT3 shutter seals the exit console (72 high, SW1EXIT); it opens when the Cyberdemon dies.
+12. **The dome (DH, DI, EXR, EXD, EXC).** A gatehouse against the lake's south wall: the hatch face on the lake, its corners cut 192 back to the wall. Through the hatch (256 wide, SPCDOOR1 in a 128-high recess) is a shallow hall, 128 deep and 416–672 wide, floor 16, ceiling 320, SHAWN2, light 255 strobing. Opposite the hatch, recessed into the south wall, is the exit alcove: the reactor's melted core pours down all its walls in falling nukage (SFALL1), the shutter at its back included, and the EXIT sign hangs on its lintel. The arch-vile waits in it. The shutter seals the exit console (72 high, SW1EXIT); it rises when the Cyberdemon dies.
 
 Optional spaces:
 
@@ -153,19 +153,24 @@ Optional spaces:
  -128          ~~~C44444C~~~~~~~~~~~~~~~~~~~~~iiiiYYi~~
  -192          ~~~C44444C~~~~~~~~~~~~~~~~~~~~~iiiiYYi~~
  -256          ~~~C44444C~~~##~~~~~~~~~~~~~~~~iYYiiii~~
- -320          ~~~C44444C~~~~~~DDddddDD~~~~~~~iYYiiii~~
- -384          ~~~CCCCCCC~~~~~DDDDDDDDDD~~~~~~iiiiiii~~
- -448          ~~~~~~~~~~~~~~DDDDDDDDDDDD~~~~~~~~~~~~~~
- -512          ~~~~~~~~~~~~~~DDDDDDDDDDDD~~~~~~~~~~~~~~
- -576          ~~~~~~~~~~~~~~DDDDDDDDDDDD~~~~~~~~~~~~~~
- -640          ~~~~~~~~~~~#~~DDDDDDDDDDDD~~~#~~~~~~~~~~
- -704          ~~iiiiii~~~~~~DDDDDDDDDDDD~~~~~~~~~~~~~~
- -768          ~~iiiiii~~~~~~DDDDDDDDDDDD~~~~~~~~~~~~~~
- -832          ~~iiiiii~~~~~~DDDDDDDDDDDD~~~~iiiiii~~~~
- -896          ~~iiiiii~~~~~~DDDDDDDDDDDD~~~~iiiiii~~~~
- -960          ~~iiiiii~~~~~~~DDDDXXDDDD~~~~~iiiiii~~~~
--1024          ~~~~~~~~~~~~~~~~DDDXXDDD~~~~~~iiiiii~~~~
+ -320          ~~~C44444C~~~~~~~~~~~~~~~~~~~~~iYYiiii~~
+ -384          ~~~CCCCCCC~~~~~~~~~~~~~~~~~~~~~iiiiiii~~
+ -448          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ -512          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ -576          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ -640          ~~~~~~~~~~~#~~~~~~~~~~~~~~~~~#~~~~~~~~~~
+ -704          ~~iiiiii~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ -768          ~~iiiiii~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ -832          ~~iiiiii~~~~~~~~~~~~~~~~~~~~~~iiiiii~~~~
+ -896          ~~iiiiii~~~~~~~~~~~~~~~~~~~~~~iiiiii~~~~
+ -960          ~~iiiiii~~~~~~~~~~~~~~~~~~~~~~iiiiii~~~~
+-1024          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~iiiiii~~~~
 -1088          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-1152          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-1216          ~~~~~~~~~~~~~~~~~DddddD~~~~~~~~~~~~~~~~~
+-1280          ~~~~~~~~~~~~~~~~DDDDDDDD~~~~~~~~~~~~~~~~
+-1344          ~~~~~~~~~~~~~~~DDDDDDDDDD~~~~~~~~~~~~~~~
+-1408                             XX
        |       |       |       |       |       |       |
        -768    -256    256     768     1280    1792    2304
 ```
@@ -209,7 +214,7 @@ Each shelf reads, north to south: a row of `~` (the trough, under the falls from
 | `X` | exit alcove at the dome's back: the arch-vile, the console, the falls |
 | `1`–`4` | secrets |
 
-Rectangles (map units), as built (see Build notes for where they differ from the first plan). They don't overlap, except where one is cut out of another (the sump and plinths from B2H, the islands and everything on them from L, the dais from DI).
+Rectangles (map units), as built (see Build notes for where they differ from the first plan). They don't overlap, except where one is cut out of another (the sump and plinths from B2H, the islands and everything on them from L).
 
 | Id | x0..x1 | y0..y1 | Floor / ceiling | Notes |
 |---|---|---|---|---|
@@ -227,17 +232,18 @@ Rectangles (map units), as built (see Build notes for where they differ from the
 | B1P | 2560..2816 | 1664..1728 | 512 / 640 | |
 | B1M | 2112..2560 | 1664..2304 | 512 / 800 | flickers; door x 2080..2096, y 1824..1952 onto S2B; plinth 2240..2432 × 1920..2048 at 536 |
 | KC | 2064..2320 | 1536..1648 | 496 / 624 | trap closet; 112-wide door x 2048..2064 faced CEMENT6, damaging like the nukage either side |
+| PEC | 2064..2224 | 576..704 | 240 / 368 | the pain elemental's closet; 128-wide door x 2048..2064 faced CEMENT6, damaging like the pond |
 | S2T / S2B / S2P | 0..2048 | 1984..2048 / 1792..1984 / 1536..1792 | 496 / 512 / 496, sky 896 | railed lip at y 1536 |
 | S2P_z | 1152..1600 | 1536..1792 | 496 / sky 704 | the pond round the tower, less the tower, VTP and FB: its low sky stops the tower's walls at 704 |
 | FB | 1376..1440 | 1664..1792 | 512 / sky 704 | footbridge |
-| VT | 1280..1536 | 1536..1664 | | the tower: interior VTI 1296..1520 × 1552..1648 at 512 / 640; doorway 1376..1440 on its north face; window 1344..1472 in its south face, sill 544, lintel 608; red key at (1472,1600) on a glowing spot |
-| VTP | 1216..1280 | 1600..1664 | 640 (lift to 496) / sky 704 | secret 2; plasma rifle on top; the panel is VTI's west wall, y 1568..1632 |
-| B2H | -768..-64 | 1664..2048 | 512 / 704 | red door x -48..-32, y 1824..1952; plinths -480..-352 × 1680..1744 and 1968..2032 at 536, each with a PIPES column |
-| B2P | -608..-288 | 1760..1952 | 496 / 704 | sump; three PIPES pumps, 64² |
+| VT | 1280..1536 | 1536..1664 | | the tower: interior VTI 1296..1520 × 1552..1648 at 512 / 640; doorway 1376..1440 on its north face; window 1344..1472 in its south face, sill 544, lintel 608, both its lines block monsters; red key at (1472,1600) on a glowing spot |
+| VTP | 1216..1280 | 1600..1664 | 640 (lift to 496) / sky 704 | secret 2; soulsphere on top; the panel is VTI's west wall, y 1568..1632 |
+| B2H | -1152..-64 | 1664..2176 | 512 / 768 | red door x -48..-32, y 1824..1952; the sump bay cut from its north wall; plinths -480..-352 × 1680..1744 and 1968..2032 at 536 |
+| B2P | -960..-576 | 2048..2176 | 496 / 768 | sump, a bay in B2H's north wall; three PIPES pumps, 64×48, along its back |
 | B2L | -256..-128 | 1536..1664 | 512 → 384 | lift, top FLOOR5_1 like the hall; B2G's ceiling is 192 above its bottom |
 | B2G | -768..-64 | 1216..1536 | 384 / 576 | door x -48..-32, y 1312..1440 |
 | S3T / S3B / S3P | 0..2048 | 1472..1536 / 1280..1472 / 1024..1280 | 368 / 384 / 368, sky 768 | railed lip at y 1024, except x 896..1152 |
-| BRK | 896..1152 | 1024..1472 | 368 | the collapsed bank and the pond strip in front of it, one sector; rubble 64² at 416: 928..992 × 1328..1392, 1040..1104 × 1392..1456 |
+| BRK | 896..1152 | 1024..1472 | 368 | the collapsed bank and the pond strip in front of it, one sector, light 240; rubble at 416: 1056..1120 × 1264..1392, 944..1008 × 1392..1456, 944..1008 × 1168..1232; tech lamps at (872,1048) and (1176,1048); armor-bonus trail from (816,1320) to (1024,1080) |
 | B3H | 2112..2816 | 1120..1472 | 384 / 544 | door x 2080..2096, y 1312..1440; tanks 2176..2368 and 2496..2688 × 1184..1312 at 368 |
 | S3x | 2560..2688 | 1488..1552 | 384 / 512 | secret 3; secret door x 2592..2656, y 1472..1488 |
 | B3C | 2560..2816 | 928..1120 | 256 / 544 | the spillway: the hall's floor drops 128 into it (one-way), riser ICKWALL1 |
@@ -247,24 +253,25 @@ Rectangles (map units), as built (see Build notes for where they differ from the
 | RSP | 1184..1248 | 784..848 | 264 | radiation suit, glowing; at the crest's pond edge, off the walk along the crest |
 | B4C | -768..-64 | 576..1088 | 256 / 416 | door x -48..-32, y 816..944; window x -64..0, y 592..704, sill 288, lintel 368; switch niche y 720..784; BFG pedestal -448..-320 × 768..896 at 264; GRAYPOIS niches in the west wall |
 | B4A | -768..-384 | 384..528 | 256 / 384 | armory; door y 544..560, x -640..-512 |
-| L | -256..2304 | -1152..512 | 0 / sky 384 | `DAMAGE_10`; split into the route strip (768..1280 × -320..512) and the rest |
+| L | -256..2304 | -1408..512 | 0 / sky 384 | `DAMAGE_10`; split into the route strip (768..1280 × -1216..512) and the rest, which the strip and the dome divide into west and east loops |
 | CT / CTI | -64..384 × -448..0 / 0..320 × -384..-64 | | ring 64 / interior 16 | secret 4; the ring section at x 320..384, y -288..-160 lowers to 0 when used |
 | I2 / I3 / I4 | -128..256 × -1024..-704 / 1728..2176 × -448..-64 / 1664..2048 × -1088..-800 | | 16 | islands |
 | TK | 1792..1920 × -384..-256; 1984..2112 × -256..-128 | | 144 | tank stubs on I3 |
 | PY | 64² centred on (512,192), (1472,192), (448,-704), (1600,-704) | | 352 | pylons, tops out of reach |
 | FR | 576..704 × -320..-256 | | 96 | dome fragment |
-| DM | octagon in 640..1408 × -1088..-320, corners cut 192 | | | METAL2 exterior; shell 64 thick on the hatch side, about 32 elsewhere |
-| DH | 896..1152 | -368..-336 | door, 16 → 140 | hatch, SPCDOOR1 (four 64-wide faces a side) in 16-deep, 128-high SUPPORT3 recesses on both sides |
-| DI | the inner octagon (816,-384) (1232,-384) (1376,-528) (1376,-880) (1296,-960) (752,-960) (672,-880) (672,-528) | | 16 / 320 | strobes; dais 896..1152 × -832..-544 at 40 |
-| EXR | 944..1104 | -1040..-960 | 24 / 128 | exit alcove behind DI's back wall on the hatch's axis, SFALL1 walls (the melted core); its first 16 (-976..-960) is a lintel at 16 / 144 with EXITSIGN (128..144) on its inner face; arch-vile at (1024,-1008) |
-| EXD | 992..1056 | -1056..-1040 | door, 24 → 124 | the shutter, SUPPORT3, tag 7: opened by the bossaction |
-| EXC | 1008..1040 | -1072..-1056 | 96 | exit console behind the shutter, SW1EXIT on its north face |
+| DM | 640..1408 × -1408..-1216: the hatch face 832..1216 at -1216, corners cut 192 back to the south wall | | | METAL2 exterior; shell 64 thick on the hatch side, about 32 on the chamfers; its back is the lake's south wall |
+| DH | 896..1152 | -1264..-1232 | door, 16 → 140 | hatch, SPCDOOR1 (four 64-wide faces a side) in 16-deep, 128-high SUPPORT3 recesses on both sides |
+| DI | (816,-1280) (1232,-1280) (1360,-1408) (688,-1408) | | 16 / 320 | strobes |
+| EXR | 944..1104 | -1488..-1408 | 24 / 128 | exit alcove recessed into the south wall on the hatch's axis, SFALL1 walls (the melted core); its first 16 (-1424..-1408) is a lintel at 16 / 144 with EXITSIGN (128..144) on its inner face; arch-vile at (1024,-1456) |
+| EXD | 992..1056 | -1504..-1488 | door, 24 → 124 | the shutter, faced SFALL1 like the alcove, SUPPORT3 jambs, tag 7: opened by the bossaction |
+| EXC | 1008..1040 | -1520..-1504 | 96 | exit console behind the shutter, SW1EXIT on its north face |
 
 Triggers:
 
 | Trigger | Where | Effect |
 |---|---|---|
 | Red key pickup (W1 ring) | VTI | opens KC (door open, stays) |
+| Breach lip, spillway drop (W1) | the BRK–S4T line; the B3C–B3N line | opens PEC (door open, stays) |
 | Red door | B2H's east wall | DR, red key |
 | B2L lift | pump station | SR lift from both levels |
 | SILVER3 panel (SR lift) | VTI's west wall | lowers VTP to 496; it rises back to 640 with you on it |
@@ -294,7 +301,7 @@ The trim set is **SUPPORT3** (brown-green rivets), at every corner where CEMENT6
 | Gatehouse (B4C, B4A) | GRAY7; GRAYPOIS signs flanking the window | SUPPORT3 round the window and the switch (SW1GRAY); DOORTRAK | FLAT19 / CEIL3_5; BFG pedestal TLITE6_1 | the dam's control house, its radiation signs facing the lake |
 | The lake (L, I2, I3, I4, PY, TK, CT, CTI) | cliffs TANROCK5; pylons CEMENT6; tank stubs SILVER1; ring CEMENT9 | SUPPORT3 where the cliffs meet the dam; NUKE24 island risers; LITE5 beside the CT panel | NUKAGE1 / F_SKY1; islands and CTI RROCK18; TK tops FLAT23; ring top FLAT1 | the valley the plant drained into: rock, with the plant's wreckage standing in it |
 | Dome exterior (DM, FR, DH) | METAL2; hatch SPCDOOR1 | SUPPORT3 framing the hatch recess | FR top FLAT23 | the reactor's steel containment and its wreckage |
-| Reactor hall (DI, EXR, EXC) | SHAWN2 with LITE5 strips; the exit alcove's walls SFALL1 (the melted core breaking through); console SW1EXIT | SUPPORT3 at the hatch's inner recess and on the alcove's lintel | FLAT20 / TLITE6_6; dais and alcove FLOOR1_7 (glowing) | the exit, as in MAP07 and MAP08: the brightest room |
+| Reactor hall (DI, EXR, EXD, EXC) | SHAWN2; the exit alcove's walls and its shutter SFALL1 (the melted core breaking through); console SW1EXIT | SUPPORT3 at the hatch's inner recess, on the alcove's lintel and the shutter's jambs | FLAT20 / TLITE6_6; alcove FLOOR1_7 (glowing) | the exit, as in MAP07 and MAP08: the brightest room |
 
 Notes for the build:
 
@@ -306,9 +313,9 @@ Notes for the build:
 
 | # | Where | Hint | Reward |
 |---|---|---|---|
-| 1 | A closet behind the outfall valve room's east wall (S1x) | A TEKGREN2 panel shifted out of line, with LITE5 beside it | backpack, green armor |
-| 2 | The pillar beside the valve tower (VTP), at 640 | The plasma rifle on its lit top, in view from the start, shelf 1 and the footbridge. Inside the tower, the west wall is SILVER3 shifted out of line, with LITE5 beside it; using it lowers the pillar, which carries you up | plasma rifle, cell pack |
-| 3 | A closet off the settling house hall (S3x) | An ICKWALL3 panel shifted out of line, with LITE5 beside it | megaarmor |
+| 1 | A closet behind the outfall valve room's east wall (S1x) | A TEKGREN2 panel shifted out of line, with LITE5 beside it | backpack, megaarmor |
+| 2 | The pillar beside the valve tower (VTP), at 640 | The soulsphere on its lit top, in view from the start, shelf 1 and the footbridge. Inside the tower, the west wall is SILVER3 shifted out of line, with LITE5 beside it; using it lowers the pillar, which carries you up | soulsphere, cell pack (first a plasma rifle, which the settling house hands you a minute later anyway; then a megasphere, too much on a map already heavy with health) |
+| 3 | A closet off the settling house hall (S3x) | An ICKWALL3 panel shifted out of line, with LITE5 beside it | green armor |
 | 4 | Inside the cooling-tower stump (CTI), in the lake | The ring's lit interior and its soulsphere, in view from the dam crest over the 64-high ring. On the ring's east face, a CEMENT9 section is shifted out of line with LITE5 beside it; using it lowers that section | soulsphere, in the middle of the boss fight |
 
 ## Targets
@@ -316,10 +323,10 @@ Notes for the build:
 | Target (DOOM II median) | Plan | Where it comes from |
 |---|---|---|
 | Optional share of area ≥ 0.3 [0.5] | ≈ 0.6 | Of about 11.3M reachable, the critical path covers about 4.2M: the banks, the buildings on the route, the breach strip, the crest's west half, and the lake strip from the floodgate to the hatch. Every trough and pond except the breach strip and the strip in front of the floodgate is optional, as are B3, OV, B4A, the sump, and the lake beyond the strip (about 3.2M). Split S3P, S4P and L into strip and rest so the metric sees it. |
-| Distinct floor heights ≥ 15 [23] | about 29 | 0 lake; 16 islands, dome, CT interior; 24 exit alcove; 40 dais; 240 S4 nukage; 256 crest, gatehouse, B3 spillway and landing; 264 pedestals; 368 S3 nukage, B3 tanks; 384 S3 bank, B2G, B3H; 496 S2 nukage, sump, KC; 512 S2 bank, tower, B2H, B1M; 528–624 the B1 stair; 624 S1 nukage; 640 S1 bank, gallery, landing, VTP; 664–808 the stairwell; 832 operations |
+| Distinct floor heights ≥ 15 [23] | about 29 | 0 lake; 16 islands, dome, CT interior; 24 exit alcove; 240 S4 nukage; 256 crest, gatehouse, B3 spillway and landing; 264 pedestals; 368 S3 nukage, B3 tanks; 384 S3 bank, B2G, B3H; 496 S2 nukage, sump, KC; 512 S2 bank, tower, B2H, B1M; 528–624 the B1 stair; 624 S1 nukage; 640 S1 bank, gallery, landing, VTP; 664–808 the stairwell; 832 operations |
 | Secrets ≥ 2 [4] | 4 | S1x, VTP, S3x, CTI |
-| Light-effect sectors ≥ 3 [9] | about 11 | two OD alarm strips (blink), B1M (flicker), the sump (flicker), the red key's spot in VTI (glow), RSP (glow), a lamp strip at the floodgate (blink), CTI (glow), a glow ring in the lake round the dome, DI (strobe), the core dais (glow) |
-| Deaf share (UV) ≥ 0.2 [0.42] | ≈ 0.9 | every monster except the KC closet's 4 and the dome's 3 |
+| Light-effect sectors ≥ 3 [9] | about 10 | two OD alarm strips (blink), B1M (flicker), the sump (flicker), the red key's spot in VTI (glow), RSP (glow), a lamp strip at the floodgate (blink), CTI (glow), a glow ring in the lake round the dome, DI (strobe) |
+| Deaf share (UV) ≥ 0.2 [0.42] | ≈ 0.9 | every monster except the KC closet's 4, the pain elemental in PEC, and the dome's 3 |
 | Most-used wall texture 0.2–0.45 [0.3] | ≈ 0.25 | CEMENT6 (canyon and retaining walls, about 2.5M of wall) and TANROCK5 (the lake's cliffs, about 2.5M at a 384 sky) lead together, with SFALL1 (about 1.5M: four lips, the dam, the outfall, the core) third. If either reads above 0.45, lower the shelves' or the lake's sky. If both read under 0.2, raise the lake's sky to 448. |
 | Rule-2 seams with a border ≥ 0.5 [0.31] | ≥ 0.7 | Every building meets the cascade at a door with DOORTRAK jambs; SUPPORT3 at the outfall, both dam abutments, the canyon mouth, every window and every switch; the hatch in a SUPPORT3 recess |
 
@@ -329,12 +336,12 @@ Balance targets:
 
 - **Ammo:** UV pistol-start ratio 2.0–2.4, counting the Cyberdemon at 4,000. He takes no splash damage, so only direct rockets, plasma and the BFG count against him. From the gatehouse on, the critical path must carry at least 240 cells: the BFG's 40, the gatehouse's cell pack, and the east island's cell pack (the armory's is extra). That is six BFG shots, four or five for the Cyberdemon.
 - **The arch-vile:** the static balance doesn't count resurrections. Budget the lake's fodder twice over (about 1,400 HP more).
-- **Health:** 35–45 per 1,000 monster HP, not counting the soulsphere (secret 4) or the megaarmor (secret 3). That is about 800 on UV: a medikit in every space and two per island.
+- **Health:** 35–45 per 1,000 monster HP, not counting the soulsphere (secret 4) or the megaarmor (secret 1). That is about 800 on UV: a medikit in every space and two per island.
 - **Suits:** one on the crest for the drop, one on each of the west and east islands.
 - **Skill ratios:** easy/UV ≈ 0.45, HMP/UV ≈ 0.73 as planned. The Cyberdemon is on every skill; easy gets a hell knight in the vile's place.
-- **Weapons:** shotgun (deck), super shotgun (sluice house), chaingun (from the pump station's chaingunners), rocket launcher (pump station), plasma rifle (secret 2, or the settling house), BFG9000 (gatehouse).
+- **Weapons:** shotgun (deck), super shotgun (sluice house), chaingun (from the pump station's chaingunners), rocket launcher (pump station), plasma rifle (the settling house), BFG9000 (gatehouse).
 
-As built: UV ammo 2.27 (2.13 with the vile's 1,400 HP of resurrections), every leg of the route covered taking only what's on it (lowest leg 1.29, the red key's); health 765 on UV without the soulsphere, 37.5 per 1,000 monster HP. From the gatehouse on the route carries 240 cells (the BFG, the gatehouse's and the east island's packs); the armory's and the west island's are extra. **Miss:** easy/UV is 0.48 and HMP/UV 0.75: the stand-ins easy gets (2 imps for the pump station's arachnotron, an imp for each revenant, a hell knight for the vile) count as easy monsters, which the plan's 0.45/0.73 left out. Kept, since each is the doc's own stand-in.
+As built: UV ammo 2.23 (2.10 with the vile's 1,400 HP of resurrections), every leg of the route covered taking only what's on it (lowest leg 1.29, the red key's); health 965 on UV without the soulsphere, 47 per 1,000 monster HP, the megasphere (secret 2) included. From the gatehouse on the route carries 240 cells (the BFG, the gatehouse's and the east island's packs); the armory's and the west island's are extra. **Miss:** easy/UV is 0.48 and HMP/UV 0.75: the stand-ins easy gets (2 imps for the pump station's arachnotron, an imp for each revenant, a hell knight for the vile) count as easy monsters, which the plan's 0.45/0.73 left out. Kept, since each is the doc's own stand-in.
 
 ### Playtest
 
@@ -400,6 +407,17 @@ Calls:
 - **The Cyberdemon waits under the drop.** Gunfire on the shelves wakes him (by design: that's how you hear him), he walks to the foot of the dam below you, and he's there when you land. Seed 2 died three times in its first second in the lake. Shooting him from the lip before dropping may be a way round it (untested); whether to keep it is a question for the next playthrough.
 - **Shelf 2's pond and the crest** (seeds 3 and 4 used up their 25 minutes there): the bot wading the nukage round the pillar secret, and stuck fighting on the crest. Bot; unchanged by this round.
 
+#### Reshaping the lake and the dome
+
+The user's call, from the preview: the lake runs 256 further south, to -1408, and the dome loses its middle. What's left of it is the angled front (the hatch and its cut corners), backed onto the lake's new south wall, with the exit alcove recessed into that wall behind it. The dais, the hall's straight walls and their LITE5 strips went with the middle; the two hell knights and the hall's medikits moved into the shallow hall left behind. The alcove's shutter is faced in SFALL1 too, so the whole alcove is falling nukage and the falls rise away when the Cyberdemon dies. The arch-vile is now about 1,950 from the landing (it was about 1,500), still past the 1,088 he attacks from. The wiring run passes all 31 checks.
+
+#### After the third playthrough (pistol start, DOOM + DOOM II 2024)
+
+- **Confirmed in the 2024 re-release:** the breach now reads as the way down (lamps, bonus trail, rubble channel); the Cyberdemon's death opens the exit shutter (the `bossaction`), which ViZDoom can't show; the bigger, open pump hall makes the arachnotron a real threat; the pain elemental comes out of his closet into the crest fight.
+- **Too much health,** megasphere or not. First cut: secret 2's megasphere is a soulsphere (UV health 1065 → 965, 52 → 47 per 1,000 monster HP).
+- **The rubble left a pocket** east of the channel where the east bank's mancubus couldn't hit you. The rubble is mirrored east-west (see Build notes).
+- **The exit switch was misaligned** once the shutter opened. The console's riser was SUPPORT3, the alcove's own wall texture, so the builder unpegged it to line up with the walls; the override swapped in SW1EXIT but kept the flag, and the picture hung from the open shutter's ceiling (124) instead of the console's top (96). Fixed in the builder: a lower texture set by an override on such a riser is pegged to the step again (README, OVERRIDES). The only other map it changed is MAP07, whose dock trench risers (NUKEDGE1 by override) now peg like every other NUKEDGE1 riser in the set.
+
 ## Build risks
 
 - **One open canyon.** The four shelves and the lake are one space, and you can see all of it from the balcony. Every outdoor monster is deaf and faces south, away from the start and from the shelves above. Check with the build's line-of-sight test that nothing awake sees OB. No hitscanner stands on a bank, the crest or the lake: the chaingunners and shotgun guys are all indoors, and the tower's zombiemen are inside it. The nearest monster to the start is on shelf 1, kept more than 300 away, not under the balcony.
@@ -408,7 +426,7 @@ Calls:
 - **One-way drops.** The breach (368 → 240) and the floodgate (240 → 0) can't be climbed back. The reach check has to follow them down and still reach EXC's room. Put EXR in `MUST_REACH`, and the islands, so the lake's every piece is proved.
 - **The floodgate** lowers to its lowest neighbour. FGG neighbours only S4P (240) and the lake (0), so it stops at 0. The W1 that opens the hatch is on the S4P–FGG line, crossed only by stepping off into the gap, and a monster can't trigger a door-open line.
 - **Pits.** Every nukage floor has an exit within 24: troughs and ponds (16 below their bank), the breach (wade to S3B's east end, or drop), the sump (16), B3's tanks (16), the lake (islands and the dome at 16). The lake has no way back up the dam, by design. Its suits, islands and the dome make it survivable.
-- **The hatch.** DH is 256 wide and the reactor hall is 304 tall, so the door needs 128-high recesses on both sides (the doom-build door gotcha). Shut, it blocks sound, so the dome group sleeps until you open it. Open, it frames the arch-vile in the exit alcove for you to see from the floodgate; keep the line from the floodgate through the hatch to the alcove clear.
+- **The hatch.** DH is 256 wide and the dome's hall is 304 tall, so the door needs 128-high recesses on both sides (the doom-build door gotcha). Shut, it blocks sound, so the dome group sleeps until you open it. Open, it frames the arch-vile in the exit alcove for you to see from the floodgate; keep the line from the floodgate through the hatch to the alcove clear.
 - **The Cyberdemon.** 4,000 HP, splash-immune, 110 tall, 80 across. He fits through the hatch and between the pylons, so he will follow you, and he can't climb the dam (240). He is deaf with his back to the dam, so the first shot is yours. With a carried BFG and full cells he goes down fast. That's acceptable on the last map, but test from a pistol start.
 - **The exit is tied to his death** (after the first playthrough). Vanilla DOOM II has no MAP09 boss rule, so it's a UMAPINFO `bossaction` (`Cyberdemon, 103, 7`): a shutter seals the exit console and opens when he dies. It works only in ports that read UMAPINFO: the 2024 re-release (written with a space after each comma, which it needs), GZDoom 4.6+, dsda-doom, Woof. In `doom2.exe`, Chocolate Doom and the ViZDoom playtests the shutter never opens; the playtest checks it's shut and warps past it. The reach check reads the bossaction, and the switch behind the 16-deep shutter is out of use until it opens (a use stops at a closed door).
 - **Railings.** MIDBARS3 on lip lines: lower-unpegged so the bars stand on the higher floor, 72 tall, above 128–240 of falls. Mid textures don't tile vertically in vanilla, so the bars must fit their opening (the sky is far above).
@@ -430,14 +448,17 @@ Where the build differs from the first plan, and why (the rectangle table is as 
 - **Door recesses are as wide as their doors** (`doorway()` since the second playthrough). They were 160 wide, leaving a 16-unit stub of wall beside each door in its plane; a vanilla monster pressed into one while over a plain door's line "uses" the door and freezes, as a cacodemon did at the machine room's door. See docs/door-stuck.md.
 - **Settling house:** the hall is 1120..1472 (tanks 1184..1312), the spillway 928..1120 and the landing 768..928, so the landing's door recess (128 wide) fits it. The spillway was first a chute of three 32 steps; from the landing they read as stairs you couldn't climb, so it's one 128 drop.
 - **KC** is 112 wide (y 1536..1648), 16 clear of the machine room, which the 128-wide plan touched. Its door is damaging nukage like the floor on both sides of it (the hazard check needs damaging floors below every dry neighbour).
-- **Pump station:** the sump is 320×192 so the arachnotron fits the hall's west end; two plinths north and south of the sump, each with a PIPES column, hold the chaingunners and the rocket launcher. The lift's top is FLOOR5_1 like the hall (rule 1); PLAT1 sides mark it when it moves. The sump flickers but doesn't hurt: a sector has one special.
+- **Pump station:** first built 768×384 with the sump in the middle and a PIPES column on each plinth; playing it, the arachnotron's room was too small and too broken up by pillars to make him a threat. It's now 1088×512 and open: the sump moved into a bay in the north wall, the columns are gone, and the arachnotron stands at the west end with a clear line down the hall to the red door. The two plinths (24 high) still hold the chaingunners and the rocket launcher. The lift's top is FLOOR5_1 like the hall (rule 1); PLAT1 sides mark it when it moves. The sump flickers but doesn't hurt: a sector has one special.
 - **The breach and the pond strip in front of it are one sector** (BRK, 896..1152 × 1024..1472).
-- **The glow ring round the dome isn't built:** the lake has to keep `DAMAGE_10`, and a sector has one special. There are 11 light-effect sectors without it.
+- **The breach marks the main path** (playtest: it read as a side gap, and the settling house looked like the way on). Rubble0 runs 128 further south and a third block lies near the lip, so the rubble walls in a channel. The rubble is mirrored east-west from the first cut (third playthrough): the open nukage east of the channel, between two blocks, was a pocket the east bank's mancubus couldn't shoot into, and rubble0 now fills it; the breach is lit 240 against the shelf's 192 (it can't blink: its nukage hurts, and a sector has one special); two tech lamps frame the broken lip, and armor bonuses lead down the channel.
+- **The tower's window blocks monsters** (playtest, every time: the pain elemental flew in through it from the shelves and spent the fight inside the tower). It's 64 tall, enough for a flier, so both its lines are `ML_BLOCKMONSTERS`; shots, sight and the player still cross it.
+- **The pain elemental is in a closet** (playtest, every time: from over shelf 4's pond he woke at gunfire on the shelves above, flew up the cascade and fought from the valve tower). Deaf doesn't hold in the open canyon, and sound blocks at shelf 3's lip would also have silenced the Cyberdemon, so he waits in PEC, behind a shut door that keeps all sound out, until you reach shelf 4. The settling house's trigger is at the spillway drop, not the landing's door: a walk line in front of a door stops the door being used in vanilla.
+- **The glow ring round the dome isn't built:** the lake has to keep `DAMAGE_10`, and a sector has one special. There are 10 light-effect sectors without it (11 before the reshape took the dais).
 - **The gatehouse's GRAYPOIS signs** are 72-high niches in its west wall, facing the window: its east wall holds the window, the switch niche and the door, with no room beside the window.
-- **Dome:** the shell is 64 thick on the hatch side, so the hatch (32 deep) has 16-deep recesses both sides inside it. The slab that screened the hatch is gone, and the melted core and the exit moved from the dome's middle to an alcove at its back on the hatch's axis, where the arch-vile waits (playtest: the slab hid the biggest threat; you should see him the moment the hatch opens). The core is the alcove's falling-nukage walls; the EXIT sign hangs on the alcove's lintel, 16 tall at 128..144, where it shows through the hatch.
+- **Dome:** the shell is 64 thick on the hatch side, so the hatch (32 deep) has 16-deep recesses both sides inside it. The slab that screened the hatch is gone, and the melted core and the exit moved from the dome's middle to an alcove at its back on the hatch's axis, where the arch-vile waits (playtest: the slab hid the biggest threat; you should see him the moment the hatch opens). Since the reshape (see Playtest) the dome is only its angled front against the lake's south wall, and the alcove is recessed into that wall. The core is the alcove's falling-nukage walls and shutter; the EXIT sign hangs on the alcove's lintel, 16 tall at 128..144, where it shows through the hatch.
 - **Sound blocks at the dam and the islands** (playtest: the lake's deaf trash woke from gunfire on the shelves, gathered at the foot of the dam and met the drop in a clump). The dam's lip lines and every island's outline are sound-blocking, so the shelves' noise reaches the open lake (the Cyberdemon) but not the islands. Checked in ViZDoom: twelve shots on the crest used to set four island monsters walking; now none move until you fire in the lake. The two cacodemons moved from over the open lake to over the west and east islands, under the same shield.
 - **The radiation suit's pedestal** stands at the crest's pond edge, not mid-crest: the playtest walked over it on the way west from the settling house's landing to the gatehouse and took the suit there, a minute before the drop needs it.
-- **Pickups** beyond the plan's list, for the balance targets: a medikit in nearly every space, two on each island, two in the reactor hall; boxes of shells on each shelf and in the buildings on the route; boxes of rockets in the lower gallery, on the crest and in the gatehouse; a cell pack on the west island and a box of rockets on the east island for the vile's resurrections.
+- **Pickups** beyond the plan's list, for the balance targets: a medikit in nearly every space, two on each island, two in the dome; boxes of shells on each shelf and in the buildings on the route; boxes of rockets in the lower gallery, on the crest and in the gatehouse; a cell pack on the west island and a box of rockets on the east island for the vile's resurrections.
 
 ## Concepts considered
 

@@ -9,9 +9,10 @@ look 270
 shot start
 look 270 12
 shot start_down
-expect ceil 1024 -352 == 16        # the dome's hatch is shut
+expect ceil 1024 -1248 == 16       # the dome's hatch is shut
 expect floor 1024 520 == 368       # the floodgate is up
 expect ceil 2056 1592 == 496       # the key-trap closet is shut
+expect ceil 2056 640 == 240        # the pain elemental's closet is shut
 walk 1024 2600
 expect has Shotgun
 look 270 20
@@ -90,7 +91,7 @@ walk 1408 1640 1408 1700 1300 1700 1248 1632
 wait 150
 expect floor 1248 1632 == 640
 expect secrets == 2
-expect has PlasmaRifle
+expect has Soulsphere
 look 300 10
 shot pillar_top
 walk 1300 1720 1408 1760 1408 1840
@@ -103,7 +104,7 @@ look 180
 shot pump_hall
 walk -368 1712
 expect has RocketLauncher
-walk -448 1930
+walk -448 1880 -896 1960 -896 2072
 expect has Berserk
 
 # The lift down to the lower gallery.
@@ -137,13 +138,14 @@ walk 2624 1420 2200 1376
 open 2096 1376
 walk 1900 1376
 
-# The breach: wade to the broken lip and drop onto shelf 4.
-walk 1200 1300 1024 1200 1024 1060
+# The breach: wade down the armor-bonus trail between the rubble to the broken lip and drop onto shelf 4.
+walk 1200 1300 1200 1240 1032 1240 1032 1136 1024 1060
 look 270 15
 shot breach_lip
 walk 1024 990
 expect pos 1024 990 24
 expect floor 1024 990 == 240
+expect ceil 2056 640 > 240         # landing off the breach let the pain elemental out
 
 # Shelf 4, the dam: the lake over the railing, the floodgate in the lip.
 walk 1024 880
@@ -193,7 +195,7 @@ shot gap
 walk 1024 400
 wait 70
 expect floor 1024 400 == 0
-expect ceil 1024 -352 > 16         # crossing into the gap opened the dome's hatch
+expect ceil 1024 -1248 > 16        # crossing into the gap opened the dome's hatch
 
 # The lake: the east island's cells and suit, secret 4 in the cooling tower, the west island.
 look 270
@@ -210,19 +212,19 @@ expect secrets == 4
 expect has Soulsphere
 walk 64 -864
 
-# The dome: through the hatch, across the reactor hall to the exit alcove at its back,
-# walled in the melted core's falls, where the arch-vile waited. The shutter over the exit
-# console opens when the Cyberdemon dies: a UMAPINFO bossaction, which ViZDoom doesn't read.
-# So: check it's shut, then warp into it to use the console.
-walk 1024 -260
+# The dome: through the hatch, across the hall to the exit alcove recessed into the lake's
+# south wall, walled in the melted core's falls, where the arch-vile waited. The shutter over
+# the exit console opens when the Cyberdemon dies: a UMAPINFO bossaction, which ViZDoom doesn't
+# read. So: check it's shut, then warp into it to use the console.
+walk 1024 -1150
 look 270
 shot hatch
-walk 1024 -600
+walk 1024 -1340
 look 270
-shot reactor_hall
-walk 1024 -1000
+shot dome
+walk 1024 -1450
 look 270 20
 shot exit
-expect ceil 1024 -1048 == 24       # the shutter is shut
-teleport 1024 -1048 270
-exit 1024 -1056
+expect ceil 1024 -1496 == 24       # the shutter is shut
+teleport 1024 -1496 270
+exit 1024 -1504

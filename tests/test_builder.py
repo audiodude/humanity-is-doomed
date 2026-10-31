@@ -5,7 +5,7 @@ from conftest import module
 
 from levels.doom2 import PLAYER1
 from levels.mapgen import compile_level
-from levels.model import ML_BLOCKING, ML_TWOSIDED, LevelError, Line, Sector, Side, Thing, load, rect
+from levels.model import ML_BLOCKING, ML_DONTPEGBOTTOM, ML_TWOSIDED, LevelError, Line, Sector, Side, Thing, load, rect
 from levels.wadmap import parse
 
 
@@ -62,6 +62,23 @@ def test_override_picture_starts_at_offset_zero_unless_x_given():
         _, m = built(SECTORS=two_rooms(), OVERRIDES={key: Line(front=side)})
         off[name] = m.sides[line_between(m, *key).front].x_offset
     assert off["wall"] != 0 and off["picture"] == 0 and off["given"] == 8
+
+
+def test_override_picture_on_a_riser_is_pegged_to_the_step():
+    """A riser in its room's own wall texture is unpegged to line up with the
+    walls; a switch put on it by override must start at the step's top instead,
+    unless the override gives the flags itself."""
+    def console():   # a 72-high console in room a, its sides in a's wall texture
+        return [room("a", rect(0, 0, 512, 512)),
+                Sector("c", [rect(192, 192, 320, 320)], 72, 128, "FLOOR4_8", "CEIL3_5", 160, "STARTAN3",
+                       lower="STARTAN3")]
+    key = ((192, 192), (320, 192))   # the console's south face, room a on the right
+    flags = {}
+    for name, ov in (("plain", None), ("switch", Line(front=Side(lower="SW1EXIT"))),
+                     ("given", Line(flags=ML_TWOSIDED | ML_DONTPEGBOTTOM, front=Side(lower="SW1EXIT")))):
+        _, m = built(SECTORS=console(), OVERRIDES={key: ov} if ov else {})
+        flags[name] = line_between(m, *key).flags & ML_DONTPEGBOTTOM
+    assert flags == {"plain": ML_DONTPEGBOTTOM, "switch": 0, "given": ML_DONTPEGBOTTOM}
 
 
 def test_override_that_matches_no_line_is_an_error():

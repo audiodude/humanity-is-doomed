@@ -184,16 +184,16 @@ From the operations balcony at the start you see the whole map: the plant's outf
 
 | Measure | MAP09 | DOOM II median |
 |---|---|---|
-| Distinct floor heights | 36 | 23 |
-| Light SD / light-effect sectors | 40 / 11 | 23 / 9 |
-| Wall material changes with a border texture | 96% | 31% |
-| Optional share of the reachable area | 66% | 50% |
-| UV ammo per monster HP (pistol start) | 2.27 | 1.81 |
-| Health per 1000 monster HP | 42 | 40 |
+| Distinct floor heights | 35 | 23 |
+| Light SD / light-effect sectors | 40 / 10 | 23 / 9 |
+| Wall material changes with a border texture | 92% | 31% |
+| Optional share of the reachable area | 59% | 50% |
+| UV ammo per monster HP (pistol start) | 2.23 | 1.81 |
+| Health per 1000 monster HP | 47 | 40 |
 | Easy/UV and HMP/UV monster ratios | 0.48 / 0.75 | 0.33 / 0.70 |
-| Deaf monsters | 92% | 42% |
+| Deaf monsters | 91% | 42% |
 | Nearest monster to the start | 667 | 300 |
-| Whole-map symmetry | 0.84 | 0.54 |
+| Whole-map symmetry | 0.78 | 0.54 |
 
 Symmetry is high because the shelves are full-width bands across one canyon; the buildings at their ends alternate sides, and the lake round the dome is open.
 
@@ -268,7 +268,7 @@ There are helpers for the rooms most maps repeat, sized so they pass the texture
 
 Floors can move both ways for the progression check: the lowering actions (`S1_FLOOR_LOWEST` and kin) drop a tagged floor to its lowest neighbour, and the raise actions lift it to the next higher neighbouring floor, so a rising bridge stops level with the nearest higher floor around it. The raise-and-change actions (`S1_RAISE_CHANGE` and kin) take the floor texture of the trigger line's front sector and clear the sector's special, which dries a walkway raised out of nukage (MAP05 does this), but they move at 0.5 units a tic: 96 units take 5.5 s. The fast raises (`S1_FLOOR_NEXT_FAST` and kin) move at 4 units a tic and keep the floor's texture and special, so use them for bridges out of a pit or the dark.
 
-Anything the builder infers can be overridden line by line in `OVERRIDES`, keyed by a line's two endpoints with its front on the right going from the first to the second: `{((1088, -3648), (1024, -3648)): Line(flags=ML_BLOCKING | ML_BLOCKMONSTERS, front=Side(mid="COMPSTA2", x=16))}`. Only the fields given replace the builder's choice (a picture such as a switch or sign set without `x` starts at x offset 0); a key that matches no line is an error. Decompiled maps use this for every difference from what the builder would make.
+Anything the builder infers can be overridden line by line in `OVERRIDES`, keyed by a line's two endpoints with its front on the right going from the first to the second: `{((1088, -3648), (1024, -3648)): Line(flags=ML_BLOCKING | ML_BLOCKMONSTERS, front=Side(mid="COMPSTA2", x=16))}`. Only the fields given replace the builder's choice (a picture such as a switch or sign set without `x` starts at x offset 0; a new `lower` on a step whose riser the builder unpegged to line up with the room's walls is pegged to the step's top again, so a switch on a console face starts at the console's top, unless the override gives `flags`); a key that matches no line is an error. Decompiled maps use this for every difference from what the builder would make.
 
 `Thing` skills are any of `e`, `m`, `h`, plus `a` for ambush (deaf) and `n` for multiplayer only; `extra` holds other flag bits. `RESOURCES` lists PWADs whose textures, flats and patches the checks and measurements load after the IWAD (for remixes of community maps; they aren't copied into the built WAD).
 

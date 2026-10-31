@@ -18,17 +18,17 @@ launcher; the lift down) -> shelf 3, along the bank to the breach -> drop
 through the breach onto shelf 4 (or go down through the settling house) ->
 the gatehouse at the crest's west end (BFG9000; the floodgate switch) ->
 back east along the crest and over the open floodgate into the lake, which
-opens the dome's hatch -> the exit console in the reactor hall.
+opens the dome's hatch -> the exit console in the alcove behind the dome.
 
-Secrets: a shifted panel in the outfall valve room (backpack); a shifted
-panel in the valve tower lowers the pillar beside it (plasma rifle); a
-shifted panel in the settling house (megaarmor); a shifted section of the
+Secrets: a shifted panel in the outfall valve room (backpack, megaarmor); a
+shifted panel in the valve tower lowers the pillar beside it (soulsphere); a
+shifted panel in the settling house (green armor); a shifted section of the
 cooling-tower ring in the lake (soulsphere).
 """
 from .doom2 import *  # noqa: F403 - thing types, actions, sector specials
-from .model import (ML_BLOCKING, ML_DONTPEGBOTTOM, ML_SOUNDBLOCK, ML_TWOSIDED, SKY, Line, Sector, Side, Special,
-                    Thing, closet, dist, door, doorway, edges, lift, on_segment, pedestal, rect, stairs, switch_niche,
-                    window)
+from .model import (ML_BLOCKING, ML_BLOCKMONSTERS, ML_DONTPEGBOTTOM, ML_SOUNDBLOCK, ML_TWOSIDED, SKY, Line,
+                    Sector, Side, Special, Thing, closet, dist, door, doorway, edges, lift, on_segment, pedestal,
+                    rect, stairs, switch_niche, window)
 
 MAP = "MAP09"
 WAD = "NUKAGE.WAD"
@@ -61,7 +61,7 @@ intertext = "Bulletin. The plant has gone critical.",
             "passed, and asks what to build next."
 """
 
-TAG_KC, TAG_VTP, TAG_B2L, TAG_FGG, TAG_DH, TAG_CT, TAG_EXIT = range(1, 8)   # TAG_EXIT: the bossaction's 7
+TAG_KC, TAG_VTP, TAG_B2L, TAG_FGG, TAG_DH, TAG_CT, TAG_EXIT, TAG_PE = range(1, 9)   # TAG_EXIT: the bossaction's 7
 
 BASE = "CEMENT6"        # every wall of the cascade, from the balcony to the dam
 NUKE = "NUKAGE1"
@@ -71,6 +71,7 @@ RISER = "NUKE24"        # a bank's 16 step down to its nukage
 # Each shelf's floors (trough and pond, bank), sky and light. Every step down is brighter.
 S1, S2, S3, S4 = (624, 640, 1024, 160), (496, 512, 896, 176), (368, 384, 768, 192), (240, 256, 640, 208)
 LAKE_SKY = 384
+BRK_LIGHT = 240         # the breach, brighter than shelf 3 round it
 
 
 def door_kw(floor, flat, near, far=None, *, near_d=32, far_d=16, **kw):
@@ -99,12 +100,16 @@ zone_e = [(1440, 1664), (1536, 1664), (1536, 1536), (1600, 1536), (1600, 1792), 
 KEY = (1472, 1600)
 KEY_SPOT = rect(1440, 1568, 1504, 1632)
 VT_PANEL = ((1296, 1568), (1296, 1632))     # VTI's west wall, VTI on the right
+VT_WIN = rect(1344, 1536, 1472, 1552)       # VT's south window, sill 544, lintel 608
 
 # ------------------------------------------------------------- pump station
-SUMP = rect(-608, 1760, -288, 1952)
-PUMPS = [rect(x, 1824, x + 64, 1888) for x in (-576, -480, -384)]
+# One open hall, 1088 x 512: the arachnotron at its west end holds the line from
+# the red door to him. The sump is a bay in the north wall, its pumps at the back.
+b2h_loop = [(-1152, 1664), (-64, 1664), (-64, 2176), (-576, 2176), (-576, 2048), (-960, 2048), (-960, 2176),
+            (-1152, 2176)]
+SUMP = rect(-960, 2048, -576, 2176)
+PUMPS = [rect(x, 2112, x + 64, 2160) for x in (-928, -800, -672)]
 PLINTH_N, PLINTH_S = rect(-480, 1968, -352, 2032), rect(-480, 1680, -352, 1744)
-COLUMN_N, COLUMN_S = rect(-432, 1984, -400, 2016), rect(-432, 1696, -400, 1728)
 
 # ------------------------------------------------------------- sluice house
 b1g_loop = [(2112, 2304), (2624, 2304), (2624, 2112), (2816, 2112), (2816, 2496), (2112, 2496)]
@@ -115,24 +120,26 @@ B1M_PLINTH = rect(2240, 1920, 2432, 2048)
 TANKS = [rect(2176, 1184, 2368, 1312), rect(2496, 1184, 2688, 1312)]
 
 # ------------------------------------------------------------- the lake and the dome
-# The dome: an octagon in 640..1408 x -1088..-320, corners cut 192, its shell
-# 64 thick on the hatch side. Its back wall stands at -960; the exit alcove is
-# recessed behind it on the hatch's axis, so from the floodgate you see
-# straight through the hatch to the arch-vile waiting in it.
-DOME = [(832, -320), (640, -512), (640, -896), (832, -1088), (1216, -1088), (1408, -896), (1408, -512),
-        (1216, -320)]   # counter-clockwise: the lake is on the right of each edge
-DI_LOOP = [(816, -384), (1232, -384), (1376, -528), (1376, -880), (1296, -960), (752, -960), (672, -880),
-           (672, -528)]
+# The lake runs south to -1408. The dome is a gatehouse against its south wall:
+# the hatch face on the lake, corners cut 192 back to the wall, its shell 64
+# thick on the hatch side. The exit alcove is recessed into the south wall
+# behind it on the hatch's axis, so from the floodgate you see straight
+# through the hatch to the arch-vile waiting in it.
+LAKE_S = -1408
+DOME_N = LAKE_S + 192
+DOME = [(832, DOME_N), (640, LAKE_S), (1408, LAKE_S), (1216, DOME_N)]   # counter-clockwise: the lake on the right
+DI_LOOP = [(816, DOME_N - 64), (1232, DOME_N - 64), (1360, LAKE_S), (688, LAKE_S)]
 # The exit alcove: a lintel at its mouth holding the EXIT sign, then the alcove,
 # walled in falling nukage (the melted core). At its back a shutter seals the
 # exit console behind it until the Cyberdemon dies (UMAPINFO bossaction).
-EXR_LINTEL = rect(944, -976, 1104, -960)
-EXR = rect(944, -1040, 1104, -976)
-EXD = rect(992, -1056, 1056, -1040)
-EXC = rect(1008, -1072, 1040, -1056)
-lake_loop = [(-256, -1152), (2304, -1152), (2304, 512), (1280, 512), (1280, -320), (1216, -320), (1408, -512),
-             (1408, -896), (1216, -1088), (832, -1088), (640, -896), (640, -512), (832, -320), (768, -320),
-             (768, 512), (-256, 512)]
+EXR_LINTEL = rect(944, LAKE_S - 16, 1104, LAKE_S)
+EXR = rect(944, LAKE_S - 80, 1104, LAKE_S - 16)
+EXD = rect(992, LAKE_S - 96, 1056, LAKE_S - 80)
+EXC = rect(1008, LAKE_S - 112, 1040, LAKE_S - 96)
+# The route strip (l_x) and the dome run from the dam to the south wall, so
+# the lake is two loops, west and east of them.
+lake_w = [(-256, LAKE_S), (640, LAKE_S), (832, DOME_N), (768, DOME_N), (768, 512), (-256, 512)]
+lake_e = [(1280, 512), (1280, DOME_N), (1216, DOME_N), (1408, LAKE_S), (2304, LAKE_S), (2304, 512)]
 CT_OUTER = rect(-64, -448, 384, 0)
 # The cooling-tower ring, less the section on its east face that lowers.
 ct_loop = [(384, -160), (384, 0), (-64, 0), (-64, -448), (384, -448), (384, -288), (320, -288), (320, -384),
@@ -141,8 +148,8 @@ ISLANDS = {"i2": rect(-128, -1024, 256, -704), "i3": rect(1728, -448, 2176, -64)
 TANK_STUBS = [rect(1792, -384, 1920, -256), rect(1984, -256, 2112, -128)]
 PYLONS = [rect(x - 32, y - 32, x + 32, y + 32) for x, y in ((512, 192), (1472, 192), (448, -704), (1600, -704))]
 FRAGMENT = rect(576, -320, 704, -256)
-EXIT_FACE = ((1040, -1056), (1008, -1056))   # the console's north face behind the shutter, SW1EXIT
-EXIT_SIGN = ((1056, -976), (992, -976))      # the lintel's inner face over the alcove
+EXIT_FACE = ((1040, LAKE_S - 96), (1008, LAKE_S - 96))   # the console's north face behind the shutter, SW1EXIT
+EXIT_SIGN = ((1056, LAKE_S - 16), (992, LAKE_S - 16))    # the lintel's inner face over the alcove
 
 # Switches.
 sw_fgg_niche, sw_fgg = switch_niche("sw_fgg", (-64, 752), "e", Special(S1_FLOOR_LOWEST, TAG_FGG, "SW1GRAY"),
@@ -151,6 +158,13 @@ sw_fgg_niche, sw_fgg = switch_niche("sw_fgg", (-64, 752), "e", Special(S1_FLOOR_
 kc = closet("kc", (2048, 1592), "e", TAG_KC, face=BASE, flat=NUKE, wall="CEMENT7", floor=S2[0], width=112,
             depth=256, ctex="CEIL5_2", light=96, special=DAMAGE_5, door_width=112)
 kc[0].special = DAMAGE_5   # a closed door level with damaging nukage on both sides must be damaging too
+
+# The pain elemental's closet in the canyon's east wall at pond level, beside the settling house's
+# landing. In the open he woke from gunfire on the shelves above and flew up to fight from the valve
+# tower; shut in here he hears nothing, and comes out onto the crest when you arrive.
+pe = closet("pe", (2048, 640), "e", TAG_PE, face=BASE, flat=NUKE, wall="CEMENT7", floor=S4[0], width=128,
+            depth=160, ctex="CEIL5_2", light=96, special=DAMAGE_5)
+pe[0].special = DAMAGE_5
 
 vtp = lift("vtp", (1216, 1600, 1280, 1664), 640, ZONE_SKY, TAG_VTP, SKY, 224, BASE, ftex="TLITE6_1", side=BASE)
 vtp.special = SECRET_AREA
@@ -220,20 +234,19 @@ SECTORS = [
     Sector("vt_door", [rect(1376, 1648, 1440, 1664)], 512, 640, "FLAT23", "CEIL5_1", 160, "SUPPORT3"),
     Sector("vti", [rect(1296, 1552, 1520, 1648)], 512, 640, "FLAT23", "CEIL5_1", 160, "SILVER1"),
     Sector("vt_key", [KEY_SPOT], 512, 640, "FLAT23", "CEIL5_1", 240, "SILVER1", special=LIGHT_GLOW),
-    window("vt_win", (1344, 1536, 1472, 1552), 544, 608, "SUPPORT3", 176, flat="FLAT23", ctex="CEIL5_1",
+    window("vt_win", VT_WIN[0] + VT_WIN[2], 544, 608, "SUPPORT3", 176, flat="FLAT23", ctex="CEIL5_1",
            lower="SUPPORT3"),
     vtp,
     *kc,
+    *pe,
 
     # ------------------------------------------------ pump station
     *doorway("d_red", (0, 1888), "w", **door_kw(512, "FLOOR5_1", BANK, alcove_wall="DOORRED2", track="DOORRED2",
                                                   action=DR_RED)),
-    Sector("b2h", [rect(-768, 1664, -64, 2048)], 512, 704, "FLOOR5_1", "CEIL5_2", 112, "PIPE2", lower="PIPE4"),
-    Sector("b2p", [SUMP], 496, 704, NUKE, "CEIL5_2", 80, "PIPES", special=LIGHT_FLICKER, pillars=PUMPS),
-    Sector("b2_plinth_n", [PLINTH_N], 536, 704, "FLOOR5_1", "CEIL5_2", 112, "PIPES", lower="PIPE4",
-           pillars=[COLUMN_N]),
-    Sector("b2_plinth_s", [PLINTH_S], 536, 704, "FLOOR5_1", "CEIL5_2", 112, "PIPES", lower="PIPE4",
-           pillars=[COLUMN_S]),
+    Sector("b2h", [b2h_loop], 512, 768, "FLOOR5_1", "CEIL5_2", 112, "PIPE2", lower="PIPE4"),
+    Sector("b2p", [SUMP], 496, 768, NUKE, "CEIL5_2", 80, "PIPES", special=LIGHT_FLICKER, pillars=PUMPS),
+    Sector("b2_plinth_n", [PLINTH_N], 536, 768, "FLOOR5_1", "CEIL5_2", 112, "PIPES", lower="PIPE4"),
+    Sector("b2_plinth_s", [PLINTH_S], 536, 768, "FLOOR5_1", "CEIL5_2", 112, "PIPES", lower="PIPE4"),
     lift("b2l", (-256, 1536, -128, 1664), 512, 704, TAG_B2L, "CEIL5_2", 128, "PIPE2", ftex="FLOOR5_1",
          side="PLAT1"),
     Sector("b2g", [rect(-768, 1216, -64, 1536)], 384, 576, "FLOOR5_1", "CEIL5_2", 128, "PIPE2"),
@@ -243,10 +256,13 @@ SECTORS = [
     *shelf(3, [rect(0, 1472, 2048, 1536)], [rect(0, 1280, 896, 1472), rect(1152, 1280, 2048, 1472)],
            [rect(0, 1024, 896, 1280), rect(1152, 1024, 2048, 1280)], S3),
     # The breach: 256 of bank and lip fallen into the pond, which pours over the broken lip unrailed.
-    Sector("brk", [rect(896, 1024, 1152, 1472)], S3[0], S3[2], NUKE, SKY, S3[3], BASE, lower=FALLS,
+    # Lit brighter than the shelf (it can't blink: its nukage hurts, and a sector has one special),
+    # so the way down stands out along the bank.
+    Sector("brk", [rect(896, 1024, 1152, 1472)], S3[0], S3[2], NUKE, SKY, BRK_LIGHT, BASE, lower=FALLS,
            special=DAMAGE_5),
-    *[Sector(f"rubble{i}", [r], 416, S3[2], BANK, SKY, S3[3], BASE)
-      for i, r in enumerate([rect(928, 1328, 992, 1392), rect(1040, 1392, 1104, 1456)])],
+    *[Sector(f"rubble{i}", [r], 416, S3[2], BANK, SKY, BRK_LIGHT, BASE)
+      for i, r in enumerate([rect(1056, 1264, 1120, 1392), rect(944, 1392, 1008, 1456),
+                             rect(944, 1168, 1008, 1232)])],
 
     # ------------------------------------------------ settling house
     *doorway("d_b3h", (2048, 1376), "e", **door_kw(384, "SLIME13", BANK)),
@@ -289,9 +305,10 @@ SECTORS = [
     Sector("b4a", [rect(-768, 384, -384, 528)], 256, 384, "FLAT19", "CEIL3_5", 144, "GRAY7"),
 
     # ------------------------------------------------ the lake
-    Sector("l", [lake_loop, CT_OUTER], 0, LAKE_SKY, NUKE, SKY, 224, "TANROCK5", lower=RISER, special=DAMAGE_10),
+    Sector("l", [lake_w, lake_e, CT_OUTER], 0, LAKE_SKY, NUKE, SKY, 224, "TANROCK5", lower=RISER,
+           special=DAMAGE_10),
     # The route strip from the floodgate to the hatch; its only walls are the dome's.
-    Sector("l_x", [rect(768, -320, 1280, 512)], 0, LAKE_SKY, NUKE, SKY, 224, "METAL2", lower=RISER,
+    Sector("l_x", [rect(768, DOME_N, 1280, 512)], 0, LAKE_SKY, NUKE, SKY, 224, "METAL2", lower=RISER,
            special=DAMAGE_10),
     *[Sector(n, [r], 16, LAKE_SKY, "RROCK18", SKY, 224, "TANROCK5", lower=RISER) for n, r in ISLANDS.items()],
     *[Sector(f"tk{i}", [r], 144, LAKE_SKY, "FLAT23", SKY, 224, "SILVER1") for i, r in enumerate(TANK_STUBS)],
@@ -304,16 +321,16 @@ SECTORS = [
            special=LIGHT_GLOW),
 
     # ------------------------------------------------ the dome
-    *doorway("dh", (1024, -320), "s", 256, alcove=16, far_alcove=16, thickness=32, alcove_wall="SUPPORT3",
+    *doorway("dh", (1024, DOME_N), "s", 256, alcove=16, far_alcove=16, thickness=32, alcove_wall="SUPPORT3",
              alcove_flat="FLAT20", floor=16, flat="FLAT20", face="SPCDOOR1", track="SUPPORT3", tag=TAG_DH),
     Sector("di", [DI_LOOP], 16, 320, "FLAT20", "TLITE6_6", 255, "SHAWN2", special=LIGHT_BLINK_SLOW),
-    Sector("dais", [rect(896, -832, 1152, -544)], 40, 320, "FLOOR1_7", "TLITE6_6", 255, "SHAWN2", special=LIGHT_GLOW),
-    # The exit alcove on the hatch's axis, where the arch-vile waits: lit, walled in falling nukage
-    # (the melted core), with the EXIT sign on its lintel. The shutter at its back opens when the
-    # Cyberdemon dies (UMAPINFO bossaction, tag TAG_EXIT); the console stands behind it.
+    # The exit alcove on the hatch's axis, recessed into the lake's south wall, where the arch-vile
+    # waits: lit, walled in falling nukage (the melted core), with the EXIT sign on its lintel. The
+    # shutter at its back opens when the Cyberdemon dies (UMAPINFO bossaction, tag TAG_EXIT); the
+    # console stands behind it.
     Sector("exr_lintel", [EXR_LINTEL], 16, 144, "FLAT20", "TLITE6_6", 255, "SUPPORT3"),
     Sector("exr", [EXR], 24, 128, "FLOOR1_7", "TLITE6_6", 255, FALLS, lower="SUPPORT3"),
-    door("exd", EXD, face="SUPPORT3", track="SUPPORT3", tag=TAG_EXIT, light=255, floor=24, flat="FLOOR1_7"),
+    door("exd", EXD, face=FALLS, track="SUPPORT3", tag=TAG_EXIT, light=255, floor=24, flat="FLOOR1_7"),
     Sector("exc", [EXC], 96, 128, "FLOOR1_7", "TLITE6_6", 255, "SUPPORT3", lower="SUPPORT3"),
 ]
 
@@ -324,6 +341,11 @@ SPECIAL_BETWEEN = {
     ("s3p", "s4t"): BARS, ("s4p", "l"): BARS, ("s4p", "l_x"): BARS,
     ("s2p_z", "vtp"): Special(),                       # the pillar only moves from the panel in the tower
     ("s4p_x", "fgg"): Special(W1_DOOR_OPEN, TAG_DH),   # over the open floodgate: the hatch opens
+    # Arriving on shelf 4 either way lets the pain elemental out: off the breach's broken lip, or down
+    # the settling house's spillway to its landing (not at the landing's door: a walk line in front of
+    # a door stops you using the door in vanilla).
+    ("brk", "s4t"): Special(W1_DOOR_OPEN, TAG_PE),
+    ("b3c", "b3n"): Special(W1_DOOR_OPEN, TAG_PE),
     ("l", "ct_s"): Special(S1_FLOOR_LOWEST, TAG_CT),   # secret 4: the ring section, used from the lake
 }
 SPECIAL_WALLS = {
@@ -356,10 +378,9 @@ EXTRA_POINTS = [
     (1296, 1536), (1520, 1536),                        # SUPPORT3 where shelf 2's falls meet the tower
     (-32, 512), (2080, 512),                           # the dam's abutments
     (960, 528), (1024, 528), (1088, 528),              # the floodgate's face: four SPCDOOR3
-    *[(x, y) for x in (960, 1024, 1088) for y in (-336, -368)],   # the hatch's faces: four SPCDOOR1 a side
+    *[(x, y) for x in (960, 1024, 1088) for y in (DOME_N - 16, DOME_N - 48)],   # the hatch's faces: four SPCDOOR1 a side
     (1904, 2864), (2672, 1472), (384, -144), (1296, 1632),        # LITE5 beside each secret
     VT_PANEL[0],                                                  # secret 2's panel
-    (1376, -712), (1376, -696), (672, -712), (672, -696),          # LITE5 in the dome
     EXIT_SIGN[1], EXIT_SIGN[0],                                    # the EXIT sign's 64 of lintel
 ]
 # Lines meet only at shared vertices: put every sector corner (and free-line
@@ -372,12 +393,12 @@ for _s in SECTORS:
 
 
 def dome_walls():
-    """The dome's outer faces seen from the lake, METAL2 instead of the lake's
-    TANROCK5 cliffs, split where the lake's loop is."""
+    """The dome's chamfered outer faces seen from the lake, METAL2 instead of the
+    lake's TANROCK5 cliffs, split where the lake's loop is."""
     out = []
     for a, b in edges(DOME):
-        if a[1] == b[1] == -320:
-            continue   # the hatch face is l_x's, METAL2 already
+        if a[1] == b[1]:
+            continue   # the hatch face is l_x's, METAL2 already; the back is the lake's south wall
         chain = [a] + sorted((p for p in _pts if on_segment(p, a, b)), key=lambda p: dist(a, p)) + [b]
         out += [trim(u, v, "METAL2") for u, v in zip(chain, chain[1:])]
     return out
@@ -415,6 +436,10 @@ OVERRIDES = dict([
     (((896, 512), (1152, 512)), Line(flags=SOUNDBLOCK, front=Side(lower="SUPPORT3"))),
     *[(pq, Line(flags=BARS_SOUNDBLOCK)) for pq in DAM_RAILINGS],
     *[(pq, Line(flags=SOUNDBLOCK)) for r in ISLANDS.values() for pq in edges(r)],
+    # The tower's window is tall enough for a flier: the pain elemental flew in from the shelves and
+    # got stuck fighting from inside the tower (playtest, every time; he's in a closet now). Monsters
+    # can't cross it; shots, sight and the player still can.
+    *[(pq, Line(flags=ML_TWOSIDED | ML_BLOCKMONSTERS)) for pq in edges(VT_WIN) if pq[0][1] == pq[1][1]],
     # The spillway's drop, seen from below.
     (((2560, 1120), (2816, 1120)), Line(front=Side(lower="ICKWALL1"))),
     # Secret 2's panel, shifted, and LITE5 beside it.
@@ -429,14 +454,11 @@ OVERRIDES = dict([
     # The exit console at the back of the alcove, and the EXIT sign on the lintel over it.
     (EXIT_FACE, Line(action=S1_EXIT, front=Side(lower="SW1EXIT"))),
     (EXIT_SIGN, Line(front=Side(upper="EXITSIGN"))),
-    # LITE5 strips in the reactor hall.
-    trim((1376, -696), (1376, -712), "LITE5"),
-    trim((672, -712), (672, -696), "LITE5"),
     *dome_walls(),
 ])
 
 MUST_REACH = ["ov", "s1x", "s1t", "b1g", "b1m", "s2t", "vti", "vtp", "kc", "b2p", "b2g", "s3t", "brk", "b3h",
-              "s3x", "b3n", "s4t", "b4c", "b4a", "s4p_x", "l", "l_x", "i2", "i3", "i4", "cti", "di", "dais", "exr"]
+              "s3x", "b3n", "s4t", "b4c", "b4a", "s4p_x", "l", "l_x", "i2", "i3", "i4", "cti", "di", "exr"]
 
 # (type, x, y, angle=0, skills="emh"); "a" = ambush (deaf). Counts in the
 # comments are UV (HMP, easy). Every outdoor monster faces south, away from
@@ -447,7 +469,7 @@ THINGS = [Thing(*t) for t in [
     (SHOTGUN, 1024, 2592), (SHELLS, 1280, 2664), (STIM, 768, 2664),                 # at the rail, on the consoles
     # outfall valve room, and secret 1 behind it
     (GREENARMOR, 1520, 2880), (STIM, 1840, 2688),
-    (BACKPACK, 1984, 2784), (GREENARMOR, 1984, 2848),
+    (BACKPACK, 1984, 2784), (BLUEARMOR, 1984, 2848),
     # stairwell landing: 2 zombiemen (1, 1), 2 imps (1, 1), facing up the stairs
     (ZOMBIE, -320, 2336, 90, "emha"), (ZOMBIE, -224, 2352, 90, "ha"),
     (IMP, -160, 2400, 90, "emha"), (IMP, -288, 2416, 90, "ha"),
@@ -479,18 +501,18 @@ THINGS = [Thing(*t) for t in [
     (SHELLBOX, 1952, 1824),
     # Shells for the key trap and the red door's hell knights: the route's leanest stretch (playtest).
     (SHELLBOX, 1360, 1632), (SHELLBOX, 192, 1920),
-    (PLASMA, 1248, 1648), (CELLPACK, 1248, 1616),                                     # secret 2
+    (SOUL, 1248, 1648), (CELLPACK, 1248, 1616),                                       # secret 2
     # the key trap: a mancubus (1, 1), a revenant (1, 0; easy: an imp), 2 imps (1, 1); awake
     (FATSO, 2192, 1592, 180), (REVENANT, 2096, 1568, 180, "mh"), (IMP, 2096, 1568, 180, "e"),
     (IMP, 2288, 1568, 180), (IMP, 2288, 1616, 180, "h"),
-    # pump station: an arachnotron (1, 0; easy: 2 imps) at the far west end, 2 chaingunners (1, 1)
-    # on the plinths, 3 imps (3, 3); 2 spectres (1, 1) in the sump
-    (ARACHNO, -688, 1856, 0, "mha"), (IMP, -704, 1792, 0, "ea"), (IMP, -704, 1920, 0, "ea"),
+    # pump station: an arachnotron (1, 0; easy: 2 imps) at the far west end, facing the red door down
+    # the open hall; 2 chaingunners (1, 1) on the plinths, 3 imps (3, 3); 2 spectres (1, 1) in the sump
+    (ARACHNO, -1024, 1888, 0, "mha"), (IMP, -1024, 1824, 0, "ea"), (IMP, -1024, 1952, 0, "ea"),
     (CHAINGUY, -456, 2000, 0, "emha"), (CHAINGUY, -456, 1712, 0, "ha"),
     (IMP, -160, 1760, 0, "emha"), (IMP, -160, 2000, 0, "emha"), (IMP, -640, 2016, 0, "emha"),
-    (SPECTRE, -528, 1792, 0, "emha"), (SPECTRE, -368, 1920, 0, "ha"),
+    (SPECTRE, -832, 2080, 270, "emha"), (SPECTRE, -704, 2080, 270, "ha"),
     (LAUNCHER, -384, 1712), (ROCKET, -160, 1696), (ROCKET, -128, 1696), (AMMOBOX, -704, 1696),
-    (MEDI, -160, 1904), (BERSERK, -448, 1936), (SHELLBOX, -704, 2016), (MEDI, -128, 1984),
+    (MEDI, -160, 1904), (BERSERK, -896, 2080), (SHELLBOX, -704, 2016), (MEDI, -128, 1984),
     # lower gallery: 2 shotgun guys (1, 0)
     (SARGE, -480, 1280, 90, "mha"), (SARGE, -640, 1440, 0, "ha"),
     (ROCKETBOX, -160, 1248), (MEDI, -704, 1248),
@@ -501,6 +523,12 @@ THINGS = [Thing(*t) for t in [
     (REVENANT, 1952, 1312, 180, "mha"), (IMP, 1952, 1312, 180, "ea"),
     (FATSO, 1760, 1408, 270, "mha"),
     (MEDI, 128, 1312), (ROCKETBOX, 832, 1312), (SHELLBOX, 448, 1440), (MEDI, 1888, 1440),
+    # The way down: tech lamps either side of the broken lip, and a trail of armor bonuses from the
+    # west bank through the rubble to the drop. The rubble stands mostly west of the channel, so the
+    # east bank's mancubus has a clear shot at you wading down it.
+    (TECHLAMP, 872, 1048), (TECHLAMP, 1176, 1048),
+    *[(ABONUS, x, y) for x, y in ((816, 1320), (880, 1320), (944, 1320), (1008, 1304), (1032, 1248),
+                                  (1032, 1192), (1032, 1136), (1024, 1080))],
     # settling house: a baron (1, 1; easy: a hell knight), 4 imps (3, 2), a chaingunner (1, 0),
     # 2 demons (1, 1)
     (BARON, 2464, 1392, 180, "mha"), (KNIGHT, 2464, 1392, 180, "ea"),
@@ -509,13 +537,14 @@ THINGS = [Thing(*t) for t in [
     (CHAINGUY, 2768, 1312, 180, "mha"),
     (DEMON, 2432, 1248, 180, "emha"), (DEMON, 2752, 1248, 180, "ha"),
     (PLASMA, 2272, 1344), (SHELLBOX, 2176, 1440), (MEDI, 2176, 1152),
-    (BLUEARMOR, 2624, 1520),                                                           # S3x: secret 3
+    (GREENARMOR, 2624, 1520),                                                          # S3x: secret 3
     (CELLPACK, 2688, 832), (MEDI, 2176, 800),
     # shelf 4: 2 hell knights (1, 1) on the crest facing the trough below the breach, 3 imps (3, 1),
-    # a pain elemental (1, 0) over the pond, an arachnotron (1, 0) at the east end facing west
+    # a pain elemental (1, 0) in the closet in the east wall, awake, out when you reach the shelf;
+    # an arachnotron (1, 0) at the east end facing west
     (KNIGHT, 896, 896, 90, "emha"), (KNIGHT, 1120, 896, 90, "ha"),
     (IMP, 384, 864, 270, "emha"), (IMP, 1504, 864, 270, "mha"), (IMP, 1760, 880, 270, "mha"),
-    (PAIN, 640, 640, 270, "mha"),
+    (PAIN, 2144, 640, 180, "mh"),
     (ARACHNO, 1920, 864, 180, "mha"),
     (RADSUIT, 1216, 816), (ROCKETBOX, 256, 800), (MEDI, 1600, 800), (SHELLBOX, 640, 928),
     (ROCKETBOX, 1792, 928), (MEDI, 1408, 928), (MEDI, 1024, 992),
@@ -530,10 +559,10 @@ THINGS = [Thing(*t) for t in [
     # once he can see you: you hear him before you see more than a speck of him.
     (CYBER, 1248, -32, 270, "emha"),
     # the dome group, awake behind the hatch: the arch-vile (1, 0; easy: a hell knight) in the exit
-    # alcove, in view from the floodgate through the hatch but about 1,500 away, past the 1,088 an
-    # arch-vile attacks from; 2 hell knights (1, 1)
-    (ARCHVILE, 1024, -1008, 90, "mh"), (KNIGHT, 1024, -1008, 90, "e"),
-    (KNIGHT, 864, -560, 90), (KNIGHT, 1184, -560, 90, "h"),
+    # alcove, in view from the floodgate through the hatch but about 1,950 away, past the 1,088 an
+    # arch-vile attacks from; 2 hell knights (1, 1) inside the hatch
+    (ARCHVILE, 1024, LAKE_S - 48, 90, "mh"), (KNIGHT, 1024, LAKE_S - 48, 90, "e"),
+    (KNIGHT, 880, LAKE_S + 80, 90), (KNIGHT, 1168, LAKE_S + 80, 90, "h"),
     # support on the islands, for the vile to raise, deaf and out of earshot of the cascade until you
     # fire in the lake: 6 imps (5, 2), 2 hell knights (2, 1), a revenant (1, 0) on the east island,
     # 2 cacodemons (1, 1) over the west and east islands
@@ -547,7 +576,7 @@ THINGS = [Thing(*t) for t in [
     (RADSUIT, 2112, -96), (CELLPACK, 1792, -128), (MEDI, 1792, -192), (MEDI, 2144, -352),   # east island
     (ROCKETBOX, 2144, -192),                       # with the cell pack: the vile's resurrections, budgeted
     (ROCKETBOX, 1728, -864), (MEDI, 1984, -1024), (MEDI, 1696, -1056),                 # south-east island
-    (MEDI, 768, -720), (MEDI, 1280, -720),                                             # reactor hall
-    (STIM, 864, -160), (STIM, 1184, -160),                                             # beside the hatch
+    (MEDI, 816, LAKE_S + 32), (MEDI, 1232, LAKE_S + 32),                               # in the dome
+    (STIM, 864, DOME_N + 160), (STIM, 1184, DOME_N + 160),                             # beside the hatch
     (SOUL, 160, -224),                                                                 # secret 4
 ]]

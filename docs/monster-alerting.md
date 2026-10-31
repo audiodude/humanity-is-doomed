@@ -32,7 +32,7 @@ The Cyberdemon's and the Spider Mastermind's sight and death sounds play at full
 
 ## After waking: when a monster attacks
 
-A monster attacks only along a line of sight, and its chance to fire falls off with distance. The arch-vile won't start its attack at all from more than about 1,088 units away (`P_CheckMissileRange`). So an arch-vile can be put in plain view at a distance, awake, and still give you time to take cover while it closes in: MAP09's stands in the exit alcove at the back of the dome, about 1,500 units from where you land in the lake, in view through the hatch.
+A monster attacks only along a line of sight, and its chance to fire falls off with distance. The arch-vile won't start its attack at all from more than about 1,088 units away (`P_CheckMissileRange`). So an arch-vile can be put in plain view at a distance, awake, and still give you time to take cover while it closes in: MAP09's stands in the exit alcove at the back of the dome, about 1,950 units from where you land in the lake, in view through the hatch.
 
 ## Support in the level generator (`levels/`)
 

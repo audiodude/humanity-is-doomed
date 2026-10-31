@@ -559,10 +559,18 @@ def overrides_of(pairs):
     for ol, bl, (bf, bb), flipped in pairs:
         d = {k: o for k, o, b in (("action", ol.action, bl.action), ("tag", ol.tag, bl.tag),
                                    ("flags", ol.flags, bl.flags)) if o is not None and o != b}
+        sides = []
         if f := side_diff(ol.front, bf):
             d["front"] = f
+            sides.append((f, bf))
         if ol.back and (b := side_diff(ol.back, bb)):
             d["back"] = b
+            sides.append((b, bb))
+        # Replacing a riser's lower texture re-pegs it (apply_overrides) unless the
+        # override gives the flags: give them whenever that would change them.
+        if "flags" not in d and ol.flags is not None and any(
+                s.lower is not None and bs.riser_unpeg and s.lower != bs.sector.wall for s, bs in sides):
+            d["flags"] = ol.flags
         if d or flipped:
             out[ol.a, ol.b] = LineOverride(**d)
     return out

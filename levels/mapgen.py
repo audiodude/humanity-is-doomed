@@ -253,11 +253,13 @@ def line_sides(l: Linedef, secret_doors, ranges, x_offsets) -> list[Sidedef]:
             up = me.wall
             l.flags |= ML_DONTPEGTOP
         moving = LIFT in (me.kind, other.kind)
+        riser = False
         if ranges[other][1] > ranges[me][0] or moving:
             lo = other.lower
             if lo == me.wall and not moving:
                 l.flags |= ML_DONTPEGBOTTOM
-        sides.append(Sidedef(up, lo, mid, me, x_offset(pos, up, lo, mid) + dx, dy))
+                riser = True
+        sides.append(Sidedef(up, lo, mid, me, x_offset(pos, up, lo, mid) + dx, dy, riser))
     return sides
 
 
@@ -304,6 +306,14 @@ def apply_overrides(level, lines, sides):
             if (s.x is None and any(getattr(s, n) for n in ("upper", "lower", "mid"))
                     and any(is_decal(t) for t in (sd.upper, sd.lower, sd.mid))):
                 sd.x_offset = 0
+            # A riser unpegged only to line up with its sector's walls keeps that
+            # alignment no longer once its texture is replaced: peg it to the step
+            # again (a switch on a console face starts at its top), unless the
+            # override gives the flags itself.
+            if sd.riser_unpeg and s.lower is not None and s.lower != sd.sector.wall:
+                sd.riser_unpeg = False
+                if ov.flags is None and not l.texture and not any(x.riser_unpeg for x in sides[i]):
+                    l.flags &= ~ML_DONTPEGBOTTOM
     if problems:
         raise LevelError("\n".join(problems))
 

@@ -148,6 +148,7 @@ class Sidedef:
     sector: Sector
     x_offset: int = 0
     y_offset: int = 0
+    riser_unpeg: bool = False   # its lower is unpegged only to line up with its sector's wall texture
 
 
 @dataclass
