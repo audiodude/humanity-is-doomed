@@ -22,7 +22,7 @@
 
 *NUKAGE: A nuclear meltdown at a UAC power plant opens a gate to hell.*
 
-`wads/NUKAGE.WAD` holds nine generated maps for DOOM II: MAP01, [Nukage Junction](#nukage-junction-nukage_junction), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), MAP06, [Nukage Undercurrent](#nukage-undercurrent-nukage_undercurrent), MAP07, [Nukage Storage](#nukage-storage-nukage_storage), MAP08, [Nukage Lockdown](#nukage-lockdown-nukage_lockdown), and MAP09, [Nukage Meltdown](#nukage-meltdown-nukage_meltdown), the last. It needs `doom2.wad`; to play it in dsda-doom, `dsda-doom -iwad doom2 -file wads/NUKAGE.WAD` (add `-warp 2` and so on for the later maps). Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP09.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
+`wads/NUKAGE.WAD` holds nine generated maps for DOOM II: MAP01, [Nukage Outskirts](#nukage-outskirts-nukage_outskirts), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), MAP06, [Nukage Undercurrent](#nukage-undercurrent-nukage_undercurrent), MAP07, [Nukage Storage](#nukage-storage-nukage_storage), MAP08, [Nukage Lockdown](#nukage-lockdown-nukage_lockdown), and MAP09, [Nukage Meltdown](#nukage-meltdown-nukage_meltdown), the last. It needs `doom2.wad`; to play it in dsda-doom, `dsda-doom -iwad doom2 -file wads/NUKAGE.WAD` (add `-warp 2` and so on for the later maps). Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP09.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
 
 ### Compatibility
 
@@ -37,10 +37,27 @@
 
 MAP01–MAP08 don't depend on UMAPINFO. Every map is checked against vanilla rules (see [Playtests](#playtests)), and MAP09 has been played through in the 2024 re-release. The bossaction gate came after that playthrough and hasn't yet been tried in any of these ports.
 
-### Nukage Junction (`nukage_junction`)
-A medium-difficulty MAP01 replacement: 46 sectors, 24/45/52 monsters on easy/medium/hard, one secret.
+### Nukage Outskirts (`nukage_outskirts`)
+MAP01, the easiest map in the set: 104 sectors, 12/22/31 monsters on easy/medium/hard, four secrets, nothing heavier than a demon. Its design doc is `levels/designs/nukage_outskirts.md`, with the playtest results; the route script is `levels/playtests/nukage_outskirts.playtest`.
 
-The `UMAPINFO` lump names the level for ports that read it (dsda-doom, GZDoom). Vanilla DOOM II still calls it "entryway".
+You start in a sunlit valley below a hillside cut into switchback shelves, with the plant's monitoring station on the crest. Its front shutter is jammed; you get in through the loading dock round the back, find the blue key in the instrument room, and the blue door at the top of the stairs opens onto the observation deck. The far side of the ridge drops into a valley filled wall to wall with nukage, and the jetty across it leads to the exit in the plant's wall.
+
+| Measure | MAP01 | DOOM II median |
+|---|---|---|
+| Distinct floor heights | 32 | 23 |
+| Light SD / light-effect sectors | 24 / 7 | 23 / 9 |
+| Most-used wall texture | 33% | 30% |
+| Wall material changes with a border texture | 99% | 31% |
+| Optional share of the reachable area | 47% | 50% |
+| UV ammo per monster HP (pistol start) | 2.66 | 1.81 |
+| Health per 1000 monster HP | 83 | 40 |
+| Easy/UV and HMP/UV monster ratios | 0.39 / 0.71 | 0.33 / 0.70 |
+| Deaf monsters | 39% | 42% |
+| Nearest monster to the start | 643 | 300 |
+
+Ammo and health are generous on purpose for a first map; the secret soulsphere is 100 of the health.
+
+The original MAP01, Nukage Junction (`levels/nukage_junction.py`, a courtyard hub with a wing per key), is kept in the repo but is no longer built into the WAD: it targets the same MAP01 slot, so building it would replace Nukage Outskirts.
 
 ### Nukage Crossing (`nukage_crossing`)
 MAP02, designed from the [research](#research-what-makes-doom-levels-fun) below: 99 sectors, 21/43/57 monsters on easy/medium/hard, four secrets. It was retextured after the texture research (design: `levels/designs/nukage_crossing.md`): one brick for the whole canal basin, a signature material per area, and trim where materials meet. The first version's textures are kept in `levels/nukage_crossing_original.py`, which isn't built into the WAD.
@@ -208,7 +225,7 @@ Symmetry is high because the shelves are full-width bands across one canyon; the
 Run from the repo root:
 
 ```sh
-python3 -m levels nukage_junction          # check, then write MAP01 into wads/NUKAGE.WAD
+python3 -m levels nukage_outskirts         # check, then write MAP01 into wads/NUKAGE.WAD
 python3 -m levels nukage_crossing          # same for MAP02
 python3 -m levels nukage_core              # same for MAP03
 python3 -m levels nukage_divided            # same for MAP04
@@ -217,10 +234,10 @@ python3 -m levels nukage_undercurrent       # same for MAP06
 python3 -m levels nukage_storage            # same for MAP07
 python3 -m levels nukage_lockdown           # same for MAP08
 python3 -m levels nukage_meltdown           # same for MAP09
-python3 -m levels nukage_junction --check  # check only
+python3 -m levels nukage_outskirts --check # check only
 ```
 
-From Python: `from levels import build, nukage_junction; build(nukage_junction)`. A build replaces only its own map slot and `UMAPINFO` entry, so several levels can share one WAD.
+From Python: `from levels import build, nukage_outskirts; build(nukage_outskirts)`. A build replaces only its own map slot and `UMAPINFO` entry, so several levels can share one WAD.
 
 Requirements:
 - **Python 3.10+**, standard library only.

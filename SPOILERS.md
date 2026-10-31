@@ -2,9 +2,14 @@
 
 Walkthroughs for the maps in `wads/NUKAGE.WAD`. Play them first.
 
-## MAP01: Nukage Junction
+## MAP01: Nukage Outskirts
 
-Route: tech start room → courtyard hub with a nukage pool → warehouse (lift to a ledge switch that lowers the blue-key island; the fake wall in the west wall leads to the secret) → blue door → lab (lift to the red key; grabbing it opens a monster closet) → red door → exit arena (ambush closets on entry) → exit switch.
+- **Idea:** up one side of a ridge, with the spill hidden on the other. From the sunlit valley at the start you see the hillside's three switchback shelves and the monitoring station on the crest; nothing on this side shows what's over the ridge.
+- **Route:** valley (shotgun by the rubble heap) → shelf 1 east → hairpin → shelf 2 west → hairpin → shelf 3 east → forecourt, where the front shutter is jammed and the barred window shows the blue door at the top of the stairs inside → service ledge → loading yard → the switch on the dock opens the dock door → storeroom → instrument room, where taking the blue key off its console opens a closet of demons in the storeroom behind you (the storeroom, instrument room, lobby and generator room are a ring, so you can circle them) → lobby → stair hall → blue door → observation deck: the far side of the ridge drops into a valley full of nukage → cliff stair, landing and lift → shore → jetty, where stepping on opens the intake house's closet and two demons charge down it → intake house → exit. A switch beside the shutter in the lobby opens it onto the forecourt.
+- **Optional:** the rubble heap by the start (shells on top), the guard hut in the valley, the spur with the toppled container, the locker room off the lobby, the pump shed on the shore.
+- **Secrets:** a shifted panel between light strips in the guard hut (green armor); the lit ledge above the container, climbed to by the crate and the container (chaingun); a shifted locker between light strips in the locker room (backpack); the glowing island in the spill, seen from the deck (soulsphere).
+
+The original MAP01, Nukage Junction, is kept in `levels/nukage_junction.py` but no longer built into the WAD. Its route: tech start room → courtyard hub with a nukage pool → warehouse (lift to a ledge switch that lowers the blue-key island; the fake wall in the west wall leads to the secret) → blue door → lab (lift to the red key; grabbing it opens a monster closet) → red door → exit arena (ambush closets on entry) → exit switch.
 
 ## MAP02: Nukage Crossing
 
