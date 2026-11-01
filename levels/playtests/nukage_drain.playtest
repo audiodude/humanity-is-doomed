@@ -22,6 +22,9 @@ expect has BasicArmor
 
 # West pump house: the corridor and its secret.
 open -816 432
+walk -880 432
+look 180
+shot west-corridor
 open -1024 352
 walk -1024 280
 expect secrets == 2
@@ -30,6 +33,8 @@ open -1024 336
 # The super shotgun opens the pump hall's closets.
 walk -1024 864
 expect has SuperShotgun
+look 0
+shot west-pump
 wait 70
 expect ceil -1416 784 > 100
 expect ceil -1416 1040 > 100
@@ -52,6 +57,9 @@ checkpoint pump1
 # Along the west walkway to the north pump house, and its lobby secret.
 open -832 432
 open -720 1712
+walk -700 1800
+look 90
+shot north-lobby
 open -864 1856
 walk -950 1856
 expect secrets == 3
@@ -61,6 +69,8 @@ open -880 1856
 open -488 1856
 walk 96 1984
 expect has YellowCard
+look 90
+shot north-hall
 wait 70
 expect ceil 520 1920 > 100
 expect ceil 520 2144 > 100
@@ -77,7 +87,13 @@ checkpoint pump2
 # Along the north walkway to the yellow door and the east boiler house and its secret.
 open -472 1856
 open -720 1728
+walk 740 1616
+look 0
+shot yellow-door
 open 816 1616
+walk 900 1616
+look 0
+shot east-hall
 open 1184 1952
 walk 1184 2030
 expect secrets == 4
@@ -88,6 +104,9 @@ expect has RocketLauncher
 
 # Pump 3 raises the east walkway and the causeway to the vault.
 open 1120 1504
+walk 1120 1440
+look 270
+shot east-pump
 walk 1000 1424
 expect ceil 280 1176 == 32
 walk 910 1424
@@ -100,7 +119,7 @@ wait 40
 shot pump3
 wait 90
 expect floor 720 800 == 32
-expect floor 400 1024 == 40       # up to the vault door's step
+expect floor 400 1024 == 32       # level with the vault door's sill
 checkpoint pump3
 
 # The east walkway closes a loop back to the start.
@@ -111,6 +130,8 @@ expect pos 720 440
 
 # Onto the causeway: closets open behind you. Then the vault and the exit.
 walk 720 1024
+look 180
+shot causeway
 walk 600 1024
 wait 70
 expect ceil 808 704 > 100

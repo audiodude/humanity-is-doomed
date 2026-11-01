@@ -122,14 +122,16 @@ You leave the start room facing a wall that is half lava, half blue computer scr
 Symmetry is high because the two wings mirror each other's footprint around the fork and the pit; their materials, lighting and monsters are opposites.
 
 ### Nukage Drain (`nukage_drain`)
-MAP05: 82 sectors, 24/43/59 monsters on easy/medium/hard, four secrets, and the first revenants.
+MAP05: 83 sectors, 24/43/59 monsters on easy/medium/hard, four secrets, and the first revenants. Its design doc is `levels/designs/nukage_drain.md`.
 
 You start on the only dry catwalk of a reservoir full of nukage, with the exit vault standing in the middle. Each of three pump houses has a switch beside an opening onto the reservoir: throw it and watch the next walkway rise out of the sludge to take you onward, while whatever was waiting inside the vault's pillar comes out at you.
 
 | Measure | MAP05 | DOOM II median |
 |---|---|---|
 | Rule-1 flat changes without a height change | 0% | 3% |
-| Distinct floor heights | 13 | 23 |
+| Distinct floor heights | 12 | 23 |
+| Most-used wall texture | 30% | 30% |
+| Wall material changes with a border texture | 100% | 31% |
 | Light SD / light-effect sectors | 24 / 9 | 23 / 9 |
 | Optional share of the reachable area | 36% | 50% |
 | UV ammo per monster HP (pistol start) | 1.9 | 1.8 |
@@ -138,7 +140,7 @@ You start on the only dry catwalk of a reservoir full of nukage, with the exit v
 | Nearest monster to the start | 697 | 300 |
 | Whole-map symmetry | 0.64 | 0.54 |
 
-It has fewer floor heights than most id maps because the reservoir is one flat pool; symmetry is high because it's a square reservoir with a pump house off each side.
+It has fewer floor heights than most id maps because the reservoir is one flat pool and each pump house is one floor; symmetry is high because it's a square reservoir with a pump house off each side.
 
 ### Nukage Undercurrent (`nukage_undercurrent`)
 MAP06: 118 sectors, 26/46/64 monsters on easy/medium/hard, four secrets, and the first arachnotrons. Its design doc is `levels/designs/nukage_undercurrent.md`.
