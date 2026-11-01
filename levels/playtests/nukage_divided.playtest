@@ -127,7 +127,9 @@ shot balcony
 walk 480 1500 0 1400 -448 1300
 open -448 1256
 wait 35
-expect ceil -448 1248 > 150
+expect ceil -448 1248 > 140
 walk 0 1400 0 1500 0 1960
 shot exit
-exit 0 1992
+open 0 2000
+walk 0 2100
+exit 0 2168

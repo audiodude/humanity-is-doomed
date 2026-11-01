@@ -439,29 +439,32 @@ def door(name, loop, face="BIGDOOR2", track="DOORTRAK", action=None, tag=0, ligh
                   face=face, kind=DOOR, tag=tag, action=action)
 
 
-def doorway(name, at, facing, width=128, *, alcove=0, far_alcove=0, alcove_wall="STARTAN3",
-            alcove_height=128, alcove_flat="FLAT1", far_flat=None, thickness=16, floor=0,
-            **door_kw) -> list[Sector]:
+def doorway(name, at, facing, width=128, *, alcove=0, far_alcove=0, alcove_wall="STARTAN3", far_wall=None,
+            alcove_height=128, alcove_flat="FLAT1", far_flat=None, alcove_ctex="CEIL5_1", far_ctex=None,
+            thickness=16, floor=0, **door_kw) -> list[Sector]:
     """A door through a wall. `at` is the centre of the opening on the wall
     you come from and `facing` (n/s/e/w) points through it. A door face is a
     picture shown whole, so a room on either side taller than the face (128
     for BIGDOOR*, 72 for EXITDOOR) needs a recess on that side: `alcove` deep
-    before the door, floor `alcove_flat`, and `far_alcove` deep after it,
-    floor `far_flat` (default `alcove_flat`). Recesses are as wide as the
-    door, as id's are: a wider one leaves a stub of wall beside the door, in
-    its plane, where vanilla monsters freeze (docs/door-stuck.md). They are
-    `alcove_height` tall: keep that at the face's height. The whole
-    doorway runs alcove + thickness + far_alcove from `at`, so the room
-    beyond starts there. door_kw goes to door(). Returns the sectors:
-    <name>_alcove, <name>, <name>_far."""
+    before the door and `far_alcove` deep after it. Each recess is dressed
+    for the room it opens into: the near one has walls `alcove_wall`, floor
+    `alcove_flat` and ceiling `alcove_ctex`; the far one `far_wall`,
+    `far_flat` and `far_ctex`, each defaulting to the near one's. Recesses
+    are as wide as the door, as id's are: a wider one leaves a stub of wall
+    beside the door, in its plane, where vanilla monsters freeze
+    (docs/door-stuck.md). They are `alcove_height` tall: keep that at the
+    face's height. The whole doorway runs alcove + thickness + far_alcove
+    from `at`, so the room beyond starts there. door_kw goes to door().
+    Returns the sectors: <name>_alcove, <name>, <name>_far."""
     out = []
     if alcove:
         out.append(Sector(f"{name}_alcove", [strip(at, facing, 0, alcove, width)], floor,
-                          floor + alcove_height, alcove_flat, "CEIL5_1", 176, alcove_wall))
+                          floor + alcove_height, alcove_flat, alcove_ctex, 176, alcove_wall))
     out.append(door(name, strip(at, facing, alcove, thickness, width), floor=floor, **door_kw))
     if far_alcove:
         out.append(Sector(f"{name}_far", [strip(at, facing, alcove + thickness, far_alcove, width)],
-                          floor, floor + alcove_height, far_flat or alcove_flat, "CEIL5_1", 176, alcove_wall))
+                          floor, floor + alcove_height, far_flat or alcove_flat, far_ctex or alcove_ctex, 176,
+                          far_wall or alcove_wall))
     return out
 
 
