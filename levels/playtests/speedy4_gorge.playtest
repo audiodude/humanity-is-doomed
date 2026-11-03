@@ -1,7 +1,7 @@
 # Cinder Gorge (SPEEDY2 MAP06) wiring test: shelter door, both secrets, the cave
 # switch and the bridge it raises, the three closet traps, the plateau lift, the
 # plug switch and the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY2.WAD MAP06 levels/playtests/speedy4_gorge.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py speedy4_gorge
 
 killall
 walk 320 224 400 224

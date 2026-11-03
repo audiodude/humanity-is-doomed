@@ -46,9 +46,9 @@ def test_monster_opens_a_plain_door_the_player_cant():
 def test_known_issue_doesnt_fail_the_build_but_a_new_one_does(tmp_path, capsys):
     out = str(tmp_path / "t.wad")
     with pytest.raises(LevelError, match="can't come to the player"):
-        build(closet_map(DR_BLUE), check_only=True, out=out)
-    build(closet_map(DR_BLUE, KNOWN_ISSUES=[SEALED]), check_only=True, out=out)
-    build(closet_map(DR_BLUE, Thing(BLUEKEY, 256, 256), KNOWN_ISSUES=[SEALED]), check_only=True, out=out)
+        build(closet_map(DR_BLUE), check_only=True, wad=out)
+    build(closet_map(DR_BLUE, KNOWN_ISSUES=[SEALED]), check_only=True, wad=out)
+    build(closet_map(DR_BLUE, Thing(BLUEKEY, 256, 256), KNOWN_ISSUES=[SEALED]), check_only=True, wad=out)
     assert "fixed: " + SEALED in capsys.readouterr().out
 
 
@@ -91,6 +91,6 @@ def test_style_findings_fail_our_maps_but_only_warn_on_imported_ones(tmp_path, c
     out = str(tmp_path / "t.wad")
     assert any("isn't below its neighbour" in s for s in findings(pit_map()).style)
     with pytest.raises(LevelError, match="isn't below its neighbour"):
-        build(pit_map(), check_only=True, out=out)
-    build(pit_map(IMPORTED=True), check_only=True, out=out)
+        build(pit_map(), check_only=True, wad=out)
+    build(pit_map(IMPORTED=True), check_only=True, wad=out)
     assert "warning: damaging floor pool" in capsys.readouterr().out

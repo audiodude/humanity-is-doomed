@@ -7,7 +7,7 @@
 - **Shape:** up one side of a ridge and down the other, with the station as the gate between them. The climb is three switchback shelves cut into the hill. The hill itself hides the payoff, so the reveal comes from the terrain, not from a door onto a room you already knew about. Nothing on the climb side looks over the crest.
 - **Theme:** the outskirts of the plant, before the meltdown has reached them. The climb side is still alive: grass on the valley floor, tan rock in sunlight, an abandoned UAC checkpoint booth, a cargo container toppled off the road. The station is clean UAC steel with blue instrument screens, in a dim interior under a red lockdown alarm. Over the ridge everything is scorched dark brown, and the only bright thing is the green glow of the spill. This light, colour and life contrast is what stops a short map from being drab.
 - **Difficulty:** easy, the easiest map in the set. About 12/22/31 monsters on easy/HMP/UV, against MAP02's 21/43/57. Fodder only: zombiemen, shotgun guys, imps, and five demons, with no heavy monsters. The shotgun comes within 300 units of the start.
-- **Slot:** MAP01 of `NUKAGE.WAD`, replacing Nukage Junction. `UMAPINFO`: `levelname` "Nukage Outskirts", `next` "MAP02", `music` D_RUNNIN. The sky is SKY1, DOOM II's own for MAP01-11, whose brown clouds suit the scorched valley.
+- **Slot:** MAP01 of `NUKAGE.WAD`, replacing Nukage Junction. `UMAPINFO`: `levelname` "Nukage Outskirts" (built with `next` "MAP02" and `music` D_RUNNIN, which are now the slot's defaults). The sky is SKY1, DOOM II's own for MAP01-11, whose brown clouds suit the scorched valley.
 
 How it differs from the set:
 
@@ -15,16 +15,16 @@ How it differs from the set:
 |---|---|
 | MAP01 Nukage Junction (replaced) | the template: courtyard hub, one wing per key |
 | MAP02 Nukage Crossing | two banks of a canal, joined by a sluice gate that sinks into a bridge |
-| MAP03 Nukage Core | a spiral climb around a reactor to the crown |
-| MAP04 Nukage Divided | a fork into two wings that never meet, keys crossed |
-| MAP05 Nukage Drain | a ring of walkways raised one by one out of a flooded reservoir |
-| MAP06 Nukage Undercurrent | one hall crossed twice: over it, then under it |
+| MAP03 Nukage Divided | a fork into two wings that never meet, keys crossed |
+| MAP04 Nukage Tower | a spiral climb around a reactor to the crown |
+| MAP05 Nukage Undercurrent | one hall crossed twice: over it, then under it |
+| MAP06 Nukage Drain | a ring of walkways raised one by one out of a flooded reservoir |
 | MAP07 Nukage Storage | a cask maze sunk into an arena |
 | MAP08 Nukage Lockdown | a loop round a spill basin, away from an exit you can see |
 | MAP09 Nukage Meltdown | a descent down terraced falls to a cooling lake |
 | **MAP01 Nukage Outskirts** | **up one side of a ridge; the spill is hidden on the other** |
 
-Every later map shows its nukage early: MAP05 starts on the reservoir, MAP08 at a window over its basin, MAP09 on a balcony above the lake. This one hides it until the end, so the set opens with the reveal the later maps take for granted. MAP03 also climbs, but round a goal you can see the whole way up; here the goal is out of sight.
+Every later map shows its nukage early: Drain starts on the reservoir, MAP08 at a window over its basin, MAP09 on a balcony above the lake. This one hides it until the end, so the set opens with the reveal the later maps take for granted. Tower also climbs, but round a goal you can see the whole way up; here the goal is out of sight.
 
 ## Route
 
@@ -314,6 +314,6 @@ The user chose Over the Ridge from all five. It wins because:
 The others lose on these grounds:
 
 - End of the Line is a straight line with little optional space.
-- Upstream repeats MAP09's outfall and dam and MAP05's reservoir.
+- Upstream repeats MAP09's outfall and dam and Drain's reservoir.
 - The Checkpoint repeats MAP08's far-side shutters and puts hitscanner towers in the open.
 - Substation echoes MAP07's maze and has the weakest reveal.

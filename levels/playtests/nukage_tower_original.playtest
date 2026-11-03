@@ -1,8 +1,8 @@
-# Nukage Core, original textures (levels/nukage_core_original.py): the same
-# route and shots as nukage_core.playtest, for comparing the retexture.
+# Nukage Tower, original textures (levels/nukage_tower_original.py): the same
+# route and shots as nukage_tower.playtest, for comparing the retexture.
 # The archived map isn't in the WAD, so build it to a scratch WAD first:
-#   python3 -c "import levels.nukage_core_original as m; from levels import build; build(m, out='/tmp/ncore_original.wad')"
-#   uv run --with vizdoom scripts/tools/playtest.py /tmp/ncore_original.wad MAP03 levels/playtests/nukage_core_original.playtest --shots /tmp/playtest-shots/nukage_core_original
+#   python3 -m levels nukage_tower_original
+#   uv run --with vizdoom scripts/tools/playtest.py nukage_tower_original --shots /tmp/playtest-shots/nukage_tower_original
 
 killall
 shot start

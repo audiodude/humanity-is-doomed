@@ -4,8 +4,10 @@
 
 SOURCE is a WAD path, or doom / doom2 for the IWADs in .env; MAPs default to
 every map in it. Each map becomes <DIR>/<source stem>_<slot>.py (default
-levels/imported/, gitignored: id's map data is never committed), built with
-`python3 -m levels imported.doom2_map01` into wads/imported/<SOURCE STEM>.WAD.
+levels/imported/, gitignored: id's map data is never committed), and with the
+default DIR the set levels/sets/imported_<source stem>.py (gitignored too)
+puts it in its own slot of wads/imported/<SOURCE STEM>.WAD, built with
+`python3 -m levels imported.doom2_map01`.
 
 Lines split where another line's vertex lies on them (the builder splits
 there too) and straight runs merge. A sector whose lines don't close into
@@ -39,8 +41,8 @@ from . import checks, doom2, model
 from .doom2 import ACTION_NAMES, ACTORS, KEY_OF, LINE_SPECIALS, PLAYERS, SECTOR_NAMES, THING_NAMES, is_decal
 from .mapgen import compile_level
 from .measure import LABELS, fmt
-from .model import (DOOR, LIFT, NO_TEX, ROOM, SECRET_HINT, SKY, THING_BITS, LevelError, Sector, Special, Thing,
-                    area2, floor_movers, floor_range, load, on_segment, rect, segments_cross)
+from .model import (DOOR, LIFT, NO_TEX, ROOM, SECRET_HINT, SKY, THING_BITS, LevelError, Place, Sector, Special,
+                    Thing, area2, floor_movers, floor_range, load, on_segment, rect, segments_cross)
 from .model import Line as LineOverride
 from .model import Side as SideOverride
 from .wad import IWADS, MAP_LUMPS, MAP_MARKER, UMAPINFO_ENTRY, iwad_textures, read_wad, umapinfo_body
@@ -48,6 +50,7 @@ from .wadmap import parse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "levels", "imported")
+SETS = os.path.join(ROOT, "levels", "sets")
 RESEARCH = os.path.join(ROOT, "research", "data")
 WIDTH = 110   # module line width
 
@@ -515,9 +518,9 @@ def sector_list(m, g: Guess):
 
 def level_of(m, g: Guess, wad, things, overrides=None, resources=()):
     return load(types.SimpleNamespace(
-        MAP=m.slot, WAD=wad, SECTORS=sector_list(m, g), THINGS=things, SPECIAL_BETWEEN=g.special_between,
+        SECTORS=sector_list(m, g), THINGS=things, SPECIAL_BETWEEN=g.special_between,
         SPECIAL_WALLS=g.special_walls, FREE_LINES=g.free_lines, SECRET_DOORS=g.secret_doors,
-        OVERRIDES=overrides or {}, IMPORTED=True, RESOURCES=resources, X_OFFSETS=g.x_offsets))
+        OVERRIDES=overrides or {}, IMPORTED=True, RESOURCES=resources, X_OFFSETS=g.x_offsets), Place(wad, m.slot))
 
 
 def matched(level, compiled, by_ends):
@@ -967,7 +970,7 @@ def module_text(src, m, g: Guess, lines, done, found, modname):
         secs += wrap(f"    {fn}(", args, 4 + len(fn) + 1, "),")
     if any("rect(" in s for s in secs):
         used.add("rect")
-    body = [f"MAP = {q(m.slot)}", f'WAD = "imported/{src.stem}.WAD"', "IMPORTED = True"]
+    body = ["IMPORTED = True"]
     if g.x_offsets == "zero":
         body.append('X_OFFSETS = "zero"')
     if src.pwad:
@@ -1145,7 +1148,7 @@ def verify(src: Source, res: Result, path):
     spec = importlib.util.spec_from_file_location(f"levels.imported.{res.modname}", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    level = load(module)
+    level = load(module, Place(f"imported/{src.stem}.WAD", res.map.slot))
     compiled = compile_level(level)
     m = res.map
     rebuilt = parse(m.game, m.slot, dict(compiled.lumps[1:]))
@@ -1164,6 +1167,20 @@ def verify(src: Source, res: Result, path):
         out.append(f"{sign} line {key[0]}-{key[1]} flags {key[2]} action {key[3]} tag {key[4]} "
                    f"front {key[5]} back {key[6]}" + (f" x{n}" if n > 1 else ""))
     return out
+
+
+def write_set(src, maps):
+    """levels/sets/imported_<source stem>.py: `maps` ({slot: module}) and the
+    maps it already lists, in their own slots of wads/imported/<SOURCE STEM>.WAD."""
+    path = os.path.join(SETS, f"imported_{src.stem.lower()}.py")
+    if os.path.exists(path):
+        old = {}
+        exec(open(path).read(), old)
+        maps = {**old["MAPS"], **maps}
+    with open(path, "w") as f:
+        f.write(f'"""Decompiled from {os.path.basename(src.path)} by levels.decompile (gitignored)."""\n'
+                f"WAD = {q(f'imported/{src.stem}.WAD')}\nMAPS = {{\n"
+                + "".join(f"    {q(k)}: {q(v)},\n" for k, v in sorted(maps.items())) + "}\n")
 
 
 def main(argv=None):
@@ -1185,7 +1202,7 @@ def main(argv=None):
     if not os.path.exists(init):
         with open(init, "w") as f:
             f.write('"""Decompiled maps, written by levels.decompile (gitignored)."""\n')
-    failed = False
+    failed, written = False, {}
     if args.verify:
         print(f"{'map':<6} {'sectors':>7} {'lines':>6} {'overrides':>9} {'repaired':>8}  result")
     for slot in slots:
@@ -1198,6 +1215,7 @@ def main(argv=None):
         path = os.path.join(args.out, res.modname + ".py")
         with open(path, "w") as f:
             f.write(res.text)
+        written[slot] = f"imported.{res.modname}"
         for p in res.problems:
             print(f"{slot}: warning: {p}")
         if not args.verify:
@@ -1213,6 +1231,8 @@ def main(argv=None):
             print("       " + d)
         for _, d in res.done:
             print("       repaired: " + d)
+    if written and os.path.abspath(args.out) == OUT:
+        write_set(src, written)
     sys.exit(1 if failed else 0)
 
 

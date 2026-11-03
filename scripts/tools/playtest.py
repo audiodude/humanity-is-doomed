@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """Scripted, headless playtests of DOOM II maps, run in ViZDoom.
 
-    uv run --with vizdoom scripts/tools/playtest.py WAD MAP SCRIPT [--skill 4] [--shots DIR] [--from NAME]
-    uv run --with vizdoom scripts/tools/playtest.py WAD MAP SCRIPT --fight [--seed N] [--watch]
-    uv run --with vizdoom scripts/tools/playtest.py WAD MAP --replay [--video FILE.mp4 [--hd]]
-    python3 scripts/tools/playtest.py WAD MAP --describe     # start, keys, special lines (no ViZDoom needed)
+    uv run --with vizdoom scripts/tools/playtest.py LEVEL [--skill 4] [--shots DIR] [--from NAME]
+    uv run --with vizdoom scripts/tools/playtest.py LEVEL --fight [--seed N] [--watch]
+    uv run --with vizdoom scripts/tools/playtest.py LEVEL --replay [--video FILE.mp4 [--hd]]
+    python3 scripts/tools/playtest.py LEVEL --describe     # start, keys, special lines (no ViZDoom needed)
+
+LEVEL is a level module (e.g. nukage_drain): the WAD and slot its set gives it
+(levels/sets; a module in no set is in wads/scratch/LEVEL.WAD as MAP01) and the
+script levels/playtests/LEVEL.playtest. `WAD... MAP [SCRIPT]` names them instead.
 
 ViZDoom (pip install vizdoom) runs a ZDoom-based engine as a Python library.
 The script drives the player with real inputs, as fast as the machine runs
@@ -99,8 +103,12 @@ import sys
 import tempfile
 import time
 import zlib
+from importlib.util import find_spec
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+LEVELS = os.path.join(ROOT, "levels")
+sys.path.insert(0, ROOT)
+from levels.sets import place  # noqa: E402
 from levels.wad import IWAD as DEFAULT_IWAD  # noqa: E402  DOOM2_WAD from .env or the environment
 CACHE = os.path.expanduser("~/.cache/playtest")
 WIDTH, HEIGHT = 640, 480
@@ -1441,6 +1449,12 @@ def main():
     if not args.iwad and not args.describe:
         p.error("no IWAD: set DOOM2_WAD in .env (see .env.example) or pass --iwad")
     pos = args.wad
+    if re.fullmatch(r"[\w.]+", pos[0]) and not pos[0].lower().endswith(".wad") and find_spec(f"levels.{pos[0]}"):
+        at = place(pos[0])
+        script = os.path.join(LEVELS, "playtests", pos[0].rsplit(".", 1)[-1] + ".playtest")
+        pos = [os.path.join(ROOT, "wads", at.wad), at.slot, *pos[1:]]
+        if len(pos) == 2 and not (args.script or args.replay or args.describe) and os.path.exists(script):
+            pos.append(script)
     if args.replay:
         args.watch = True
         if len(pos) < 2:

@@ -7,7 +7,7 @@
 - **Shape:** one hall in two states. On the way in it's a maze: you see it whole from a gallery, then walk it aisle by aisle at floor level. After the switch it's a 1664×1472 arena with nothing standing but four columns. The second half isn't a revisit. It's a different place inside the same walls.
 - **Theme:** the plant's spent-fuel store. Rows of steel casks stand in a concrete hall 384 high, under lamps that light the aisles between them. A staff wing with a decontamination corridor leads up to an observation gallery along the hall's west wall. The control tower stands outside the east wall, and its cab looks in through a window. The dispatch dock is behind blast shutters in the north wall, under an EXIT sign.
 - **Gate to the exit: DOOM II's own MAP07 rule.** When the last mancubus on the map dies, every sector tagged 666 lowers to its lowest neighbour. That works by slot in vanilla and in the ports, and `levels/reach.py` models it (`BOSS["MAP07"]`). Here, tag 666 is on the dispatch shutters. DOOM II's Dead Simple is built on the same rule. This map uses the rule without copying that map's arena.
-- **Difficulty:** hard, a step up from MAP06. About 30/54/75 monsters on easy/HMP/UV, and about 12,600 monster HP on UV, which is about 30% more than MAP06. The heavy share is about 23%: 6 mancubi, 3 arachnotrons, a baron, 2 hell knights, 2 revenants, 2 cacodemons and a pain elemental. It's the first fight in the set against six heavies at once. **Debut: the pain elemental**, alone in the open air over the cask field.
+- **Difficulty:** hard, a step up from Undercurrent. About 30/54/75 monsters on easy/HMP/UV, and about 12,600 monster HP on UV, which is about 30% more than Undercurrent. The heavy share is about 23%: 6 mancubi, 3 arachnotrons, a baron, 2 hell knights, 2 revenants, 2 cacodemons and a pain elemental. It's the first fight in the set against six heavies at once. **Debut: the pain elemental**, alone in the open air over the cask field.
 - **Slot:** MAP07 of `NUKAGE.WAD`. UMAPINFO: `levelname "Nukage Storage"`, `music "D_SHAWN"` (the slot's own track), no `next` (slot order follows), and **no `bossaction`**. Any `bossaction` replaces the slot's default boss behaviour and would remove the exit gate. (Built as Nukage Casks, and renamed.)
 
 How it differs from the set:
@@ -16,13 +16,13 @@ How it differs from the set:
 |---|---|
 | MAP01 Nukage Junction | the template: courtyard hub, one wing per key |
 | MAP02 Nukage Crossing | two banks of a canal, joined by a sluice gate that sinks into a bridge |
-| MAP03 Nukage Core | a spiral climb around a reactor to the crown |
-| MAP04 Nukage Divided | a fork into two wings that never meet, keys crossed |
-| MAP05 Nukage Drain | a ring of walkways raised one by one out of a flooded reservoir |
-| MAP06 Nukage Undercurrent | one hall crossed twice: over it, then under it |
+| MAP03 Nukage Divided | a fork into two wings that never meet, keys crossed |
+| MAP04 Nukage Tower | a spiral climb around a reactor to the crown |
+| MAP05 Nukage Undercurrent | one hall crossed twice: over it, then under it |
+| MAP06 Nukage Drain | a ring of walkways raised one by one out of a flooded reservoir |
 | **MAP07 Nukage Storage** | **one hall in two states: a maze on the way in, an arena once you sink it** |
 
-None of these changes the shape of a whole space. MAP03's pens and MAP06's floodgate each drop one wall. MAP06 crosses its hall twice, while this map crosses its hall once and then changes it.
+None of these changes the shape of a whole space. Tower's pens and Undercurrent's floodgate each drop one wall. Undercurrent crosses its hall twice, while this map crosses its hall once and then changes it.
 
 ## Route
 
@@ -314,7 +314,7 @@ Notes for the build:
 
 Balance targets for the build:
 
-- **Ammo:** UV pistol-start ammo ratio 1.6–2.0. That's tighter than MAP06's 2.26 and nearer DOOM II's later maps.
+- **Ammo:** UV pistol-start ammo ratio 1.6–2.0. That's tighter than Undercurrent's 2.26 and nearer DOOM II's later maps.
 - **Health:** 35–45 per 1,000 monster HP. The megasphere comes down with the casks, and the megaarmor and soulsphere are optional.
 - **Skill ratios:** easy/UV ≈ 0.40 and HMP/UV ≈ 0.72, with items kept.
 - **Weapons:** one within 300 of the start (the shotgun). In route order: shotgun (start), super shotgun (lockers), chaingun (gallery), rocket launcher (tower base; secret 2 leaks it early), plasma rifle (secret 3).
@@ -378,7 +378,7 @@ Changes from the plan above, and why:
 - **The pain elemental's souls in the aisles.** The pain elemental is meant to fight in open air at the gallery. Placed deaf on B2H12 facing west, it engages there. If it survives into the maze, its souls in 128-wide aisles are the player's problem, not the map's.
 - **The fight bot.** The exit needs all six mancubi dead. A fight run that doesn't kill them will skip the dispatch steps and warp, so read that as bot, not map, unless the curve is short there.
 - **Set bookkeeping.**
-  - Add MAP07 sections to README "Included WAD" and SPOILERS, and the preview `wads/NUKAGE-MAP07.svg`.
+  - Add MAP07 sections to README "Included WAD" and SPOILERS, and the preview `wads/previews/nukage_storage.svg`.
   - This worktree's `wads/NUKAGE.WAD` has no MAP06, which lives on branch `map06`. Build into a scratch WAD while iterating. Write the real WAD only on top of a NUKAGE.WAD that has MAP06, and never merge the binary: rebuild it with `python3 -m levels nukage_storage`.
 
 ## Concepts considered
@@ -399,6 +399,6 @@ The Cask Store wins for four reasons:
 The others lose on these grounds:
 
 - **Skylights** has no single set piece. Its drop-and-climb repeats, the open roofs invite sniping, and it needs many one-way drops and pits.
-- **Outfall** is a descent, and SPEEDY has three. It has long sightlines down a valley, and its nukage crossings repeat MAP02 and MAP05.
+- **Outfall** is a descent, and SPEEDY has three. It has long sightlines down a valley, and its nukage crossings repeat Crossing and Drain.
 - **Lockdown** repeats its one trick at every door, and a corridor with rooms off both sides is the template strung out.
 - **Breakout** is a gradient, not a shape. It's linear, and its climax is a yard, not a fight.

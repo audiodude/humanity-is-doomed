@@ -2,7 +2,7 @@
 # maze to the yellow key and its closets, the tower, the cask switch that
 # sinks the maze, MAP07's boss rule (the last mancubus lowers the dispatch
 # shutters), then the exit. Every secret on the way.
-#   uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP07 levels/playtests/nukage_storage.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py nukage_storage
 #
 # The wiring run's killall kills the mancubi too, so it tests the boss rule
 # up front: the shutters are shut before it and down after it (nothing else

@@ -78,6 +78,13 @@ def umapinfo_body(info: dict[str, str]) -> str:
     return "\n" + "".join(f'  {k} = "{v}"\n' for k, v in info.items())
 
 
+def umapinfo_keys(info) -> set[str]:
+    """Lower-cased keys a UMAPINFO entry (dict or string body) sets."""
+    if isinstance(info, str):
+        return {k.lower() for k in re.findall(r"(?m)^\s*(\w+)\s*=", info)}
+    return {k.lower() for k in info}
+
+
 def umapinfo_lump(level):
     """level's UMAPINFO entry: a dict's values are written quoted, a string
     is the body between the braces, written as it is."""

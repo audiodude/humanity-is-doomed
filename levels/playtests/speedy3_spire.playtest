@@ -1,6 +1,6 @@
 # The Spire (SPEEDY2 MAP02) wiring test: both lifts, the secret, the gate
 # switch, the stair climb, the trap closets, the bridge and the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY2.WAD MAP02 levels/playtests/speedy3_spire.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py speedy3_spire
 
 killall
 # Ground ring: round the bend to the first lift.

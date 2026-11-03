@@ -19,5 +19,5 @@ def needs_iwad(game):
 def module(**attrs):
     """A level module made of `attrs`, as level modules are read."""
     mod = types.ModuleType("levels.test_level")
-    mod.__dict__.update(MAP="MAP01", WAD="test.wad", **attrs)
+    mod.__dict__.update(attrs)
     return mod

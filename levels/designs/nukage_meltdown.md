@@ -9,7 +9,7 @@
 - **The reveal, in two parts.** From the start you step onto the operations balcony and see the whole map: below you four glowing ponds step down the canyon, the floodgate sits in the middle of the dam, and beyond it the dome. A gap in shelf 3's railing (the breach) is visible from the start, and the red door at the far end of shelf 2. The outfall's falls show once you're down on shelf 1. The Cyberdemon is a hint, not a sight: a speck over the dam at most, and his roar and footsteps as you come down. By the time the gatehouse hands you the BFG you know what's in the lake. **The arch-vile is the real reveal:** as you drop over the floodgate the hatch opens, and through it, past the Cyberdemon, he stands lit in the exit alcove at the back of the dome, too far off to attack yet, giving you the seconds to get to cover.
 - **Gating:** the first two steps down are free: the stairwell, then the sluice house's stair. Shelf 2 is gated by the red key, held in a valve tower out in the pond. Then come a lift, a breach you drop through (or the optional settling house down beside it), and the floodgate. The floodgate's switch is in the gatehouse at the west end of the dam. The final drop rides the dam's falls 240 down into the lake.
 - **Difficulty:** the hardest map in the set. The per-space counts below sum to 40/63/84 monsters on easy/HMP/UV (ratios 0.48/0.75, counting easy's stand-ins) and about 20,400 monster HP on UV, 4,000 of it the Cyberdemon, before resurrections. The heavy share is 25%: the Cyberdemon, an arch-vile, 5 revenants, 2 mancubi, 2 arachnotrons, 9 hell knights and a baron. **Debut: the Cyberdemon**, in the lake. **The arch-vile** returns from MAP08, in the dome, to raise the Cyberdemon's support.
-- **Slot:** MAP09 of `NUKAGE.WAD`, the last map. UMAPINFO is written as a string body, because it needs `endcast = true`, a multi-line `intertext` and a `bossaction`; the module's dict form quotes every value. The body is `UMAPINFO` in `levels/nukage_meltdown.py`: the level name, the slot's own track `D_IN_CIT` (as on every map in the set), the end text (`intertext`, one quoted string per line) and the cast call after it, and `bossaction = Cyberdemon, 103, 7`, which opens the shutter over the exit console (tag 7) when the Cyberdemon dies. MAP08's entry has no `next`, so MAP08 leads here. Ports that don't read UMAPINFO never open the shutter (see Build risks).
+- **Slot:** MAP09 of `NUKAGE.WAD`, the last map. UMAPINFO is written as string lines, because it needs `endcast = true`, a multi-line `intertext` and a `bossaction`, and the dict form quotes every value. The map's own `UMAPINFO` in `levels/nukage_meltdown.py` has the level name and `bossaction = Cyberdemon, 103, 7`, which opens the shutter over the exit console (tag 7) when the Cyberdemon dies. The end text (`intertext`, one quoted string per line) and the cast call after it are MAP09's lines in the set file, `levels/sets/nukage.py`. The music is the slot's own track `D_IN_CIT` (as on every map in the set). MAP08's entry has no `next`, so MAP08 leads here. Ports that don't read UMAPINFO never open the shutter (see Build risks).
 
 How it differs from the set:
 
@@ -17,15 +17,15 @@ How it differs from the set:
 |---|---|
 | MAP01 Nukage Junction | the template: courtyard hub, one wing per key |
 | MAP02 Nukage Crossing | two banks of a canal, joined by a sluice gate that sinks into a bridge |
-| MAP03 Nukage Core | a spiral climb around a reactor to the crown |
-| MAP04 Nukage Divided | a fork into two wings that never meet, keys crossed |
-| MAP05 Nukage Drain | a ring of walkways raised one by one out of a flooded reservoir |
-| MAP06 Nukage Undercurrent | one hall crossed twice: over it, then under it |
+| MAP03 Nukage Divided | a fork into two wings that never meet, keys crossed |
+| MAP04 Nukage Tower | a spiral climb around a reactor to the crown |
+| MAP05 Nukage Undercurrent | one hall crossed twice: over it, then under it |
+| MAP06 Nukage Drain | a ring of walkways raised one by one out of a flooded reservoir |
 | MAP07 Nukage Storage | one hall in two states: a maze on the way in, an arena once you sink it |
 | MAP08 Nukage Lockdown | a loop away from the exit you can see, closed by wading back through the spill |
 | **MAP09 Nukage Meltdown** | **a descent down a staircase of nukage falls to the lake it all drains into** |
 
-It is the set's first descent, the reverse of MAP03's climb. MAP05 and MAP08 both put one nukage body in the middle and route you round it. Here the nukage *is* the route: you follow it down every lip, and the lake isn't something you circle but the floor of the final fight.
+It is the set's first descent, the reverse of Tower's climb. Drain and Lockdown both put one nukage body in the middle and route you round it. Here the nukage *is* the route: you follow it down every lip, and the lake isn't something you circle but the floor of the final fight.
 
 ## Route
 
@@ -345,7 +345,7 @@ As built: UV ammo 2.23 (2.10 with the vile's 1,400 HP of resurrections), every l
 
 ### Playtest
 
-The wiring run (`uv run -q --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP09 levels/playtests/nukage_meltdown.playtest`) passes all 30 checks: every door, the red key and its closet, the pillar secret, the pump station lift, the breach drop, the floodgate switch, the drop over the gap and the hatch it opens, the four secrets and the exit. The static balance prints no warnings: lowest detour ratio 1.29 (the red key's leg), health never below 71 on the median model, long-range hitscan peak 20/s. Changes the playtest led to:
+The wiring run (`uv run -q --with vizdoom scripts/tools/playtest.py nukage_meltdown`) passes all 30 checks: every door, the red key and its closet, the pillar secret, the pump station lift, the breach drop, the floodgate switch, the drop over the gap and the hatch it opens, the four secrets and the exit. The static balance prints no warnings: lowest detour ratio 1.29 (the red key's leg), health never below 71 on the median model, long-range hitscan peak 20/s. Changes the playtest led to:
 
 - **The radiation suit's pedestal** moved to the crest's pond edge (see Build notes): the route walked over it on the way to the gatehouse.
 - **The EXIT sign** hung under a beam, then moved with the exit to the alcove's lintel (see Build notes): at the ceiling it never showed.
@@ -435,7 +435,7 @@ The user's call, from the preview: the lake runs 256 further south, to -1408, an
 - **Visplanes.** The balcony sees most of the map. Keep each shelf to one trough, one bank and one pond sector, the lake to as few sectors as its islands allow, and check in dsda-doom that nothing drops out.
 - **Lifts and the spillway.** B2L travels 128, and B2G's ceiling is 192 above its floor (the lift gotcha needs 56 above the lift top). The settling house's way down is a 128 drop into the spillway, one-way, and it should look it: a wall from below, not steps.
 - **UMAPINFO.** Write it as a string body (`endcast = true` is unquoted; `intertext` is a comma-separated list; `bossaction` takes bare values). The end text screen fits 17 lines of up to about 39 characters (vanilla draws them 11 apart from y=10 on a 200-high screen, and stops at the first that runs past x=320). Check in a port that the text plays after MAP09 and the cast call follows. ViZDoom ignores UMAPINFO.
-- **Set bookkeeping.** Add MAP09 to README "Included WAD" (nine maps) and SPOILERS, write the preview `wads/NUKAGE-MAP09.svg`, and write `levels/playtests/nukage_meltdown.playtest`.
+- **Set bookkeeping.** Add MAP09 to README "Included WAD" (nine maps) and SPOILERS, write the preview `wads/previews/nukage_meltdown.svg`, and write `levels/playtests/nukage_meltdown.playtest`.
 
 ## Build notes
 
@@ -477,7 +477,7 @@ The Outfall wins because:
 
 The others lose:
 
-- **High Tide** reuses MAP05's rising floors at four times the scale, with 5–8 s waits between tiers.
-- **The Archipelago** is MAP05's reservoir scaled up, the most open space this builder has tried, and the whole sea wakes at the first shot.
+- **High Tide** reuses Drain's rising floors at four times the scale, with 5–8 s waits between tiers.
+- **The Archipelago** is Drain's reservoir scaled up, the most open space this builder has tried, and the whole sea wakes at the first shot.
 - **Two Titans'** Spider Mastermind is a hitscanner across open nukage, on the research's cheap list, and it's a set piece more than a shape.
-- **Meltdown Run** repeats the sinking floors of MAP06 and MAP07.
+- **Meltdown Run** repeats the sinking floors of Undercurrent and Storage.

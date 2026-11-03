@@ -1,11 +1,11 @@
-# Nukage Drain (MAP05, NUKAGE.WAD): retexture
+# Nukage Drain (MAP06, NUKAGE.WAD): retexture
 
 ## Concept
 
 **A flooded open-air reservoir with the exit vault standing in the middle. You pump it dry one pump house at a time, and each pump raises the next walkway out of the nukage.**
 
 - Theme: the plant's nukage reservoir. Its retaining walls enclose a square pool; walkways run round it under the sludge, and a causeway leads to the pillar in the middle that holds the vault. A pump house opens off the west, north and east sides, and each one looks back over the reservoir through an opening beside its pump switch.
-- Difficulty: medium, the set's fifth map, the first revenants. Slot: `MAP05` of `NUKAGE.WAD`, module `levels/nukage_drain.py`.
+- Difficulty: medium, the set's sixth map, the first lost souls. Slot: `MAP06` of `NUKAGE.WAD`, module `levels/nukage_drain.py`.
 - **Scope: retexture, and remove floor height changes that do nothing.** The shape, route, lights, things and specials stay as built; geometry moves only where a texture needs it (a door recess, a room raised to a texture's height) or where a step had no job (`doom-build`, Gotchas: Floor heights).
 
 Baseline (the module before this change; DOOM II median in brackets):
@@ -18,16 +18,16 @@ Baseline (the module before this change; DOOM II median in brackets):
 
 What the walls were: the reservoir in NUKEPOIS, its poison sign repeated every 128 units round the whole pool; each pump house split between two families (west BROWNPIP corridor and PIPE2 hall, east STONE2 boiler hall and METAL1 pump room); the three switch booths, the door recesses and the ledges in SUPPORT2 grey girders inside brown and green rooms; the start booth the map's only STARG3; the exit niche EXITSTON in a SILVER3 vault; the yellow door a wooden skull door (BIGDOOR7) in a steel plant.
 
-Other maps in the set and their base families, so MAP05's differs:
+Other maps in the set and their base families, so Drain's differs:
 
 | Map | Shape | Base family |
 |---|---|---|
 | MAP01 Outskirts | climb a hillside to a station over a nukage spill | ROCK5 / ASHWALL4 |
 | MAP02 Crossing | loop round a canal and sink a sluice gate to cross it | BRICK6 |
-| MAP03 Core | climb three galleries round a reactor core | BRONZE2 |
-| MAP04 Divided | two wings that never meet (lava and screens) | STONE3 |
-| MAP05 Drain | pump a flooded reservoir dry, walkways surface | **NUKEDGE1** |
-| MAP06 Undercurrent | one hall crossed over, then under | STARGR |
+| MAP03 Divided | two wings that never meet (lava and screens) | STONE3 |
+| MAP04 Tower | climb three galleries round a reactor core | BRONZE2 |
+| MAP05 Undercurrent | one hall crossed over, then under | STARGR |
+| MAP06 Drain | pump a flooded reservoir dry, walkways surface | **NUKEDGE1** |
 | MAP07 Storage | cask maze that sinks into an arena | CEMENT6 |
 | MAP08 Lockdown | loop away from an exit you can see, closed by wading | STARG3 |
 | MAP09 Meltdown | descent down terraced nukage falls | CEMENT6 |

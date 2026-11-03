@@ -1,11 +1,9 @@
 """Builds DOOM-format WADs from level modules.
 
-A level module is plain data, read as module attributes:
+A level module is plain data, read as module attributes. Its WAD and slot
+aren't among them: they come from its set in levels/sets/ (ExMy slots are DOOM
+maps, MAPxx DOOM II; level.game picks the IWAD the checks use).
 
-    MAP             map slot, e.g. "MAP01"; ExMy is a DOOM map, MAPxx DOOM II
-                    (level.game), which picks the IWAD the checks use
-    WAD             output file name, written to wads/; may name a
-                    subdirectory, e.g. "imported/DOOM2.WAD"
     SECTORS         list[Sector]; list order is the SECTORS lump order
     THINGS          list[Thing]; needs a PLAYER1 start. Thing.skills: e/m/h,
                     a (ambush), n (multiplayer only); Thing.extra: other
@@ -28,9 +26,10 @@ A level module is plain data, read as module attributes:
     UMAPINFO        {key: value} for the map's UMAPINFO entry, values
                     written quoted; or a string, the entry's body between
                     the braces written as it is (unquoted values, lists,
-                    repeated keys). A string's `bossaction` lines replace
-                    the slot's boss deaths in the progression check
-                    (reach.umapinfo_boss)                             [optional]
+                    repeated keys). Its set adds the slot's own lines. A
+                    string's `bossaction` lines replace the slot's boss
+                    deaths in the progression check (reach.umapinfo_boss)
+                                                                     [optional]
     OVERRIDES       {(point, point): model.Line} changing a built line, keyed
                     by its exact endpoints after edges are split at vertices,
                     sector edges and free lines alike. The front is on the
@@ -89,6 +88,7 @@ from .model import (ALL, DOOR, LIFT, ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTO
                     floor_movers, floor_range, load, on_segment, oriented, sector_at)
 from .measure import measure
 from .preview import write_svg
+from .sets import place
 from .wad import map_lumps, read_wad, replace_map, umapinfo_lump, write_wad
 
 UDB_ZDBSP = "/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp"
@@ -338,25 +338,34 @@ def compile_level(level) -> Compiled:
     return Compiled(lines, sides, map_lumps(level, lines, sides))
 
 
-def build(module, check_only=False, out=None, zdbsp=None):
-    """Validate a level module and write its map into its WAD (default
-    wads/<WAD>), keeping any other maps already there, plus an SVG preview
-    wads/<WAD stem>-<MAP>.svg. The preview is written first, even when checks
-    fail or check_only is set. zdbsp is the node builder executable (default:
-    see find_zdbsp). Returns the WAD path, or None with check_only. Raises
+def build(module, check_only=False, wad=None, slot=None, zdbsp=None):
+    """Validate a level module and write its map into its WAD, keeping any
+    other maps already there, plus an SVG preview previews/<module>.svg
+    beside the WAD. The WAD and slot are `wad` (under wads/, or a path) and
+    `slot` if given, else its set's, else wads/scratch/<module>.WAD and MAP01
+    (sets.place). The preview is written first, even when checks fail or
+    check_only is set. zdbsp is the node builder executable (default: see
+    find_zdbsp). Returns the WAD path, or None with check_only. Raises
     LevelError."""
-    level = load(module)
-    out = out or os.path.join(ROOT, "wads", level.wad)
+    level = load(module, place(module.__name__.removeprefix("levels."), wad, slot))
+    out = os.path.join(ROOT, "wads", level.wad)
     compiled = compile_level(level)
     lines, sides, lumps = compiled.lines, compiled.sides, compiled.lumps
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    svg = f"{os.path.splitext(out)[0]}-{level.map}.svg"
+    os.makedirs(os.path.join(os.path.dirname(out), "previews"), exist_ok=True)
+    svg = os.path.join(os.path.dirname(out), "previews", level.name.rsplit(".", 1)[-1] + ".svg")
     write_svg(level, lines, svg)
     monsters = [t for t in level.things if t.type in ACTORS and t.type not in PLAYERS and "n" not in t.skills]
     print(f"{level.name}: {len(level.sectors)} sectors, {len(lines)} linedefs, "
           f"{sum(map(len, sides))} sidedefs, {len(level.things)} things; monsters "
           + "/".join(str(sum(sk in t.skills for t in monsters)) for sk in ALL) + " (e/m/h)")
-    print("preview:", svg)
+
+    def shown(path):
+        rel = os.path.relpath(path, ROOT)
+        return path if rel.startswith("..") else rel
+
+    print(f"slot: {level.map} of {shown(out)}"
+          + (" (in no set: a scratch build, so no slot checks)" if level.scratch else ""))
+    print("preview:", shown(svg))
     if any(SKY in (s.ftex, s.ctex) for s in level.sectors.values()):
         print("sky: %s (%s)" % slot_sky(level))
     print("\n".join(balance_report(level)))

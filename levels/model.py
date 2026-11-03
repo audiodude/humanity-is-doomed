@@ -5,6 +5,7 @@ import re
 from dataclasses import dataclass, field
 
 from .doom2 import DR_DOOR, FLOOR_LOWERERS, FLOOR_RAISERS, LIGHT_GLOW, SECRET_AREA
+from .wad import umapinfo_body, umapinfo_keys
 # Thing and linedef flags; level modules import the ML_* flags from here.
 from .wadmap import (AMBUSH, EASY, HARD, MEDIUM, ML_BLOCKING, ML_BLOCKMONSTERS, ML_DONTDRAW,  # noqa: F401
                      ML_DONTPEGBOTTOM, ML_DONTPEGTOP, ML_MAPPED, ML_SECRET, ML_SOUNDBLOCK, ML_TWOSIDED,
@@ -166,6 +167,7 @@ class Level:
     umapinfo: dict[str, str] | str
     overrides: dict[tuple[Point, Point], Line] = field(default_factory=dict)
     imported: bool = False
+    scratch: bool = False   # built where no set puts it (wads/scratch/, MAP01): no slot checks
     known_issues: list[str] = field(default_factory=list)
     resources: list[str] = field(default_factory=list)   # absolute PWAD paths
     x_offsets: str = "continuous"   # X_OFFSETS: "continuous" or "zero"
@@ -176,16 +178,41 @@ class Level:
         return "doom" if re.fullmatch(r"E\dM\d", self.map) else "doom2"
 
 
-def load(module) -> Level:
+@dataclass(frozen=True)
+class Place:
+    """Where a level builds: its WAD (under wads/, or a path), its slot, the
+    UMAPINFO lines its set gives that slot, and whether it's a scratch build
+    (levels.sets.place)."""
+    wad: str
+    slot: str
+    umapinfo: str = ""
+    scratch: bool = False
+
+
+def load(module, place=None) -> Level:
+    """The Level a module describes, built at `place` (default: a scratch
+    build, MAP01 of wads/scratch/<module>.WAD)."""
+    name = getattr(module, "__name__", repr(module))
+    if stale := [k for k in ("MAP", "WAD") if hasattr(module, k)]:
+        raise LevelError(f"{' and '.join(stale)} set in {name}: a map's WAD and slot come from its set in "
+                         "levels/sets/, or --wad/--map")
+    place = place or Place(f"scratch/{name.rsplit('.', 1)[-1]}.WAD", "MAP01", scratch=True)
+    info = getattr(module, "UMAPINFO", {})
+    if place.umapinfo:
+        if both := umapinfo_keys(info) & umapinfo_keys(place.umapinfo):
+            raise LevelError(f"UMAPINFO {', '.join(sorted(both))}: set by {name} and by its set's "
+                             f"{place.slot} entry")
+        body = info if isinstance(info, str) else umapinfo_body(info)
+        info = body.rstrip() + "\n" + place.umapinfo.strip("\n") + "\n"
     sectors = {}
     for s in module.SECTORS:
         if s.name in sectors:
             raise LevelError(f"duplicate sector name {s.name}")
         sectors[s.name] = s
     level = Level(
-        name=getattr(module, "__name__", repr(module)),
-        map=module.MAP,
-        wad=module.WAD,
+        name=name,
+        map=place.slot,
+        wad=place.wad,
         sectors=sectors,
         things=list(module.THINGS),
         special_between=dict(getattr(module, "SPECIAL_BETWEEN", {})),
@@ -193,9 +220,10 @@ def load(module) -> Level:
         free_lines=dict(getattr(module, "FREE_LINES", {})),
         secret_doors=secret_door_offsets(getattr(module, "SECRET_DOORS", ())),
         must_reach=list(getattr(module, "MUST_REACH", ())),
-        umapinfo=getattr(module, "UMAPINFO", {}),
+        umapinfo=info,
         overrides=dict(getattr(module, "OVERRIDES", {})),
         imported=bool(getattr(module, "IMPORTED", False)),
+        scratch=place.scratch,
         known_issues=list(getattr(module, "KNOWN_ISSUES", ())),
         resources=[os.path.join(ROOT, os.path.expanduser(p)) for p in getattr(module, "RESOURCES", ())],
         x_offsets=getattr(module, "X_OFFSETS", "continuous"),

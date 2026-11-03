@@ -1,6 +1,6 @@
-# Nukage Drain (MAP05) wiring test: each pump raises its walkways, every
+# Nukage Drain (MAP06) wiring test: each pump raises its walkways, every
 # closet, key door and secret, the loop back to the start, then the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP05 levels/playtests/nukage_drain.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py nukage_drain
 
 killall
 shot start

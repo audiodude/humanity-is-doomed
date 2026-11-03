@@ -8,7 +8,7 @@
 - Difficulty: medium, the set's second map. Slot: `MAP02` of `NUKAGE.WAD`, module `levels/nukage_crossing.py`.
 - **Scope: retexture only.** The shape, route, heights, lights, things and specials stay as built. This map was made before the texture research and the contact sheets, and its walls are a collage. It averages 27 wall textures, and the one outdoor basin uses a different material on each side: `BRICK12` south, `BROWN144` north, `STONE3` south-east. The canal walls switch between `BRICK12`, `SILVER2` and `METAL`. Geometry changes are limited to what the trim needs: recesses beside door faces and switches, and short trim wall lines at seams.
 
-Baseline (`python3 -c "import levels.nukage_crossing as m; from levels import build; build(m, out='/tmp/nc.wad')"`, DOOM II median in brackets):
+Baseline (`python3 -m levels nukage_crossing_original`, the archived first version, DOOM II median in brackets):
 
 | Measure | Now | Target |
 |---|---|---|
@@ -21,10 +21,10 @@ The other maps in the set and their base families. MAP02 takes **BRICK**, which 
 | Map | Shape | Base family |
 |---|---|---|
 | MAP01 Outskirts (in progress on its own branch; replaces Junction) | climb a hillside to a station whose deck looks over a nukage spill | ROCK5 / ASHWALL4 |
-| MAP03 Core | climb round a reactor core in a moat | TEKBRON / SUPPORT |
-| MAP04 Divided | two wings that never meet (lava and screens) | STONE3 |
-| MAP05 Drain | pump a flooded reservoir dry, walkways surface | STONE2 / TEKGREN |
-| MAP06 Undercurrent | one hall crossed over, then under | STARGR |
+| MAP03 Divided | two wings that never meet (lava and screens) | STONE3 |
+| MAP04 Tower | climb round a reactor core in a moat | TEKBRON / SUPPORT |
+| MAP05 Undercurrent | one hall crossed over, then under | STARGR |
+| MAP06 Drain | pump a flooded reservoir dry, walkways surface | STONE2 / TEKGREN |
 | MAP07 Storage | cask maze that sinks into an arena | CEMENT6 |
 | MAP08 Lockdown | loop away from an exit you can see, closed by wading | STARG3 |
 | MAP09 Meltdown | descent down terraced nukage falls | CEMENT6 |
@@ -35,7 +35,7 @@ The shape is fixed, so the open choice was the palette, not the concept (step 2 
 
 1. **Brick quays with brown plant buildings (chosen).** One brick for the whole basin, its darker variant for the canal walls, PIPE for the pump wing, SILVER for the tower, BROWN variants for the small buildings. A canal with brick embankments reads at once. BRICK is free in the set. It also keeps the map's best existing pieces: PIPE2 in the pump hall, SILVER in the tower and the brown key doors.
 2. **BROWN panels everywhere outside** (BROWN96 yards, BROWN144 canal). This sits too close to MAP08 Lockdown's BROWN144 and SUPPORT3, and a brown-panel quay reads as a shed wall, not an embankment.
-3. **STONE2/STONE3 grey blocks.** MAP04 and MAP05 already lean on STONE, and grey stone against grey MFLR8_1 paving makes the basin monotone.
+3. **STONE2/STONE3 grey blocks.** Divided and Drain already lean on STONE, and grey stone against grey MFLR8_1 paving makes the basin monotone.
 
 ## Route
 

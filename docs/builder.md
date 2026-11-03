@@ -7,19 +7,17 @@
 Run from the repo root:
 
 ```sh
-python3 -m levels nukage_outskirts         # check, then write MAP01 into wads/NUKAGE.WAD
-python3 -m levels nukage_crossing          # same for MAP02
-python3 -m levels nukage_core              # same for MAP03
-python3 -m levels nukage_divided            # same for MAP04
-python3 -m levels nukage_drain              # same for MAP05
-python3 -m levels nukage_undercurrent       # same for MAP06
-python3 -m levels nukage_storage            # same for MAP07
-python3 -m levels nukage_lockdown           # same for MAP08
-python3 -m levels nukage_meltdown           # same for MAP09
-python3 -m levels nukage_outskirts --check # check only
+python3 -m levels nukage_drain                            # check, then write it into its set's WAD and slot
+python3 -m levels nukage_drain --check                    # check only (still writes the preview)
+python3 -m levels nukage_tower_original                   # in no set: wads/scratch/nukage_tower_original.WAD, MAP01
+python3 -m levels nukage_drain --wad TEST.WAD --map MAP12 # anywhere else: wads/TEST.WAD, MAP12
 ```
 
-From Python: `from levels import build, nukage_outskirts; build(nukage_outskirts)`. A build replaces only its own map slot and `UMAPINFO` entry, so several levels can share one WAD.
+Which WAD a map goes in, and in which slot, belongs to its set, not to the map. `levels/sets/<set>.py` lists one WAD's maps by slot (`levels/sets/nukage.py` is `NUKAGE.WAD`'s running order), so reordering a WAD is an edit to that list. A set can also give a slot `UMAPINFO` lines of its own, whichever map is in it: NUKAGE gives MAP06 `intertext = clear` and MAP09 the ending. A map's `UMAPINFO` without `music` or `next` gets its slot's (the spec's defaults), so a moved map plays its new slot's DOOM II track and the maps chain in slot order. A module in no set builds to its own scratch WAD, `wads/scratch/<module>.WAD` (gitignored), as MAP01, and skips the slot checks below because it isn't in its slot; `--wad`/`--map` put it anywhere, with them.
+
+To rebuild a whole WAD, build each map in its set: `for m in $(python3 -c "import levels.sets.nukage as s; print(*s.MAPS.values())"); do python3 -m levels $m; done`.
+
+From Python: `from levels import build, nukage_outskirts; build(nukage_outskirts)`, with `wad=` and `slot=` for the flags. A build replaces only its own map slot and `UMAPINFO` entry, so several levels share one WAD.
 
 Requirements:
 - **Python 3.10+**, standard library only.
@@ -41,10 +39,10 @@ Findings come in two kinds. **Playability** findings fail every build:
 - Pictures such as switches and door faces fit their wall exactly. Bars and fences can't use textures built from overlapping patches, which vanilla draws as garbage on two-sided lines (the medusa effect).
 - The exit can be reached without a running jump. Jumps only count when the exit can't be reached any other way.
 
-Textures vanilla can't tile cleanly, and line actions or thing types that aren't vanilla, get a warning. So does anything the engine does by map slot that the map doesn't account for (`levels/checks.py` `check_slot`, from id's source and the UMAPINFO spec):
+Textures vanilla can't tile cleanly, and line actions or thing types that aren't vanilla, get a warning. So does anything the engine does by map slot that the map doesn't account for (`levels/checks.py` `check_slot`, from id's source and the UMAPINFO spec). A scratch build only gets its `UMAPINFO` checked (the quoted `"clear"` below):
 - DOOM II's own text screens after MAP06, MAP11, MAP20 and MAP30, and after the MAP15 and MAP31 secret exits, when the map's `UMAPINFO` has no `intertext` (`intertextsecret`) of its own. `intertext = clear` turns one off; it has to be a string body, because the dict form quotes `"clear"` and ports show the word.
 - A secret exit on a slot with no secret level. Without UMAPINFO, DOOM II only routes MAP15 and MAP31 (a secret exit elsewhere reloads the map), and DOOM sends every secret exit to ExM9, which returns to the map after id's own secret exit. With a `UMAPINFO` entry, a secret exit with no `nextsecret` goes where the normal exit does.
-- Boss deaths. The slot's built-in rule (E1M8, E2M8, E3M8, E4M6, E4M8, MAP07) or a `bossaction` in its place: a `bossaction` that drops a built-in rule the map's tagged sectors relied on, a built-in rule on a tag a line also uses, E2M8/E3M8 ending the level on the boss's death when the map has its own exit, and a boss death that is the only way to move its sectors (or end the level) while the monster is missing on some skill. The reach model plays UV only, so that last case isn't caught elsewhere.
+- Boss deaths. The slot's built-in rule (E1M8, E2M8, E3M8, E4M6, E4M8, MAP07) or a `bossaction` in its place: a `bossaction` that drops a built-in rule the map's tagged sectors relied on, a built-in rule on a tag a line also uses, E2M8/E3M8 ending the level on the boss's death when the map has its own exit, and a boss death that is the only way to move its sectors (or end the level) while the monster is missing on some skill. The reach model plays UV only, so that last case isn't caught elsewhere. And a map built for another slot's rule: sectors nothing moves here, tagged as that slot's rule would move them, with its boss in the map (Nukage Storage anywhere but MAP07).
 
 A module can list the playability findings and warnings it accepts in `KNOWN_ISSUES`: the build fails only on findings not on the list, doesn't print listed warnings, and says `fixed:` for listed entries that no longer occur.
 
@@ -52,13 +50,13 @@ Every build also prints:
 - A balance report for each skill: monster health against ammo damage, health and armor.
 - The sky, for a map that shows one, and where it comes from: the `UMAPINFO` `skytexture`, or the slot's default (DOOM II: `SKY1` for MAP01–MAP11, `SKY2` for MAP12–MAP20, `SKY3` from MAP21; DOOM: one per episode). Moving a map across MAP11/MAP12 or MAP20/MAP21 changes its sky unless it sets one. Vanilla `doom2.exe` only sets the sky when a game starts, so there it never changes in play.
 - The research measurements (`levels/measure.py`, using `scripts/metrics/`): floor heights, lighting, texture variety, border textures, symmetry, optional area, secrets, monster mix, ammo and health, skill ratios and distance to the nearest monster, each beside the median and interquartile range of id's maps for that game and flagged `below` or `above` it. Then the balance along the route (`levels/balance.py`, design in `docs/balance-metrics.md`), with no bot: the reach model's critical path split into legs (one per required key or trigger), the monsters each leg engages (on the path, able to walk to it, or able to shoot it from within 1024 units), and two ammo curves leg by leg with carry caps: *thorough* (every reachable item) and *detour* (items within a 1024-unit round trip off the path, secrets excluded), plus health at the median id map's cost per monster HP, the long-range hitscan peak, side rooms, the monster HP each trap on the route releases against the ammo in hand, and monsters that can shoot the start. These are warnings judged against the id maps, never errors: a quarter of id's maps run short on the thorough curve too. Rule-1 slips (a floor texture change with no height change) are listed by sector pair, and rule-2 seams (two wall textures meeting in one plane with no border texture such as `SUPPORT3`, `DOORTRAK` or `LITE5` between them) by sector, texture pair and one junction's coordinates. This takes a couple of seconds.
-- A top-down SVG preview, `wads/<WAD stem>-<MAP>.svg`: sectors shaded by floor height, special lines in red, bars and fences dashed, monsters by skill, pickups and keys.
+- A top-down SVG preview, `previews/<module>.svg` beside the WAD (`wads/previews/nukage_drain.svg`): sectors shaded by floor height, special lines in red, bars and fences dashed, monsters by skill, pickups and keys.
 
 A failed check prints `ERROR:` lines and stops the build before the WAD is touched. The preview is still written, so you can see what went wrong.
 
 ## Writing a level
 
-A level is a module of plain data: `MAP`, `WAD`, `SECTORS`, `THINGS`, `SPECIAL_BETWEEN`, `SPECIAL_WALLS`, `FREE_LINES`, `MUST_REACH`, … To start a new one, copy `levels/nukage_junction.py`. `MAP` also picks the game: `E1M1`-style slots are Ultimate Doom, `MAP01`-style DOOM II. `WAD` may name a subdirectory of `wads/`.
+A level is a module of plain data: `SECTORS`, `THINGS`, `SPECIAL_BETWEEN`, `SPECIAL_WALLS`, `FREE_LINES`, `MUST_REACH`, `UMAPINFO`, … (the full list is in `levels/mapgen.py`'s docstring). To start a new one, copy `levels/nukage_junction.py`, then add it to a set in `levels/sets/` when it has a place. Its slot picks the game: `E1M1`-style slots are Ultimate Doom, `MAP01`-style DOOM II, so a DOOM map in no set needs `--map E1M1`. A set's `WAD` may name a subdirectory of `wads/`.
 
 Sectors are polygons: outer loops, holes that other sectors fill, and solid `pillars`. Whether a loop is an outer loop or a hole follows from nesting, so one sector can be several separate areas, as in many id maps. A hole's edges with no sector across become walls; a hole no sector touches at all is an error (make it a pillar). Edges that two sectors share become two-sided lines; the rest become walls. Texture x offsets follow each sector's outline, so patterns run continuously along a wall (`X_OFFSETS = "zero"` writes 0 instead, as id mostly did), and the wall above or below an opening uses the room's own texture. The exception is secret doors (`SECRET_DOORS`): their faces are shifted off the wall pattern by `SECRET_HINT` (16 across, 8 down) as the classic clue. Pass a `{name: (x, y)}` dict instead to pick offsets per door, with `(0, 0)` for a seamless door.
 
@@ -98,6 +96,7 @@ uv run --with pillow scripts/tools/texture_sheets.py            # DOOM2_WAD from
 ## Code layout
 
 - `levels/model.py`: the dataclasses levels are written in (`Sector`, `Special`, `Thing`, `Line`, `Side`) and the shape helpers.
+- `levels/sets/`: the set lists, one per WAD: which module is in which slot, and the `UMAPINFO` lines a slot gets from its set.
 - `levels/mapgen.py`: `build()` and `compile_level()`, which turn sectors into lines and sides and place textures. Its docstring describes the level format.
 - `levels/checks.py`: the checks and the balance report. `levels/reach.py`: the reach model, shared with the research scripts. `levels/measure.py`: the sector-overlap check, rule-1 slips and the research measurements. `levels/balance.py`: the resource curve and exposure checks along the route.
 - `levels/decompile.py`: the decompiler. `levels/wadmap.py`: reads maps from WADs.
@@ -117,7 +116,7 @@ python3 -m levels imported.doom2_map01 --check # check and measure it; without -
 python3 -m levels.decompile doom2 --verify     # rebuild each map and compare it with the original
 ```
 
-Modules go to `levels/imported/` and their builds to `wads/imported/`. Both are gitignored: id's map data is never committed, so make them from your own IWADs.
+Modules go to `levels/imported/`, and `levels/sets/imported_<source>.py` puts each in its own slot of `wads/imported/<SOURCE>.WAD`, so a decompiled MAP07 keeps MAP07's boss rule. All three are gitignored: id's map data is never committed, so make them from your own IWADs.
 
 A decompiled module is minimal-diff: what the builder would infer anyway (sector outlines, wall and step textures, doors, lifts, door actions, `SPECIAL_BETWEEN`, `SPECIAL_WALLS`) is ordinary module data, and only the rest is written as `OVERRIDES`. Sectors are named by role and original number (`room_5`, `door_12`, `lift_40`, `secret_83`, `nukage_7`), matching the sector numbers walkthroughs use. The docstring gives the map's title, monsters per skill, keys, secrets and check findings, and, if `research/data/` is there, its designers, reception and the measurements furthest from the medians. The original's playability findings become its `KNOWN_ISSUES`, and `IMPORTED = True` makes style findings warnings, so an unchanged map builds and a remix can't quietly add new problems.
 
@@ -131,9 +130,10 @@ ViZDoom comes from Michał Kempka, Marek Wydmuch, Grzegorz Runc, Jakub Toczek an
 ViZDoom isn't needed to build maps, so it isn't a requirement of the builder. `uv run --with vizdoom` fetches it into a cached environment the first time:
 
 ```sh
-uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest
-uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP05 levels/playtests/nukage_drain.playtest --from pump3
-python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 --describe   # start, keys, special lines
+uv run --with vizdoom scripts/tools/playtest.py nukage_crossing                 # its set's WAD and slot, levels/playtests/nukage_crossing.playtest
+uv run --with vizdoom scripts/tools/playtest.py nukage_drain --from pump3
+uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest   # the same, named
+python3 scripts/tools/playtest.py nukage_crossing --describe                    # start, keys, special lines
 ```
 
 Scripts say where to go, not how to get there: `walk X Y` finds its own way round walls, solid things, steps too high to climb and closed doors, avoiding damaging floors when it can, and `open` and `use` walk up to their line first. A script can mark `checkpoint NAME` steps; `--from NAME` resumes from the save the last full run made there, as long as the WAD, map, skill and every step before it are unchanged. The script language is in the runner's docstring.
@@ -141,9 +141,9 @@ Scripts say where to go, not how to get there: `walk X Y` finds its own way roun
 With `--fight` the same scripts test balance instead: god mode is off and a bot fights its way along the route, picking up health and ammo when it's low. Each death is counted, with where, when and a label (`hazard`, `starved`, `unseen`, `stuck` or `combat`), and the run carries on. A step the bot gets stuck on, or 3 deaths in one spot within 30 s, is listed as skipped and the bot is warped to where the step was going, and `--max-time` (default 15 game minutes) caps the run, so a fight always finishes. The build's resource curve answers most balance questions faster; use fights to confirm it. It reports each section of the route with time, kills, damage taken, deaths, health and ammo fired. Runs are recorded: `--watch` shows one live in a window, `--replay` plays the last one back (pass the same `--seed`), and `--replay --video FILE.mp4` renders it with sound (`--hd` for 1080p). The bot is a weaker player than a person and its results vary with `--seed`, so try several seeds and check the footage before blaming the map.
 
 ```sh
-uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP03 levels/playtests/nukage_core.playtest --fight --seed 2
-uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP03 --replay --seed 2                  # watch it
-uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP03 --replay --seed 2 --video run.mp4  # needs ffmpeg
+uv run --with vizdoom scripts/tools/playtest.py nukage_tower --fight --seed 2
+uv run --with vizdoom scripts/tools/playtest.py nukage_tower --replay --seed 2                  # watch it
+uv run --with vizdoom scripts/tools/playtest.py nukage_tower --replay --seed 2 --video run.mp4  # needs ffmpeg
 ```
 
 The runner turns on ZDoom's strict Doom compatibility, so a pass shows the map's wiring works under vanilla rules as far as ZDoom can follow them: the player can only use a line from its front side, pressing use stops at the first line with an action (so a walk-over trigger just in front of a door or switch blocks it), and monsters are infinitely tall. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.

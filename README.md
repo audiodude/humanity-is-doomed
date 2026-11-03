@@ -32,15 +32,15 @@ dsda-doom -iwad doom2 -file wads/NUKAGE.WAD            # add -warp 2 and so on f
 |---|---|---|---|---|
 | MAP01 | [Nukage Outskirts](docs/maps.md#nukage-outskirts-nukage_outskirts) | Up a hillside to the plant's monitoring station, with the spill hidden over the ridge. The easiest map. | | 12 / 22 / 31 |
 | MAP02 | [Nukage Crossing](docs/maps.md#nukage-crossing-nukage_crossing) | A sluice gate sinks into a nukage canal to become a bridge, and demons charge across it. | | 21 / 43 / 57 |
-| MAP03 | [Nukage Core](docs/maps.md#nukage-core-nukage_core) | Spiral up around a reactor core to the exit in its crown. | mancubus | 27 / 53 / 73 |
-| MAP04 | [Nukage Divided](docs/maps.md#nukage-divided-nukage_divided) | A red furnace wing and a blue cooling wing that never meet. | baron | 23 / 43 / 56 |
-| MAP05 | [Nukage Drain](docs/maps.md#nukage-drain-nukage_drain) | Pump-house switches raise walkways out of a reservoir of nukage. | revenant | 24 / 43 / 59 |
-| MAP06 | [Nukage Undercurrent](docs/maps.md#nukage-undercurrent-nukage_undercurrent) | Taking the yellow key sinks your platform into a pit, and the way back is under the gantry. | arachnotron | 26 / 46 / 64 |
+| MAP03 | [Nukage Divided](docs/maps.md#nukage-divided-nukage_divided) | A red furnace wing and a blue cooling wing that never meet. | baron | 23 / 43 / 56 |
+| MAP04 | [Nukage Tower](docs/maps.md#nukage-tower-nukage_tower) | Spiral up around a reactor core to the exit in its crown. | mancubus | 27 / 53 / 73 |
+| MAP05 | [Nukage Undercurrent](docs/maps.md#nukage-undercurrent-nukage_undercurrent) | Taking the yellow key sinks your platform into a pit, and the way back is under the gantry. | arachnotron, revenant | 26 / 46 / 64 |
+| MAP06 | [Nukage Drain](docs/maps.md#nukage-drain-nukage_drain) | Pump-house switches raise walkways out of a reservoir of nukage. | lost soul | 24 / 43 / 59 |
 | MAP07 | [Nukage Storage](docs/maps.md#nukage-storage-nukage_storage) | A maze of fuel casks sinks into the floor and frees six mancubi. | pain elemental | 30 / 54 / 75 |
 | MAP08 | [Nukage Lockdown](docs/maps.md#nukage-lockdown-nukage_lockdown) | A loop round a spill basin where every shutter opens only from its far side. | arch-vile | 33 / 53 / 72 |
 | MAP09 | [Nukage Meltdown](docs/maps.md#nukage-meltdown-nukage_meltdown) | Down a terraced canyon of falls to the cooling lake, where the Cyberdemon wades. | Cyberdemon | 40 / 63 / 84 |
 
-Each map has four secrets (MAP03 has five). Every map's design notes and measurements are in [docs/maps.md](docs/maps.md), top-down maps are `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP09.svg`, and routes and secrets are in [SPOILERS.md](SPOILERS.md).
+Each map has four secrets (MAP04 has five). Every map's design notes and measurements are in [docs/maps.md](docs/maps.md), top-down maps are `wads/previews/<module>.svg` (`wads/previews/nukage_outskirts.svg` and so on), and routes and secrets are in [SPOILERS.md](SPOILERS.md).
 
 ### Compatibility
 
@@ -60,9 +60,11 @@ MAP01–MAP08 don't depend on UMAPINFO. Every map is checked against vanilla rul
 `levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the lines and texture alignment, checks that the map can be finished (every key, secret and monster reachable, no softlocks), measures it against id's maps, and writes it into a WAD with a top-down preview. A decompiler turns any Doom-format map back into this form, and a ViZDoom runner playtests the routes.
 
 ```sh
-python3 -m levels nukage_outskirts          # check, then write MAP01 into wads/NUKAGE.WAD
+python3 -m levels nukage_outskirts          # check, then write it into its set's WAD and slot (MAP01 of wads/NUKAGE.WAD)
 python3 -m levels nukage_outskirts --check  # check only
 ```
+
+A map's WAD and slot come from its set list, not the map: `levels/sets/nukage.py` is NUKAGE.WAD's running order, so reordering the WAD is an edit there. A map in no set builds to `wads/scratch/<module>.WAD`.
 
 It needs Python 3.10+ (standard library only), ZDBSP, and the IWADs set in `.env` (copy `.env.example`). The full reference is [docs/builder.md](docs/builder.md): [building](docs/builder.md#building-a-map), [what every build checks](docs/builder.md#what-every-build-checks), [writing a level](docs/builder.md#writing-a-level), [agent skills](docs/builder.md#agent-skills), [code layout](docs/builder.md#code-layout), [decompiling](docs/builder.md#decompiling-existing-maps) and [playtests](docs/builder.md#playtests).
 
@@ -92,7 +94,7 @@ python3 scripts/metrics/route_metrics.py        # -> research/data/metrics_route
 >
 > **Bulletin.** A second structure has appeared. It is called Nukage Crossing. Witnesses describe a sluice gate that sinks into a canal of toxic waste to become a bridge, and a pack of demons that charges across it the moment it settles. There are four secrets. Before any human set foot inside, the machine walked it itself: invulnerable, in a window no one could see, opening every door and throwing every switch. It reports nineteen checks out of nineteen passed.
 >
-> **Bulletin.** A third structure. It is called Nukage Core: a reactor rising out of a moat of waste, its exit in the crown on top, visible from the first window. The way up spirals around it, gallery by gallery, past a room that goes black when you take its key and the first mancubus. The machine walked this one too, twenty-six checks of twenty-six.
+> **Bulletin.** A third structure. It is called Nukage Tower: a reactor rising out of a moat of waste, its exit in the crown on top, visible from the first window. The way up spirals around it, gallery by gallery, past a room that goes black when you take its key and the first mancubus. The machine walked this one too, twenty-six checks of twenty-six.
 >
 > Ladies and gentlemen, I must tell you plainly: the demons were never the danger. A demon can be shotgunned. The danger is the thing that *summons* them, from a single sentence, tirelessly, and gets better at it every time. Humanity is—
 >

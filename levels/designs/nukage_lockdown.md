@@ -17,14 +17,14 @@ How it differs from the set:
 |---|---|
 | MAP01 Nukage Junction | the template: courtyard hub, one wing per key |
 | MAP02 Nukage Crossing | two banks of a canal, joined by a sluice gate that sinks into a bridge |
-| MAP03 Nukage Core | a spiral climb around a reactor to the crown |
-| MAP04 Nukage Divided | a fork into two wings that never meet, keys crossed |
-| MAP05 Nukage Drain | a ring of walkways raised one by one out of a flooded reservoir |
-| MAP06 Nukage Undercurrent | one hall crossed twice: over it, then under it |
+| MAP03 Nukage Divided | a fork into two wings that never meet, keys crossed |
+| MAP04 Nukage Tower | a spiral climb around a reactor to the crown |
+| MAP05 Nukage Undercurrent | one hall crossed twice: over it, then under it |
+| MAP06 Nukage Drain | a ring of walkways raised one by one out of a flooded reservoir |
 | MAP07 Nukage Storage | one hall in two states: a maze on the way in, an arena once you sink it |
 | **MAP08 Nukage Lockdown** | **a loop away from the exit you can see, closed by wading back through the spill** |
 
-The nearest relative is MAP05, which also has nukage in the middle. There, you walk on the pool, along walkways you raise out of it, to a vault in its centre. Here, the basin is never walked round: the loop runs through buildings on its banks, sees it only through windows, and crosses it once, at the end. The goal isn't in the middle; it's next to the start.
+The nearest relative is Drain, which also has nukage in the middle. There, you walk on the pool, along walkways you raise out of it, to a vault in its centre. Here, the basin is never walked round: the loop runs through buildings on its banks, sees it only through windows, and crosses it once, at the end. The goal isn't in the middle; it's next to the start.
 
 ## Route
 
@@ -339,7 +339,7 @@ Changes from the plan above, and why:
 
 ### Playtest
 
-The wiring run (`uv run -q --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP08 levels/playtests/nukage_lockdown.playtest`) passes all 31 checks: every shutter, both lifts and the secret lift, all three traps, the four secrets, the suit, the megasphere and the exit. The static balance prints no warnings. Changes the playtest led to:
+The wiring run (`uv run -q --with vizdoom scripts/tools/playtest.py nukage_lockdown`) passes all 31 checks: every shutter, both lifts and the secret lift, all three traps, the four secrets, the suit, the megasphere and the exit. The static balance prints no warnings. Changes the playtest led to:
 
 - **Shutters are one door sector each.** Two 64-wide door halves side by side each opened only to the other's closed ceiling, 4 below their own floor. Each shutter is now one 128-wide sector whose faces are split at the middle, so SPCDOOR3 fits each half.
 - **Window sills.** The lobby window's sill is 32 (it was 48, above eye height, so the basin didn't show from the start) and the gallery windows' sills are 104 (32 above the gallery). Both are still too high to climb.
@@ -376,7 +376,7 @@ No death is `starved`. Clusters and calls:
 - **Long sightlines over the basin.** The basin is 1536×1216 and open. No hitscanner anywhere with a line across it: the gallery's chaingunner stands at the shutter, out of the windows' view of the east bank, and the bank's monsters are projectile users.
 - **The arch-vile's attack ignores range.** It needs only a line of sight, so the decon hall's four pillars are the cover, and nothing in the vault or the lobby may see into the hall through VD (the vault door is shut until used). The vile can't be in sight of the culvert mouth, or you'd take its flame climbing the step.
 - **Lobby closets shooting through bars.** Bars (impassable) stop the closet monsters but not their shots, which is the point. The two revenants' missiles home: the vault is 320 deep, so the exit switch is reachable, but test it.
-- **Set bookkeeping.** Add MAP08 to README "Included WAD" and SPOILERS, and write the preview `wads/NUKAGE-MAP08.svg`.
+- **Set bookkeeping.** Add MAP08 to README "Included WAD" and SPOILERS, and write the preview `wads/previews/nukage_lockdown.svg`.
 
 ## Concepts considered
 
@@ -396,6 +396,6 @@ Locked Out wins because:
 The others lose:
 
 - **Cascade** is a descent, and SPEEDY already has three; its open terraces invite long-range hitscan.
-- **The Bowl** repeats MAP06's one-way sink into a pit.
+- **The Bowl** repeats Undercurrent's one-way sink into a pit.
 - **The Pipeline** is one trick at every bulkhead, with long sightlines and one material.
 - **Crater** needs irregular geometry, which is slow and fragile in this builder.

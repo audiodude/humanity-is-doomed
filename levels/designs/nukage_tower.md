@@ -1,14 +1,14 @@
-# Nukage Core (MAP03, NUKAGE.WAD): retexture
+# Nukage Tower (MAP04, NUKAGE.WAD): retexture
 
 ## Concept
 
 **A reactor core stands in a nukage moat in an open-air atrium. You see its crown from the start window, then climb three galleries round it to reach the exit on top.**
 
 - Theme: the plant's reactor atrium. Galleries at three heights line the atrium's west, north and east walls, the core stands in the moat in the middle, and a wing opens off each gallery: the pump room and tank room (west), the storage room and turbine hall (north), the control room (east). The start booth and a filter house open off the terrace on the south side.
-- Difficulty: medium, the set's third map, the first mancubus. Slot: `MAP03` of `NUKAGE.WAD`, module `levels/nukage_core.py`.
-- **Scope: retexture only.** The shape, route, heights, lights, things and specials stay as built. Like MAP02 before its retexture, this map came before the texture research and its walls are a collage: 31 wall textures, and the one open atrium takes a different material on each side (`TEKWALL4` south, `BROWNGRN` west, `BRONZE2` north, `SILVER3` east), so the gallery you're on changes material at each corner. The two stair towers are `STONE2` and `STONE3`, the base families of MAP04 and MAP05. Geometry changes are limited to what the trim needs.
+- Difficulty: medium, the set's fourth map, the first mancubus. Slot: `MAP04` of `NUKAGE.WAD`, module `levels/nukage_tower.py`. (Built as Nukage Core, and renamed.)
+- **Scope: retexture only.** The shape, route, heights, lights, things and specials stay as built. Like MAP02 before its retexture, this map came before the texture research and its walls are a collage: 31 wall textures, and the one open atrium takes a different material on each side (`TEKWALL4` south, `BROWNGRN` west, `BRONZE2` north, `SILVER3` east), so the gallery you're on changes material at each corner. The two stair towers are `STONE2` and `STONE3`, the base families of Divided and Drain. Geometry changes are limited to what the trim needs.
 
-Baseline (`python3 -c "import levels.nukage_core_original as m; from levels import build; build(m, out='/tmp/ncore_original.wad')"`, DOOM II median in brackets):
+Baseline (`python3 -m levels nukage_tower_original`, DOOM II median in brackets):
 
 | Measure | Now | Target |
 |---|---|---|
@@ -16,15 +16,15 @@ Baseline (`python3 -c "import levels.nukage_core_original as m; from levels impo
 | rule-2 seams with a border | 0.80 [0.31]; 9 unbordered seams listed | ≥ 0.7, none listed |
 | distinct wall textures | 31 | about 25 |
 
-The other maps in the set and their base families. MAP03 takes **BRONZE**, which no other map uses.
+The other maps in the set and their base families. MAP04 takes **BRONZE**, which no other map uses.
 
 | Map | Shape | Base family |
 |---|---|---|
 | MAP01 Outskirts | climb a hillside to a station whose deck looks over a nukage spill | ROCK5 / ASHWALL4 |
 | MAP02 Crossing | loop round a canal and sink a sluice gate to cross it | BRICK6 |
-| MAP04 Divided | two wings that never meet (lava and screens) | STONE3 |
-| MAP05 Drain | pump a flooded reservoir dry, walkways surface | STONE2 / TEKGREN |
-| MAP06 Undercurrent | one hall crossed over, then under | STARGR |
+| MAP03 Divided | two wings that never meet (lava and screens) | STONE3 |
+| MAP05 Undercurrent | one hall crossed over, then under | STARGR |
+| MAP06 Drain | pump a flooded reservoir dry, walkways surface | STONE2 / TEKGREN |
 | MAP07 Storage | cask maze that sinks into an arena | CEMENT6 |
 | MAP08 Lockdown | loop away from an exit you can see, closed by wading | STARG3 |
 | MAP09 Meltdown | descent down terraced nukage falls | CEMENT6 |
@@ -206,13 +206,13 @@ Unchanged in place and reward. Each panel is in its room's own material, with th
 
 ## As built
 
-`levels/nukage_core.py` is authoritative; the first version is archived as `levels/nukage_core_original.py` (not built into the WAD).
+`levels/nukage_tower.py` is authoritative; the first version is archived as `levels/nukage_tower_original.py` (not built into the WAD).
 
 - **Measured** (build table, DOOM II median in brackets): most-used wall texture 0.36 BRONZE2 [0.3], rule-2 seams with a border 0.77 [0.31] with no unbordered seams listed, 25 wall textures (was 31), rule-1 slips 0. Everything else is identical to the baseline: 29 floor heights, 5 secrets, 10 light-effect sectors, deaf share 0.48, optional share 0.40, symmetry 0.62, and the same resource curve (lowest detour ratio 1.75, on the blue-key leg).
 - **Door thresholds** keep the walkway flat (FLOOR5_2) through both recesses, so the flat changes at the step down into each room rather than at the door.
 - **The crown's 8-unit step** at the hatch shows TEKGREN5's lamp strip as a lit sill, seen from the causeway. It's the crown's own material, so it stays.
 - **Secret lift disguised** (play feedback): the original's ledge lift had the default PLAT1 sides and the ledge a METAL face, a grey hazard-striped block and a dark column against the green core that gave the secret away from anywhere in the moat. Both are now TEKGREN2.
-- **Playtest** (`levels/playtests/nukage_core.playtest`; `nukage_core_original.playtest` runs the same route and shots on the archived map). Material shots added to both: `terrace`, `filter-house`, `pump-room`, `gallery-west`, `stair-tower-nw`, `storage`, `turbine-hall`, `gallery-north`, `gallery-east`, `control-room`, joining `start`, `blackout`, `pens`, `control-window`, `causeway` and `crown`. Wiring passes on both, 26 checks, 0 fails.
+- **Playtest** (`levels/playtests/nukage_tower.playtest`; `nukage_tower_original.playtest` runs the same route and shots on the archived map). Material shots added to both: `terrace`, `filter-house`, `pump-room`, `gallery-west`, `stair-tower-nw`, `storage`, `turbine-hall`, `gallery-north`, `gallery-east`, `control-room`, joining `start`, `blackout`, `pens`, `control-window`, `causeway` and `crown`. Wiring passes on both, 26 checks, 0 fails.
 - **Fight runs** (UV, seeds 1–3, on both versions) play the same, and every death cluster is the bot's:
 
   | Seed | Retextured: deaths (labels), kills | Original: deaths (labels), kills |

@@ -1,8 +1,8 @@
 # Nukage Crossing, original textures (levels/nukage_crossing_original.py): the
 # same route and shots as nukage_crossing.playtest, for comparing the retexture.
 # The archived map isn't in the WAD, so build it to a scratch WAD first:
-#   python3 -c "import levels.nukage_crossing_original as m; from levels import build; build(m, out='/tmp/nc_original.wad')"
-#   uv run --with vizdoom scripts/tools/playtest.py /tmp/nc_original.wad MAP02 levels/playtests/nukage_crossing_original.playtest --shots /tmp/playtest-shots/nukage_crossing_original
+#   python3 -m levels nukage_crossing_original
+#   uv run --with vizdoom scripts/tools/playtest.py nukage_crossing_original --shots /tmp/playtest-shots/nukage_crossing_original
 
 killall
 shot start

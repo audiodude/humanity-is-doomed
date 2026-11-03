@@ -25,3 +25,7 @@ docs/door-stuck/*.mp4
 # Decompiled id maps (levels.decompile): never committed
 levels/imported/
 wads/imported/
+
+# Scratch builds (levels/sets: a module in no set) and decompiled sets (levels.decompile)
+wads/scratch/
+levels/sets/imported_*.py

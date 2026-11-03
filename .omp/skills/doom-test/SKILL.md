@@ -18,7 +18,7 @@ Done when every door, switch, lift, key, trap trigger and secret on the doc's ro
 ## 2. Wiring run
 
 ```sh
-uv run -q --with vizdoom scripts/tools/playtest.py <WAD> MAPnn levels/playtests/<module>.playtest --shots /tmp/playtest-shots/<module>
+uv run -q --with vizdoom scripts/tools/playtest.py <module> --shots /tmp/playtest-shots/<module>
 ```
 
 Run against the scratch WAD while the map is changing. Fix the map for real failures; fix the script only for script mistakes (an `expect` taken before a slow floor finished).
@@ -67,7 +67,7 @@ Script sections don't map onto curve legs automatically: match a `starved` death
 For each place deaths cluster, and each skipped step, decide **map** or **bot**, from the labels and the curve first, and from the footage when they don't settle it:
 
 ```sh
-uv run -q --with vizdoom scripts/tools/playtest.py <WAD> MAPnn --replay --seed N --video /tmp/<module>-seedN.mp4
+uv run -q --with vizdoom scripts/tools/playtest.py <module> --replay --seed N --video /tmp/<module>-seedN.mp4
 ```
 
 Then extract frames around the death times (`ffmpeg -ss M:SS -i … -frames:v 1 out.png`) and read them.

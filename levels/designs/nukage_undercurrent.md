@@ -6,8 +6,8 @@
 
 - **Shape:** one long hall crossed twice, at two heights and in opposite directions: a horizontal hairpin folded vertically. On the first crossing you look down at everything you'll walk through on the second. On the second, the gantry you walked along is the arachnotrons' firing line.
 - **Theme:** the turbine hall of the nukage plant. Four turbine housings stand in a grey hall 2048 long and 384 high. A railed gantry runs the length of its north wall, and a control annex, a bronze generator house and a flooded sump open off it.
-- **Difficulty:** medium-hard. About 24/46/63 monsters on easy/HMP/UV. **Debut: the arachnotron.**
-- **Slot:** MAP06 of `NUKAGE.WAD`. No other module changes: UMAPINFO entries without `next` follow slot order, so MAP05 leads to MAP06. Its UMAPINFO sets `intertext = clear`: without it, UMAPINFO ports fall back to DOOM II's own text screen after MAP06, the starport one.
+- **Difficulty:** medium-hard. About 24/46/63 monsters on easy/HMP/UV. **Debut: the arachnotron**, and, since the reorder that moved Drain after it, the revenant.
+- **Slot:** MAP05 of `NUKAGE.WAD` (built as MAP06; moved when the set was reordered). UMAPINFO entries without `next` follow slot order, so MAP04 leads to MAP05. The `intertext = clear` that keeps UMAPINFO ports from showing DOOM II's own starport text screen after MAP06 is now the set file's (`levels/sets/nukage.py`), on whichever map holds MAP06.
 
 How it differs from the set:
 
@@ -15,10 +15,10 @@ How it differs from the set:
 |---|---|
 | MAP01 Nukage Junction | the template: courtyard hub, one wing per key |
 | MAP02 Nukage Crossing | two banks of a canal, joined by a sluice gate that sinks into a bridge |
-| MAP03 Nukage Core | a spiral climb around a reactor to the crown |
-| MAP04 Nukage Divided | a fork into two wings that never meet, keys crossed |
-| MAP05 Nukage Drain | a ring of walkways raised one by one out of a flooded reservoir |
-| **MAP06 Nukage Undercurrent** | **one hall crossed twice: over it, then under it** |
+| MAP03 Nukage Divided | a fork into two wings that never meet, keys crossed |
+| MAP04 Nukage Tower | a spiral climb around a reactor to the crown |
+| **MAP05 Nukage Undercurrent** | **one hall crossed twice: over it, then under it** |
+| MAP06 Nukage Drain | a ring of walkways raised one by one out of a flooded reservoir |
 
 None of these crosses the same space twice at two heights. The SPEEDY maps don't either: they're hubs, spiral shafts, descents and canyon crossings.
 
@@ -212,7 +212,7 @@ Static balance as built (resource curve, UV pistol start): the lowest detour rat
 - **Arachnotrons on a 192-wide gantry.** They have radius 64, so closets need to be at least 192 wide, as planned. Rails keep them from falling, and they must be able to step out (closet floor = gantry floor, 160).
 - **Shared vertices.** The gantry break, the plinths in the split floor lanes, the parapet strip, WIN against FE beside FG, and the pilaster jogs along 2048-unit walls all have neighbours meeting mid-edge. Add the vertices.
 - **Sector count.** About 130-160 with pilasters, plinths and stairs, which is within the IWAD band.
-- **Set bookkeeping.** README "Included WAD" and SPOILERS sections for MAP06; preview `wads/NUKAGE-MAP06.svg`.
+- **Set bookkeeping.** README "Included WAD" and SPOILERS sections for MAP06; preview `wads/previews/nukage_undercurrent.svg`.
 
 ## As built
 
@@ -249,7 +249,7 @@ Over and Under wins for four reasons:
 
 The others lose on these grounds:
 
-- The Breach is MAP03 inside out, and ring after ring reads alike.
+- The Breach is Tower inside out, and ring after ring reads alike.
 - The Long Line is a straight line with hitscan sightlines, which is on the anti-pattern list.
-- Flood Behind repeats MAP05's nukage-level mechanic and the SPEEDY descents, and needs many fragile floor-change actions.
+- Flood Behind repeats Drain's nukage-level mechanic and the SPEEDY descents, and needs many fragile floor-change actions.
 - Inside the Walls puts too much of the map in passages 128 wide or less, and is hard to read.

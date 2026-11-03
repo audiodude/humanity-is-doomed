@@ -1,7 +1,7 @@
 # The Long Way Down (SPEEDY2 MAP04) wiring test: the roof door, the gallery
 # secret, the sinking elevator, the cistern pump, the cave drop, the quarry
 # closets and the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY2.WAD MAP04 levels/playtests/speedy4_long_way_down.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py speedy4_long_way_down
 
 killall
 # Rooftop: the shotgun, then the stair door.

@@ -7,31 +7,29 @@ from conftest import module, needs_iwad
 from levels import checks
 from levels.doom2 import CYBER, FATSO, PLAYER1, S1_DOOR_OPEN, W1_EXIT, W1_FLOOR_LOWEST, W1_SECRET_EXIT
 from levels.mapgen import compile_level
-from levels.model import Sector, Special, Thing, load, rect
+from levels.model import Place, Sector, Special, Thing, load, rect
 
 EXIT = {((256, 400), (320, 400)): Special(W1_EXIT)}
 SECRET_EXIT = {((256, 400), (320, 400)): Special(W1_SECRET_EXIT)}
 
 
-def room(slot, *things, pad_tag=0, free_lines=EXIT, **attrs):
-    """A room with the player and an exit line; a raised pad in it tagged
-    `pad_tag` (0: no tag)."""
+def room(slot, *things, pad_tag=0, free_lines=EXIT, scratch=False, **attrs):
+    """A room with the player and an exit line, loaded at `slot`; a raised pad
+    in it tagged `pad_tag` (0: no tag)."""
     sectors = [Sector("room", [rect(0, 0, 512, 512), rect(128, 128, 256, 256)], 0, 128, "FLOOR4_8", "CEIL3_5",
                       160, "STARTAN3"),
                Sector("pad", [rect(128, 128, 256, 256)], 32, 128, "FLOOR4_8", "CEIL3_5", 160, "STARTAN3",
                       tag=pad_tag)]
     mod = module(SECTORS=sectors, FREE_LINES=free_lines, THINGS=[Thing(PLAYER1, 64, 64), *things], **attrs)
-    mod.MAP = slot
-    return mod
+    return load(mod, Place("test.wad", slot, scratch=scratch))
 
 
-def warnings(mod):
-    level = load(mod)
+def warnings(level):
     return checks.findings(level, compile_level(level)).warnings
 
 
-def warned(mod, text):
-    return any(text in w for w in warnings(mod))
+def warned(level, text):
+    return any(text in w for w in warnings(level))
 
 
 @pytest.mark.parametrize("slot, text", [
@@ -51,6 +49,13 @@ def test_intertext_replaces_the_default_text(umapinfo, default_text, quoted_clea
     found = warnings(room("MAP06", UMAPINFO=umapinfo))
     assert any("DOOM II shows its own text screen" in w for w in found) == default_text
     assert any('intertext = "clear" is written quoted' in w for w in found) == quoted_clear
+
+
+def test_a_scratch_build_isnt_in_its_slot_so_only_its_umapinfo_is_checked():
+    found = warnings(room("MAP06", Thing(FATSO, 400, 400, skills="h"), pad_tag=666, free_lines=SECRET_EXIT,
+                          scratch=True, UMAPINFO={"intertext": "clear"}))
+    assert [w for w in found if "is written quoted" not in w] == []
+    assert any("is written quoted" in w for w in found)
 
 
 def test_secret_exit_off_map15_and_map31_has_nowhere_to_go_without_umapinfo():
@@ -93,6 +98,14 @@ def test_map07s_rule_also_moves_a_tag_a_line_uses():
                   "a line moves tag 666 too")
 
 
+def test_a_map_built_for_map07s_rule_moved_to_another_slot():
+    assert warned(room("MAP03", Thing(FATSO, 400, 400), pad_tag=666),
+                  "nothing on MAP03 moves the sectors tagged 666 (pad): MAP07's boss rule lowers them when the "
+                  "last mancubus dies")
+    assert not warned(room("MAP07", Thing(FATSO, 400, 400), pad_tag=666), "nothing on")
+    assert not warned(room("MAP03", pad_tag=666), "nothing on")   # no mancubus: not a MAP07 map
+
+
 def test_boss_death_needs_its_monster_on_every_skill():
     assert warned(room("MAP07", Thing(FATSO, 400, 400, skills="mh"), pad_tag=666),
                   "only the last mancubus's death lowers the sectors tagged 666 (pad), and there's no "
@@ -113,10 +126,10 @@ def test_e2m8_ends_when_the_cyberdemon_dies_even_with_an_exit_line():
     ("E3M1", {}, "SKY3"), ("MAP12", {"skytexture": "sky3"}, "SKY3"), ("MAP01", 'skytexture = "SKY2"', "SKY2"),
 ])
 def test_sky_is_the_slots_unless_umapinfo_sets_one(slot, umapinfo, sky):
-    assert checks.slot_sky(load(room(slot, UMAPINFO=umapinfo)))[0] == sky
+    assert checks.slot_sky(room(slot, UMAPINFO=umapinfo))[0] == sky
 
 
 @needs_iwad("doom2")
 def test_unknown_umapinfo_skytexture_is_a_playability_finding():
-    level = load(room("MAP01", UMAPINFO={"skytexture": "SKYNOPE"}))
+    level = room("MAP01", UMAPINFO={"skytexture": "SKYNOPE"})
     assert "UMAPINFO skytexture SKYNOPE: unknown texture" in checks.findings(level, compile_level(level)).playability

@@ -1,7 +1,7 @@
 # Spiral Shaft (SPEEDY2 MAP05) wiring test: the secret, the pump door and lift,
 # the machine-room switch that drops the stair block, the storage door and
 # lift, the bridge-switch trap, the rising bridge and the exit on the spire.
-#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY2.WAD MAP05 levels/playtests/speedy4_shaft.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py speedy4_shaft
 
 killall
 walk 0 -560

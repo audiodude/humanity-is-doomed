@@ -17,7 +17,7 @@ from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, BOSSBRAIN, DAMAGE_PER_A
 from .measure import check_sector_overlaps
 from .model import ALL, DOOR, NO_TEX, THING_BITS, crossings, floor_movers, floor_range, seg_dist
 from .reach import BOSS, EXITS, solve, umapinfo_boss
-from .wad import IWAD_VARS, IWADS, iwad_textures
+from .wad import IWAD_VARS, IWADS, iwad_textures, umapinfo_keys
 from .wadmap import ML_BLOCKING, ML_BLOCKMONSTERS, MULTI_ONLY, SKILLS, parse
 
 GAMES = {"doom": "DOOM", "doom2": "DOOM II"}
@@ -171,13 +171,6 @@ DOOM_SECRET_FROM = {1: 3, 2: 5, 3: 6, 4: 2}   # episode -> ExMy whose secret exi
 BOSS_VERBS = {"floor_LnF": "lowers", "floor_tex": "raises", "door_open": "opens"}
 
 
-def umapinfo_keys(info):
-    """Lower-cased keys a UMAPINFO entry (dict or string body) sets."""
-    if isinstance(info, str):
-        return {k.lower() for k in re.findall(r"(?m)^\s*(\w+)\s*=", info)}
-    return {k.lower() for k in info}
-
-
 def slot_sky(level):
     """(sky texture, where it comes from): the UMAPINFO skytexture, else the
     slot's default (ports set it per map; vanilla DOOM II only when a game
@@ -205,8 +198,10 @@ def check_slot(level, m, names, found, textures=None):
     built-in rules, or UMAPINFO bossactions in their place) that also move
     sectors a line moves, end a level that has its own exit, replace a
     built-in rule the map's tagged sectors relied on, or need a monster that
-    is missing on some skill. An unknown UMAPINFO skytexture is a
-    playability finding (with `textures`, the IWAD's)."""
+    is missing on some skill. A scratch build (level.scratch) isn't in its
+    slot, so it only gets the UMAPINFO checks: an unknown skytexture is a
+    playability finding (with `textures`, the IWAD's), and a quoted "clear"
+    a warning."""
     slot, info, keys = level.map, level.umapinfo, umapinfo_keys(level.umapinfo)
     warn = found.warnings.append
     sky, source = slot_sky(level)
@@ -217,6 +212,8 @@ def check_slot(level, m, names, found, textures=None):
             if k.lower() in ("intertext", "intertextsecret") and v.strip().lower() == "clear":
                 warn(f'UMAPINFO {k} = "clear" is written quoted (the dict form quotes every value), so ports '
                      f"show the word; write the entry as a string body for {k} = clear")
+    if level.scratch:
+        return
     exits = {EXITS[ln.special] for ln in m.lines if ln.special in EXITS}
     if level.game == "doom2":
         if slot in TEXT_AFTER and "intertext" not in keys:
@@ -247,7 +244,8 @@ def check_slot(level, m, names, found, textures=None):
 def check_boss_rules(level, m, names, exits, warn):
     """check_slot's boss-death part. A UMAPINFO bossaction replaces the slot's
     A_BossDeath rules (not the Icon of Sin's or Keen's deaths, which aren't
-    A_BossDeath)."""
+    A_BossDeath). Sectors nothing moves on this slot, tagged as another slot's
+    boss rule would move them, are a map built for that slot."""
     slot = level.map
     try:
         bossaction = umapinfo_boss(level.umapinfo)
@@ -287,7 +285,16 @@ def check_boss_rules(level, m, names, exits, warn):
             elif act != "exit" and tagged[tag] and tag in line_tags:
                 warn(f"{slot}'s built-in boss rule {does(act, tag)} when the last {who(types)} dies, and a line "
                      f"moves tag {tag} too")
-    for types, act, tag in builtin if bossaction is None else bossaction:
+    active = builtin if bossaction is None else bossaction
+    moved = line_tags | {tag for _, act, tag in active if act != "exit"}
+    for tag in sorted(set(tagged) - moved):
+        for s, rs in BOSS.items():
+            for types, act, t in rs:
+                if s != slot and s.startswith("MAP") == slot.startswith("MAP") and t == tag and act != "exit" \
+                        and skills(types):
+                    warn(f"nothing on {slot} moves the sectors tagged {tag} ({', '.join(tagged[tag])}): {s}'s "
+                         f"boss rule {BOSS_VERBS.get(act, 'moves')} them when the last {who(types)} dies")
+    for types, act, tag in active:
         relies = "exit" not in exits if act == "exit" else (tagged[tag] and tag not in line_tags)
         missing = [sk for sk in SKILLS if sk not in skills(types)]
         if relies and missing:

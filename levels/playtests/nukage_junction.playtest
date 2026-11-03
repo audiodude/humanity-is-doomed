@@ -1,6 +1,8 @@
-# Nukage Junction (MAP01) wiring test: doors, both lifts, the island switch,
-# the secret, both key traps and the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP01 levels/playtests/nukage_junction.playtest
+# Nukage Junction wiring test: doors, both lifts, the island switch, the
+# secret, both key traps and the exit. It isn't in the WAD, so build it to a
+# scratch WAD first:
+#   python3 -m levels nukage_junction
+#   uv run --with vizdoom scripts/tools/playtest.py nukage_junction
 
 killall
 walk 256 360

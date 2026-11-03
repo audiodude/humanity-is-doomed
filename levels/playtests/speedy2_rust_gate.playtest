@@ -1,6 +1,6 @@
 # Rust Gate (SPEEDY1 MAP04) wiring test: every door, the shotgun, the
 # secret, the yellow key and its closet trap, the exit-hall closet, the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py wads/SPEEDY1.WAD MAP04 levels/playtests/speedy2_rust_gate.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py speedy2_rust_gate
 
 # Bunker out to the yard.
 killall

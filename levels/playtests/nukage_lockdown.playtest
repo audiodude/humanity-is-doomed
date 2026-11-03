@@ -1,7 +1,7 @@
 # Nukage Lockdown (MAP08) wiring test: the loop round the spill basin, every
 # shutter, lift, key trap and secret on the way, the wade, the decon hall,
 # the vault (its trap opens the lobby closets), the lobby shutter, the exit.
-#   uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP08 levels/playtests/nukage_lockdown.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py nukage_lockdown
 
 # Lobby: the exit switch and its EXIT sign through the window, the basin through the north window.
 look 0

@@ -2,7 +2,7 @@
 # door, the red key and its closet, the pump station lift, the breach drop,
 # the floodgate switch and the drop over the open gate (which opens the
 # dome's hatch), every secret, and the exit in the reactor hall.
-#   uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP09 levels/playtests/nukage_meltdown.playtest
+#   uv run --with vizdoom scripts/tools/playtest.py nukage_meltdown
 
 # Operations deck: the reveal from the start, down the whole cascade to the lake.
 look 270
