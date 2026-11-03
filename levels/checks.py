@@ -7,17 +7,18 @@ decides what fails. Messages name sectors and coordinates, so they stay the
 same across rebuilds (level modules list known ones in KNOWN_ISSUES).
 
 Reachability comes from levels.reach, run once on the map lumps as built."""
+import re
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 
 from .doom2 import (ACTORS, AMMO_PICKUPS, ARMOR_PICKUPS, BOSSBRAIN, DAMAGE_PER_AMMO, DAMAGING, DROPS,
-                    HEALTH_PICKUPS, KEEN, LINE_SPECIALS, MAX_STEP, MONSTERS, PLAYER1, PLAYERS, SECRET_AREA,
+                    HEALTH_PICKUPS, KEEN, LABELS, LINE_SPECIALS, MAX_STEP, MONSTERS, PLAYER1, PLAYERS, SECRET_AREA,
                     START_AMMO, THING_GAMES, THING_NAMES, is_decal)
 from .measure import check_sector_overlaps
 from .model import ALL, DOOR, NO_TEX, THING_BITS, crossings, floor_movers, floor_range, seg_dist
-from .reach import solve, umapinfo_boss
+from .reach import BOSS, EXITS, solve, umapinfo_boss
 from .wad import IWAD_VARS, IWADS, iwad_textures
-from .wadmap import ML_BLOCKING, ML_BLOCKMONSTERS, MULTI_ONLY, parse
+from .wadmap import ML_BLOCKING, ML_BLOCKMONSTERS, MULTI_ONLY, SKILLS, parse
 
 GAMES = {"doom": "DOOM", "doom2": "DOOM II"}
 
@@ -57,6 +58,7 @@ def findings(level, compiled) -> Findings:
                               "(set it in .env, see .env.example); skipping texture checks")
     else:
         check_textures(level, compiled.lines, compiled.sides, iwad, found)
+    check_slot(level, m, names, found, iwad[0] if iwad else None)
     p1 = next((t for t in m.things if t.type == PLAYER1), None)
     if p1 is None or m.sector_of_point(p1.x, p1.y) is None:
         found.playability.append("no player 1 start inside a sector")
@@ -153,6 +155,145 @@ def check_types(m, found):
     for action, places in sorted(unknown.items()):
         more = f" (+{len(places) - 1} more)" if len(places) > 1 else ""
         found.warnings.append(f"line action {action} isn't vanilla, at {places[0]}{more}")
+
+
+# What the engine does by map slot unless the map's UMAPINFO entry says otherwise:
+# id's g_game.c (G_WorldDone, G_DoCompleted, G_DoLoadLevel) and p_enemy.c
+# (A_BossDeath), and the UMAPINFO spec's "Default handling".
+TEXT_AFTER = {   # DOOM II's text screens after the normal exit, by how they open
+    "MAP06": "YOU HAVE ENTERED DEEPLY INTO THE INFESTED STARPORT", "MAP11": "YOU HAVE WON!",
+    "MAP20": "YOU ARE AT THE CORRUPT HEART OF THE CITY", "MAP30": "THE HORRENDOUS VISAGE OF THE BIGGEST DEMON",
+}
+TEXT_AFTER_SECRET = {"MAP15": "CONGRATULATIONS, YOU'VE FOUND THE SECRET LEVEL!",
+                     "MAP31": "CONGRATULATIONS, YOU'VE FOUND THE SUPER SECRET LEVEL!"}
+DOOM2_SECRET_SLOTS = ("MAP15", "MAP31")
+DOOM_SECRET_FROM = {1: 3, 2: 5, 3: 6, 4: 2}   # episode -> ExMy whose secret exit is id's; ExM9 returns to ExM(y+1)
+BOSS_VERBS = {"floor_LnF": "lowers", "floor_tex": "raises", "door_open": "opens"}
+
+
+def umapinfo_keys(info):
+    """Lower-cased keys a UMAPINFO entry (dict or string body) sets."""
+    if isinstance(info, str):
+        return {k.lower() for k in re.findall(r"(?m)^\s*(\w+)\s*=", info)}
+    return {k.lower() for k in info}
+
+
+def slot_sky(level):
+    """(sky texture, where it comes from): the UMAPINFO skytexture, else the
+    slot's default (ports set it per map; vanilla DOOM II only when a game
+    starts, so there it never changes in play)."""
+    info = level.umapinfo
+    if isinstance(info, str):
+        found = re.search(r'(?im)^\s*skytexture\s*=\s*"([^"]+)"', info)
+        sky = found.group(1) if found else None
+    else:
+        sky = next((v for k, v in info.items() if k.lower() == "skytexture"), None)
+    if sky:
+        return sky.upper(), "UMAPINFO skytexture"
+    if level.game == "doom":
+        return f"SKY{level.map[1]}", f"DOOM's sky for episode {level.map[1]}; UMAPINFO skytexture changes it"
+    n = int(level.map[3:])
+    first, last, sky = (1, 11, "SKY1") if n < 12 else (12, 20, "SKY2") if n < 21 else (21, 32, "SKY3")
+    return sky, f"DOOM II's default for MAP{first:02}-MAP{last:02}; UMAPINFO skytexture changes it"
+
+
+def check_slot(level, m, names, found, textures=None):
+    """Warnings where what the engine does by slot would surprise the map:
+    DOOM II's text screens after MAP06/11/20/30 and the MAP15/31 secret exits
+    with no UMAPINFO text of the set's own; a secret exit from a slot with no
+    secret level, or with no UMAPINFO nextsecret; boss deaths (the slot's
+    built-in rules, or UMAPINFO bossactions in their place) that also move
+    sectors a line moves, end a level that has its own exit, replace a
+    built-in rule the map's tagged sectors relied on, or need a monster that
+    is missing on some skill. An unknown UMAPINFO skytexture is a
+    playability finding (with `textures`, the IWAD's)."""
+    slot, info, keys = level.map, level.umapinfo, umapinfo_keys(level.umapinfo)
+    warn = found.warnings.append
+    sky, source = slot_sky(level)
+    if textures is not None and source == "UMAPINFO skytexture" and sky not in textures:
+        found.playability.append(f"UMAPINFO skytexture {sky}: unknown texture")
+    if isinstance(info, dict):
+        for k, v in info.items():
+            if k.lower() in ("intertext", "intertextsecret") and v.strip().lower() == "clear":
+                warn(f'UMAPINFO {k} = "clear" is written quoted (the dict form quotes every value), so ports '
+                     f"show the word; write the entry as a string body for {k} = clear")
+    exits = {EXITS[ln.special] for ln in m.lines if ln.special in EXITS}
+    if level.game == "doom2":
+        if slot in TEXT_AFTER and "intertext" not in keys:
+            warn(f'DOOM II shows its own text screen after {slot} ("{TEXT_AFTER[slot]} ..."); set UMAPINFO '
+                 "intertext to the set's own text, or intertext = clear for none")
+        if slot in TEXT_AFTER_SECRET and "secret_exit" in exits and "intertextsecret" not in keys:
+            warn(f'DOOM II shows its own text screen after {slot}\'s secret exit ("{TEXT_AFTER_SECRET[slot]} ..."); '
+                 "set UMAPINFO intertextsecret, or intertextsecret = clear for none")
+    if "secret_exit" in exits:
+        if level.game == "doom2" and slot not in DOOM2_SECRET_SLOTS:
+            warn(f"without UMAPINFO, DOOM II only has secret exits on MAP15 and MAP31: the one on {slot} reloads "
+                 f"{slot} (or goes to MAP01 if the game was started there)")
+        if level.game == "doom":
+            ep, n = int(slot[1]), int(slot[3])
+            parent = DOOM_SECRET_FROM.get(ep)
+            if parent and n not in (parent, 9):
+                a, b = (parent + 1, n) if n > parent else (n + 1, parent)
+                maps = f"E{ep}M{a}" if a == b else f"E{ep}M{a}-E{ep}M{b}"
+                span = f"replays {maps}" if n > parent else f"skips {maps}"
+                warn(f"without UMAPINFO, every secret exit in DOOM leads to E{ep}M9, which returns to "
+                     f"E{ep}M{parent + 1}: from {slot} that {span}")
+        if info and "nextsecret" not in keys:
+            warn(f"in UMAPINFO ports the secret exit on {slot} goes where the normal exit does: its UMAPINFO "
+                 "entry has no nextsecret")
+    check_boss_rules(level, m, names, exits, warn)
+
+
+def check_boss_rules(level, m, names, exits, warn):
+    """check_slot's boss-death part. A UMAPINFO bossaction replaces the slot's
+    A_BossDeath rules (not the Icon of Sin's or Keen's deaths, which aren't
+    A_BossDeath)."""
+    slot = level.map
+    try:
+        bossaction = umapinfo_boss(level.umapinfo)
+    except ValueError:
+        return   # findings() reports it
+    builtin = [b for b in BOSS.get(slot, []) if not b[0] & {BOSSBRAIN, KEEN}]
+    tagged = defaultdict(list)
+    for o, s in enumerate(m.sectors):
+        if s.tag:
+            tagged[s.tag].append(names[o])
+    line_tags = {ln.tag for ln in m.lines if ln.special and ln.tag}
+
+    def skills(types):
+        return [sk for sk, bit in SKILLS.items() if any(t.type in types and t.on(bit) for t in m.things)]
+
+    def who(types):
+        return " or ".join(LABELS[t] for t in sorted(types))
+
+    def does(act, tag):
+        if act == "exit":
+            return "ends the level"
+        return f"{BOSS_VERBS.get(act, 'moves')} the sectors tagged {tag} ({', '.join(tagged[tag])})"
+
+    if bossaction is not None:
+        kept = {(frozenset(t), a, g) for t, a, g in bossaction}
+        for types, act, tag in builtin:
+            if (frozenset(types), act, tag) not in kept and skills(types) and (act == "exit" or tagged[tag]):
+                warn(f"{slot}'s UMAPINFO bossaction replaces the slot's built-in boss rule: killing the last "
+                     f"{who(types)} no longer {does(act, tag)}")
+    else:
+        for types, act, tag in builtin:
+            if not skills(types):
+                continue
+            if act == "exit" and "exit" in exits:
+                warn(f"{slot}'s built-in boss rule ends the level when the last {who(types)} dies, whatever is "
+                     "left; UMAPINFO bossaction = clear turns it off")
+            elif act != "exit" and tagged[tag] and tag in line_tags:
+                warn(f"{slot}'s built-in boss rule {does(act, tag)} when the last {who(types)} dies, and a line "
+                     f"moves tag {tag} too")
+    for types, act, tag in builtin if bossaction is None else bossaction:
+        relies = "exit" not in exits if act == "exit" else (tagged[tag] and tag not in line_tags)
+        missing = [sk for sk in SKILLS if sk not in skills(types)]
+        if relies and missing:
+            on = "any skill" if len(missing) == len(SKILLS) else " or ".join(missing)
+            warn(f"on {slot} only the last {who(types)}'s death {does(act, tag)}, and there's no "
+                 f"{who(types)} on {on}")
 
 
 def check_reach(level, md, res, names, found):

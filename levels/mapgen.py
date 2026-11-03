@@ -82,7 +82,7 @@ import subprocess
 import tempfile
 from dataclasses import dataclass
 
-from .checks import balance_report, findings, level_textures
+from .checks import balance_report, findings, level_textures, slot_sky
 from .doom2 import ACTORS, PLAYERS, SR_LIFT, WR_LIFT, is_decal
 from .model import (ALL, DOOR, LIFT, ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, ML_SECRET,
                     ML_TWOSIDED, NO_TEX, ROOM, ROOT, SKY, LevelError, Linedef, Sidedef, dist, edges,
@@ -357,6 +357,8 @@ def build(module, check_only=False, out=None, zdbsp=None):
           f"{sum(map(len, sides))} sidedefs, {len(level.things)} things; monsters "
           + "/".join(str(sum(sk in t.skills for t in monsters)) for sk in ALL) + " (e/m/h)")
     print("preview:", svg)
+    if any(SKY in (s.ftex, s.ctex) for s in level.sectors.values()):
+        print("sky: %s (%s)" % slot_sky(level))
     print("\n".join(balance_report(level)))
     found = findings(level, compiled)
     known = set(level.known_issues)
