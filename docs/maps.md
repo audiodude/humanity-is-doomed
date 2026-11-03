@@ -45,7 +45,7 @@ Measured with the research scripts against the DOOM II maps (median in brackets)
 No monster can see the start window. Whole-map symmetry (0.82) is above the id range, because the two banks mirror each other across the canal; they are told apart by their landmarks: the pump housing, the silver tower, the red-key platform and the terrace.
 
 ## Nukage Divided (`nukage_divided`)
-MAP03: 112 sectors, 23/43/56 monsters on easy/medium/hard, four secrets, and the first barons.
+MAP03: 112 sectors, 23/43/56 monsters on easy/medium/hard, four secrets, and the first barons. Its first version, Nukage Divide, is kept as `levels/nukage_divide_original.py` and built on its own into `wads/DIVIDE.WAD` (set `levels/sets/divide.py`).
 
 You leave the start room facing a wall that is half lava, half blue computer screens: a red furnace wing on one side, a blue cooling wing on the other. The wings never meet, and each ends at its own key beside a locked arena door of the other colour, with the other key in sight across a nukage pit.
 
