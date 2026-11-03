@@ -20,6 +20,12 @@
 
 ## Included WAD - NUKAGE.WAD
 
+> [!IMPORTANT]
+> **Looking for the levels from the YouTube videos?** They're in the [v0.9 release](https://github.com/audiodude/humanity-is-doomed/releases/tag/v0.9): the original `NUKAGE.WAD`, more or less raw AI output, built up one map at a time while the AI was still learning how DOOM levels should be structured and play. It still has Nukage Junction as MAP01, the first maps' original textures, and none of the later re-ordering and balance work. It's kept for history and research; for the polished set, play the `wads/NUKAGE.WAD` described below.
+>
+> - [Claude made me a DOOM II level - Nukage Junction](https://youtu.be/o6tNhFPuYjE)
+> - [Claude made me ANOTHER DOOM II level - Nukage Crossing](https://youtu.be/8l30OIKdmmA)
+
 *NUKAGE: A nuclear meltdown at a UAC power plant opens a gate to hell.*
 
 `wads/NUKAGE.WAD` holds nine generated maps for DOOM II: MAP01, [Nukage Outskirts](#nukage-outskirts-nukage_outskirts), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), MAP06, [Nukage Undercurrent](#nukage-undercurrent-nukage_undercurrent), MAP07, [Nukage Storage](#nukage-storage-nukage_storage), MAP08, [Nukage Lockdown](#nukage-lockdown-nukage_lockdown), and MAP09, [Nukage Meltdown](#nukage-meltdown-nukage_meltdown), the last. It needs `doom2.wad`; to play it in dsda-doom, `dsda-doom -iwad doom2 -file wads/NUKAGE.WAD` (add `-warp 2` and so on for the later maps). Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP09.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
