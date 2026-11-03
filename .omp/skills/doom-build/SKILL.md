@@ -7,7 +7,7 @@ Turn a design doc (`levels/designs/<module>.md`, from `doom-design`) into `level
 
 ## 1. Read
 
-- `README.md` "The level builder" through "Code layout": the format, every check, the room helpers.
+- `docs/builder.md` "Building a map" through "Code layout": the format, every check, the room helpers.
 - `levels/mapgen.py` docstring, `levels/model.py` (`Sector`, `Special`, `Thing`, and the helpers), `levels/doom2.py` (thing types, line actions, sector specials).
 - One existing module for syntax: `levels/nukage_junction.py`. Take its syntax only; the layout comes from the doc.
 
@@ -50,7 +50,7 @@ Observed in past builds; most cost an agent several rebuilds to find.
 - **Rising floors**: the raise actions move at 0.5 units per tic (a 96 rise is about 5 s) and stop at the next higher neighbouring floor, so start a bridge close to its final height and keep neighbouring floors from catching it.
 - **Open spaces**: your first shot floods every sector joined by an opening (railings too), and a deaf monster (`"a"` in `Thing.skills`) that hears it wakes as soon as it has any line of sight to you, whichever way it faces. Deaf monsters across an open space from you wake together and gather below you. Keep a group asleep by cutting its sound off with two sound-blocking lines in series (`ML_SOUNDBLOCK` in `OVERRIDES`); `docs/monster-alerting.md` has the rules and MAP09's dam-and-islands pattern.
 - **Pits**: any drop the player can't climb out of without a lift needs stairs or a lift back, or a railing, unless the doc makes it a deliberate one-way drop.
-- **Slot defaults**: the slot brings engine behaviour the module doesn't show, and the build warns about each (README "What every build checks"):
+- **Slot defaults**: the slot brings engine behaviour the module doesn't show, and the build warns about each (`docs/builder.md` "What every build checks"):
   - DOOM II's own text screens after MAP06/11/20/30 and the MAP15/31 secret exits: give the map an `intertext` (or `intertext = clear`, in a string `UMAPINFO` body; the dict form writes `"clear"` as text).
   - Secret exits outside MAP15/MAP31 and without `nextsecret`.
   - MAP07's built-in mancubus/arachnotron rule on tags 666/667, which any `bossaction` replaces.

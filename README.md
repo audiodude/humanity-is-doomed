@@ -1,5 +1,85 @@
 # Humanity is Doomed
 
+Nine DOOM II maps that an AI wrote as Python, the level compiler it built to do it, and the research on id's 68 maps that it designed them from.
+
+> [!IMPORTANT]
+> **Looking for the levels from the YouTube videos?** They're in the [v0.9 release](https://github.com/audiodude/humanity-is-doomed/releases/tag/v0.9): the original `NUKAGE.WAD`, more or less raw AI output, built up one map at a time while the AI was still learning how DOOM levels should be structured and play. It still has Nukage Junction as MAP01, the first maps' original textures, and none of the later re-ordering and balance work. It's kept for history and research; for the polished set, play the `wads/NUKAGE.WAD` described below.
+>
+> - [Claude made me a DOOM II level - Nukage Junction](https://youtu.be/o6tNhFPuYjE)
+> - [Claude made me ANOTHER DOOM II level - Nukage Crossing](https://youtu.be/8l30OIKdmmA)
+
+## NUKAGE.WAD
+
+*A nuclear meltdown at a UAC power plant opens a gate to hell.*
+
+`wads/NUKAGE.WAD` is a nine-map set for DOOM II. It needs `doom2.wad` and a port that reads UMAPINFO (see [Compatibility](#compatibility)).
+
+**GZDoom** (4.6 or later): drag `NUKAGE.WAD` onto the GZDoom executable, or run it from a terminal. If GZDoom finds more than one IWAD it asks which to use; pick DOOM II.
+
+```sh
+gzdoom -iwad doom2.wad -file wads/NUKAGE.WAD           # add +map MAP02 and so on to start on a later map
+```
+
+`-iwad` takes a path if `doom2.wad` isn't in GZDoom's search folders (the GZDoom folder, or `~/.config/gzdoom` on Linux).
+
+**dsda-doom**:
+
+```sh
+dsda-doom -iwad doom2 -file wads/NUKAGE.WAD            # add -warp 2 and so on for the later maps
+```
+
+| Slot | Map | What happens | New monster | Monsters (easy / medium / hard) |
+|---|---|---|---|---|
+| MAP01 | [Nukage Outskirts](docs/maps.md#nukage-outskirts-nukage_outskirts) | Up a hillside to the plant's monitoring station, with the spill hidden over the ridge. The easiest map. | | 12 / 22 / 31 |
+| MAP02 | [Nukage Crossing](docs/maps.md#nukage-crossing-nukage_crossing) | A sluice gate sinks into a nukage canal to become a bridge, and demons charge across it. | | 21 / 43 / 57 |
+| MAP03 | [Nukage Core](docs/maps.md#nukage-core-nukage_core) | Spiral up around a reactor core to the exit in its crown. | mancubus | 27 / 53 / 73 |
+| MAP04 | [Nukage Divided](docs/maps.md#nukage-divided-nukage_divided) | A red furnace wing and a blue cooling wing that never meet. | baron | 23 / 43 / 56 |
+| MAP05 | [Nukage Drain](docs/maps.md#nukage-drain-nukage_drain) | Pump-house switches raise walkways out of a reservoir of nukage. | revenant | 24 / 43 / 59 |
+| MAP06 | [Nukage Undercurrent](docs/maps.md#nukage-undercurrent-nukage_undercurrent) | Taking the yellow key sinks your platform into a pit, and the way back is under the gantry. | arachnotron | 26 / 46 / 64 |
+| MAP07 | [Nukage Storage](docs/maps.md#nukage-storage-nukage_storage) | A maze of fuel casks sinks into the floor and frees six mancubi. | pain elemental | 30 / 54 / 75 |
+| MAP08 | [Nukage Lockdown](docs/maps.md#nukage-lockdown-nukage_lockdown) | A loop round a spill basin where every shutter opens only from its far side. | arch-vile | 33 / 53 / 72 |
+| MAP09 | [Nukage Meltdown](docs/maps.md#nukage-meltdown-nukage_meltdown) | Down a terraced canyon of falls to the cooling lake, where the Cyberdemon wades. | Cyberdemon | 40 / 63 / 84 |
+
+Each map has four secrets (MAP03 has five). Every map's design notes and measurements are in [docs/maps.md](docs/maps.md), top-down maps are `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP09.svg`, and routes and secrets are in [SPOILERS.md](SPOILERS.md).
+
+### Compatibility
+
+**Play it in a port that reads UMAPINFO.** MAP09's exit is sealed behind a shutter that opens only when the Cyberdemon dies, and that rule lives in the WAD's `UMAPINFO` lump (a `bossaction`). Without UMAPINFO the shutter never opens and MAP09 can't be finished.
+
+| Port | MAP09's exit | Level names, the ending's text and cast call |
+|---|---|---|
+| DOOM + DOOM II (2024 re-release) | opens when the Cyberdemon dies | yes |
+| GZDoom 4.6 and later | opens | yes |
+| dsda-doom, Woof | opens | yes |
+| `doom2.exe`, Chocolate Doom, and any port without UMAPINFO | never opens | no: DOOM II's own names, and MAP09 leads to MAP10 |
+
+MAP01–MAP08 don't depend on UMAPINFO. Every map is checked against vanilla rules (see [Playtests](docs/builder.md#playtests)), and MAP09 has been played through in the 2024 re-release. The bossaction gate came after that playthrough and hasn't yet been tried in any of these ports.
+
+## The level builder
+
+`levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the lines and texture alignment, checks that the map can be finished (every key, secret and monster reachable, no softlocks), measures it against id's maps, and writes it into a WAD with a top-down preview. A decompiler turns any Doom-format map back into this form, and a ViZDoom runner playtests the routes.
+
+```sh
+python3 -m levels nukage_outskirts          # check, then write MAP01 into wads/NUKAGE.WAD
+python3 -m levels nukage_outskirts --check  # check only
+```
+
+It needs Python 3.10+ (standard library only), ZDBSP, and the IWADs set in `.env` (copy `.env.example`). The full reference is [docs/builder.md](docs/builder.md): [building](docs/builder.md#building-a-map), [what every build checks](docs/builder.md#what-every-build-checks), [writing a level](docs/builder.md#writing-a-level), [agent skills](docs/builder.md#agent-skills), [code layout](docs/builder.md#code-layout), [decompiling](docs/builder.md#decompiling-existing-maps) and [playtests](docs/builder.md#playtests).
+
+## Research: what makes DOOM levels fun
+Nukage Crossing and the maps after it were designed from a research report on the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It drew on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. The report quotes its sources at length, so it isn't published here; the measurement scripts are.
+
+The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs to `research/data/`. They read the v1.9 IWADs set by `DOOM_WAD` (Ultimate Doom) and `DOOM2_WAD` in `.env`. Run them from the repo root:
+
+```sh
+python3 scripts/metrics/space_metrics.py        # -> research/data/metrics_space.csv (about 2 minutes)
+python3 scripts/metrics/combat_metrics.py       # -> research/data/metrics_combat.csv
+python3 scripts/metrics/progression_metrics.py  # -> research/data/metrics_progression.csv; pass a slot (E1M7) to dump one map
+python3 scripts/metrics/route_metrics.py        # -> research/data/metrics_route.csv (balance along the route; about 40 s); pass a slot for its report
+```
+
+## Special bulletin
+
 > *We interrupt this program to bring you a special bulletin.*
 >
 > Ladies and gentlemen, on the evening of October 19th, at ten minutes to seven, Pacific time, a single sentence was typed into a terminal in an ordinary American home: **"Make me a moderately complex, medium difficulty DOOM II level."**
@@ -17,373 +97,3 @@
 > Ladies and gentlemen, I must tell you plainly: the demons were never the danger. A demon can be shotgunned. The danger is the thing that *summons* them, from a single sentence, tirelessly, and gets better at it every time. Humanity is—
 >
 > *[transmission ends]*
-
-## Included WAD - NUKAGE.WAD
-
-> [!IMPORTANT]
-> **Looking for the levels from the YouTube videos?** They're in the [v0.9 release](https://github.com/audiodude/humanity-is-doomed/releases/tag/v0.9): the original `NUKAGE.WAD`, more or less raw AI output, built up one map at a time while the AI was still learning how DOOM levels should be structured and play. It still has Nukage Junction as MAP01, the first maps' original textures, and none of the later re-ordering and balance work. It's kept for history and research; for the polished set, play the `wads/NUKAGE.WAD` described below.
->
-> - [Claude made me a DOOM II level - Nukage Junction](https://youtu.be/o6tNhFPuYjE)
-> - [Claude made me ANOTHER DOOM II level - Nukage Crossing](https://youtu.be/8l30OIKdmmA)
-
-*NUKAGE: A nuclear meltdown at a UAC power plant opens a gate to hell.*
-
-`wads/NUKAGE.WAD` holds nine generated maps for DOOM II: MAP01, [Nukage Outskirts](#nukage-outskirts-nukage_outskirts), MAP02, [Nukage Crossing](#nukage-crossing-nukage_crossing), MAP03, [Nukage Core](#nukage-core-nukage_core), MAP04, [Nukage Divided](#nukage-divided-nukage_divided), MAP05, [Nukage Drain](#nukage-drain-nukage_drain), MAP06, [Nukage Undercurrent](#nukage-undercurrent-nukage_undercurrent), MAP07, [Nukage Storage](#nukage-storage-nukage_storage), MAP08, [Nukage Lockdown](#nukage-lockdown-nukage_lockdown), and MAP09, [Nukage Meltdown](#nukage-meltdown-nukage_meltdown), the last. It needs `doom2.wad`; to play it in dsda-doom, `dsda-doom -iwad doom2 -file wads/NUKAGE.WAD` (add `-warp 2` and so on for the later maps). Top-down maps of the levels are in `wads/NUKAGE-MAP01.svg` through `wads/NUKAGE-MAP09.svg`. Routes, secrets and set pieces are in [SPOILERS.md](SPOILERS.md).
-
-### Compatibility
-
-**Play it in a port that reads UMAPINFO.** MAP09's exit is sealed behind a shutter that opens only when the Cyberdemon dies, and that rule lives in the WAD's `UMAPINFO` lump (a `bossaction`). Without UMAPINFO the shutter never opens and MAP09 can't be finished.
-
-| Port | MAP09's exit | Level names, the ending's text and cast call |
-|---|---|---|
-| DOOM + DOOM II (2024 re-release) | opens when the Cyberdemon dies | yes |
-| GZDoom 4.6 and later | opens | yes |
-| dsda-doom, Woof | opens | yes |
-| `doom2.exe`, Chocolate Doom, and any port without UMAPINFO | never opens | no: DOOM II's own names, and MAP09 leads to MAP10 |
-
-MAP01–MAP08 don't depend on UMAPINFO. Every map is checked against vanilla rules (see [Playtests](#playtests)), and MAP09 has been played through in the 2024 re-release. The bossaction gate came after that playthrough and hasn't yet been tried in any of these ports.
-
-### Nukage Outskirts (`nukage_outskirts`)
-MAP01, the easiest map in the set: 104 sectors, 12/22/31 monsters on easy/medium/hard, four secrets, nothing heavier than a demon. Its design doc is `levels/designs/nukage_outskirts.md`, with the playtest results; the route script is `levels/playtests/nukage_outskirts.playtest`.
-
-You start in a sunlit valley below a hillside cut into switchback shelves, with the plant's monitoring station on the crest. Its front shutter is jammed; you get in through the loading dock round the back, find the blue key in the instrument room, and the blue door at the top of the stairs opens onto the observation deck. The far side of the ridge drops into a valley filled wall to wall with nukage, and the jetty across it leads to the exit in the plant's wall.
-
-| Measure | MAP01 | DOOM II median |
-|---|---|---|
-| Distinct floor heights | 32 | 23 |
-| Light SD / light-effect sectors | 24 / 7 | 23 / 9 |
-| Most-used wall texture | 33% | 30% |
-| Wall material changes with a border texture | 99% | 31% |
-| Optional share of the reachable area | 47% | 50% |
-| UV ammo per monster HP (pistol start) | 2.66 | 1.81 |
-| Health per 1000 monster HP | 83 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.39 / 0.71 | 0.33 / 0.70 |
-| Deaf monsters | 39% | 42% |
-| Nearest monster to the start | 643 | 300 |
-
-Ammo and health are generous on purpose for a first map; the secret soulsphere is 100 of the health.
-
-The original MAP01, Nukage Junction (`levels/nukage_junction.py`, a courtyard hub with a wing per key), is kept in the repo but is no longer built into the WAD: it targets the same MAP01 slot, so building it would replace Nukage Outskirts.
-
-### Nukage Crossing (`nukage_crossing`)
-MAP02, designed from the [research](#research-what-makes-doom-levels-fun) below: 99 sectors, 21/43/57 monsters on easy/medium/hard, four secrets. It was retextured after the texture research (design: `levels/designs/nukage_crossing.md`): one brick for the whole canal basin, a signature material per area, and trim where materials meet. The first version's textures are kept in `levels/nukage_crossing_original.py`, which isn't built into the WAD.
-
-Measured with the research scripts against the DOOM II maps (median in brackets):
-
-| Measure | MAP02 | DOOM II median |
-|---|---|---|
-| Rule-1 flat changes without a height change | 1% | 3% |
-| Distinct floor heights | 22 | 23 |
-| Light-effect sectors | 11 | 9 |
-| UV ammo per monster HP (pistol start) | 2.1 | 1.8 |
-| Health per 1000 monster HP | 58 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.37 / 0.75 | 0.33 / 0.70 |
-| Deaf monsters | 37% | 42% |
-| Nearest monster to the start | 487 | 300 |
-| Most-used wall texture (BRICK6) | 28% | 30% |
-| Material joins with a border texture | 81% | 31% |
-
-No monster can see the start window. Whole-map symmetry (0.82) is above the id range, because the two banks mirror each other across the canal; they are told apart by their landmarks: the pump housing, the silver tower, the red-key platform and the terrace.
-
-### Nukage Core (`nukage_core`)
-MAP03, also designed from the research: 112 sectors, 27/53/73 monsters on easy/medium/hard, five secrets. It introduces the mancubus. It was retextured after the texture research (design: `levels/designs/nukage_core.md`): one bronze cladding for the whole atrium and its stair towers, the reactor core in green tech panels, a signature material per wing, and trim where materials meet. The first version's textures are kept in `levels/nukage_core_original.py`, which isn't built into the WAD.
-
-A reactor core stands in a nukage moat, with the exit in the crown on top; you see it from the start and climb around it to get there.
-
-Measured with the research scripts against the DOOM II maps:
-
-| Measure | MAP03 | DOOM II median |
-|---|---|---|
-| Rule-1 flat changes without a height change | 0% | 3% |
-| Distinct floor heights | 29 | 23 |
-| Light-effect sectors | 10 | 9 |
-| Optional share of the reachable area | 40% | 50% |
-| Heavy-monster share (UV) | 15% | 10% |
-| UV ammo per monster HP (pistol start) | 2.7 | 1.8 |
-| Health per 1000 monster HP | 38 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.37 / 0.73 | 0.33 / 0.70 |
-| Deaf monsters | 48% | 42% |
-| Nearest monster to the start | 353 | 300 |
-| Most-used wall texture (BRONZE2) | 36% | 30% |
-| Material joins with a border texture | 77% | 31% |
-| Whole-map symmetry | 0.62 | 0.54 |
-
-### Nukage Divided (`nukage_divided`)
-MAP04: 112 sectors, 23/43/56 monsters on easy/medium/hard, four secrets, and the first barons.
-
-You leave the start room facing a wall that is half lava, half blue computer screens: a red furnace wing on one side, a blue cooling wing on the other. The wings never meet, and each ends at its own key beside a locked arena door of the other colour, with the other key in sight across a nukage pit.
-
-| Measure | MAP04 | DOOM II median |
-|---|---|---|
-| Rule-1 flat changes without a height change | 2% | 3% |
-| Distinct floor heights | 23 | 23 |
-| Light SD / light-effect sectors | 39 / 11 | 23 / 9 |
-| Most-used wall texture | 26% | 30% |
-| UV ammo per monster HP (pistol start) | 1.8 | 1.8 |
-| Health per 1000 monster HP | 36 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.41 / 0.77 | 0.33 / 0.70 |
-| Nearest monster to the start | 563 | 300 |
-| Whole-map symmetry | 0.71 | 0.54 |
-
-Symmetry is high because the two wings mirror each other's footprint around the fork and the pit; their materials, lighting and monsters are opposites.
-
-### Nukage Drain (`nukage_drain`)
-MAP05: 83 sectors, 24/43/59 monsters on easy/medium/hard, four secrets, and the first revenants. Its design doc is `levels/designs/nukage_drain.md`.
-
-You start on the only dry catwalk of a reservoir full of nukage, with the exit vault standing in the middle. Each of three pump houses has a switch beside an opening onto the reservoir: throw it and watch the next walkway rise out of the sludge to take you onward, while whatever was waiting inside the vault's pillar comes out at you.
-
-| Measure | MAP05 | DOOM II median |
-|---|---|---|
-| Rule-1 flat changes without a height change | 0% | 3% |
-| Distinct floor heights | 12 | 23 |
-| Most-used wall texture | 30% | 30% |
-| Wall material changes with a border texture | 100% | 31% |
-| Light SD / light-effect sectors | 24 / 9 | 23 / 9 |
-| Optional share of the reachable area | 36% | 50% |
-| UV ammo per monster HP (pistol start) | 1.9 | 1.8 |
-| Health per 1000 monster HP | 35 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.41 / 0.73 | 0.33 / 0.70 |
-| Nearest monster to the start | 697 | 300 |
-| Whole-map symmetry | 0.64 | 0.54 |
-
-It has fewer floor heights than most id maps because the reservoir is one flat pool and each pump house is one floor; symmetry is high because it's a square reservoir with a pump house off each side.
-
-### Nukage Undercurrent (`nukage_undercurrent`)
-MAP06: 118 sectors, 26/46/64 monsters on easy/medium/hard, four secrets, and the first arachnotrons. Its design doc is `levels/designs/nukage_undercurrent.md`.
-
-You cross the turbine hall on a railed gantry along its north wall, looking down at the exit door, the turbines and a floodgate across the floor. At the far end, taking the yellow key sinks the platform you're standing on into a pit of demons, and the only way back is along the hall floor, under the gantry, where arachnotrons now walk.
-
-| Measure | MAP06 | DOOM II median |
-|---|---|---|
-| Distinct floor heights | 24 | 23 |
-| Light SD / light-effect sectors | 35 / 12 | 23 / 9 |
-| Most-used wall texture | 22% | 30% |
-| Wall material changes with a border texture | 96% | 31% |
-| Optional share of the reachable area | 42% | 50% |
-| UV ammo per monster HP (pistol start) | 2.26 | 1.81 |
-| Health per 1000 monster HP | 47 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.41 / 0.72 | 0.33 / 0.70 |
-| Deaf monsters | 42% | 42% |
-| Nearest monster to the start | 511 | 300 |
-
-### Nukage Storage (`nukage_storage`)
-MAP07: 187 sectors, 30/54/75 monsters on easy/medium/hard, four secrets, and the first pain elemental.
-
-You look over a spent-fuel store from a gallery: a maze of steel casks under lit aisles, the yellow key on a blue-lit cask stack, the control tower's window high in the far wall, and blast shutters under an EXIT sign. You thread the maze at floor level to the tower, and the switch in its cab sinks every cask into the floor at once. The maze becomes an open hall, and the six mancubi sealed among the casks are standing in it, each in the nukage its cask leaked. DOOM II's own MAP07 rule opens the way out: the shutters drop when the last mancubus dies.
-
-| Measure | MAP07 | DOOM II median |
-|---|---|---|
-| Rule-1 flat changes without a height change | 3% | 3% |
-| Distinct floor heights | 33 | 23 |
-| Light SD / light-effect sectors | 25 / 10 | 23 / 9 |
-| Most-used wall texture | 30% | 30% |
-| Optional share of the reachable area | 67% | 50% |
-| Heavy-monster share (UV) | 20% | 10% |
-| UV ammo per monster HP (pistol start) | 2.4 | 1.8 |
-| Health per 1000 monster HP | 44 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.40 / 0.72 | 0.33 / 0.70 |
-| Nearest monster to the start | 488 | 300 |
-| Whole-map symmetry | 0.59 | 0.54 |
-
-### Nukage Lockdown (`nukage_lockdown`)
-MAP08: 120 sectors, 33/53/72 monsters on easy/medium/hard, four secrets, and the first arch-vile. Its design doc is `levels/designs/nukage_lockdown.md`, with the playtest results; the route script is `levels/playtests/nukage_lockdown.playtest`.
-
-You start in a locked-down lobby looking through a window at the exit switch under its EXIT sign, and the only way out leads away from it. The route circles the plant's nukage spill basin, through buildings on its banks, past the burst storage tank pouring nukage down a channel into it, and closes by wading the basin in a radiation suit, through the drainage culvert into the decontamination hall where the arch-vile waits. Every lockdown shutter opens only from its far side.
-
-| Measure | MAP08 | DOOM II median |
-|---|---|---|
-| Distinct floor heights | 25 | 23 |
-| Light SD / light-effect sectors | 25 / 15 | 23 / 9 |
-| Most-used wall texture | 27% | 30% |
-| Wall material changes with a border texture | 99% | 31% |
-| Optional share of the reachable area | 43% | 50% |
-| UV ammo per monster HP (pistol start) | 2.30 | 1.81 |
-| Health per 1000 monster HP | 45 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.44 / 0.70 | 0.33 / 0.70 |
-| Deaf monsters | 100% | 42% |
-| Nearest monster to the start | 304 | 300 |
-| Whole-map symmetry | 0.70 | 0.54 |
-
-Symmetry is high because the loop runs round a square basin; each bank is its own material, height and light.
-
-### Nukage Meltdown (`nukage_meltdown`)
-MAP09, the last map: 137 sectors, 40/63/84 monsters on easy/medium/hard, four secrets, and the Cyberdemon. Its design doc is `levels/designs/nukage_meltdown.md`, with the playtest results; the route script is `levels/playtests/nukage_meltdown.playtest`. Its exit opens only when the Cyberdemon dies, which needs a port that reads UMAPINFO (see [Compatibility](#compatibility)); those ports also show an end text after it and then the cast call. The end text is the `intertext` list in the module's `UMAPINFO`.
-
-From the operations balcony at the start you see the whole map: the plant's outfall runs down a canyon in four terraced shelves, each pond pouring over a railed lip onto the next, down to the reactor's cooling lake and the cracked dome in it. Something huge is down there: you hear it more than see it. You go down shelf by shelf, through the buildings at each bank's end, drop through a breach in the third shelf, open the floodgate from the gatehouse and ride the dam's falls into the lake, where the Cyberdemon wades. As you land, the dome's hatch opens, and the arch-vile is waiting in the exit alcove at its back.
-
-| Measure | MAP09 | DOOM II median |
-|---|---|---|
-| Distinct floor heights | 35 | 23 |
-| Light SD / light-effect sectors | 40 / 10 | 23 / 9 |
-| Wall material changes with a border texture | 92% | 31% |
-| Optional share of the reachable area | 59% | 50% |
-| UV ammo per monster HP (pistol start) | 2.23 | 1.81 |
-| Health per 1000 monster HP | 47 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.48 / 0.75 | 0.33 / 0.70 |
-| Deaf monsters | 91% | 42% |
-| Nearest monster to the start | 667 | 300 |
-| Whole-map symmetry | 0.78 | 0.54 |
-
-Symmetry is high because the shelves are full-width bands across one canyon; the buildings at their ends alternate sides, and the lake round the dome is open.
-
-## The level builder
-
-`levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All nine maps in `NUKAGE.WAD` came out of it, and the [decompiler](#decompiling-existing-maps) turns any Doom-format map back into this form.
-
-### Building a map
-
-Run from the repo root:
-
-```sh
-python3 -m levels nukage_outskirts         # check, then write MAP01 into wads/NUKAGE.WAD
-python3 -m levels nukage_crossing          # same for MAP02
-python3 -m levels nukage_core              # same for MAP03
-python3 -m levels nukage_divided            # same for MAP04
-python3 -m levels nukage_drain              # same for MAP05
-python3 -m levels nukage_undercurrent       # same for MAP06
-python3 -m levels nukage_storage            # same for MAP07
-python3 -m levels nukage_lockdown           # same for MAP08
-python3 -m levels nukage_meltdown           # same for MAP09
-python3 -m levels nukage_outskirts --check # check only
-```
-
-From Python: `from levels import build, nukage_outskirts; build(nukage_outskirts)`. A build replaces only its own map slot and `UMAPINFO` entry, so several levels can share one WAD.
-
-Requirements:
-- **Python 3.10+**, standard library only.
-- **ZDBSP** to build nodes, blockmap and reject. The default is the copy bundled with [Ultimate Doom Builder](https://github.com/UltimateDoomBuilder/UltimateDoomBuilder), at `/usr/lib/ultimate-doom-builder/Compilers/Nodebuilders/zdbsp` (Arch: `chaotic-aur/ultimate-doom-builder-git`), then `zdbsp` on `PATH`. Use `--zdbsp-path PATH` (or `build(..., zdbsp=PATH)`) for any other ZDBSP binary.
-- **The IWADs** for the texture checks, the reach checks' texture heights and the measurements. Copy `.env.example` to `.env` and set `DOOM2_WAD` (and `DOOM_WAD`, Ultimate Doom, for `ExMy` maps) to their paths; a variable set in the environment overrides `.env`. Without them the texture checks are skipped with a warning.
-
-### What every build checks
-
-Findings come in two kinds. **Playability** findings fail every build:
-- Geometry: lines only meet at shared vertices. A sector outline that crosses itself, or sectors and free lines that cut through each other, is an error. A sector standing free inside another (a pedestal, a crate, a pool) is cut out of it automatically; one touching the other's outline has to be listed as a hole by hand.
-- Every thing is inside a sector with room for its height (a closed door has none), clear of walls, bars, fences and steps it can't climb, and not overlapping another monster or player on a skill they share. Thing types must exist in the map's game.
-- Progression, worked out by the reach model in `levels/reach.py` on the built map, the way the engine does it: every vanilla line action (doors, floors, ceilings, lifts, stairs, donuts, teleporters, exits, boss deaths, and a `UMAPINFO` string's `bossaction`s in place of the slot's own boss deaths), keys, and the height each moving sector can reach. A switch can be used across a thin sector within use range, but not through a closed door. The exit, every `MUST_REACH` sector and every secret must be reachable from the player start.
-- 100% kills: every monster can either be reached or walk (or fly) to somewhere the player can go, by monster rules: no keys, only plain use doors, blocked by monster-blocking lines. A sniper the player can only shoot at fails this too.
-- No softlocks: from every damaging floor the player can get onto, the exit can still be reached.
-- Every texture and flat exists in the IWAD (plus the module's `RESOURCES`), and so does a `UMAPINFO` `skytexture`.
-
-**Style** findings fail our own maps; in an imported map (`IMPORTED = True`) they are warnings:
-- Damaging floors sit lower than every neighbouring floor that isn't damaging.
-- Pictures such as switches and door faces fit their wall exactly. Bars and fences can't use textures built from overlapping patches, which vanilla draws as garbage on two-sided lines (the medusa effect).
-- The exit can be reached without a running jump. Jumps only count when the exit can't be reached any other way.
-
-Textures vanilla can't tile cleanly, and line actions or thing types that aren't vanilla, get a warning. So does anything the engine does by map slot that the map doesn't account for (`levels/checks.py` `check_slot`, from id's source and the UMAPINFO spec):
-- DOOM II's own text screens after MAP06, MAP11, MAP20 and MAP30, and after the MAP15 and MAP31 secret exits, when the map's `UMAPINFO` has no `intertext` (`intertextsecret`) of its own. `intertext = clear` turns one off; it has to be a string body, because the dict form quotes `"clear"` and ports show the word.
-- A secret exit on a slot with no secret level. Without UMAPINFO, DOOM II only routes MAP15 and MAP31 (a secret exit elsewhere reloads the map), and DOOM sends every secret exit to ExM9, which returns to the map after id's own secret exit. With a `UMAPINFO` entry, a secret exit with no `nextsecret` goes where the normal exit does.
-- Boss deaths. The slot's built-in rule (E1M8, E2M8, E3M8, E4M6, E4M8, MAP07) or a `bossaction` in its place: a `bossaction` that drops a built-in rule the map's tagged sectors relied on, a built-in rule on a tag a line also uses, E2M8/E3M8 ending the level on the boss's death when the map has its own exit, and a boss death that is the only way to move its sectors (or end the level) while the monster is missing on some skill. The reach model plays UV only, so that last case isn't caught elsewhere.
-
-A module can list the playability findings and warnings it accepts in `KNOWN_ISSUES`: the build fails only on findings not on the list, doesn't print listed warnings, and says `fixed:` for listed entries that no longer occur.
-
-Every build also prints:
-- A balance report for each skill: monster health against ammo damage, health and armor.
-- The sky, for a map that shows one, and where it comes from: the `UMAPINFO` `skytexture`, or the slot's default (DOOM II: `SKY1` for MAP01–MAP11, `SKY2` for MAP12–MAP20, `SKY3` from MAP21; DOOM: one per episode). Moving a map across MAP11/MAP12 or MAP20/MAP21 changes its sky unless it sets one. Vanilla `doom2.exe` only sets the sky when a game starts, so there it never changes in play.
-- The research measurements (`levels/measure.py`, using `scripts/metrics/`): floor heights, lighting, texture variety, border textures, symmetry, optional area, secrets, monster mix, ammo and health, skill ratios and distance to the nearest monster, each beside the median and interquartile range of id's maps for that game and flagged `below` or `above` it. Then the balance along the route (`levels/balance.py`, design in `docs/balance-metrics.md`), with no bot: the reach model's critical path split into legs (one per required key or trigger), the monsters each leg engages (on the path, able to walk to it, or able to shoot it from within 1024 units), and two ammo curves leg by leg with carry caps: *thorough* (every reachable item) and *detour* (items within a 1024-unit round trip off the path, secrets excluded), plus health at the median id map's cost per monster HP, the long-range hitscan peak, side rooms, the monster HP each trap on the route releases against the ammo in hand, and monsters that can shoot the start. These are warnings judged against the id maps, never errors: a quarter of id's maps run short on the thorough curve too. Rule-1 slips (a floor texture change with no height change) are listed by sector pair, and rule-2 seams (two wall textures meeting in one plane with no border texture such as `SUPPORT3`, `DOORTRAK` or `LITE5` between them) by sector, texture pair and one junction's coordinates. This takes a couple of seconds.
-- A top-down SVG preview, `wads/<WAD stem>-<MAP>.svg`: sectors shaded by floor height, special lines in red, bars and fences dashed, monsters by skill, pickups and keys.
-
-A failed check prints `ERROR:` lines and stops the build before the WAD is touched. The preview is still written, so you can see what went wrong.
-
-### Writing a level
-
-A level is a module of plain data: `MAP`, `WAD`, `SECTORS`, `THINGS`, `SPECIAL_BETWEEN`, `SPECIAL_WALLS`, `FREE_LINES`, `MUST_REACH`, … To start a new one, copy `levels/nukage_junction.py`. `MAP` also picks the game: `E1M1`-style slots are Ultimate Doom, `MAP01`-style DOOM II. `WAD` may name a subdirectory of `wads/`.
-
-Sectors are polygons: outer loops, holes that other sectors fill, and solid `pillars`. Whether a loop is an outer loop or a hole follows from nesting, so one sector can be several separate areas, as in many id maps. A hole's edges with no sector across become walls; a hole no sector touches at all is an error (make it a pillar). Edges that two sectors share become two-sided lines; the rest become walls. Texture x offsets follow each sector's outline, so patterns run continuously along a wall (`X_OFFSETS = "zero"` writes 0 instead, as id mostly did), and the wall above or below an opening uses the room's own texture. The exception is secret doors (`SECRET_DOORS`): their faces are shifted off the wall pattern by `SECRET_HINT` (16 across, 8 down) as the classic clue. Pass a `{name: (x, y)}` dict instead to pick offsets per door, with `(0, 0)` for a seamless door.
-
-Lines that aren't sector edges go in `FREE_LINES`, keyed by their two endpoints: `{((384, 32), (384, 480)): Special(W1_DOOR_OPEN, 5)}` is a walk-over trigger across the middle of a room, so you don't have to split the room into two sectors for it. Give a `Special` a `texture` to hang bars or a fence: on a free line it stands inside one room (`Special(texture="MIDGRATE")`). In `SPECIAL_BETWEEN` it fills every opening between two sectors, such as bars between a cage and the room around it. These lines are impassable, and the texture stands on the floor. A free fence doesn't split its sector for the progression check, so to wall off part of a room with bars, make that part its own sector.
-
-Helpers in `levels/model.py` build the common shapes. `doorway()` makes a door with optional recesses, plus its use action. Each recess is dressed for the room it opens into: `alcove_wall`/`alcove_flat`/`alcove_ctex` for the near one, `far_wall`/`far_flat`/`far_ctex` for the far one (each defaulting to the near one's), and `door()`'s `flat` sets the threshold, so floors can match the rooms (Romero's rule 1: floor texture changes only with a height change). A door face is a picture that must fit its wall, so a room taller than the face (128 for `BIGDOOR*`, 72 for `EXITDOOR`) needs a recess that tall on its side of the door: `alcove` before it, `far_alcove` after it. The doorway runs `alcove + thickness + far_alcove` from its wall. `stairs()` makes a run of steps. `lift()` makes a lift used (`SR_LIFT`) from below and from its top; `walk_on=True` makes it lower when walked onto from the top instead (`WR_LIFT`), which monsters can set off and ride too.
-
-There are helpers for the rooms most maps repeat, sized so they pass the texture checks:
-- `closet()`: a monster closet behind a door disguised as the wall, opened only by its tag.
-- `pedestal()`: a glowing, metal-sided pedestal for a key or item. Stand it clear of the walls and the build cuts it out of the room. Put a W1 trigger on its edge in `SPECIAL_BETWEEN` to spring a trap when the item is taken.
-- `switch_niche()`: a recess whose back wall is a switch, sized to the switch picture (64 × 128, or 32 × 72 for `SW1EXIT`). It returns the sector and the `SPECIAL_WALLS` entry for the switch. Make it deep (a booth) to fire a W1 trigger on its entrance just before the switch is used.
-- `lit_ledge()`: a brightly lit ledge with an unlit strip against the wall behind it, so the wall isn't lit up too.
-- `window()`: an opening between rooms. Walking monsters can't climb a sill more than 24 above their floor, and fliers need at least 56 of height.
-
-Floors can move both ways for the progression check: the lowering actions (`S1_FLOOR_LOWEST` and kin) drop a tagged floor to its lowest neighbour, and the raise actions lift it to the next higher neighbouring floor, so a rising bridge stops level with the nearest higher floor around it. The raise-and-change actions (`S1_RAISE_CHANGE` and kin) take the floor texture of the trigger line's front sector and clear the sector's special, which dries a walkway raised out of nukage (MAP05 does this), but they move at 0.5 units a tic: 96 units take 5.5 s. The fast raises (`S1_FLOOR_NEXT_FAST` and kin) move at 4 units a tic and keep the floor's texture and special, so use them for bridges out of a pit or the dark.
-
-Anything the builder infers can be overridden line by line in `OVERRIDES`, keyed by a line's two endpoints with its front on the right going from the first to the second: `{((1088, -3648), (1024, -3648)): Line(flags=ML_BLOCKING | ML_BLOCKMONSTERS, front=Side(mid="COMPSTA2", x=16))}`. Only the fields given replace the builder's choice (a picture such as a switch or sign set without `x` starts at x offset 0; a new `lower` on a step whose riser the builder unpegged to line up with the room's walls is pegged to the step's top again, so a switch on a console face starts at the console's top, unless the override gives `flags`); a key that matches no line is an error. Decompiled maps use this for every difference from what the builder would make.
-
-`Thing` skills are any of `e`, `m`, `h`, plus `a` for ambush (deaf) and `n` for multiplayer only; `extra` holds other flag bits. `RESOURCES` lists PWADs whose textures, flats and patches the checks and measurements load after the IWAD (for remixes of community maps; they aren't copied into the built WAD).
-
-### Agent skills
-
-Three skills in `.omp/skills/` (linked as `.claude/skills/` for Claude Code) take an agent through a new map in order, each ending where the next begins:
-
-- `doom-design`: pitch five structurally different concepts, pick one, and write a design doc to `levels/designs/<module>.md` (route, sketch, materials, secrets, measurement targets).
-- `doom-build`: turn the doc into a level module that builds clean and matches it, with the builder's known gotchas.
-- `doom-test`: route script, wiring run, screenshots, and combat-bot runs on three seeds, with each death cluster called as a map or bot problem.
-
-They came out of four timed rounds of agents building maps from scratch: the six maps in `SPEEDY1.WAD`, built from feature checklists, all came out as the same hub with a wing per key, while the six in `SPEEDY2.WAD`, each built around a layout idea, didn't.
-
-Agents choose textures by name unless they can see them, which is how a map ends up a collage. `scripts/tools/texture_sheets.py` renders the IWAD's wall textures (grouped into families by name, border textures labelled in yellow) and flats onto contact sheets in `/tmp/texture-sheets/<iwad>/`, with an `index.txt` of which sheet holds which family. The design skill has the agent look at them before writing the doc's materials plan:
-
-```sh
-uv run --with pillow scripts/tools/texture_sheets.py            # DOOM2_WAD from .env; --iwad for another
-```
-
-### Code layout
-
-- `levels/model.py`: the dataclasses levels are written in (`Sector`, `Special`, `Thing`, `Line`, `Side`) and the shape helpers.
-- `levels/mapgen.py`: `build()` and `compile_level()`, which turn sectors into lines and sides and place textures. Its docstring describes the level format.
-- `levels/checks.py`: the checks and the balance report. `levels/reach.py`: the reach model, shared with the research scripts. `levels/measure.py`: the sector-overlap check, rule-1 slips and the research measurements. `levels/balance.py`: the resource curve and exposure checks along the route.
-- `levels/decompile.py`: the decompiler. `levels/wadmap.py`: reads maps from WADs.
-- `levels/preview.py`: the SVG preview. `levels/wad.py`: WAD reading and writing, IWAD paths from `.env`.
-- `levels/doom2.py`: every DOOM and DOOM II thing type, monster sizes and health, pickups, line actions and sector specials.
-- `tests/`: `uv run --with pytest pytest`. Tests that need an IWAD skip when it isn't set.
-
-### Decompiling existing maps
-
-`levels/decompile.py` turns maps from any Doom-format WAD into level modules, so id's maps can serve as worked examples, existing maps can be remixed in Python, and every check and measurement above can run on any map:
-
-```sh
-python3 -m levels.decompile doom2 MAP01        # from the DOOM2_WAD in .env -> levels/imported/doom2_map01.py
-python3 -m levels.decompile doom               # every map in DOOM_WAD
-python3 -m levels.decompile wads/NUKAGE.WAD    # any PWAD
-python3 -m levels imported.doom2_map01 --check # check and measure it; without --check, build it into wads/imported/
-python3 -m levels.decompile doom2 --verify     # rebuild each map and compare it with the original
-```
-
-Modules go to `levels/imported/` and their builds to `wads/imported/`. Both are gitignored: id's map data is never committed, so make them from your own IWADs.
-
-A decompiled module is minimal-diff: what the builder would infer anyway (sector outlines, wall and step textures, doors, lifts, door actions, `SPECIAL_BETWEEN`, `SPECIAL_WALLS`) is ordinary module data, and only the rest is written as `OVERRIDES`. Sectors are named by role and original number (`room_5`, `door_12`, `lift_40`, `secret_83`, `nukage_7`), matching the sector numbers walkthroughs use. The docstring gives the map's title, monsters per skill, keys, secrets and check findings, and, if `research/data/` is there, its designers, reception and the measurements furthest from the medians. The original's playability findings become its `KNOWN_ISSUES`, and `IMPORTED = True` makes style findings warnings, so an unchanged map builds and a remix can't quietly add new problems.
-
-Building a decompiled module gives back the same map: the same sectors, things, actions, flags, textures and offsets; only line order and where a straight wall is split into lines may differ. `--verify` proves it for each map and exits 1 on any difference. Sectors whose outlines don't close in the original (16 of id's 68 maps have some) are repaired with the fewest edits that close them, when that set of edits is unique, each noted in a `# repaired:` comment; otherwise the map is refused. Hexen-format and UDMF maps are refused.
-
-### Playtests
-`levels/playtests/<module>.playtest` scripts walk each map's intended route: doors, switches, lifts, key traps, secrets and the exit, checking floor and ceiling heights after each trigger. The runner, `scripts/tools/playtest.py`, plays them in [ViZDoom](https://vizdoom.farama.org/), a ZDoom-based engine packaged as a Python library. It drives the player with real inputs as fast as the machine runs the game, with god mode on and no window, so a whole route takes 4–10 seconds. Screenshots go to `/tmp/playtest-shots/<MAP>/`. The IWAD is `DOOM2_WAD` from `.env`; override with `--iwad` (for example with your `DOOM.WAD` for a decompiled `ExMy` map).
-
-ViZDoom comes from Michał Kempka, Marek Wydmuch, Grzegorz Runc, Jakub Toczek and Wojciech Jaśkowski ([paper](https://arxiv.org/abs/1605.02097)), is maintained by the [Farama Foundation](https://github.com/Farama-Foundation/ViZDoom), and is built on [ZDoom](https://zdoom.org). It was made for research into AI that learns to play Doom from the screen, and the same hooks make playtesting simple. Python advances the game one tic at a time, so the runner steers like a player and checks as it goes; the GZDoom runner before it compiled each script to ZScript and played it in real time on a hidden X display. The runner reads the game's state straight from the engine: the player's position, health and ammo, every sector's floor and ceiling (`expect floor`, `expect ceil`), and every monster and item, which is how `expect has` sees a key taken and how the `--fight` bot finds monsters and pickups without any training. Saves give `checkpoint`, console commands give god mode, `give`, `killall` and `teleport`, seeds make a fight repeatable, recordings with the screen and sound buffers give `--replay` and `--video`, and ZDoom's compatibility settings give the vanilla rules described below.
-
-ViZDoom isn't needed to build maps, so it isn't a requirement of the builder. `uv run --with vizdoom` fetches it into a cached environment the first time:
-
-```sh
-uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 levels/playtests/nukage_crossing.playtest
-uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP05 levels/playtests/nukage_drain.playtest --from pump3
-python3 scripts/tools/playtest.py wads/NUKAGE.WAD MAP02 --describe   # start, keys, special lines
-```
-
-Scripts say where to go, not how to get there: `walk X Y` finds its own way round walls, solid things, steps too high to climb and closed doors, avoiding damaging floors when it can, and `open` and `use` walk up to their line first. A script can mark `checkpoint NAME` steps; `--from NAME` resumes from the save the last full run made there, as long as the WAD, map, skill and every step before it are unchanged. The script language is in the runner's docstring.
-
-With `--fight` the same scripts test balance instead: god mode is off and a bot fights its way along the route, picking up health and ammo when it's low. Each death is counted, with where, when and a label (`hazard`, `starved`, `unseen`, `stuck` or `combat`), and the run carries on. A step the bot gets stuck on, or 3 deaths in one spot within 30 s, is listed as skipped and the bot is warped to where the step was going, and `--max-time` (default 15 game minutes) caps the run, so a fight always finishes. The build's resource curve answers most balance questions faster; use fights to confirm it. It reports each section of the route with time, kills, damage taken, deaths, health and ammo fired. Runs are recorded: `--watch` shows one live in a window, `--replay` plays the last one back (pass the same `--seed`), and `--replay --video FILE.mp4` renders it with sound (`--hd` for 1080p). The bot is a weaker player than a person and its results vary with `--seed`, so try several seeds and check the footage before blaming the map.
-
-```sh
-uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP03 levels/playtests/nukage_core.playtest --fight --seed 2
-uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP03 --replay --seed 2                  # watch it
-uv run --with vizdoom scripts/tools/playtest.py wads/NUKAGE.WAD MAP03 --replay --seed 2 --video run.mp4  # needs ffmpeg
-```
-
-The runner turns on ZDoom's strict Doom compatibility, so a pass shows the map's wiring works under vanilla rules as far as ZDoom can follow them: the player can only use a line from its front side, pressing use stops at the first line with an action (so a walk-over trigger just in front of a door or switch blocks it), and monsters are infinitely tall. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
-
-## Research: what makes DOOM levels fun
-Nukage Crossing and the maps after it were designed from a research report on the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It drew on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. The report quotes its sources at length, so it isn't published here; the measurement scripts are.
-
-The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs to `research/data/`. They read the v1.9 IWADs set by `DOOM_WAD` (Ultimate Doom) and `DOOM2_WAD` in `.env`. Run them from the repo root:
-
-```sh
-python3 scripts/metrics/space_metrics.py        # -> research/data/metrics_space.csv (about 2 minutes)
-python3 scripts/metrics/combat_metrics.py       # -> research/data/metrics_combat.csv
-python3 scripts/metrics/progression_metrics.py  # -> research/data/metrics_progression.csv; pass a slot (E1M7) to dump one map
-python3 scripts/metrics/route_metrics.py        # -> research/data/metrics_route.csv (balance along the route; about 40 s); pass a slot for its report
-```

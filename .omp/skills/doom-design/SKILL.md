@@ -10,7 +10,7 @@ A map is remembered by its **shape**: a descent, a tower around a shaft, a canyo
 ## 1. Read
 
 - `research/REPORT.md` (gitignored, present locally): "The short version" (line 14), Part 2 sections that bear on your idea, "Part 4: Anti-patterns checklist" (line 459), "Part 6" (line 493).
-- `README.md` "Included WAD" sections and `SPOILERS.md`: the maps that already exist, so yours differs from them.
+- `docs/maps.md` and `SPOILERS.md`: the maps that already exist, so yours differs from them.
 - For the target WAD, every map already in it (its module's docstring and `wads/<WAD stem>-<MAP>.svg` preview).
 - The texture contact sheets: `uv run --with pillow scripts/tools/texture_sheets.py`, then `/tmp/texture-sheets/doom2/index.txt` and the sheets (`read` the PNGs) for the families your theme suggests. Pick textures from what they look like, not from their names.
 

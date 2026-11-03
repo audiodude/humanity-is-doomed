@@ -7,7 +7,7 @@ Prove the map plays: the intended route works end to end, and a fight through it
 
 Balance is answered first from the map itself: `build()` prints a resource curve and exposure warnings along the route (`levels/balance.py`, design and calibration in `docs/balance-metrics.md`), deterministic and in seconds. The fight bot confirms it; it is a weaker player than a person, so where it and the curve disagree, the curve wins unless the footage shows a real map problem.
 
-The runner is `scripts/tools/playtest.py`; its docstring is the script language and option reference, and `README.md` "Playtests" shows the commands. ViZDoom comes from `uv run -q --with vizdoom`, never system Python. Run headless (no `--watch`).
+The runner is `scripts/tools/playtest.py`; its docstring is the script language and option reference, and `docs/builder.md` "Playtests" shows the commands. ViZDoom comes from `uv run -q --with vizdoom`, never system Python. Run headless (no `--watch`).
 
 ## 1. Route script
 
