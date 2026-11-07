@@ -38,7 +38,6 @@ walk 1376 544
 walk 1440 576
 walk 1536 680
 expect secrets == 2
-expect has Chaingun
 walk 1440 576
 walk 1152 512
 

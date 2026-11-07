@@ -23,7 +23,7 @@ the forecourt, closing a loop through the station.
 
 Secrets: a shifted panel between light strips in the guard hut (green
 armor); the lit ledge above the toppled container, reached by climbing the
-crate and the container (chaingun); a shifted locker between light strips in
+crate and the container (shells); a shifted locker between light strips in
 the locker room (backpack); the glowing island in the spill (soulsphere).
 """
 from .doom2 import *  # noqa: F403 - thing types, actions, sector specials
@@ -324,7 +324,7 @@ THINGS = [Thing(*t) for t in [
     (ZOMBIE, 448, 1024, 90, "emh"), (ZOMBIE, 192, 960, 90, "h"),
     (IMP, 640, 1216, 90, "emh"), (IMP, 896, 1216, 90, "mh"),
     (STIM, 1088, 832), (SHELLS, 1248, 448),
-    (CHAINGUN, 1504, 680), (CLIP, 1568, 680),                                          # secret 2
+    (SHELLS, 1504, 680), (CLIP, 1568, 680),                                            # secret 2
     # loading yard: 2 imps (1, 1) on the dock, a shotgun guy (1, 0) in the yard
     (IMP, 1632, 1952, 270, "emha"), (IMP, 1632, 2160, 270, "ha"),
     (SARGE, 1920, 1792, 180, "mh"),

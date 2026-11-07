@@ -14,7 +14,7 @@ You start in a sunlit valley below a hillside cut into switchback shelves, with 
 | Most-used wall texture | 33% | 30% |
 | Wall material changes with a border texture | 99% | 31% |
 | Optional share of the reachable area | 47% | 50% |
-| UV ammo per monster HP (pistol start) | 2.66 | 1.81 |
+| UV ammo per monster HP (pistol start) | 2.70 | 1.81 |
 | Health per 1000 monster HP | 83 | 40 |
 | Easy/UV and HMP/UV monster ratios | 0.39 / 0.71 | 0.33 / 0.70 |
 | Deaf monsters | 39% | 42% |
