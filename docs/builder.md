@@ -62,6 +62,8 @@ Sectors are polygons: outer loops, holes that other sectors fill, and solid `pil
 
 Lines that aren't sector edges go in `FREE_LINES`, keyed by their two endpoints: `{((384, 32), (384, 480)): Special(W1_DOOR_OPEN, 5)}` is a walk-over trigger across the middle of a room, so you don't have to split the room into two sectors for it. Give a `Special` a `texture` to hang bars or a fence: on a free line it stands inside one room (`Special(texture="MIDGRATE")`). In `SPECIAL_BETWEEN` it fills every opening between two sectors, such as bars between a cage and the room around it. These lines are impassable, and the texture stands on the floor. A free fence doesn't split its sector for the progression check, so to wall off part of a room with bars, make that part its own sector.
 
+`SOUND_BETWEEN` lists pairs of sector names whose shared lines block sound (`ML_SOUNDBLOCK`, added to whatever else the line has). Sound stops at the second flagged line it crosses, so flagging the lines between neighbouring zones of an open map keeps a shot from waking more than its own zone and the next: `[("terrace", "par_w_s"), ("par_w_s", "gal_w")]`. See [docs/monster-alerting.md](monster-alerting.md).
+
 Helpers in `levels/model.py` build the common shapes. `doorway()` makes a door with optional recesses, plus its use action. Each recess is dressed for the room it opens into: `alcove_wall`/`alcove_flat`/`alcove_ctex` for the near one, `far_wall`/`far_flat`/`far_ctex` for the far one (each defaulting to the near one's), and `door()`'s `flat` sets the threshold, so floors can match the rooms (Romero's rule 1: floor texture changes only with a height change). A door face is a picture that must fit its wall, so a room taller than the face (128 for `BIGDOOR*`, 72 for `EXITDOOR`) needs a recess that tall on its side of the door: `alcove` before it, `far_alcove` after it. The doorway runs `alcove + thickness + far_alcove` from its wall. `stairs()` makes a run of steps. `lift()` makes a lift used (`SR_LIFT`) from below and from its top; `walk_on=True` makes it lower when walked onto from the top instead (`WR_LIFT`), which monsters can set off and ride too.
 
 There are helpers for the rooms most maps repeat, sized so they pass the texture checks:
@@ -147,3 +149,10 @@ uv run --with vizdoom scripts/tools/playtest.py nukage_tower --replay --seed 2 -
 ```
 
 The runner turns on ZDoom's strict Doom compatibility, so a pass shows the map's wiring works under vanilla rules as far as ZDoom can follow them: the player can only use a line from its front side, pressing use stops at the first line with an action (so a walk-over trigger just in front of a door or switch blocks it), and monsters are infinitely tall. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
+
+`scripts/tools/wake.py` answers a narrower question with the same engine: which monsters one shot wakes. It starts the map fresh for each spot you give, warps there, fires once, waits (`--seconds`, default 10) and lists every monster that moved. With no spot it fires from the start. Use it after zoning a map with `SOUND_BETWEEN` (see [docs/monster-alerting.md](monster-alerting.md)):
+
+```sh
+uv run --with vizdoom scripts/tools/wake.py nukage_tower 0,600 -672,1400   # the terrace, then the west gallery
+uv run --with vizdoom scripts/tools/wake.py wads/NUKAGE.WAD MAP03            # from the start
+```

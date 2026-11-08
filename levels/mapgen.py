@@ -23,6 +23,11 @@ maps, MAPxx DOOM II; level.game picks the IWAD the checks use).
                     or {name: (x, y)} to pick offsets, (0, 0) = seamless
                                                                      [optional]
     MUST_REACH      sector names the progression check must reach    [optional]
+    SOUND_BETWEEN   (sector_name, sector_name) pairs whose shared lines
+                    get the sound-blocking flag, on top of their other
+                    flags (OVERRIDES included). Sound stops at the second
+                    flagged line it crosses (docs/monster-alerting.md)
+                                                                     [optional]
     UMAPINFO        {key: value} for the map's UMAPINFO entry, values
                     written quoted; or a string, the entry's body between
                     the braces written as it is (unquoted values, lists,
@@ -83,7 +88,7 @@ from dataclasses import dataclass
 
 from .checks import balance_report, findings, level_textures, slot_sky
 from .doom2 import ACTORS, PLAYERS, SR_LIFT, WR_LIFT, is_decal
-from .model import (ALL, DOOR, LIFT, ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, ML_SECRET,
+from .model import (ALL, DOOR, LIFT, ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, ML_SECRET, ML_SOUNDBLOCK,
                     ML_TWOSIDED, NO_TEX, ROOM, ROOT, SKY, LevelError, Linedef, Sidedef, dist, edges,
                     floor_movers, floor_range, load, on_segment, oriented, sector_at)
 from .measure import measure
@@ -327,15 +332,28 @@ class Compiled:
 
 
 def compile_level(level) -> Compiled:
-    """Build the level's lines, specials and sides, apply its OVERRIDES, and
-    pack its map lumps. Raises LevelError."""
+    """Build the level's lines, specials and sides, apply its OVERRIDES and
+    SOUND_BETWEEN, and pack its map lumps. Raises LevelError."""
     lines = build_lines(level)
     assign_specials(level, lines)
     movers = floor_movers(lines)
     ranges = {s: floor_range(s, lines, movers) for s in level.sectors.values()}
     sides = [line_sides(l, level.secret_doors, ranges, level.x_offsets) for l in lines]
     apply_overrides(level, lines, sides)
+    block_sound(level, lines)
     return Compiled(lines, sides, map_lumps(level, lines, sides))
+
+
+def block_sound(level, lines):
+    """Set ML_SOUNDBLOCK on every line between each SOUND_BETWEEN pair."""
+    pairs = {frozenset(p): p for p in level.sound_between}
+    hit = set()
+    for l in lines:
+        if l.back is not None and l.back is not l.front and (k := frozenset((l.front.name, l.back.name))) in pairs:
+            l.flags |= ML_SOUNDBLOCK
+            hit.add(k)
+    if missing := [pairs[k] for k in pairs.keys() - hit]:
+        raise LevelError(f"SOUND_BETWEEN pairs that share no line: {missing}")
 
 
 def build(module, check_only=False, wad=None, slot=None, zdbsp=None):

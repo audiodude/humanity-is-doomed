@@ -37,5 +37,6 @@ A monster attacks only along a line of sight, and its chance to fire falls off w
 ## Support in the level generator (`levels/`)
 
 - `levels/model.py`: adding `"a"` to a `Thing`'s `skills` sets the Ambush flag.
-- `ML_SOUNDBLOCK` (from `levels/model.py`) goes on lines through `OVERRIDES`, whose `flags` replaces the line's whole flags word: give the flags the builder would have set plus `ML_SOUNDBLOCK` (two-sided `ML_TWOSIDED`; a railing also `ML_BLOCKING | ML_DONTPEGBOTTOM`). MAP08's windows and MAP09's dam and islands do this.
-- The build doesn't model sound: no check catches a crowd of ambush monsters woken by one shot. Test it in the engine: fire from a spot on the route and see which monsters move.
+- `SOUND_BETWEEN` in a level module lists sector pairs whose shared lines get `ML_SOUNDBLOCK`, on top of whatever flags the builder or `OVERRIDES` gave them (`levels/mapgen.py`). Zone a map with it: flag the lines between each pair of neighbouring zones, and a shot wakes its own zone and the next one, not the one after. MAP03 (Tower) does this.
+- `ML_SOUNDBLOCK` (from `levels/model.py`) can also go on single lines through `OVERRIDES`, whose `flags` replaces the line's whole flags word: give the flags the builder would have set plus `ML_SOUNDBLOCK` (two-sided `ML_TWOSIDED`; a railing also `ML_BLOCKING | ML_DONTPEGBOTTOM`). MAP07's windows and MAP08's dam and islands do this.
+- The build doesn't model sound: no check catches a crowd of ambush monsters woken by one shot. Test it in the engine with `scripts/tools/wake.py`: it fires once from each spot you give (a fresh start of the map each time), waits, and lists the monsters that moved: `uv run --with vizdoom scripts/tools/wake.py nukage_tower 0,600 -672,1400`.

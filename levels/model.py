@@ -164,6 +164,7 @@ class Level:
     free_lines: dict[tuple[Point, Point], Special]
     secret_doors: dict[str, tuple[int, int]]
     must_reach: list[str]
+    sound_between: list[tuple[str, str]]
     umapinfo: dict[str, str] | str
     overrides: dict[tuple[Point, Point], Line] = field(default_factory=dict)
     imported: bool = False
@@ -220,6 +221,7 @@ def load(module, place=None) -> Level:
         free_lines=dict(getattr(module, "FREE_LINES", {})),
         secret_doors=secret_door_offsets(getattr(module, "SECRET_DOORS", ())),
         must_reach=list(getattr(module, "MUST_REACH", ())),
+        sound_between=[tuple(p) for p in getattr(module, "SOUND_BETWEEN", ())],
         umapinfo=info,
         overrides=dict(getattr(module, "OVERRIDES", {})),
         imported=bool(getattr(module, "IMPORTED", False)),
@@ -229,7 +231,8 @@ def load(module, place=None) -> Level:
         x_offsets=getattr(module, "X_OFFSETS", "continuous"),
     )
     cut_free_standing(list(sectors.values()))
-    named = {n for pair in level.special_between for n in pair} | set(level.secret_doors) | set(level.must_reach)
+    named = ({n for pair in level.special_between for n in pair} | set(level.secret_doors) | set(level.must_reach)
+             | {n for pair in level.sound_between for n in pair})
     if unknown := named - sectors.keys():
         raise LevelError(f"unknown sector names: {sorted(unknown)}")
     if bad := [k for k, v in level.overrides.items() if not isinstance(v, Line)]:
