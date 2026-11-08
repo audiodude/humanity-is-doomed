@@ -33,7 +33,7 @@ expect ceil -1160 1216 > 64        # the closet behind you opened
 # Secret 2: wade in through the intake and along the canal to the ledge.
 walk -1024 1500 -1024 1424 -960 1300 -930 1216 -700 1216 -400 1216 -300 1216 -32 1300 -64 1376
 expect secrets == 2
-expect has RocketLauncher
+expect has SuperShotgun
 walk -32 1300 -300 1216 -400 1216 -700 1216 -930 1216 -1024 1424 -1024 1740 -500 1740 -444 1664
 expect floor -444 1664 == 16       # back up the intake steps
 

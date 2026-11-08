@@ -302,27 +302,28 @@ THINGS = [Thing(*t) for t in [
     (SARGE, -1024, 1216, 270, "mha"),
     (IMP, -1024, 1696, 0, "emha"), (IMP, -544, 1744, 180, "mha"),
     (CHAINGUY, -576, 1600, 180, "ha"), (SARGE, -576, 1600, 180, "ma"),
-    (CHAINGUN, -960, 896), (SHELLS, -1056, 864), (MEDI, -512, 1000),
+    (CLIP, -960, 896), (SHELLS, -1056, 864), (MEDI, -512, 1000),   # no chaingun pickup: only chaingunners drop one
     (RADSUIT, -960, 1088), (STIM, -1088, 1344), (SHELLS, -1088, 1504), (CLIP, -512, 1472),
     (BLUEKEY, -768, 1632),
     # pump hall closet (opens when you step onto the blue key's pedestal)
     (DEMON, -1232, 1152), (DEMON, -1232, 1280, 0, "mh"), (IMP, -1200, 1216, 0, "mh"),
     (SPECTRE, -1296, 1216, 0, "h"),
-    # canal ledge (secret 2)
-    (LAUNCHER, -64, 1376), (ROCKETBOX, 16, 1376),
+    # canal ledge (secret 2): the super shotgun, and rockets to carry on to MAP03's launcher
+    (SSG, -64, 1376), (ROCKETBOX, 16, 1376),
     # north bank
     (IMP, -128, 1520, 90, "emha"), (IMP, 32, 1520, 90, "mha"),
     (SARGE, -32, 1840, 180, "emha"), (SARGE, 96, 1760, 135, "mha"),
-    (KNIGHT, 896, 1600, 90, "mh"), (DEMON, 896, 1600, 90, "e"), (CACO, 800, 1216, 90, "h"),
+    (DEMON, 896, 1600, 90),
     (ZOMBIE, 1440, 1760, 0, "emha"), (ZOMBIE, 1600, 2000, 0, "mha"),
-    (KNIGHT, 1664, 1600, 90, "h"), (SARGE, 1696, 1760, 90, "ha"),
+    (IMP, 1664, 1600, 90, "h"), (SARGE, 1696, 1760, 90, "ha"),
     (SHELLS, -256, 1504), (CLIP, -256, 1840), (MEDI, 160, 1600), (STIM, 1088, 1600), (MEDI, 960, 1520),
     (SHELLS, 1376, 1600), (ABONUS, 960, 1744), (ABONUS, 1024, 1744), (ABONUS, 1088, 1744),
     (TECHLAMP, 1376, 2016), (TECHLAMP, 1568, 2016),
-    # tower: lobby with the super shotgun, control room with the bridge switch
-    (SSG, 464, 1792), (SHELLS, 608, 1792), (DEMON, 320, 1792, 0, "mh"),
+    # tower: lobby, control room with the bridge switch, and the map's one hell knight in the
+    # bay between the stairs, looking down into the lobby
+    (SHELLS, 464, 1792), (SHELLS, 608, 1792), (DEMON, 320, 1792, 0, "mh"),
     (ZOMBIE, 320, 1504, 90, "emha"), (ZOMBIE, 448, 1520, 0, "mha"), (SARGE, 608, 1520, 90, "ha"),
-    (IMP, 464, 1680, 90, "mh"), (SHELLS, 608, 1456),
+    (KNIGHT, 464, 1680, 270, "mh"), (SHELLS, 608, 1456),
     # pier and island (secret 3)
     (HBONUS, 448, 1280), (HBONUS, 448, 1344), (SOUL, 448, 1120),
     # filter house, and its secret closet (secret 4)
@@ -338,7 +339,7 @@ THINGS = [Thing(*t) for t in [
     (TELEPORT_DEST, 1760, 976, 0),   # gag: in front of the switch
     (MEDI, 1024, 448), (SHELLS, 1536, 480), (STIM, 1152, 880), (STIM, 1744, 576), (ROCKET, 1600, 512),
     # red-key closets: east and south of the yard, and the guardroom by the red door
-    (DEMON, 1856, 848, 180), (DEMON, 1856, 944, 180, "mh"), (KNIGHT, 1920, 896, 180, "h"),
+    (DEMON, 1856, 848, 180), (DEMON, 1856, 944, 180, "mh"), (DEMON, 1920, 896, 180, "h"),
     (IMP, 1360, 288, 90), (IMP, 1456, 288, 90, "mh"), (CHAINGUY, 1408, 240, 90, "h"),
     (SARGE, 1136, 2160, 270), (SARGE, 1232, 2160, 270, "mh"), (CHAINGUY, 1184, 2224, 270, "mh"),
     # exit

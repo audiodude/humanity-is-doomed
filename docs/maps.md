@@ -25,7 +25,7 @@ Ammo and health are generous on purpose for a first map; the secret soulsphere i
 The original MAP01, Nukage Junction (`levels/nukage_junction.py`, a courtyard hub with a wing per key), is kept in the repo but is no longer in the set: `python3 -m levels nukage_junction` builds it to `wads/scratch/nukage_junction.WAD`.
 
 ## Nukage Crossing (`nukage_crossing`)
-MAP02, designed from the [research](../README.md#research-what-makes-doom-levels-fun) below: 99 sectors, 21/43/57 monsters on easy/medium/hard, four secrets. It was retextured after the texture research (design: `levels/designs/nukage_crossing.md`): one brick for the whole canal basin, a signature material per area, and trim where materials meet. The first version's textures are kept in `levels/nukage_crossing_original.py`, which isn't built into the WAD.
+MAP02, designed from the [research](../README.md#research-what-makes-doom-levels-fun) below: 99 sectors, 21/43/56 monsters on easy/medium/hard, four secrets, one hell knight and one cacodemon; the super shotgun is its secret. It was retextured after the texture research (design: `levels/designs/nukage_crossing.md`): one brick for the whole canal basin, a signature material per area, and trim where materials meet. The first version's textures are kept in `levels/nukage_crossing_original.py`, which isn't built into the WAD.
 
 Measured with the research scripts against the DOOM II maps (median in brackets):
 
@@ -34,9 +34,9 @@ Measured with the research scripts against the DOOM II maps (median in brackets)
 | Rule-1 flat changes without a height change | 1% | 3% |
 | Distinct floor heights | 22 | 23 |
 | Light-effect sectors | 11 | 9 |
-| UV ammo per monster HP (pistol start) | 2.1 | 1.8 |
-| Health per 1000 monster HP | 58 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.37 / 0.75 | 0.33 / 0.70 |
+| UV ammo per monster HP (pistol start) | 2.60 | 1.8 |
+| Health per 1000 monster HP | 73 | 40 |
+| Easy/UV and HMP/UV monster ratios | 0.38 / 0.77 | 0.33 / 0.70 |
 | Deaf monsters | 37% | 42% |
 | Nearest monster to the start | 487 | 300 |
 | Most-used wall texture (BRICK6) | 28% | 30% |
