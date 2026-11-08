@@ -19,6 +19,9 @@ walk -288 192
 walk -448 192
 expect has Shell
 walk -96 224
+walk 640 160
+look 270
+shot guard-hut-door
 open 640 -16
 walk 640 -128
 walk 704 -256
@@ -29,14 +32,23 @@ expect has BasicArmor
 walk 640 -128
 walk 640 160
 
-# Shelf 1 east to the hairpin, the spur and secret 2 on the ledge above the container.
+# Shelf 1 east to the hairpin, the spur and secret 2: a rock door in the cliff above the container.
 walk 128 512
 walk 1152 512
 look 0 -5
 shot hairpin-ledge
 walk 1376 544
 walk 1440 576
-walk 1536 680
+walk 1536 560
+look 90 -10
+shot secret2-door
+open 1536 640
+walk 1536 560
+look 90 -10
+shot secret2-open
+walk 1536 720
+look 270 -20
+shot secret2-inside
 expect secrets == 2
 walk 1440 576
 walk 1152 512
@@ -71,9 +83,9 @@ look 180
 shot storeroom
 open 1248 2048
 walk 1180 2048
-look 180
+look 180 25
 shot instrument-room
-walk 1080 2048
+walk 1056 2016
 expect has BlueCard
 wait 70
 expect ceil 1384 2248 > 288
@@ -140,12 +152,19 @@ use 0 2560
 wait 50
 expect floor -64 2560 == 16
 
-# The pump shed, and the island across the nukage: secret 4.
+# The pump shed: secret 4 is a shifted panel whose switch lowers the island into the spill. Then across the nukage.
+expect floor 1696 3168 == 96
 open 2304 2624
 walk 2304 2512
+open 2312 2432
+walk 2312 2376
+expect secrets == 4
+use 2312 2336
+wait 140
+expect floor 1696 3168 == 0
+walk 2312 2512
 walk 1700 2720
 walk 1696 3168
-expect secrets == 4
 expect has Soulsphere
 walk 1700 2720
 
