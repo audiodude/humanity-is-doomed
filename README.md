@@ -12,7 +12,7 @@ Nine DOOM II maps that an AI wrote as Python, the level compiler it built to do 
 
 *A nuclear meltdown at a UAC power plant opens a gate to hell.*
 
-`wads/NUKAGE.WAD` is a nine-map set for DOOM II. It needs `doom2.wad` and a port that reads UMAPINFO (see [Compatibility](#compatibility)).
+`wads/NUKAGE.WAD` is an eight-map set for DOOM II. It needs `doom2.wad` and a port that reads UMAPINFO (see [Compatibility](#compatibility)).
 
 **GZDoom** (4.6 or later): drag `NUKAGE.WAD` onto the GZDoom executable, or run it from a terminal. If GZDoom finds more than one IWAD it asks which to use; pick DOOM II.
 
@@ -31,29 +31,28 @@ dsda-doom -iwad doom2 -file wads/NUKAGE.WAD            # add -warp 2 and so on f
 | Slot | Map | What happens | New monster | Monsters (easy / medium / hard) |
 |---|---|---|---|---|
 | MAP01 | [Nukage Outskirts](docs/maps.md#nukage-outskirts-nukage_outskirts) | Up a hillside to the plant's monitoring station, with the spill hidden over the ridge. The easiest map. | | 12 / 22 / 31 |
-| MAP02 | [Nukage Crossing](docs/maps.md#nukage-crossing-nukage_crossing) | A sluice gate sinks into a nukage canal to become a bridge, and demons charge across it. | | 21 / 43 / 57 |
-| MAP03 | [Nukage Divided](docs/maps.md#nukage-divided-nukage_divided) | A red furnace wing and a blue cooling wing that never meet. | baron | 23 / 43 / 56 |
-| MAP04 | [Nukage Tower](docs/maps.md#nukage-tower-nukage_tower) | Spiral up around a reactor core to the exit in its crown. | mancubus | 27 / 53 / 73 |
-| MAP05 | [Nukage Undercurrent](docs/maps.md#nukage-undercurrent-nukage_undercurrent) | Taking the yellow key sinks your platform into a pit, and the way back is under the gantry. | arachnotron, revenant | 26 / 46 / 64 |
-| MAP06 | [Nukage Drain](docs/maps.md#nukage-drain-nukage_drain) | Pump-house switches raise walkways out of a reservoir of nukage. | lost soul | 24 / 43 / 59 |
-| MAP07 | [Nukage Storage](docs/maps.md#nukage-storage-nukage_storage) | A maze of fuel casks sinks into the floor and frees six mancubi. | pain elemental | 30 / 54 / 75 |
-| MAP08 | [Nukage Lockdown](docs/maps.md#nukage-lockdown-nukage_lockdown) | A loop round a spill basin where every shutter opens only from its far side. | arch-vile | 33 / 53 / 72 |
-| MAP09 | [Nukage Meltdown](docs/maps.md#nukage-meltdown-nukage_meltdown) | Down a terraced canyon of falls to the cooling lake, where the Cyberdemon wades. | Cyberdemon | 40 / 63 / 84 |
+| MAP02 | [Nukage Crossing](docs/maps.md#nukage-crossing-nukage_crossing) | A sluice gate sinks into a nukage canal to become a bridge, and demons charge across it. | hell knight, cacodemon | 21 / 43 / 56 |
+| MAP03 | [Nukage Tower](docs/maps.md#nukage-tower-nukage_tower) | Spiral up around a reactor core to the exit in its crown. | mancubus | 27 / 53 / 73 |
+| MAP04 | [Nukage Undercurrent](docs/maps.md#nukage-undercurrent-nukage_undercurrent) | Taking the yellow key sinks your platform into a pit, and the way back is under the gantry. | arachnotron, revenant | 26 / 46 / 64 |
+| MAP05 | [Nukage Drain](docs/maps.md#nukage-drain-nukage_drain) | Pump-house switches raise walkways out of a reservoir of nukage. | lost soul | 24 / 43 / 59 |
+| MAP06 | [Nukage Storage](docs/maps.md#nukage-storage-nukage_storage) | A maze of fuel casks sinks into the floor and frees six mancubi. | pain elemental | 30 / 54 / 75 |
+| MAP07 | [Nukage Lockdown](docs/maps.md#nukage-lockdown-nukage_lockdown) | A loop round a spill basin where every shutter opens only from its far side. | arch-vile | 33 / 53 / 72 |
+| MAP08 | [Nukage Meltdown](docs/maps.md#nukage-meltdown-nukage_meltdown) | Down a terraced canyon of falls to the cooling lake, where the Cyberdemon wades. | Cyberdemon | 40 / 63 / 84 |
 
-Each map has four secrets (MAP04 has five). Every map's design notes and measurements are in [docs/maps.md](docs/maps.md), top-down maps are `wads/previews/<module>.svg` (`wads/previews/nukage_outskirts.svg` and so on), and routes and secrets are in [SPOILERS.md](SPOILERS.md).
+Each map has four secrets (MAP03 has five). Every map's design notes and measurements are in [docs/maps.md](docs/maps.md), top-down maps are `wads/previews/<module>.svg` (`wads/previews/nukage_outskirts.svg` and so on), and routes and secrets are in [SPOILERS.md](SPOILERS.md). Nukage Divided, the original MAP03, was cut to fit an eight-map episode; `python3 -m levels nukage_divided` still builds it to `wads/scratch/nukage_divided.WAD`.
 
 ### Compatibility
 
-**Play it in a port that reads UMAPINFO.** MAP09's exit is sealed behind a shutter that opens only when the Cyberdemon dies, and that rule lives in the WAD's `UMAPINFO` lump (a `bossaction`). Without UMAPINFO the shutter never opens and MAP09 can't be finished.
+**Play it in a port that reads UMAPINFO.** Two exits are sealed behind shutters that open only when a boss dies, and those rules live in the WAD's `UMAPINFO` lump (`bossaction`s): MAP06's when the last mancubus dies, MAP08's when the Cyberdemon dies. Without UMAPINFO neither opens, and those maps can't be finished.
 
-| Port | MAP09's exit | Level names, the ending's text and cast call |
+| Port | MAP06 and MAP08 exits | Level names, the ending's text and cast call |
 |---|---|---|
-| DOOM + DOOM II (2024 re-release) | opens when the Cyberdemon dies | yes |
-| GZDoom 4.6 and later | opens | yes |
-| dsda-doom, Woof | opens | yes |
-| `doom2.exe`, Chocolate Doom, and any port without UMAPINFO | never opens | no: DOOM II's own names, and MAP09 leads to MAP10 |
+| DOOM + DOOM II (2024 re-release) | open when the bosses die | yes |
+| GZDoom 4.6 and later | open | yes |
+| dsda-doom, Woof | open | yes |
+| `doom2.exe`, Chocolate Doom, and any port without UMAPINFO | never open | no: DOOM II's own names, and MAP08 leads to MAP09 |
 
-MAP01–MAP08 don't depend on UMAPINFO. Every map is checked against vanilla rules (see [Playtests](docs/builder.md#playtests)), and MAP09 has been played through in the 2024 re-release. The bossaction gate came after that playthrough and hasn't yet been tried in any of these ports.
+Every map is checked against vanilla rules (see [Playtests](docs/builder.md#playtests)). Meltdown has been played through in the 2024 re-release, bossaction gate included: the exit opened when the Cyberdemon died. Storage's bossaction is new with the move off MAP07 and hasn't been played in a port yet.
 
 ## The level builder
 

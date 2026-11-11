@@ -1,13 +1,11 @@
-# Nukage Storage (MAP07) wiring test: the staff wing up to the gallery, the
-# maze to the yellow key and its closets, the tower, the cask switch that
-# sinks the maze, MAP07's boss rule (the last mancubus lowers the dispatch
-# shutters), then the exit. Every secret on the way.
+# Nukage Storage wiring test: the staff wing up to the gallery, the maze to
+# the yellow key and its closets, the tower, the cask switch that sinks the
+# maze, the dispatch shutters, then the exit. Every secret on the way.
 #   uv run --with vizdoom scripts/tools/playtest.py nukage_storage
 #
-# The wiring run's killall kills the mancubi too, so it tests the boss rule
-# up front: the shutters are shut before it and down after it (nothing else
-# moves tag 666). A --fight run skips killall: its bot has to kill all six in
-# the arena, and the shutter check after the arena is the real test.
+# The shutters drop when the last mancubus dies: a UMAPINFO bossaction, which
+# ViZDoom doesn't read (on MAP07 the slot's own rule would do the same). So,
+# as in nukage_meltdown: check they stay shut, then warp past them.
 
 # Guardhouse: the yard, the facade and the flatcar cask through the window.
 look 0
@@ -174,7 +172,7 @@ look 180 12
 shot arena
 
 # The arena: down into the open hall, past every cell. The last mancubus's
-# death lowers the shutters (MAP07's boss rule).
+# death lowers the shutters in a UMAPINFO port; here they stay shut.
 # The cask tops' supplies are on the floor now.
 walk 1776 940 1776 720 1840 512
 open 1696 512
@@ -183,11 +181,12 @@ expect has Megasphere
 look 180
 shot arena_floor
 walk 448 1400
-expect floor 320 1488 == 0
-expect floor 448 1488 == 0
-expect floor 576 1488 == 0
+expect floor 320 1488 == 128
+expect floor 448 1488 == 128
+expect floor 576 1488 == 128
 look 90 -4
 shot shutters
+teleport 448 1560 90
 
 # Dispatch: apron, steps, the dock among the crates.
 walk 448 1560 448 1760 1040 1744 960 1952 160 2016 640 1960

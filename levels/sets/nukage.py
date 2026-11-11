@@ -1,23 +1,23 @@
-"""NUKAGE.WAD: nine maps for DOOM II. The four that loop round a nukage pool
-(Crossing, Tower, Drain, Lockdown) sit on even slots, so no two are adjacent."""
+"""NUKAGE.WAD: eight maps for DOOM II. Storage and Meltdown open their exits
+by UMAPINFO bossactions, so every map works in any slot. Nukage Divided was
+cut for the eight-map episode; it still builds to wads/scratch/."""
 WAD = "NUKAGE.WAD"
 MAPS = {
     "MAP01": "nukage_outskirts",
     "MAP02": "nukage_crossing",
-    "MAP03": "nukage_divided",
-    "MAP04": "nukage_tower",
-    "MAP05": "nukage_undercurrent",
-    "MAP06": "nukage_drain",
-    "MAP07": "nukage_storage",   # its exit opens by MAP07's own boss rule, so only in MAP07
-    "MAP08": "nukage_lockdown",
-    "MAP09": "nukage_meltdown",
+    "MAP03": "nukage_tower",
+    "MAP04": "nukage_undercurrent",
+    "MAP05": "nukage_drain",
+    "MAP06": "nukage_storage",
+    "MAP07": "nukage_lockdown",
+    "MAP08": "nukage_meltdown",
 }
 UMAPINFO = {
     # No text screen: DOOM II's own after MAP06 is "YOU HAVE ENTERED DEEPLY INTO THE INFESTED STARPORT...".
     "MAP06": "intertext = clear",
     # The ending: the bulletin, then the cast. intertext is one quoted string per line, separated by
     # commas; the screen fits 17 lines of up to about 39 characters.
-    "MAP09": """
+    "MAP08": """
 endcast = true
 intertext = "Bulletin. The plant has gone critical.",
             "Our modestly armed nuclear inspector",

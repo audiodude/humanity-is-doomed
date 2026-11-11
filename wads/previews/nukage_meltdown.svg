@@ -1050,5 +1050,5 @@
 <circle cx="844.8" cy="1651.2" r="2.5" fill="#1f6fd0"/>
 <circle cx="972.8" cy="1651.2" r="2.5" fill="#1f6fd0"/>
 <circle cx="563.2" cy="1318.4" r="2.5" fill="#1f6fd0"/>
-<text x="8" y="1901" font-size="11" fill="#222">levels.nukage_meltdown (MAP09): grey = floor height (lighter is higher), brown = door, yellow = lift, purple = secret, green = liquid, red line = special, dashed = bars/fence; red circles = monsters (faint/dashed = not on easy), blue dots = pickups, green = start</text>
+<text x="8" y="1901" font-size="11" fill="#222">levels.nukage_meltdown (MAP08): grey = floor height (lighter is higher), brown = door, yellow = lift, purple = secret, green = liquid, red line = special, dashed = bars/fence; red circles = monsters (faint/dashed = not on easy), blue dots = pickups, green = start</text>
 </svg>

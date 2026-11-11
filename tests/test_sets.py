@@ -20,7 +20,9 @@ def test_every_set_names_modules_that_exist_once_each():
 
 
 def test_explicit_wad_or_slot_beats_the_set_and_no_set_is_a_scratch_build():
-    assert place("nukage_storage") == Place("NUKAGE.WAD", "MAP07")
+    from levels.sets import nukage
+    slot = next(k for k, v in nukage.MAPS.items() if v == "nukage_storage")
+    assert place("nukage_storage") == Place("NUKAGE.WAD", slot, nukage.UMAPINFO.get(slot, ""))
     assert place("nukage_storage", slot="map03") == Place("scratch/nukage_storage.WAD", "MAP03")
     assert place("nukage_storage", wad="/tmp/x.wad") == Place("/tmp/x.wad", "MAP01")
     assert place("nukage_junction") == Place("scratch/nukage_junction.WAD", "MAP01", scratch=True)
