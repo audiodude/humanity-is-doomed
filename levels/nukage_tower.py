@@ -313,7 +313,9 @@ THINGS = [Thing(*t) for t in [
     (PLASMA, 1040, 320), (CELL, 1040, 288),                                     # secret: filter closet
     # turret imps on the core's rim, hidden from the start by the crown
     (IMP, -64, 1488, 90, "emha"), (IMP, 64, 1488, 90, "mha"),
-    (CACO, 416, 1008, 90, "mh"),
+    # the moat's south-east caco faces the terrace: it joins the terrace fight on sight (the moat
+    # doesn't hear the terrace, SOUND_BETWEEN), while the two by the galleries sleep on
+    (CACO, 416, 1008, 270, "mh"),
     # cacodemons over the moat's north side, between the imps and the galleries
     (CACO, -320, 1712, 90, "mh"), (CACO, 320, 1712, 90, "h"),
     # pump room (dark)
