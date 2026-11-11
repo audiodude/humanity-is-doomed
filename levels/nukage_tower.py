@@ -271,6 +271,22 @@ OVERRIDES = {
     ((800, 1248), (800, 1376)): Line(front=Side(upper=TRIM_OPS, lower=TRIM_OPS)),     # control window, frame beside the switch
 }
 SECRET_DOORS = {"d_sec1", "d_sec3", "d_sec4", "d_sec5"}
+# Sound zones. The atrium is one open space, so the first shot used to wake
+# every gallery and the rooms off them. The parapets and pier are a buffer
+# between the atrium floor (terrace, moat, core) and the galleries, flagged on
+# both sides: a shot on the floor stops at the galleries, a shot on a gallery
+# stops at the floor. Each gallery hears only the next one, and its wing hears
+# only its own gallery (docs/monster-alerting.md).
+_BUFFER = ["par_w_s", "par_w_n", "par_n", "par_e_n", "par_e_s", "pier"]
+SOUND_BETWEEN = [
+    ("terrace", "par_w_s"), ("terrace", "par_e_s"), ("par_sw", "par_w_s"), ("par_se", "par_e_s"),
+    *[("moat", p) for p in _BUFFER],
+    ("gal_w", "par_w_s"), ("gal_w", "par_w_n"), ("gal_w", "pier"),
+    ("gal_n", "par_w_n"), ("gal_n", "par_n"), ("gal_n", "par_e_n"),
+    ("gal_e", "par_e_s"), ("gal_e", "par_e_n"),
+    ("gal_w", "gal_n"), ("gal_n", "gal_e"),
+    ("gal_w", "pland"), ("gal_w", "pumps"), ("gal_n", "nw_top"), ("gal_e", "ne_top"), ("gal_e", "window_c"),
+]
 MUST_REACH = ["sec1", "filt", "sec5", "ledge", "pier", "tcl_w", "tcl_s", "nw_top", "store", "crate_s3", "pen_w",
               "pen_e", "sec3", "sec4", "ctrl", "terrace", "causeway", "crown"]
 
@@ -299,11 +315,13 @@ THINGS = [Thing(*t) for t in [
     (SARGE, -1216, 768, 0), (SPECTRE, -1280, 720, 0, "h"), (ZOMBIE, -1104, 448, 90, "h"),
     (CHAINGUN, -1040, 704), (CLIP, -880, 800), (STIM, -1312, 416), (SHELLS, -880, 560),
     (GREENARMOR, -1432, 608), (SHELLS, -1440, 576),                            # secret: pump closet
-    # west gallery, and turret imps across on the north gallery
+    # west gallery, and turret imps across on the north gallery. Gallery monsters face their
+    # outer wall, not the atrium, so they don't see the terrace: each gallery wakes when you
+    # fight on it or the one before it (SOUND_BETWEEN), and the ambush flag then turns them.
     (SSG, -672, 800), (SHELLS, -704, 864),
-    (SARGE, -672, 1200, 270, "emha"), (ZOMBIE, -640, 1440, 270, "emha"), (IMP, -672, 1600, 270, "mha"),
-    (SARGE, -704, 1776, 270, "ha"),
-    (IMP, -448, 1952, 270, "emha"), (IMP, -256, 1952, 270, "ha"),
+    (SARGE, -672, 1200, 180, "emha"), (ZOMBIE, -640, 1440, 180, "emha"), (IMP, -672, 1600, 180, "mha"),
+    (SARGE, -704, 1776, 180, "ha"),
+    (IMP, -448, 1952, 180, "emha"), (IMP, -256, 1952, 180, "ha"),
     (SHELLS, -704, 1520),
     (MEDI, -448, 1440), (SHELLS, -448, 1504),                                   # the pier
     # tank room; grabbing the blue key blacks it out and opens both closets
@@ -322,8 +340,8 @@ THINGS = [Thing(*t) for t in [
     (IMP, -880, 2560, 270, "h"), (SARGE, -880, 2176, 180, "ha"),
     (BERSERK, -1216, 2480), (ROCKET, -1088, 2480), (SHELLS, -1376, 2128), (MEDI, -880, 2400),
     # north gallery
-    (SARGE, 192, 1984, 180, "mha"), (ZOMBIE, 0, 1920, 270, "emha"), (KNIGHT, 576, 1952, 180, "mh"),
-    (SARGE, 448, 2000, 180, "ha"),
+    (SARGE, 192, 1984, 90, "mha"), (ZOMBIE, 0, 1920, 90, "emha"), (KNIGHT, 576, 1952, 90, "mh"),
+    (SARGE, 448, 2000, 90, "ha"),
     (SHELLS, -640, 1920), (CLIP, 384, 2000), (SHELLS, 640, 2000),
     # turbine hall: the first mancubus, imps in its line of fire
     (FATSO, 0, 2736, 270, "emh"),
@@ -341,11 +359,11 @@ THINGS = [Thing(*t) for t in [
     (SHELLS, 1104, 1664), (ROCKET, 1104, 1920),
     (SOUL, 976, 2128),                                                          # secret: tower closet
     # east gallery
-    (IMP, 672, 1504, 270, "emha"), (SARGE, 672, 960, 90, "mha"), (KNIGHT, 672, 800, 90, "h"),
+    (IMP, 672, 1504, 0, "emha"), (SARGE, 672, 960, 90, "mha"), (KNIGHT, 672, 800, 90, "h"),
     (ZOMBIE, 704, 1280, 90, "emha"),
     (ROCKET, 640, 1568), (SHELLS, 640, 1056),
     # control room
-    (CHAINGUY, 1056, 1408, 180, "mha"), (CHAINGUY, 1056, 1088, 180, "ha"), (SARGE, 1056, 1248, 180, "emha"),
+    (CHAINGUY, 1056, 1408, 0, "mha"), (CHAINGUY, 1056, 1088, 0, "ha"), (SARGE, 1056, 1248, 0, "emha"),
     (ROCKETBOX, 1040, 1312), (MEDI, 880, 1440), (SHELLBOX, 880, 1056),
     # core ledge (secret)
     (BLUEARMOR, -48, 960), (ROCKETBOX, 48, 960),
