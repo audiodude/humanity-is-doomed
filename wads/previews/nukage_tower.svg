@@ -158,10 +158,10 @@
 <line x1="697.6" y1="883.2" x2="697.6" y2="896.0" stroke="#777" stroke-width="0.6"/>
 <line x1="646.4" y1="896.0" x2="646.4" y2="883.2" stroke="#777" stroke-width="0.6"/>
 <line x1="876.8" y1="979.2" x2="876.8" y2="985.6" stroke="#111" stroke-width="1.6"/>
-<line x1="876.8" y1="985.6" x2="825.6" y2="985.6" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
+<line x1="876.8" y1="985.6" x2="825.6" y2="985.6" stroke="#d0201a" stroke-width="2.5"><title>action 31 tag 0</title></line>
 <line x1="825.6" y1="985.6" x2="825.6" y2="979.2" stroke="#111" stroke-width="1.6"/>
 <line x1="876.8" y1="985.6" x2="876.8" y2="992.0" stroke="#111" stroke-width="1.6"/>
-<line x1="825.6" y1="992.0" x2="876.8" y2="992.0" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
+<line x1="825.6" y1="992.0" x2="876.8" y2="992.0" stroke="#d0201a" stroke-width="2.5"><title>action 31 tag 0</title></line>
 <line x1="825.6" y1="992.0" x2="825.6" y2="985.6" stroke="#111" stroke-width="1.6"/>
 <line x1="876.8" y1="992.0" x2="876.8" y2="998.4" stroke="#111" stroke-width="1.6"/>
 <line x1="876.8" y1="998.4" x2="825.6" y2="998.4" stroke="#777" stroke-width="0.6"/>
@@ -299,10 +299,10 @@
 <line x1="902.4" y1="633.6" x2="896.0" y2="633.6" stroke="#777" stroke-width="0.6"/>
 <line x1="435.2" y1="915.2" x2="441.6" y2="915.2" stroke="#111" stroke-width="1.6"/>
 <line x1="441.6" y1="966.4" x2="435.2" y2="966.4" stroke="#111" stroke-width="1.6"/>
-<line x1="435.2" y1="966.4" x2="435.2" y2="915.2" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
+<line x1="435.2" y1="966.4" x2="435.2" y2="915.2" stroke="#d0201a" stroke-width="2.5"><title>action 31 tag 0</title></line>
 <line x1="428.8" y1="915.2" x2="435.2" y2="915.2" stroke="#111" stroke-width="1.6"/>
 <line x1="435.2" y1="966.4" x2="428.8" y2="966.4" stroke="#111" stroke-width="1.6"/>
-<line x1="428.8" y1="915.2" x2="428.8" y2="966.4" stroke="#d0201a" stroke-width="2.5"><title>action 1 tag 0</title></line>
+<line x1="428.8" y1="915.2" x2="428.8" y2="966.4" stroke="#d0201a" stroke-width="2.5"><title>action 31 tag 0</title></line>
 <line x1="364.8" y1="915.2" x2="428.8" y2="915.2" stroke="#111" stroke-width="1.6"/>
 <line x1="428.8" y1="966.4" x2="364.8" y2="966.4" stroke="#111" stroke-width="1.6"/>
 <line x1="364.8" y1="966.4" x2="364.8" y2="915.2" stroke="#777" stroke-width="0.6"/>

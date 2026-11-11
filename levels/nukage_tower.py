@@ -121,9 +121,10 @@ SECTORS = [
     Sector("mstep", [rect(-64, 720, 64, 752)], -24, SKYC, "NUKAGE1", SKY, 176, BASE, lower="NUKEDGE1",
            special=DAMAGE_5),
     # Filter house (optional), off the terrace: filter beds of sludge, crates
-    # for cover, and a hinted panel to a secret closet.
+    # for cover, and a hinted panel to a secret closet. D1: a terrace monster
+    # chasing you would open a DR door and let the whole house out.
     *recessed("d_filt", (448, 512), "s", BASE, FILTER, alcove=16, far_alcove=16, face=DOOR, floor=8,
-              alcove_flat=F_WALK, flat=F_WALK),
+              alcove_flat=F_WALK, flat=F_WALK, action=D1_DOOR),
     Sector("filt", [rect(288, -16, 960, 464)] + beds + crates_f, 0, 192, "FLOOR1_7", "CEIL5_2", 144, FILTER,
            special=LIGHT_FLICKER),
     *[Sector(f"bed{i}", [b], -16, 192, "NUKAGE1", "CEIL5_2", 160, FILTER, lower="NUKEDGE1",
@@ -166,8 +167,9 @@ SECTORS = [
          flat=F_WALK),
 
     # West wing: a dark, low pump room off the terrace, stairs up onto the west gallery.
+    # D1 like the filter house's: the terrace fight can't open it.
     *recessed("d_west", (-576, 608), "w", BASE, None, alcove=16, face=DOOR, floor=8, alcove_flat=F_WALK,
-              flat=F_WALK),
+              flat=F_WALK, action=D1_DOOR),
     Sector("wcorr", [rect(-768, 544, -608, 672)], 0, 128, "FLOOR3_3", "CEIL5_2", 128, "PIPE4"),
     Sector("pumps", [rect(-1344, 384, -768, 832)], 0, 112, "FLOOR3_3", "CEIL5_2", 104, "PIPE4",
            special=LIGHT_FLICKER, pillars=pump_pillars),
@@ -273,13 +275,17 @@ OVERRIDES = {
 SECRET_DOORS = {"d_sec1", "d_sec3", "d_sec4", "d_sec5"}
 # Sound zones. The atrium is one open space, so the first shot used to wake
 # every gallery and the rooms off them. The parapets and pier are a buffer
-# between the atrium floor (terrace, moat, core) and the galleries, flagged on
-# both sides: a shot on the floor stops at the galleries, a shot on a gallery
-# stops at the floor. Each gallery hears only the next one, and its wing hears
+# between the moat and the galleries, flagged on both sides: a shot in the
+# moat stops at the galleries, a shot on a gallery stops at the moat. The
+# terrace's rail (par_sw, par_se, the gap and the step down) is a buffer
+# between the terrace and the moat, so the terrace fight doesn't wake the
+# cacodemons and turret imps out over the moat; they wake on sight, one by
+# one, as you climb. Each gallery hears only the next one, and its wing hears
 # only its own gallery (docs/monster-alerting.md).
-_BUFFER = ["par_w_s", "par_w_n", "par_n", "par_e_n", "par_e_s", "pier"]
+_BUFFER = ["par_w_s", "par_w_n", "par_n", "par_e_n", "par_e_s", "pier", "par_sw", "par_se", "mstep"]
 SOUND_BETWEEN = [
     ("terrace", "par_w_s"), ("terrace", "par_e_s"), ("par_sw", "par_w_s"), ("par_se", "par_e_s"),
+    ("terrace", "par_sw"), ("terrace", "par_se"), ("terrace", "moat_gap"),
     *[("moat", p) for p in _BUFFER],
     ("gal_w", "par_w_s"), ("gal_w", "par_w_n"), ("gal_w", "pier"),
     ("gal_n", "par_w_n"), ("gal_n", "par_n"), ("gal_n", "par_e_n"),
