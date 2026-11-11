@@ -1,0 +1,33 @@
+map,game,legs,route_min_detour_ratio,route_min_thorough_share,route_max_long_hitscan,route_min_health,route_start_fire,route_health_per_khp,set,slot,wad,year,year_source,authors,official,format,format_evidence,nonvanilla_specials,decompile,progression_valid,rating,votes,rating_scope
+MAP01,doom2,6,0.827,-0.173,4,93,2,92.2,tnt,MAP01,TNT,1996,official release,Tom Mustaine,true,vanilla,,0,ok,true,,,none
+MAP02,doom2,0,,,,,0,,tnt,MAP02,TNT,1996,official release,John Wakelin,true,vanilla,,0,repaired,true,,,none
+MAP03,doom2,2,1.531,1.662,0.0,-29,0,13.95,tnt,MAP03,TNT,1996,official release,Robin Patenall and John Minadeo,true,vanilla,,0,ok,true,,,none
+MAP04,doom2,2,1.641,1.008,20,67,2,30.56,tnt,MAP04,TNT,1996,official release,Ty Halderman,true,vanilla,,0,ok,true,,,none
+MAP05,doom2,11,1.357,-0.675,50,0,0,17.32,tnt,MAP05,TNT,1996,official release,Jim Dethlefsen,true,vanilla,,0,ok,true,,,none
+MAP06,doom2,0,,,,,0,,tnt,MAP06,TNT,1996,official release,Jimmy Sieben and Ty Halderman,true,vanilla,,0,ok,true,,,none
+MAP07,doom2,9,0.758,-0.261,0.0,-164,0,9.0,tnt,MAP07,TNT,1996,official release,Andrew Dowswell,true,vanilla,,0,ok,true,,,none
+MAP08,doom2,0,,,,,0,,tnt,MAP08,TNT,1996,official release,John Minadeo,true,vanilla,,0,ok,true,,,none
+MAP09,doom2,8,2.966,0.4,40,-22,1,15.67,tnt,MAP09,TNT,1996,official release,Jimmy Sieben,true,vanilla,,0,ok,true,,,none
+MAP10,doom2,6,0.591,-0.878,0.0,56,8,25.11,tnt,MAP10,TNT,1996,official release,Tom Mustaine,true,vanilla,,0,ok,true,,,none
+MAP11,doom2,2,2.2,1.144,20,52,1,30.65,tnt,MAP11,TNT,1996,official release,Dean Johnson,true,vanilla,,0,ok,true,,,none
+MAP12,doom2,5,0.911,0.462,60,-73,7,12.77,tnt,MAP12,TNT,1996,official release,Jim Lowell,true,vanilla,,0,ok,true,,,none
+MAP13,doom2,8,1.526,-0.537,60,1,2,17.42,tnt,MAP13,TNT,1996,official release,Brian Kidby,true,vanilla,,0,ok,true,,,none
+MAP14,doom2,1,7.129,6.29,0.0,91,0,164.52,tnt,MAP14,TNT,1996,official release,Robin Patenall,true,vanilla,,0,ok,true,,,none
+MAP15,doom2,2,0.316,-0.824,0.0,-50,0,12.54,tnt,MAP15,TNT,1996,official release,William D. Whitaker,true,vanilla,,0,ok,true,,,none
+MAP16,doom2,11,1.059,-0.591,88,-1,4,17.24,tnt,MAP16,TNT,1996,official release,Andre Arsenault,true,vanilla,,0,ok,true,,,none
+MAP17,doom2,1,2.134,-0.284,60,59,2,31.26,tnt,MAP17,TNT,1996,official release,Tom Mustaine,true,vanilla,,0,ok,true,,,none
+MAP18,doom2,6,0.41,-0.023,60,-451,3,4.36,tnt,MAP18,TNT,1996,official release,Dario Casali and Ty Halderman,true,vanilla,,0,ok,true,,,none
+MAP19,doom2,6,1.54,0.849,90,-115,0,8.82,tnt,MAP19,TNT,1996,official release,Ty Halderman,true,vanilla,,0,ok,true,,,none
+MAP20,doom2,16,0.94,0.058,90,-194,3,9.28,tnt,MAP20,TNT,1996,official release,Drake O'Brien,true,vanilla,,0,ok,true,,,none
+MAP21,doom2,17,1.119,0.215,50,-195,7,10.31,tnt,MAP21,TNT,1996,official release,Drake O'Brien,true,vanilla,,0,refused,true,,,none
+MAP22,doom2,4,0.591,0.608,50,-216,9,5.48,tnt,MAP22,TNT,1996,official release,Christopher Buteau,true,vanilla,,0,ok,true,,,none
+MAP23,doom2,4,1.623,0.661,140,38,5,26.06,tnt,MAP23,TNT,1996,official release,Paul Turnbull,true,vanilla,,0,ok,true,,,none
+MAP24,doom2,2,2.211,1.263,0.0,43,0,28.35,tnt,MAP24,TNT,1996,official release,Dean Johnson,true,vanilla,,0,ok,true,,,none
+MAP25,doom2,3,0.87,0.882,10,-82,0,9.89,tnt,MAP25,TNT,1996,official release,David J. Hill,true,vanilla,,0,ok,true,,,none
+MAP26,doom2,8,0.72,-0.28,72,-35,0,14.13,tnt,MAP26,TNT,1996,official release,Mark Snell and Jim Lowell,true,vanilla,,0,ok,true,,,none
+MAP27,doom2,10,1.351,0.219,100,-297,2,7.45,tnt,MAP27,TNT,1996,official release,Drake O'Brien,true,vanilla,,0,refused,true,,,none
+MAP28,doom2,2,0.903,0.274,20,200,4,1000.0,tnt,MAP28,TNT,1996,official release,Milo Casali,true,vanilla,,0,ok,true,,,none
+MAP29,doom2,7,0.733,0.107,10,-103,4,8.66,tnt,MAP29,TNT,1996,official release,Jimmy Sieben,true,vanilla,,0,ok,true,,,none
+MAP30,doom2,9,1.316,0.316,10,-189,0,8.8,tnt,MAP30,TNT,1996,official release,Jimmy Sieben,true,vanilla,,0,ok,true,,,none
+MAP31,doom2,6,0.438,-0.802,0.0,-160,5,9.03,tnt,MAP31,TNT,1996,official release,Dario Casali,true,vanilla,,0,ok,true,,,none
+MAP32,doom2,13,0.625,-0.375,20,-137,0,7.3,tnt,MAP32,TNT,1996,official release,Dario Casali,true,vanilla,,0,ok,true,,,none

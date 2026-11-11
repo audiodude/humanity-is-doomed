@@ -99,7 +99,7 @@ Two summary numbers go into `measure.py` with IWAD ranges, like the other target
 
 ### Calibration
 
-Thresholds come from the DOOM II IWAD, like the repo's other targets. `scripts/metrics/route_metrics.py` (stdlib, like its siblings) writes `research/data/metrics_route.csv`: for MAP01–MAP32 at each skill, the per-leg curves and the two summaries. The thresholds are the IWAD's low quantiles (say the 10th percentile of minimum detour ratio). `D` is chosen so that id's maps sit comfortably inside it.
+Thresholds come from the DOOM II IWAD, like the repo's other targets. `scripts/metrics/route_metrics.py` (stdlib, like its siblings) writes `data/metrics/metrics_route.csv`: for MAP01–MAP32 at each skill, the per-leg curves and the two summaries. The thresholds are the IWAD's low quantiles (say the 10th percentile of minimum detour ratio). `D` is chosen so that id's maps sit comfortably inside it.
 
 ## B. Exposure checks
 

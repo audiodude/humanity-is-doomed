@@ -1,11 +1,12 @@
 """Event-driven reachability model of the vanilla DOOM / DOOM II maps, and the
 layout/progression metrics derived from it (keys and locks, critical path,
 optional area, backtracking, loops, dead ends, one-way drops, teleporters,
-secrets, sky). Writes research/data/metrics_progression.csv.
+secrets, sky). Writes data/metrics/metrics_progression.csv.
 
 Run from the repo root:
     python3 scripts/metrics/progression_metrics.py          # all 68 maps
     python3 scripts/metrics/progression_metrics.py E1M7     # debug one map
+    python3 scripts/metrics/progression_metrics.py --set tnt  # an official set (doomwad.SETS)
 
 Model (levels/reach.py; see research/facets/12-quant-progression.md for the full write-up):
 - Nodes are regions: connected pieces of sectors (vanilla maps reuse one
@@ -45,7 +46,7 @@ from levels.reach import HEIGHT, seg_cross, solve  # noqa: E402
 from levels.wad import iwad_textures  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
-OUT = os.path.join(ROOT, "research", "data", "metrics_progression.csv")
+OUT = os.path.join(dw.METRICS, "metrics_progression.csv")
 
 
 def episode(slot):
@@ -542,16 +543,15 @@ def analyse_map(m, textures):
 
 
 def main(argv):
+    maps, out, argv = dw.select(argv, OUT)
     textures = {}
-    for game, path in dw.IWADS.items():
-        tx = iwad_textures(path)[0]
-        first = next(iter(tx.values()))
-        textures[game] = (tx, first[1])
-    maps = dw.load_all()
+    for key in {(m.iwad, m.pwads) for m in maps}:
+        tx = iwad_textures(*key)[0]
+        textures[key] = (tx, next(iter(tx.values()))[1])
     if argv:
         for m in maps:
             if m.slot in argv:
-                row, dbg = analyse_map(m, textures[m.game])
+                row, dbg = analyse_map(m, textures[m.iwad, m.pwads])
                 for k, v in row.items():
                     print(f"{k:28} {v}")
                 print("goals", dbg["goals"])
@@ -560,16 +560,16 @@ def main(argv):
         return
     rows = []
     for m in maps:
-        row, _ = analyse_map(m, textures[m.game])
-        rows.append(row)
-        print(m.slot, "exit" if row["exit_reachable"] else "NO EXIT", "jumps" if row["model_jumps"] else "",
+        row, _ = analyse_map(m, textures[m.iwad, m.pwads])
+        rows.append(dw.with_meta(row, m))
+        print(m.wad, m.slot, "exit" if row["exit_reachable"] else "NO EXIT", "jumps" if row["model_jumps"] else "",
               row["reachable_area_share"], row["n_keys"], row["crit_path_len"], file=sys.stderr)
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w", newline="") as fh:
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    with open(out, "w", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
-    print(f"wrote {OUT} ({len(rows)} rows)")
+    print(f"wrote {out} ({len(rows)} rows)")
 
 
 if __name__ == "__main__":

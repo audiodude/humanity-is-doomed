@@ -34,7 +34,7 @@ Non-goals: Hexen-format or UDMF maps (refused with a message); Boom generalized 
 | Game | From the MAP slot: `ExMy` is Doom (DOOM.WAD), `MAPxx` is DOOM II |
 | Storage | Modules in `levels/imported/`, WADs in `wads/imported/`, both gitignored: id's map data is never committed |
 | PWAD resources | `RESOURCES = [paths]`, loaded after the IWAD by the texture checks and measurements; not copied |
-| Header | Map facts, plus designers, reception and measurements from `research/data/` when it exists locally |
+| Header | Map facts, plus measurements from `data/metrics/`, and designers and reception from `research/data/` when it exists locally |
 | Playtests | Hand-written only |
 | Verification | `--verify` mode and a pytest suite |
 
@@ -119,14 +119,14 @@ Steps:
 8. Run the checks on the result and write its playability findings to `KNOWN_ISSUES`.
 9. Write the module: a docstring header, `from .. import` lines, `MAP`, `WAD`, `IMPORTED = True`, `RESOURCES` (PWAD sources), `UMAPINFO` (only if the source had an entry for the map), `SECTORS` in original order, `SPECIAL_BETWEEN`, `SPECIAL_WALLS`, `FREE_LINES`, `THINGS` in original order with named types, `OVERRIDES`, `KNOWN_ISSUES`.
 
-Header: title (built-in table for the 68 id maps; the source's UMAPINFO otherwise), source and slot, monsters per skill, keys, secrets, check findings, and if `research/data/` exists: designers, reception score and tier, and the measurements furthest outside the medians.
+Header: title (built-in table for the 68 id maps; the source's UMAPINFO otherwise), source and slot, monsters per skill, keys, secrets, check findings, the measurements furthest outside the medians (`data/metrics/`), and if `research/data/` exists: designers, reception score and tier.
 
 `--verify` decompiles, rebuilds without ZDBSP, and compares both maps after merging straight runs the same way: sectors exactly, things exactly and in order, and lines with their sides as multisets (unused vertices ignored). It prints one row per map with sectors, lines, overrides, repaired sectors and the result, and exits 1 on any mismatch.
 
 ## Acceptance
 
 1. Every NUKAGE and SPEEDY module rebuilds to a byte-identical WAD with no new check errors.
-2. `research/data/metrics_*.csv` come out byte-identical after the moves.
+2. The metrics CSVs (now `data/metrics/metrics_*.csv`) come out byte-identical after the moves.
 3. `--verify` round-trips all 68 id maps and every NUKAGE and SPEEDY map; only repaired sectors may differ.
 4. Decompiled E1M1 and MAP01 build and pass `--check` against their `KNOWN_ISSUES`.
 5. The pytest suite passes (`uv run --with pytest pytest`; it skips what needs IWADs that aren't set). README, `levels/mapgen.py`'s format docstring and the doomwad/doom2 docstrings are updated.

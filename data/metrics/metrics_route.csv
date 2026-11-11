@@ -1,0 +1,69 @@
+map,game,legs,route_min_detour_ratio,route_min_thorough_share,route_max_long_hitscan,route_min_health,route_start_fire,route_health_per_khp,set,slot,wad,year,year_source,authors,official,format,format_evidence,nonvanilla_specials,decompile,progression_valid,rating,votes,rating_scope
+E1M1,doom,1,6.702,0.964,38,100,0,171.43,doom,E1M1,DOOM,1993,official release,John Romero,true,vanilla,,0,ok,true,0.85,15,per-map
+E1M2,doom,3,4.75,2.088,10,100,4,157.33,doom,E1M2,DOOM,1993,official release,John Romero,true,vanilla,,0,ok,true,0.97,10,per-map
+E1M3,doom,3,3.593,-0.465,24,100,0,47.97,doom,E1M3,DOOM,1993,official release,John Romero,true,vanilla,,0,repaired,true,1.29,15,per-map
+E1M4,doom,4,1.058,-0.157,0.0,25,0,22.78,doom,E1M4,DOOM,1993,official release,Tom Hall; Sandy Petersen; John Romero,true,vanilla,,0,ok,true,0.45,13,per-map
+E1M5,doom,3,2.335,1.245,32,100,2,51.89,doom,E1M5,DOOM,1993,official release,John Romero,true,vanilla,,0,ok,true,0.97,11,per-map
+E1M6,doom,3,2.422,1.887,40,100,2,39.31,doom,E1M6,DOOM,1993,official release,John Romero,true,vanilla,,0,ok,true,0.10,16,per-map
+E1M7,doom,7,3.863,-0.118,20,95,0,52.54,doom,E1M7,DOOM,1993,official release,John Romero,true,vanilla,,0,ok,true,0.87,15,per-map
+E1M8,doom,6,1.332,0.557,0.0,28,0,22.32,doom,E1M8,DOOM,1993,official release,Tom Hall; Sandy Petersen,true,vanilla,,0,ok,true,0.34,15,per-map
+E1M9,doom,6,1.433,-0.522,24,28,4,23.58,doom,E1M9,DOOM,1993,official release,John Romero,true,vanilla,,0,ok,true,-0.37,12,per-map
+E2M1,doom,6,1.597,0.928,10,92,0,61.46,doom,E2M1,DOOM,1993,official release,Tom Hall; Sandy Petersen,true,vanilla,,0,ok,true,0.54,13,per-map
+E2M2,doom,6,0.516,-0.676,0.0,95,0,47.48,doom,E2M2,DOOM,1993,official release,Tom Hall; Sandy Petersen,true,vanilla,,0,ok,true,1.07,14,per-map
+E2M3,doom,2,0.405,0.349,4,9,2,18.45,doom,E2M3,DOOM,1993,official release,Tom Hall; Sandy Petersen,true,vanilla,,0,ok,true,-0.79,14,per-map
+E2M4,doom,6,0.187,-0.751,10,-144,0,7.12,doom,E2M4,DOOM,1993,official release,Tom Hall; Sandy Petersen,true,vanilla,,0,ok,true,0.68,14,per-map
+E2M5,doom,6,0.864,-0.81,0.0,33,4,20.23,doom,E2M5,DOOM,1993,official release,Sandy Petersen,true,vanilla,,0,ok,true,-0.04,14,per-map
+E2M6,doom,9,0.892,-0.452,18,-14,0,16.32,doom,E2M6,DOOM,1993,official release,Sandy Petersen,true,vanilla,,0,ok,true,0.49,15,per-map
+E2M7,doom,7,0.208,-0.521,0.0,52,2,21.72,doom,E2M7,DOOM,1993,official release,Tom Hall; Sandy Petersen,true,vanilla,special_65535=1;line_flags=249,0,ok,true,0.17,14,per-map
+E2M8,doom,2,3.883,1.333,0.0,196,0,50.0,doom,E2M8,DOOM,1993,official release,Sandy Petersen,true,vanilla,,0,ok,true,0.49,15,per-map
+E2M9,doom,5,1.089,0.089,0.0,62,4,25.0,doom,E2M9,DOOM,1993,official release,Sandy Petersen,true,vanilla,,0,ok,true,-1.12,15,per-map
+E3M1,doom,5,0.68,0.293,0.0,80,0,58.42,doom,E3M1,DOOM,1993,official release,Sandy Petersen,true,vanilla,,0,ok,true,-0.76,13,per-map
+E3M2,doom,4,0.587,-0.655,10,33,3,22.38,doom,E3M2,DOOM,1993,official release,Sandy Petersen,true,vanilla,,0,repaired,true,-0.31,17,per-map
+E3M3,doom,2,0.608,-0.012,0.0,7,1,18.13,doom,E3M3,DOOM,1993,official release,Tom Hall; Sandy Petersen,true,vanilla,,0,ok,true,0.92,12,per-map
+E3M4,doom,8,0.511,-0.1,0.0,7,1,18.35,doom,E3M4,DOOM,1993,official release,Sandy Petersen,true,vanilla,,0,ok,true,0.28,12,per-map
+E3M5,doom,4,0.396,0.156,0.0,12,0,19.08,doom,E3M5,DOOM,1993,official release,Sandy Petersen,true,vanilla,,0,ok,true,-0.90,14,per-map
+E3M6,doom,4,0.537,0.583,10,4,0,17.67,doom,E3M6,DOOM,1993,official release,Tom Hall; Sandy Petersen,true,vanilla,,0,ok,true,1.26,19,per-map
+E3M7,doom,7,0.771,-0.881,10,19,4,20.48,doom,E3M7,DOOM,1993,official release,Tom Hall; Sandy Petersen,true,vanilla,,0,ok,true,-0.52,15,per-map
+E3M8,doom,2,1.004,-0.208,60,17,0,20.83,doom,E3M8,DOOM,1993,official release,Sandy Petersen,true,vanilla,,0,repaired,true,-1.34,16,per-map
+E3M9,doom,7,0.413,-0.159,170,-46,0,12.47,doom,E3M9,DOOM,1993,official release,Sandy Petersen,true,vanilla,,0,ok,true,0.52,15,per-map
+E4M1,doom,3,1.04,0.105,0.0,-41,0,12.54,doom,E4M1,DOOM,1995,official release,American McGee,true,vanilla,,0,repaired,true,-0.18,15,per-map
+E4M2,doom,8,0.598,-0.206,0.0,-180,10,8.48,doom,E4M2,DOOM,1995,official release,John Romero,true,vanilla,,0,ok,true,0.61,15,per-map
+E4M3,doom,4,1.473,0.472,112,-175,21,6.29,doom,E4M3,DOOM,1995,official release,Shawn Green,true,vanilla,,0,repaired,true,0.50,9,per-map
+E4M4,doom,5,0.864,0.03,0.0,51,0,25.39,doom,E4M4,DOOM,1995,official release,American McGee,true,vanilla,,0,ok,true,-1.15,13,per-map
+E4M5,doom,4,1.663,0.078,22,67,2,37.35,doom,E4M5,DOOM,1995,official release,Tim Willits,true,vanilla,,0,ok,true,-0.58,7,per-map
+E4M6,doom,3,0.844,-0.516,10,-154,1,9.78,doom,E4M6,DOOM,1995,official release,John Romero,true,vanilla,,0,ok,true,0.82,14,per-map
+E4M7,doom,6,0.885,-0.047,20,-50,0,12.29,doom,E4M7,DOOM,1995,official release,John Anderson (Dr. Sleep),true,vanilla,,0,ok,true,-0.02,14,per-map
+E4M8,doom,8,1.173,0.388,10,-81,2,10.4,doom,E4M8,DOOM,1995,official release,Shawn Green,true,vanilla,,0,repaired,true,0.79,11,per-map
+E4M9,doom,2,0.825,1.026,16,49,11,22.63,doom,E4M9,DOOM,1995,official release,Tim Willits,true,vanilla,,0,ok,true,-0.93,9,per-map
+MAP01,doom2,1,1.935,0.935,0.0,100,0,311.29,doom2,MAP01,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,ok,true,0.24,11,per-map
+MAP02,doom2,2,5.753,2.0,14,100,0,70.64,doom2,MAP02,DOOM2,1994,official release,American McGee,true,vanilla,,0,repaired,true,0.89,11,per-map
+MAP03,doom2,8,2.379,0.731,98,74,0,48.7,doom2,MAP03,DOOM2,1994,official release,American McGee,true,vanilla,,0,ok,true,0.22,12,per-map
+MAP04,doom2,14,2.213,-0.252,0.0,87,0,59.81,doom2,MAP04,DOOM2,1994,official release,American McGee,true,vanilla,,0,ok,true,0.27,11,per-map
+MAP05,doom2,4,1.549,0.94,10,77,0,31.03,doom2,MAP05,DOOM2,1994,official release,American McGee,true,vanilla,,0,ok,true,-0.16,11,per-map
+MAP06,doom2,14,0.74,-0.691,60,25,0,21.7,doom2,MAP06,DOOM2,1994,official release,American McGee,true,vanilla,,0,ok,true,0.70,10,per-map
+MAP07,doom2,2,1.128,0.124,0.0,-76,0,9.8,doom2,MAP07,DOOM2,1994,official release,American McGee; Sandy Petersen,true,vanilla,,0,ok,true,1.22,12,per-map
+MAP08,doom2,4,0.046,-0.829,0.0,-442,0,6.02,doom2,MAP08,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,ok,true,0.88,18,per-map
+MAP09,doom2,8,0.625,-0.821,0.0,-129,0,10.39,doom2,MAP09,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,ok,true,-0.60,15,per-map
+MAP10,doom2,2,0.717,0.102,22,-259,0,7.66,doom2,MAP10,DOOM2,1994,official release,Tom Hall; Sandy Petersen,true,vanilla,,0,ok,true,0.65,14,per-map
+MAP11,doom2,1,0.521,0.213,40,-55,11,13.05,doom2,MAP11,DOOM2,1994,official release,John Romero,true,vanilla,,0,ok,true,1.18,11,per-map
+MAP12,doom2,9,0.658,-0.043,0.0,-132,0,8.41,doom2,MAP12,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,ok,true,-0.50,11,per-map
+MAP13,doom2,4,0.242,0.719,0.0,-110,2,10.7,doom2,MAP13,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,ok,true,-0.90,16,per-map
+MAP14,doom2,3,1.754,1.288,92,73,3,29.71,doom2,MAP14,DOOM2,1994,official release,American McGee,true,vanilla,,0,repaired,true,0.38,11,per-map
+MAP15,doom2,13,1.492,0.687,10,24,4,22.73,doom2,MAP15,DOOM2,1994,official release,John Romero,true,vanilla,,0,ok,true,0.15,13,per-map
+MAP16,doom2,3,0.056,-0.449,0.0,-359,0,5.78,doom2,MAP16,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,repaired,true,0.74,14,per-map
+MAP17,doom2,12,0.667,-0.126,0.0,70,0,31.8,doom2,MAP17,DOOM2,1994,official release,John Romero,true,vanilla,,0,repaired,true,-0.07,12,per-map
+MAP18,doom2,4,0.139,-0.861,0.0,-167,0,8.42,doom2,MAP18,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,repaired,true,0.43,14,per-map
+MAP19,doom2,1,0.437,-0.886,0.0,100,3,24.24,doom2,MAP19,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,repaired,true,-0.32,15,per-map
+MAP20,doom2,5,0.539,-0.859,20,-160,6,7.69,doom2,MAP20,DOOM2,1994,official release,John Romero,true,vanilla,,0,ok,true,0.50,13,per-map
+MAP21,doom2,1,0.614,-0.386,0.0,100,0,50.53,doom2,MAP21,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,repaired,true,-0.79,12,per-map
+MAP22,doom2,6,1.528,0.648,20,52,7,26.64,doom2,MAP22,DOOM2,1994,official release,American McGee,true,vanilla,,0,repaired,true,-0.47,12,per-map
+MAP23,doom2,6,0.427,-0.782,0.0,-96,0,13.24,doom2,MAP23,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,ok,true,-0.32,12,per-map
+MAP24,doom2,2,0.275,0.963,0.0,19,1,19.87,doom2,MAP24,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,ok,true,-1.16,20,per-map
+MAP25,doom2,6,2.544,1.267,10,-2,0,16.98,doom2,MAP25,DOOM2,1994,official release,Shawn Green,true,vanilla,,0,ok,true,-0.59,11,per-map
+MAP26,doom2,2,0.316,-0.684,0.0,-50,4,13.62,doom2,MAP26,DOOM2,1994,official release,John Romero,true,vanilla,,0,repaired,true,0.84,12,per-map
+MAP27,doom2,9,0.165,-0.103,40,-289,0,8.19,doom2,MAP27,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,ok,true,0.59,12,per-map
+MAP28,doom2,4,0.339,0.375,0.0,-114,0,11.66,doom2,MAP28,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,ok,true,0.84,14,per-map
+MAP29,doom2,3,0.185,-0.891,80,-2,0,17.03,doom2,MAP29,DOOM2,1994,official release,John Romero,true,vanilla,,0,ok,true,1.59,14,per-map
+MAP30,doom2,6,69.909,68.364,0.0,196,0,800.0,doom2,MAP30,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,repaired,true,-0.80,14,per-map
+MAP31,doom2,1,1.241,0.357,78,33,0,23.21,doom2,MAP31,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,ok,true,-0.51,11,per-map
+MAP32,doom2,3,0.649,0.489,102,1,0,17.54,doom2,MAP32,DOOM2,1994,official release,Sandy Petersen,true,vanilla,,0,ok,true,-0.78,10,per-map

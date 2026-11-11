@@ -59,7 +59,7 @@ def findings(level, compiled) -> Findings:
     else:
         check_textures(level, compiled.lines, compiled.sides, iwad, found)
     check_slot(level, m, names, found, iwad[0] if iwad else None)
-    p1 = next((t for t in m.things if t.type == PLAYER1), None)
+    p1 = next((t for t in reversed(m.things) if t.type == PLAYER1), None)   # earlier ones are voodoo dolls
     if p1 is None or m.sector_of_point(p1.x, p1.y) is None:
         found.playability.append("no player 1 start inside a sector")
     else:

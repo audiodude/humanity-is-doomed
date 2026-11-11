@@ -4,7 +4,7 @@
 Operationalises Romero's rules 1-4 (texture change => height change, border
 textures, texture alignment, light/space contrast), Doomkid's "skinny
 hallways" and "symmetry" warnings, and The Level Design Book's room-size
-scale. Writes research/data/metrics_space.csv (one row per map, E1M1..MAP32).
+scale. Writes data/metrics/metrics_space.csv (one row per map, E1M1..MAP32).
 
 Run from the repo root (stdlib only, uses all cores, ~2 min on 16 cores):
     python3 scripts/metrics/space_metrics.py
@@ -28,6 +28,7 @@ Method notes (full definitions in research/facets/10-quant-space.md):
   wall-free disk containing the cell ("local thickness"), computed by
   painting maximal disks (medial-axis cells) in descending radius order.
 """
+import csv
 import math
 import multiprocessing as mp
 import os
@@ -37,12 +38,12 @@ import sys
 from collections import Counter, defaultdict, deque
 
 sys.path.insert(0, os.path.dirname(__file__))
-from doomwad import (DAMAGE_SPECIALS, IWADS, LIGHT_SPECIALS, LINE_SPECIALS,  # noqa: E402
-                     ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, SKY, load_all)
+from doomwad import (DAMAGE_SPECIALS, LIGHT_SPECIALS, LINE_SPECIALS,  # noqa: E402
+                     ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, SKY, METRICS, load_all, select, with_meta)
 from levels.wad import iwad_textures, read_wad  # noqa: E402  (doomwad put repo root on sys.path)
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
-OUT = os.path.join(ROOT, "research", "data", "metrics_space.csv")
+OUT = os.path.join(METRICS, "metrics_space.csv")
 
 G = 8            # raster cell size (map units); centres sit on multiples of G
 EPS = 1 / 1024   # scanline nudge so no scanline passes through an (integer) vertex
@@ -419,7 +420,7 @@ def texture_info(path, resources=()):
                         for y, c in posts:
                             if 0 <= py + y < h:
                                 col[py + y] = c + 1
-            cols = [bytes(c) for c in canvas]
+            cols = [tuple(c) for c in canvas]   # not bytes: palette index 255 is stored as 256
             hp = next(p for p in range(1, w + 1)
                       if w % p == 0 and all(cols[x] == cols[x - p] for x in range(p, w)))
             vh = VPERIOD if h >= VPERIOD else h
@@ -741,9 +742,8 @@ KEY = ["walkable_area", "frac_width_le96", "frac_width_le128", "width_median", "
 def summary():
     """Markdown tables from the CSV: group medians [IQR], top/bottom 5, and a
     check of lump counts against the Doom Wiki {{mapdata}} infoboxes."""
-    with open(OUT) as f:
-        hdr = f.readline().strip().split(",")
-        rows = [dict(zip(hdr, ln.strip().split(","))) for ln in f]
+    with open(OUT, newline="") as f:
+        rows = list(csv.DictReader(f))
 
     def num(r, k):
         try:
@@ -798,24 +798,25 @@ def main(argv):
     if argv == ["--summary"]:
         summary()
         return
-    maps = load_all()
-    tex = {g: texture_info(IWADS[g]) for g in ("doom", "doom2")}
+    maps, out, argv = select(argv, OUT)
+    tex = {k: texture_info(*k) for k in {(m.iwad, m.pwads) for m in maps}}
     if argv:
         maps = [m for m in maps if m.slot in argv]
-    jobs = [(m, tex[m.game]) for m in maps]
+    jobs = [(m, tex[m.iwad, m.pwads]) for m in maps]
     with mp.Pool(min(len(jobs), os.cpu_count() or 1)) as pool:
         rows = pool.map(analyse, jobs, chunksize=1)
+    rows = [with_meta(r, m) for m, r in zip(maps, rows)]
     cols = list(rows[0])
     if argv:
         for r in rows:
             print("\n".join(f"{r['map']:6} {k:30} {fmt(v)}" for k, v in r.items() if k != "map"))
         return
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w") as f:
-        f.write(",".join(cols) + "\n")
-        for r in rows:
-            f.write(",".join(fmt(r[c]) for c in cols) + "\n")
-    print(f"wrote {OUT} ({len(rows)} rows, {len(cols)} columns)")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    with open(out, "w", newline="") as f:   # csv quoting: authors can hold commas
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(cols)
+        w.writerows([fmt(r[c]) for c in cols] for r in rows)
+    print(f"wrote {out} ({len(rows)} rows, {len(cols)} columns)")
 
 
 if __name__ == "__main__":

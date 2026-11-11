@@ -6,11 +6,13 @@ Run from the repo root:
     python3 scripts/metrics/combat_metrics.py --summary # also prints the
                                                         # markdown tables used
                                                         # in research/facets/11-quant-combat.md
+    python3 scripts/metrics/combat_metrics.py --set tnt # metrics_combat.csv only, for an
+                                                        # official set (doomwad.SETS)
 Outputs:
-    research/data/metrics_combat.csv         one row per map
-    research/data/combat_first_appearance.csv first map (hard skill) for each
+    data/metrics/metrics_combat.csv          one row per map
+    data/metrics/combat_first_appearance.csv first map (hard skill) for each
                                               monster and weapon type
-    research/data/combat_wiki_validation.csv  monster counts per type and
+    data/metrics/combat_wiki_validation.csv  monster counts per type and
                                               skill vs the Doom Wiki tables
                                               (only if research/sources/doomwiki/
                                               has the wiki pages)
@@ -31,12 +33,12 @@ sys.path.insert(0, os.path.dirname(__file__))
 from doomwad import (AMBUSH, AMMO, ARMOR, BARREL, DAMAGE_PER_AMMO, DAMAGE_SPECIALS, DROPS,  # noqa: E402
                      EASY, HARD, HEALTH, HITSCANNERS, KEYS, LINE_SPECIALS, MAX_STEP, MEDIUM, ML_BLOCKING,
                      ML_BLOCKMONSTERS, MONSTERS, MULTI_ONLY, POWERUPS, SECRET_SPECIAL, TELEPORT_DEST,
-                     WEAPONS, load_all)
+                     WEAPONS, METRICS, select, with_meta)
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..", "research")
-OUT = os.path.join(ROOT, "data", "metrics_combat.csv")
-OUT_FIRST = os.path.join(ROOT, "data", "combat_first_appearance.csv")
-OUT_VALID = os.path.join(ROOT, "data", "combat_wiki_validation.csv")
+OUT = os.path.join(METRICS, "metrics_combat.csv")
+OUT_FIRST = os.path.join(METRICS, "combat_first_appearance.csv")
+OUT_VALID = os.path.join(METRICS, "combat_wiki_validation.csv")
 WIKI = os.path.join(ROOT, "sources", "doomwiki")
 
 SKILLS = (("easy", EASY), ("medium", MEDIUM), ("hard", HARD))
@@ -216,7 +218,7 @@ class Geometry:
                 elif (min(sec[a].ceil, sec[c].ceil) - max(sec[a].floor, sec[c].floor) >= WALKABLE_HEIGHT
                       and sec[c].floor - sec[a].floor <= MAX_STEP):
                     adj[a].add(c)
-        p1 = next(t for t in m.things if t.type == PLAYER1)
+        p1 = [t for t in m.things if t.type == PLAYER1][-1]   # the last one; earlier ones are voodoo dolls
         start = self.sector(p1)
         seen, todo = {start}, [start]
         while todo:
@@ -238,8 +240,8 @@ class Geometry:
 def map_metrics(m, first_seen):
     g = Geometry(m)
     sec = m.sectors
-    row = {"map": m.slot, "game": "DOOM" if m.game == "doom" else "DOOM II"}
-    p1 = next((t for t in m.things if t.type == PLAYER1), None)
+    row = {"map": m.slot, "game": m.game}
+    p1 = next((t for t in reversed(m.things) if t.type == PLAYER1), None)
     secret_sectors = g.secret_sectors
     row["secret_sectors"] = len(secret_sectors)
     row["secret_area_sectors"] = len(g.secret_area)
@@ -546,8 +548,8 @@ TOPBOTTOM = ["monster_hp_hard", "hp_density_hard", "ammo_ratio_ps_hard", "health
 
 def summary(rows, first, valid):
     p = print
-    games = {"DOOM": [r_ for r_ in rows if r_["game"] == "DOOM"],
-             "DOOM II": [r_ for r_ in rows if r_["game"] == "DOOM II"]}
+    games = {"DOOM": [r_ for r_ in rows if r_["game"] == "doom"],
+             "DOOM II": [r_ for r_ in rows if r_["game"] == "doom2"]}
     p("### DOOM vs DOOM II (median [Q1–Q3])\n")
     p("| Metric | DOOM | DOOM II | All 68 |\n|---|---|---|---|")
     for k in KEY:
@@ -590,14 +592,23 @@ def summary(rows, first, valid):
 
 
 def main():
-    maps = load_all()
+    maps, out, _ = select(sys.argv[1:], OUT)
+    if out != OUT:   # an official set: the per-map rows only
+        rows = [with_meta(map_metrics(m, {})[0], m) for m in maps]
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        with open(out, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=list(rows[0]))
+            w.writeheader()
+            w.writerows(rows)
+        print(f"wrote {out} ({len(rows)} rows)")
+        return
     order = [f"E{e}M{i}" for e in range(1, 5) for i in range(1, 10)] + [f"MAP{i:02d}" for i in range(1, 33)]
     maps.sort(key=lambda m: order.index(m.slot))
     assert [m.slot for m in maps] == order, "expected all 68 maps"
     first, rows, valid, present = {}, [], [], Counter()
     for m in maps:
         row, seen = map_metrics(m, first)
-        rows.append(row)
+        rows.append(with_meta(row, m))
         if os.path.isdir(WIKI):
             valid += validate(m)
         present.update((m.game, kind, t) for kind, t in seen)

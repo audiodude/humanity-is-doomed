@@ -51,7 +51,8 @@ from .wadmap import parse
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "levels", "imported")
 SETS = os.path.join(ROOT, "levels", "sets")
-RESEARCH = os.path.join(ROOT, "research", "data")
+RESEARCH = os.path.join(ROOT, "research", "data")   # local only: designers, reception
+METRICS = os.path.join(ROOT, "data", "metrics")     # scripts/metrics output
 WIDTH = 110   # module line width
 
 FLAG_NAMES = dict(sorted((v, n) for n, v in vars(model).items() if n.startswith("ML_")))   # {bit: "ML_..."}
@@ -905,12 +906,12 @@ def sector_expr(i, s, g: Guess, near, used):
 
 
 def research_lines(slot, game):
-    """Designers, reception and the measurements furthest outside the game's
-    medians, from research/data/ when it's there."""
+    """Designers and reception from research/data/ when it's there, and the
+    measurements furthest outside the game's medians, from data/metrics/."""
     out = []
 
-    def rows(name):
-        path = os.path.join(RESEARCH, name)
+    def rows(name, folder=RESEARCH):
+        path = os.path.join(folder, name)
         if not os.path.exists(path):
             return {}
         with open(path, newline="") as f:
@@ -921,7 +922,7 @@ def research_lines(slot, game):
         out.append(f"Reception: {r['score']} ({r['tier']}).")
     metrics = defaultdict(dict)
     for name in ("metrics_space.csv", "metrics_combat.csv", "metrics_progression.csv"):
-        for m, r in rows(name).items():
+        for m, r in rows(name, METRICS).items():
             metrics[m].update(r)
     if slot not in metrics:
         return out

@@ -1,12 +1,13 @@
 """Balance along the critical path (levels/balance.py) of the id maps, at UV:
 the resource curves' low points, the long-range hitscan peak, the health
 column's low point and the starts under fire. Writes
-research/data/metrics_route.csv; the thresholds in levels/balance.py and the
+data/metrics/metrics_route.csv; the thresholds in levels/balance.py and the
 quartiles in levels/measure.py come from it.
 
 Run from the repo root:
-    python3 scripts/metrics/route_metrics.py          # every map of both IWADs
-    python3 scripts/metrics/route_metrics.py MAP06    # print one map's report
+    python3 scripts/metrics/route_metrics.py            # every map of both IWADs
+    python3 scripts/metrics/route_metrics.py MAP06      # print one map's report
+    python3 scripts/metrics/route_metrics.py --set tnt  # an official set (doomwad.SETS)
 """
 import csv
 import os
@@ -20,7 +21,7 @@ from levels.balance import health_rate, report, route_balance  # noqa: E402
 from levels.reach import solve  # noqa: E402
 from levels.wad import iwad_textures  # noqa: E402
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "research", "data", "metrics_route.csv")
+OUT = os.path.join(dw.METRICS, "metrics_route.csv")
 
 
 def analyse_map(m, textures):
@@ -37,35 +38,37 @@ def analyse_map(m, textures):
 
 
 def main(argv):
+    maps, out, argv = dw.select(argv, OUT)
     textures = {}
-    for game, path in dw.IWADS.items():
-        if path:
-            tx = iwad_textures(path)[0]
-            textures[game] = (tx, next(iter(tx.values()))[1])
+    for key in {(m.iwad, m.pwads) for m in maps}:
+        tx = iwad_textures(*key)[0]
+        textures[key] = (tx, next(iter(tx.values()))[1])
     rows = []
-    for m in dw.load_all():
+    for m in maps:
         if argv and m.slot not in argv:
             continue
-        row, bal = analyse_map(m, textures[m.game])
+        row, bal = analyse_map(m, textures[m.iwad, m.pwads])
         if argv:
             lines, warnings = report(bal, m.game)
             print("\n".join(lines + [f"warning: {w}" for w in warnings]))
             print(row)
             continue
-        rows.append(row)
-        print(m.slot, row["route_min_detour_ratio"], row["route_max_long_hitscan"], file=sys.stderr)
+        rows.append(dw.with_meta(row, m))
+        print(m.wad, m.slot, row.get("route_min_detour_ratio"), row.get("route_max_long_hitscan"), file=sys.stderr)
     if argv:
         return
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    with open(out, "w", newline="") as fh:
+        # A map whose exit the model can't reach has no route columns: blank them.
+        w = csv.DictWriter(fh, fieldnames=list(dict.fromkeys(k for r in sorted(rows, key=len, reverse=True)
+                                                             for k in r)), restval="")
         w.writeheader()
         w.writerows(rows)
-    print(f"wrote {OUT} ({len(rows)} rows)")
+    print(f"wrote {out} ({len(rows)} rows)")
     for game in sorted({r["game"] for r in rows}):
         for k in ("route_min_detour_ratio", "route_min_thorough_share", "route_max_long_hitscan", "route_min_health",
                   "route_health_per_khp"):
-            v = sorted(r[k] for r in rows if r["game"] == game and isinstance(r[k], (int, float)))
+            v = sorted(r[k] for r in rows if r["game"] == game and isinstance(r.get(k), (int, float)))
             if len(v) >= 4:
                 q = statistics.quantiles(v, n=10, method="exclusive")
                 print(f"{game} {k}: p10 {q[0]:.4g}  quartiles {statistics.quantiles(v, n=4, method='exclusive')}  "

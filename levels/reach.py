@@ -729,7 +729,7 @@ class Model:
     def _things(self):
         m = self.m
         uv = m.things_on(HARD)
-        p1 = next(t for t in m.things if t.type == 1)
+        p1 = [t for t in m.things if t.type == 1][-1]   # vanilla: the last one; earlier ones are voodoo dolls
         self.start = self.region_of_point(p1.x, p1.y)
         self.start_pt = (p1.x, p1.y)
         self.keys = []   # (colour, region, (x, y))

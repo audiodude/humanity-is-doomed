@@ -1,0 +1,4 @@
+game,flavor,sets,maps,decompile_ok,decompile_repaired,decompile_refused,decompile_lines_only,decompile_unknown,progression_invalid,exit_unreachable,provisional
+doom,doom,doom,36,30,6,0,0,0,0,0,false
+doom2,1993-2003,master;plutonia;tnt,85,80,2,3,0,0,0,8,false
+doom2,doom2,doom2,32,22,10,0,0,0,0,0,false

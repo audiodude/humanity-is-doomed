@@ -70,13 +70,16 @@ It needs Python 3.10+ (standard library only), ZDBSP, and the IWADs set in `.env
 ## Research: what makes DOOM levels fun
 Nukage Crossing and the maps after it were designed from a research report on the 68 id maps (Ultimate Doom E1M1–E4M9, DOOM II MAP01–MAP32) and what makes them fun. It drew on designer interviews, Dan Pinchbeck's *Doom: Scarydarkfast*, Not Jabba's *The Roots of Doom Mapping*, a per-map community reception score, and metrics measured from the IWADs and correlated with that score. The report quotes its sources at length, so it isn't published here; the measurement scripts are.
 
-The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs to `research/data/`. They read the v1.9 IWADs set by `DOOM_WAD` (Ultimate Doom) and `DOOM2_WAD` in `.env`. Run them from the repo root:
+The metrics scripts in `scripts/metrics/` are stdlib-only and write their CSVs to `data/metrics/`. They read the v1.9 IWADs set by `DOOM_WAD` (Ultimate Doom) and `DOOM2_WAD` in `.env`, and, for TNT, Plutonia and the Master Levels, the Steam `base/` directory in `DOOM_STEAM_BASE`. One script regenerates everything (about 20 minutes): decompile outcomes and top-down SVGs, every metric for the id maps and each official set, per-(game, flavor) medians with n, and the reception correlations. The columns, the flavor table and each step are in [docs/metrics-data.md](docs/metrics-data.md).
 
 ```sh
-python3 scripts/metrics/space_metrics.py        # -> research/data/metrics_space.csv (about 2 minutes)
-python3 scripts/metrics/combat_metrics.py       # -> research/data/metrics_combat.csv
-python3 scripts/metrics/progression_metrics.py  # -> research/data/metrics_progression.csv; pass a slot (E1M7) to dump one map
-python3 scripts/metrics/route_metrics.py        # -> research/data/metrics_route.csv (balance along the route; about 40 s); pass a slot for its report
+scripts/metrics/run_all.sh                      # everything below, in order
+python3 scripts/metrics/space_metrics.py        # -> data/metrics/metrics_space.csv (about 2 minutes)
+python3 scripts/metrics/combat_metrics.py       # -> data/metrics/metrics_combat.csv
+python3 scripts/metrics/progression_metrics.py  # -> data/metrics/metrics_progression.csv; pass a slot (E1M7) to dump one map
+python3 scripts/metrics/route_metrics.py        # -> data/metrics/metrics_route.csv (balance along the route; about 40 s); pass a slot for its report
+python3 scripts/metrics/space_metrics.py --set tnt   # any of the four, for an official set -> data/metrics/sets/tnt/
+python3 scripts/metrics/flavor_summary.py       # -> data/metrics/flavor_summary.csv, flavor_coverage.csv
 ```
 
 ## Special bulletin

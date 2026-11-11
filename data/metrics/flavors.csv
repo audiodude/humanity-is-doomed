@@ -1,0 +1,10 @@
+set,flavor,reason
+doom,doom,"id's E1-E4 (DOOM.WAD, Ultimate Doom v1.9)"
+doom2,doom2,"id's DOOM II MAP01-MAP32 (DOOM2.WAD v1.9)"
+tnt,1993-2003,"Official (TeamTNT, 1996), but a community team's vanilla megawad of its era: plays like 1990s PWADs, not like id's DOOM II"
+plutonia,1993-2003,"Official (Casali brothers, 1996); vanilla, mid-90s community authors; its difficulty set the late-90s PWAD style"
+master,1993-2003,"Official (1995), commissioned single-map PWADs by community authors of the time"
+nerve,2004-2014,"Official (Nerve Software, 2010); vanilla-compatible but designed to 2010 expectations"
+sigil,2015-present,"Official (Romero, 2019), DOOM-format: modern difficulty, size and set-piece density (facet 24: HP curve and finale unlike E1-E4), so it is compared with modern DOOM-format maps, not id's 1993 ones"
+sigil2,2015-present,"Official (Romero, 2023), DOOM-format; same reasoning as sigil"
+id1,2015-present,"Official (id/Nightdive, 2024, Legacy of Rust); ID24 actions and monsters, modern design; most maps will be progression-invalid"
