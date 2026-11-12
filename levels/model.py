@@ -249,16 +249,26 @@ def cut_free_standing(sectors):
     pool) a hole in it, so levels don't have to list it twice. Free means its
     outline is clear of the other's: one touching a wall or another hole must
     be cut out by hand."""
+    def outers_of(s):   # [(loop, bounding box)]; nesting is quadratic, so once per sector
+        return [(lp, bbox(lp)) for lp in s.outer_loops()]
+    outers = {s: outers_of(s) for s in sectors}
     for s in sectors:
-        for outer in s.outer_loops():
-            around = [(o, lp) for o in sectors if o is not s for lp in o.outer_loops()
-                      if all(point_in_loop(p, lp) and not on_loop(p, lp) for p in outer)]
+        for outer, (x0, y0, x1, y1) in outers[s]:
+            around = [(o, lp) for o in sectors if o is not s for lp, (a0, b0, a1, b1) in outers[o]
+                      if a0 <= x0 and b0 <= y0 and x1 <= a1 and y1 <= b1
+                      and all(point_in_loop(p, lp) and not on_loop(p, lp) for p in outer)]
             if not around:
                 continue
             o, _ = min(around, key=lambda ol: abs(area2(ol[1])))   # the innermost
             p = label_point(s, outer)
             if p and o.contains(p) and not any(on_loop(q, loop) for q in outer for loop in o.loops + o.pillars):
                 o.loops = o.loops + [outer]
+                outers[o] = outers_of(o)
+
+
+def bbox(loop):
+    xs, ys = [x for x, _ in loop], [y for _, y in loop]
+    return min(xs), min(ys), max(xs), max(ys)
 
 
 # Secret doors' faces are shifted off the surrounding wall pattern by this much,

@@ -80,6 +80,8 @@ it prints the measurements and runs ZDBSP (by default the copy bundled with
 Ultimate Doom Builder) for nodes, blockmap and reject. Several level modules
 can share a WAD: build() replaces only its own map slot and UMAPINFO entry.
 """
+import bisect
+import math
 import os
 import shutil
 import subprocess
@@ -122,7 +124,10 @@ def build_lines(level):
         for loop, role in oriented(sec):
             pos = 0.0
             for a, b in edges(loop):
-                mids = sorted((p for p in verts if on_segment(p, a, b)), key=lambda p: dist(a, p))
+                # Only vertices within the edge's x-range can lie on it (verts is sorted by x, then y).
+                lo = bisect.bisect_left(verts, (min(a[0], b[0]), -math.inf))
+                hi = bisect.bisect_right(verts, (max(a[0], b[0]), math.inf))
+                mids = sorted((p for p in verts[lo:hi] if on_segment(p, a, b)), key=lambda p: dist(a, p))
                 chain = [a] + mids + [b]
                 for u, v in zip(chain, chain[1:]):
                     if (u, v) in directed:
