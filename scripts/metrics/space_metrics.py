@@ -30,7 +30,6 @@ Method notes (full definitions in research/facets/10-quant-space.md):
 """
 import csv
 import math
-import multiprocessing as mp
 import os
 import re
 import struct
@@ -39,7 +38,8 @@ from collections import Counter, defaultdict, deque
 
 sys.path.insert(0, os.path.dirname(__file__))
 from doomwad import (DAMAGE_SPECIALS, LIGHT_SPECIALS, LINE_SPECIALS,  # noqa: E402
-                     ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, SKY, METRICS, load_all, select, with_meta)
+                     ML_BLOCKING, ML_DONTPEGBOTTOM, ML_DONTPEGTOP, SKY, METRICS, load_all, parallel_rows,
+                     pmap, select)
 from levels.wad import iwad_textures, read_wad  # noqa: E402  (doomwad put repo root on sys.path)
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
@@ -794,18 +794,22 @@ def summary():
     print(f"wiki mapdata check: {bad} mismatches over {len(rows)} maps")
 
 
+def _texture_info(key):
+    return texture_info(*key)
+
+
 def main(argv):
     if argv == ["--summary"]:
         summary()
         return
     maps, out, argv = select(argv, OUT)
-    tex = {k: texture_info(*k) for k in {(m.iwad, m.pwads) for m in maps}}
     if argv:
         maps = [m for m in maps if m.slot in argv]
-    jobs = [(m, tex[m.iwad, m.pwads]) for m in maps]
-    with mp.Pool(min(len(jobs), os.cpu_count() or 1)) as pool:
-        rows = pool.map(analyse, jobs, chunksize=1)
-    rows = [with_meta(r, m) for m, r in zip(maps, rows)]
+    keys = sorted({(m.iwad, m.pwads) for m in maps})
+    tex = {k: t for k, (t, _) in zip(keys, pmap(_texture_info, keys))}
+    for k in [k for k, t in tex.items() if t is None]:   # unreadable PWAD textures: the IWAD's alone
+        tex[k] = texture_info(k[0])
+    rows = parallel_rows(analyse, [(m, tex[m.iwad, m.pwads]) for m in maps], maps, out)
     cols = list(rows[0])
     if argv:
         for r in rows:

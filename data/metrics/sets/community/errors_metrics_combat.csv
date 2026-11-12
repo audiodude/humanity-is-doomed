@@ -1,0 +1,5 @@
+set,wad,slot,error
+valiant,VALIANT,MAP23,"TypeError: list indices must be integers or slices, not NoneType"
+legher,LEGHER,MAP08,"TypeError: list indices must be integers or slices, not NoneType"
+bldstlp,BLDSTLP,MAP07,"TypeError: list indices must be integers or slices, not NoneType"
+kaiser_12,KAISER_12,MAP02,IndexError: list index out of range

@@ -32,7 +32,6 @@ Model (levels/reach.py; see research/facets/12-quant-progression.md for the full
 - Running jumps (tic-by-tic straight runs under vanilla gravity) are only
   enabled for the 13 maps whose exit needs them (column model_jumps).
 """
-import csv
 import heapq
 import itertools
 import math
@@ -43,7 +42,6 @@ from collections import defaultdict, deque
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import doomwad as dw  # noqa: E402  (also puts the repo root on sys.path)
 from levels.reach import HEIGHT, seg_cross, solve  # noqa: E402
-from levels.wad import iwad_textures  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 OUT = os.path.join(dw.METRICS, "metrics_progression.csv")
@@ -542,12 +540,13 @@ def analyse_map(m, textures):
     return row, dbg
 
 
+def _row(job):
+    return analyse_map(*job)[0]
+
+
 def main(argv):
     maps, out, argv = dw.select(argv, OUT)
-    textures = {}
-    for key in {(m.iwad, m.pwads) for m in maps}:
-        tx = iwad_textures(*key)[0]
-        textures[key] = (tx, next(iter(tx.values()))[1])
+    textures = dw.reach_textures(maps)
     if argv:
         for m in maps:
             if m.slot in argv:
@@ -558,18 +557,8 @@ def main(argv):
                 print("required", dbg["required"], "keys_req", dbg["keys_req"], "key_dep", dbg["key_dep"])
                 print("exit", dbg["exit"], "start", dbg["model"].start)
         return
-    rows = []
-    for m in maps:
-        row, _ = analyse_map(m, textures[m.iwad, m.pwads])
-        rows.append(dw.with_meta(row, m))
-        print(m.wad, m.slot, "exit" if row["exit_reachable"] else "NO EXIT", "jumps" if row["model_jumps"] else "",
-              row["reachable_area_share"], row["n_keys"], row["crit_path_len"], file=sys.stderr)
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    with open(out, "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
-        w.writeheader()
-        w.writerows(rows)
-    print(f"wrote {out} ({len(rows)} rows)")
+    rows = dw.parallel_rows(_row, [(m, textures[m.iwad, m.pwads]) for m in maps], maps, out)
+    dw.write_rows(rows, out)
 
 
 if __name__ == "__main__":

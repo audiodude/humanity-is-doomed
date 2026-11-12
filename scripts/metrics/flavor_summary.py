@@ -5,8 +5,14 @@ and data/metrics/sets/*/metrics_*.csv; every row carries doomwad.META_COLS)
 and data/metrics/flavors.csv (set -> flavor), and writes:
 
     data/metrics/flavor_summary.csv   game, flavor, metric, n, median, q1, q3, provisional
-    data/metrics/flavor_coverage.csv  per (game, flavor): sets, maps, decompile outcomes,
-                                       progression-invalid maps, provisional
+    data/metrics/flavor_coverage.csv  per (game, flavor): sets, every map marker, measured maps,
+                                       non-Doom-format maps, decompile outcomes,
+                                       progression-invalid maps, maps whose exit the reach
+                                       model can't reach (blank critical-path and route
+                                       metrics), provisional (fewer than MIN_N measured)
+
+Before that it gives every downloaded community release with no row in
+flavors.csv one, by release year (assign_community_flavors).
 
 A metric is `<table>.<column>` (space.width_median), as in correlations.csv.
 Progression and route metrics skip maps with progression_valid=false. A group
@@ -25,7 +31,7 @@ import sys
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from doomwad import META_COLS, METRICS as DATA  # noqa: E402
+from doomwad import DECOMPILE_STATUS, IDGAMES, META_COLS, METRICS as DATA, _csv, releases  # noqa: E402
 
 MIN_N = 10
 NOT_METRICS = set(META_COLS) | {"map", "episode"}
@@ -48,7 +54,29 @@ def tables():
     return [(os.path.basename(p)[len("metrics_"):-len(".csv")], p) for p in paths]
 
 
+def assign_community_flavors():
+    """Append a flavors.csv row for every downloaded community release that
+    has none, by its release year (doomwad.releases). Existing rows, hand
+    edits included, are never changed. Needs the local idgames download."""
+    path = os.path.join(DATA, "flavors.csv")
+    with open(path, newline="") as f:
+        known = {r["set"] for r in csv.DictReader(f)}
+    new = [{"set": r["set"], "flavor": era(r["year"]),
+            "reason": f"community release, {r['year']} ({r['year_source']})"}
+           for r in releases() if r["set"] not in known]
+    if new:
+        with open(path, "a", newline="") as f:
+            csv.DictWriter(f, fieldnames=["set", "flavor", "reason"], lineterminator="\n").writerows(new)
+        print(f"flavors.csv: {len(new)} community releases added")
+
+
+def era(year):
+    return "1993-2003" if year <= 2003 else "2004-2014" if year <= 2014 else "2015-present"
+
+
 def main(argv):
+    if os.path.exists(os.path.join(IDGAMES, "manifest.csv")):
+        assign_community_flavors()
     with open(os.path.join(DATA, "flavors.csv"), newline="") as f:
         flavor_of = {r["set"]: r["flavor"] for r in csv.DictReader(f)}
     values = defaultdict(list)    # (game, flavor, metric) -> [value]
@@ -89,31 +117,49 @@ def main(argv):
         w.writeheader()
         w.writerows(out)
 
+    # Coverage: every map decompile_status.csv lists (every map marker, UDMF
+    # and Hexen ones too) plus every measured map.
+    status = {}
+    for r in _csv(DECOMPILE_STATUS):
+        game = "doom" if r["slot"][0] == "E" else "doom2"
+        status[game, flavor_of.get(r["set"], "unassigned"), r["set"], r["wad"], r["slot"]] = r
+    groups = defaultdict(set)
+    for (game, flavor, *key) in status:
+        groups[game, flavor].add(tuple(key))
+    for group, ms in maps.items():
+        groups[group] |= set(ms)
     cov = []
-    for (game, flavor), ms in sorted(maps.items()):
+    for (game, flavor), keys in sorted(groups.items()):
+        measured = maps.get((game, flavor), {})
         outcome = defaultdict(int)
-        for r in ms.values():
-            outcome[r["decompile"] or "unknown"] += 1
-        cov.append({"game": game, "flavor": flavor, "sets": ";".join(sorted({s for s, _, _ in ms})),
-                    "maps": len(ms), "decompile_ok": outcome["ok"], "decompile_repaired": outcome["repaired"],
-                    "decompile_refused": outcome["refused"], "decompile_lines_only": outcome["lines-only"],
-                    "decompile_unknown": outcome["unknown"],
-                    "progression_invalid": sum(r["progression_valid"] != "true" for r in ms.values()),
+        for key in keys:
+            r = status.get((game, flavor, *key))
+            outcome[r["decompile"] if r else "unknown"] += 1
+        not_doom = sum(1 for key in keys if (r := status.get((game, flavor, *key)))
+                       and r["detail"] in ("udmf map", "hexen map", "broken map"))
+        sets = sorted({s for s, _, _ in keys})
+        cov.append({"game": game, "flavor": flavor, "n_sets": len(sets), "sets": ";".join(sets),
+                    "maps": len(keys), "measured": len(measured), "not_doom_format": not_doom,
+                    "decompile_ok": outcome["ok"], "decompile_repaired": outcome["repaired"],
+                    "decompile_refused": outcome["refused"] - not_doom,
+                    "decompile_lines_only": outcome["lines-only"], "decompile_timeout": outcome["timeout"],
+                    "decompile_error": outcome["error"], "decompile_unknown": outcome["unknown"],
+                    "progression_invalid": sum(r["progression_valid"] != "true" for r in measured.values()),
                     "exit_unreachable": len(no_exit[game, flavor]),
-                    "provisional": str(len(ms) < MIN_N).lower()})
+                    "provisional": str(len(measured) < MIN_N).lower()})
     with open(OUT_COVERAGE, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(cov[0]))
         w.writeheader()
         w.writerows(cov)
     print(f"wrote {os.path.relpath(OUT)} ({len(out)} rows), {os.path.relpath(OUT_COVERAGE)}\n")
-    print("| game | flavor | sets | maps | ok | repaired | refused | lines-only | unknown | progression-invalid "
-          "| exit unreachable |")
-    print("|---|---|---|---|---|---|---|---|---|---|---|")
+    cols = ("n_sets", "maps", "measured", "not_doom_format", "decompile_ok", "decompile_repaired",
+            "decompile_refused", "decompile_lines_only", "decompile_timeout", "decompile_error",
+            "decompile_unknown", "progression_invalid", "exit_unreachable")
+    print("| game | flavor | " + " | ".join(c.removeprefix("decompile_").replace("_", " ") for c in cols) + " |")
+    print("|---|---|" + "---|" * len(cols))
     for c in cov:
         mark = " (provisional)" if c["provisional"] == "true" else ""
-        print(f"| {c['game']} | {c['flavor']}{mark} | {c['sets']} | {c['maps']} | {c['decompile_ok']} | "
-              f"{c['decompile_repaired']} | {c['decompile_refused']} | {c['decompile_lines_only']} | "
-              f"{c['decompile_unknown']} | {c['progression_invalid']} | {c['exit_unreachable']} |")
+        print(f"| {c['game']} | {c['flavor']}{mark} | " + " | ".join(str(c[k]) for k in cols) + " |")
     for metric in argv:
         print(f"\n{metric}: median [q1-q3] (n)")
         for r in (r for r in out if r["metric"] == metric):

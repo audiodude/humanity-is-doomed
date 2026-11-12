@@ -1,0 +1,24 @@
+set,wad,slot,error
+c-shock2,C-SHOCK2,MAP06,"TypeError: list indices must be integers or slices, not NoneType"
+swtw,SWTW,MAP03,"TypeError: list indices must be integers or slices, not NoneType"
+hellbnd,HELLBND,MAP17,"TypeError: list indices must be integers or slices, not NoneType"
+valiant,VALIANT,MAP23,"TypeError: list indices must be integers or slices, not NoneType"
+hfd,HFD,MAP09,"TypeError: list indices must be integers or slices, not NoneType"
+sci,SCI,MAP01,"TypeError: list indices must be integers or slices, not NoneType"
+aaliens,AALIENS_V1_2,MAP29,"TypeError: list indices must be integers or slices, not NoneType"
+frozent,FROZENT,MAP01,TimeoutError: timed out
+legher,LEGHER,MAP08,"TypeError: list indices must be integers or slices, not NoneType"
+thtthren,THTTHREN,MAP08,TimeoutError: timed out
+thtthren,THTTHREN,MAP10,"TypeError: list indices must be integers or slices, not NoneType"
+thtthren,THTTHREN,MAP12,"TypeError: list indices must be integers or slices, not NoneType"
+vanilsky,VANILSKY,MAP01,TimeoutError: timed out
+sunlust,SUNLUST,MAP24,TimeoutError: timed out
+sunlust,SUNLUST,MAP28,TimeoutError: timed out
+sunlust,SUNLUST,MAP30,TimeoutError: timed out
+bldstlp,BLDSTLP,MAP07,"TypeError: list indices must be integers or slices, not NoneType"
+nova,NOVA,MAP28,"TypeError: list indices must be integers or slices, not NoneType"
+nova,NOVA,MAP31,TimeoutError: timed out
+travmoon,TTTM_21,MAP01,"TypeError: list indices must be integers or slices, not NoneType"
+kaiser_12,KAISER_12,MAP02,"KeyError: (0, 0)"
+5l1c,5L1C,MAP01,"TypeError: list indices must be integers or slices, not NoneType"
+ngmvmt1,NGMVMT1,MAP21,"TypeError: list indices must be integers or slices, not NoneType"

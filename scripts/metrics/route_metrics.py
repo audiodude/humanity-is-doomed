@@ -9,7 +9,6 @@ Run from the repo root:
     python3 scripts/metrics/route_metrics.py MAP06      # print one map's report
     python3 scripts/metrics/route_metrics.py --set tnt  # an official set (doomwad.SETS)
 """
-import csv
 import os
 import statistics
 import sys
@@ -19,7 +18,6 @@ import doomwad as dw  # noqa: E402  (also puts the repo root on sys.path)
 import progression_metrics as pm  # noqa: E402
 from levels.balance import health_rate, report, route_balance  # noqa: E402
 from levels.reach import solve  # noqa: E402
-from levels.wad import iwad_textures  # noqa: E402
 
 OUT = os.path.join(dw.METRICS, "metrics_route.csv")
 
@@ -37,34 +35,22 @@ def analyse_map(m, textures):
     return row, bal
 
 
+def _row(job):
+    return analyse_map(*job)[0]
+
+
 def main(argv):
     maps, out, argv = dw.select(argv, OUT)
-    textures = {}
-    for key in {(m.iwad, m.pwads) for m in maps}:
-        tx = iwad_textures(*key)[0]
-        textures[key] = (tx, next(iter(tx.values()))[1])
-    rows = []
-    for m in maps:
-        if argv and m.slot not in argv:
-            continue
-        row, bal = analyse_map(m, textures[m.iwad, m.pwads])
-        if argv:
+    textures = dw.reach_textures(maps)
+    if argv:
+        for m in (m for m in maps if m.slot in argv):
+            row, bal = analyse_map(m, textures[m.iwad, m.pwads])
             lines, warnings = report(bal, m.game)
             print("\n".join(lines + [f"warning: {w}" for w in warnings]))
             print(row)
-            continue
-        rows.append(dw.with_meta(row, m))
-        print(m.wad, m.slot, row.get("route_min_detour_ratio"), row.get("route_max_long_hitscan"), file=sys.stderr)
-    if argv:
         return
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    with open(out, "w", newline="") as fh:
-        # A map whose exit the model can't reach has no route columns: blank them.
-        w = csv.DictWriter(fh, fieldnames=list(dict.fromkeys(k for r in sorted(rows, key=len, reverse=True)
-                                                             for k in r)), restval="")
-        w.writeheader()
-        w.writerows(rows)
-    print(f"wrote {out} ({len(rows)} rows)")
+    rows = dw.parallel_rows(_row, [(m, textures[m.iwad, m.pwads]) for m in maps], maps, out)
+    dw.write_rows(rows, out)
     for game in sorted({r["game"] for r in rows}):
         for k in ("route_min_detour_ratio", "route_min_thorough_share", "route_max_long_hitscan", "route_min_health",
                   "route_health_per_khp"):

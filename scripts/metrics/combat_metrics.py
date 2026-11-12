@@ -33,7 +33,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from doomwad import (AMBUSH, AMMO, ARMOR, BARREL, DAMAGE_PER_AMMO, DAMAGE_SPECIALS, DROPS,  # noqa: E402
                      EASY, HARD, HEALTH, HITSCANNERS, KEYS, LINE_SPECIALS, MAX_STEP, MEDIUM, ML_BLOCKING,
                      ML_BLOCKMONSTERS, MONSTERS, MULTI_ONLY, POWERUPS, SECRET_SPECIAL, TELEPORT_DEST,
-                     WEAPONS, METRICS, select, with_meta)
+                     WEAPONS, METRICS, parallel_rows, select, with_meta, write_rows)
 
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..", "research")
 OUT = os.path.join(METRICS, "metrics_combat.csv")
@@ -591,16 +591,15 @@ def summary(rows, first, valid):
           f"vs wiki {v['wiki_easy']}/{v['wiki_medium']}/{v['wiki_hard']}")
 
 
+def _set_row(m):
+    return map_metrics(m, {})[0]
+
+
 def main():
     maps, out, _ = select(sys.argv[1:], OUT)
-    if out != OUT:   # an official set: the per-map rows only
-        rows = [with_meta(map_metrics(m, {})[0], m) for m in maps]
-        os.makedirs(os.path.dirname(out), exist_ok=True)
-        with open(out, "w", newline="") as f:
-            w = csv.DictWriter(f, fieldnames=list(rows[0]))
-            w.writeheader()
-            w.writerows(rows)
-        print(f"wrote {out} ({len(rows)} rows)")
+    if out != OUT:   # an official or community set: the per-map rows only
+        rows = parallel_rows(_set_row, maps, maps, out)
+        write_rows(rows, out)
         return
     order = [f"E{e}M{i}" for e in range(1, 5) for i in range(1, 10)] + [f"MAP{i:02d}" for i in range(1, 33)]
     maps.sort(key=lambda m: order.index(m.slot))
