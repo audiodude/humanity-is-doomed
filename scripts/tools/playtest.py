@@ -57,11 +57,16 @@ starts from the beginning, saving checkpoints as it goes. Saves live in
 The player has god mode and notarget, so tests check wiring, not balance.
 
 --fight plays the route for real, to test balance: no god mode, and the
-monsters stay alive (`killall` and `checkpoint` are skipped). Between steps
-the bot fights the nearest monster on screen with the best weapon it has ammo
-for at that range (no bullets beyond 768 units), strafes onto safe floor only,
-backs away from melee monsters, turns to look when hit from out of sight, and
-detours for nearby health, armor and ammo when it's low. It plays in buddha
+monsters stay alive (`killall` and `checkpoint` are skipped). It aims to play
+like a person, so its trouble is the map's: between steps it fights the
+nearest monster on screen with the best weapon it has ammo for at that range
+(no shells beyond 512 units, no bullets beyond 768, and beyond that only heavy
+monsters, with cells or rockets), strafes onto safe floor only, backs away
+from melee monsters, turns to look when a monster hits it from out of sight,
+and doesn't stop to fight on damaging floor. It picks up whatever it can use
+within 512 units' walk (the build's detour curve), and goes up to 1536 for
+health, armor or ammo it's low on. A walk that stops getting closer for 2 s
+(sliding along a wall or a raised lift counts) is stuck. It plays in buddha
 mode: when it would die, the death is counted with its place, time and a
 label, and it's healed, so one run covers the whole map. Labels: hazard (on a
 damaging floor), starved (no ammo for any weapon but the pistol), unseen (no
@@ -132,6 +137,7 @@ USE_DOORS = {1, 26, 27, 28, 31, 32, 33, 34, 117, 118}   # doors the player opens
 STUCK_TICS, ARRIVE, PASS_BY = 70, 3, 24
 LOOP_DEATHS, LOOP_RADIUS, LOOP_TICS = 3, 128, 30 * 35   # this many deaths this close together is a loop
 BULLET_RANGE = 768     # the bot doesn't spend bullets on monsters farther away than this
+SHELL_RANGE = 512      # nor shells: the shotgun's spread misses most pellets beyond it
 MONSTERS = {"Zombieman", "ShotgunGuy", "ChaingunGuy", "WolfensteinSS", "DoomImp", "Demon", "Spectre", "LostSoul",
             "Cacodemon", "HellKnight", "BaronOfHell", "Revenant", "Fatso", "Arachnotron", "PainElemental", "Archvile",
             "Cyberdemon", "SpiderMastermind"}
@@ -145,7 +151,11 @@ HEALTH_ITEMS = {"Stimpack", "Medikit", "Soulsphere", "Megasphere", "Berserk"}
 AMMO_ITEMS = {"Clip", "ClipBox", "Shell", "ShellBox", "RocketAmmo", "RocketBox", "Cell", "CellPack", "Backpack",
               "Shotgun", "SuperShotgun", "Chaingun", "RocketLauncher", "PlasmaRifle"}
 ARMOR_ITEMS = {"GreenArmor", "BlueArmor", "Megasphere"}
-FORAGE = 1024          # how far the bot goes out of its way for health or ammo it needs
+AMMO_PICKUPS = {"bullets": {"Clip", "ClipBox", "Chaingun"}, "shells": {"Shell", "ShellBox", "Shotgun", "SuperShotgun"},
+                "rockets": {"RocketAmmo", "RocketBox", "RocketLauncher"}, "cells": {"Cell", "CellPack", "PlasmaRifle"}}
+AMMO_MAX = {"bullets": 200, "shells": 50, "rockets": 50, "cells": 300}   # without a backpack
+WEAPON_SLOTS = {"Shotgun": 3, "SuperShotgun": 3, "Chaingun": 4, "RocketLauncher": 5, "PlasmaRifle": 6}
+FORAGE = 1024          # path length the bot goes out of its way for what it's low on (half that for the rest)
 # Solid decorations the player has to go round, by radius. Monsters aren't here:
 # scripts kill them first, and their corpses keep their names.
 SOLID = {"ExplosiveBarrel": 10, "TechLamp": 16, "TechLamp2": 16, "Column": 16, "TallGreenColumn": 16,
@@ -773,7 +783,11 @@ class Run:
         if d > 192:
             order += [(5, "rockets")]
         if d > BULLET_RANGE:   # bullets miss at range: don't spend them there
+            if name not in HEAVY:
+                return None    # nor cells or rockets on a far zombie or imp: close in first
             order = [o for o in order if o[1] != "bullets"]
+        if d > SHELL_RANGE:
+            order = [o for o in order if o[1] != "shells"]
         return next((slot for slot, ammo in order if have(slot, ammo)), None if d > BULLET_RANGE else 1)
 
     def fight(self):
@@ -782,9 +796,12 @@ class Run:
         if not self.args.fight:
             return False
         dmg = self.var("DAMAGE_TAKEN")
-        if dmg > getattr(self, "_dmg", 0):
-            self.hurt_at = self.tics
+        on_hazard = self.geo.sector_at(self.pos()) in self.geo.damaging
+        if dmg > getattr(self, "_dmg", 0) and not on_hazard:
+            self.hurt_at = self.tics   # floor damage isn't a monster to look for
         self._dmg = dmg
+        if on_hazard:
+            return False   # as a player would: get off the nukage first, then fight
         fought, engaged, turned = False, None, 0
         while True:
             tg = self.targets()
@@ -852,21 +869,38 @@ class Run:
                 self.tic()
 
     def needs(self):
-        """Pickup names worth a detour now."""
-        want = set()
-        if self.var("HEALTH") < 60:
-            want |= HEALTH_ITEMS
-        if self.var("ARMOR") < 20:
-            want |= ARMOR_ITEMS
-        dmg = (self.var("AMMO2") * 10 + self.var("AMMO3") * 70 * (self.var("WEAPON3") > 0)
-               + self.var("AMMO5") * 150 * (self.var("WEAPON5") > 0) + self.var("AMMO6") * 22 * (self.var("WEAPON6") > 0))
+        """Pickups worth a detour now, with how far (path length) to go for each.
+        Anything the player can still use is taken within FORAGE / 2, the
+        normal player of the build's detour curve (D = 1024 there, a round
+        trip); things it's low on, within FORAGE * 1.5."""
+        v = self.var
+        health, armor = v("HEALTH"), v("ARMOR")
+        ammo = {k: v(AMMO[k]) for k in AMMO}
+        useful = {"Backpack", "Megasphere"}
+        useful |= {n for n, cap in (("Stimpack", 100), ("Medikit", 100), ("Berserk", 100), ("Soulsphere", 200))
+                   if health < cap}
+        useful |= {n for n, cap in (("GreenArmor", 100), ("BlueArmor", 200)) if armor < cap}
+        for kind, items in AMMO_PICKUPS.items():
+            if ammo[kind] < AMMO_MAX[kind]:
+                useful |= items
+        useful |= {n for n, slot in WEAPON_SLOTS.items() if v(f"WEAPON{slot}") == 0}
+        low = set()
+        if health < 60:
+            low |= HEALTH_ITEMS
+        if armor < 20:
+            low |= ARMOR_ITEMS
+        dmg = (ammo["bullets"] * 10 + ammo["shells"] * 70 * (v("WEAPON3") > 0)
+               + ammo["rockets"] * 150 * (v("WEAPON5") > 0) + ammo["cells"] * 22 * (v("WEAPON6") > 0))
         if dmg < 1500:
-            want |= AMMO_ITEMS
+            low |= AMMO_ITEMS
+        want = {n: FORAGE / 2 for n in useful}
+        want.update({n: FORAGE * 1.5 for n in low & useful})
         return want
 
     def forage(self, ln):
         """As a player would: go and get nearby health, armor or ammo the player
-        needs, if it's reachable without crossing doors or damaging floor."""
+        can use (farther for what it's low on), if it's reachable without
+        crossing doors or damaging floor."""
         for _ in range(6):
             want = self.needs()
             if not want:
@@ -875,7 +909,7 @@ class Run:
             g = self.geo
             items = sorted(((math.hypot(o.position_x - x, o.position_y - y), o) for o in self.state().objects
                             if o.name in want and o.id not in self.skip
-                            and math.hypot(o.position_x - x, o.position_y - y) < FORAGE),
+                            and math.hypot(o.position_x - x, o.position_y - y) < min(want[o.name], FORAGE)),
                            key=lambda t: t[0])   # equal distances mustn't compare the objects
             for d, o in items:
                 at = (o.position_x, o.position_y)
@@ -886,9 +920,8 @@ class Run:
                 pts = self.plan.route(self.pos(), at, self.heights(),
                                       [(round(s.position_x), round(s.position_y), SOLID[s.name])
                                        for s in self.state().objects if s.name in SOLID])
-                if pts is None or sum(math.dist(a, b) for a, b in zip([self.pos()] + pts, pts)) > FORAGE * 1.5:
-                    self.skip.add(o.id)
-                    continue
+                if pts is None or sum(math.dist(a, b) for a, b in zip([self.pos()] + pts, pts)) > want[o.name]:
+                    continue   # too far by path for now; it may be worth it later, when the player is low
                 self.say(f"  detour for {o.name} at {at[0]:.0f},{at[1]:.0f}")
                 for k, p in enumerate(pts):
                     if not self.drive(p, ln, k == len(pts) - 1):
@@ -964,7 +997,7 @@ class Run:
     def drive(self, target, ln, final):
         """Run at target; on the last leg brake to stop within ARRIVE units.
         Returns False if it stopped to fight (the route needs replanning)."""
-        last, since, presses = self.pos(), 0, 0
+        best, since, presses = math.dist(self.pos(), target), 0, 0
         while True:
             if self.fight():
                 return False
@@ -988,9 +1021,12 @@ class Run:
             k = 25
             self.tic(fwd=max(-100, min(100, fwd * k)), side=max(-100, min(100, side * k)),
                      turn=max(-30, min(30, turn)))
+            # Stuck means not getting closer: sliding against a wall or a raised
+            # lift moves the player but gets it nowhere. `best` only ever falls,
+            # so jitter can't keep resetting the count.
             now = self.pos()
-            if math.dist(now, last) > 8:
-                last, since = now, 0
+            if math.dist(now, target) < best - 2:
+                best, since = math.dist(now, target), 0
             else:
                 since += 1
                 if since == STUCK_TICS // 3 and presses < 3:
