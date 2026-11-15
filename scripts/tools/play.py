@@ -44,7 +44,7 @@ from types import SimpleNamespace
 
 import playtest as pt
 from explore import Explorer, Teleported, level_info, line_textures
-from levels.doom2 import LINE_SPECIALS
+from levels.doom2 import BOOM_SPECIALS as SPECIALS
 
 PLAYS = os.path.expanduser("~/.local/share/playtest/plays")
 
@@ -145,7 +145,7 @@ class Observer(Explorer):
         self.key_doors = {}   # door sector -> key, for locked doors opened by hand
         self.used = set()     # tags that a switch or shot line acts on (not only walk-over lines)
         for _a, _b, _f, sp, tag, _fs, bs in geo.lines:
-            spec = LINE_SPECIALS.get(sp)
+            spec = SPECIALS.get(sp)
             if spec and spec.trigger == "D" and spec.key and bs is not None:
                 self.key_doors[bs] = spec.key
             if spec and tag and spec.trigger[:1] in "SG":

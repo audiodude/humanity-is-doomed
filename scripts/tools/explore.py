@@ -116,7 +116,7 @@ from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import playtest as pt  # noqa: E402
-from levels.doom2 import LINE_SPECIALS  # noqa: E402
+from levels.doom2 import BOOM_SPECIALS as SPECIALS  # noqa: E402
 
 KEYS = {"blue": {"BlueCard", "BlueSkull"}, "yellow": {"YellowCard", "YellowSkull"},
         "red": {"RedCard", "RedSkull"}}
@@ -220,7 +220,7 @@ class Explorer(pt.Run):
         # it has seen one, it can walk through it, opening it on the way.
         self.door_lines = {}
         for i, (_a, _b, flags, sp, _t, _fs, bs) in enumerate(geo.lines):
-            spec = LINE_SPECIALS.get(sp)
+            spec = SPECIALS.get(sp)
             if spec and spec.trigger == "D" and bs is not None and not flags & ML_SECRET:
                 self.door_lines[i] = (bs, spec.key)
         self.cell_lines = {}
@@ -241,7 +241,7 @@ class Explorer(pt.Run):
         # Teleporters: a player knows one by its pad. Once it has used a
         # repeatable one it knows where that goes: line -> (from cell, to cell).
         self.teleports = {i for i, (*_r, sp, _t, _fs, _bs) in enumerate(geo.lines)
-                          if sp in LINE_SPECIALS and LINE_SPECIALS[sp].kind == "teleport"}
+                          if sp in SPECIALS and SPECIALS[sp].kind == "teleport"}
         self.links = {}
         self._via = {}            # (from cell, to cell) -> teleport line, for go_to
         self._pads = {}           # cell -> seen teleporter lines the box touches there, for reach
@@ -296,7 +296,7 @@ class Explorer(pt.Run):
             self.event("teleport", f"to {self.name(here)}", progress=False, clear=False, at=was)
         else:
             self.learn(i, self.plan.cell(p))
-            spec = LINE_SPECIALS[g.lines[i][3]]
+            spec = SPECIALS[g.lines[i][3]]
             self.event("teleport", f"{spec.trigger} by {self.name(g.lines[i][5])} -> {self.name(here)}",
                        progress=False, clear=False, at=was)
         raise Teleported()
@@ -312,7 +312,7 @@ class Explorer(pt.Run):
             if j == i or (g.lines[j][3] == sp and g.lines[j][4] == tag and ("line", j) not in self.done
                           and pt.seg_dist(mid, *g.lines[j][:2]) <= 128):
                 self.links[j] = (self.plan.cell(self.spot(j, 0)), to)
-        if LINE_SPECIALS[sp].trigger != "WR":
+        if SPECIALS[sp].trigger != "WR":
             self.done.add(("line", i))
             del self.links[i]
 
@@ -611,7 +611,7 @@ class Explorer(pt.Run):
         h = self.heights()
         for i in self.seen_lines:
             a, b, flags, sp, _tag, fs, bs = self.geo.lines[i]
-            spec = LINE_SPECIALS.get(sp)
+            spec = SPECIALS.get(sp)
             if not spec or ("line", i) in self.done or ("line", i) in self.failed:
                 continue
             if spec.key and spec.key not in have:
@@ -675,7 +675,7 @@ class Explorer(pt.Run):
             # Still nothing: use again a repeatable switch it has used (a door
             # it opened may have shut behind it), once each till the next progress.
             for i in self.seen_lines:
-                spec = LINE_SPECIALS.get(self.geo.lines[i][3])
+                spec = SPECIALS.get(self.geo.lines[i][3])
                 if spec and spec.trigger == "SR" and spec.kind not in EXITS and ("line", i) in self.done \
                         and i not in self.again and i not in self.door_lines and ("line", i) not in self.failed:
                     c = self.near(self.spot(i, 0), dist, lv, line=i, use=i)
@@ -878,9 +878,9 @@ class Explorer(pt.Run):
             # A lift switch it has seen on the lift's own edge (a switch in the
             # room that is the lift): use it from where it is, and ride down.
             switch = min((i for i in self.seen_lines if self.geo.lines[i][5] == s
-                          and self.geo.lines[i][3] in LINE_SPECIALS
-                          and LINE_SPECIALS[self.geo.lines[i][3]].kind == "lift"
-                          and LINE_SPECIALS[self.geo.lines[i][3]].trigger in ("S1", "SR")),
+                          and self.geo.lines[i][3] in SPECIALS
+                          and SPECIALS[self.geo.lines[i][3]].kind == "lift"
+                          and SPECIALS[self.geo.lines[i][3]].trigger in ("S1", "SR")),
                          key=lambda i: pt.seg_dist(self.pos(), *self.geo.lines[i][:2]), default=None)
             if self.geo.sector_at(self.pos()) == s and switch is not None:
                 (x1, y1), (x2, y2) = self.geo.lines[switch][:2]
@@ -1015,7 +1015,7 @@ class Explorer(pt.Run):
         down before: go and use that switch again, and catch the lift."""
         i, side = self.lift_switch[s]
         a, b, _flags, sp, _tag, fs, _bs = self.geo.lines[i]
-        spec = LINE_SPECIALS[sp]
+        spec = SPECIALS[sp]
         self._calling = True
         try:
             doors = self.doors()
@@ -1251,7 +1251,7 @@ class Explorer(pt.Run):
             moved = self.heard(i, before, moving)
         if not moved:
             return
-        spec = LINE_SPECIALS.get(sp)
+        spec = SPECIALS.get(sp)
         if spec and spec.trigger == "D" and bs is not None:
             self.door_lines[i] = (bs, spec.key)   # a door: now it knows, it can open it again
         self.found_secs |= set(moved)

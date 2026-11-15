@@ -4,6 +4,7 @@ exists in, and size and health for monsters), pickups, every line action
 ACTION_NAMES and SECTOR_NAMES map numbers back to the constant names. Level
 modules usually `from .doom2 import *`; scripts/metrics/doomwad.py imports
 these too."""
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 # ------------------------------------------------------------ thing types ---
@@ -218,6 +219,52 @@ LINE_SPECIALS = {}
 for _item in _LS.split(";"):
     _p = _item.split()
     LINE_SPECIALS[int(_p[0])] = LineSpecial("" if _p[1] == "_" else _p[1], _p[2], _p[3] if len(_p) > 3 else None)
+
+
+def generalized(sp):
+    """A Boom generalized line type (0x2F80-0x7FFF) as a LineSpecial, or None.
+    The trigger is bits 0-2; the kind comes from the type's range and, for
+    floors and ceilings, the direction bit; manual doors (D1/DR) are "D" as in
+    the vanilla table. A locked door's "any key" or "all keys" has key None."""
+    if not 0x2F80 <= sp < 0x8000:
+        return None
+    trigger = ("W1", "WR", "S1", "SR", "G1", "GR", "D", "D")[sp & 7]
+    key = None
+    if sp >= 0x6000:
+        kind = "floor_raise" if sp & 0x40 else "floor_lower"
+    elif sp >= 0x4000:
+        kind = "ceiling_raise" if sp & 0x40 else "ceiling_lower"
+    elif sp >= 0x3C00:
+        kind = "door" if not sp & 0x20 else "door_close"   # kinds 0/1 open, 2/3 close
+    elif sp >= 0x3800:
+        kind, key = "door", (None, "red", "blue", "yellow", "red", "blue", "yellow", None)[(sp >> 6) & 7]
+    elif sp >= 0x3400:
+        kind = "lift"
+    elif sp >= 0x3000:
+        kind = "stairs"
+    else:
+        kind = "crusher"
+    return LineSpecial(trigger, kind, key)
+
+
+class _Specials(Mapping):
+    """LINE_SPECIALS plus Boom's generalized types, for the tools that play
+    any WAD (the explorer, --play). The build and the metrics keep to vanilla."""
+
+    def __getitem__(self, sp):
+        spec = LINE_SPECIALS.get(sp) or generalized(sp)
+        if spec is None:
+            raise KeyError(sp)
+        return spec
+
+    def __iter__(self):
+        return iter(LINE_SPECIALS)
+
+    def __len__(self):
+        return len(LINE_SPECIALS)
+
+
+BOOM_SPECIALS = _Specials()
 
 # -------------------------------------------------------- sector specials ---
 _before_sectors = set(globals())
