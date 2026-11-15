@@ -310,17 +310,18 @@ THINGS = [Thing(*t) for t in [
     (SPECTRE, 2640, 590, 0, "emha"), (SPECTRE, 2520, 600, 0, "ha"),
     (MEDI, 2420, 448), (SHELLS, 2640, 448),
     (YELLOWKEY, *KEY), (SHELLS, 2300, 560),
+    (BERSERK, 2832, 512),   # beside the key, on the cradle: you ride it down into the pit with it
     # loft and secret 3
     (IMP, 2500, 1024, 180, "emh"), (IMP, 2800, 1024, 180, "mha"),
     (PLASMA, 2288, 1024), (CELL, 2256, 1000), (CELL, 2256, 1048),
     # boiler room
     (REVENANT, 3168, 480, 180, "mha"), (IMP, 3168, 480, 180, "ea"),
     (IMP, 3100, 0, 180, "emh"), (IMP, 3200, 200, 180, "mh"), (IMP, 3100, -200, 180, "h"),
-    (LAUNCHER, 3040, 240), (ROCKETBOX, 3200, -260), (SHELLBOX, 3040, -200),
+    (LAUNCHER, 3040, 240), (ROCKETBOX, 3200, -260), (SHELLBOX, 3040, -200), (MEDI, 3120, 320),
     # pipe gallery: chaingunners in the dark at the far end, spectres
     (CHAINGUY, 2280, -180, 0, "mha"), (CHAINGUY, 2280, -260, 0, "ha"), (ZOMBIE, 2280, -220, 0, "ea"),
     (SPECTRE, 2600, -170, 0, "emh"), (SPECTRE, 2700, -280, 0, "h"),
-    (ROCKETBOX, 2500, -280), (STIM, 2150, -200),
+    (ROCKETBOX, 2500, -280), (MEDI, 2150, -200),
     (SHELLBOX, 2152, 60),   # the boiler passage: armed for the return, whatever the generator house cost
     # the return: arachnotron 1 and its imps on gantry B
     (ARACHNO, 1632, 720, 270, "emh"), (IMP, 1580, 816, 270, "mh"), (IMP, 1690, 816, 270, "h"),
