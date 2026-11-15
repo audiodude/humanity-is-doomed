@@ -13,18 +13,24 @@ by walking distance over floor it has seen:
   - a key it has seen (a third)
   - a switch it hasn't pressed (two thirds)
   - a door it hasn't opened, if it has the key
-  - a teleporter it has seen and not been through (a player knows a pad):
-    it steps on from the side the line works from
+  - a teleporter it has seen and not been through (a player knows a pad),
+    if the pad has room to stand on: it steps on from the side that works
   - the edge of what it has seen, where it goes and looks round
+
+When nothing of these is left it goes to stand in places it has only seen
+from afar, and presses each repeatable switch it has used once more (a
+door it opened may have shut again); a re-press is logged but isn't progress.
 
 Teleporters: a jump in position is a teleport, logged as an event (not
 progress). It looks round where it landed and carries on from there; it
 knows only what it has seen, so the new place starts as unknown ground.
-A repeatable teleporter it has been through (and the rest of that pad) then
-counts as a way from the pad to where it landed, a few cells long, so it
-goes back and forth through it like through a door. It keeps off the pads
-it has seen, with a margin, unless it means to use one; a target it keeps
-being teleported away from on the way to is given up after three goes.
+A teleporter it has been through (and the rest of that pad) then counts as
+a way from the pad to where it landed, a few cells long, so it goes back
+and forth through it like through a door (a one-shot line once). It keeps
+off the pads it has seen unless it means to use one: no step that would set
+one off (box touching, centre crossing from the front, as Doom does), and
+cells just in front cost extra. A target it keeps being teleported away
+from on the way to is given up after three goes.
 
 Costs are jittered by --seed, so seeds explore in different orders. Secret
 doors look like walls to it, and it never shoots a wall. Monsters are killed
@@ -115,21 +121,20 @@ class Explorer(pt.Run):
             spec = LINE_SPECIALS.get(sp)
             if spec and spec.trigger == "D" and bs is not None and not flags & ML_SECRET:
                 self.door_lines[i] = (bs, spec.key)
-        self.cell_lines, self.line_cells = {}, {}
+        self.cell_lines = {}
         for i, (a, b, *_rest) in enumerate(geo.lines):
             n = max(1, int(math.dist(a, b) / 4))
             for k in range(n + 1):
                 c = self.plan.cell((a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n))
                 self.cell_lines.setdefault(c, []).append(i)
-                self.line_cells.setdefault(i, set()).add(c)
         # Teleporters: a player knows one by its pad. Once it has used a
         # repeatable one it knows where that goes: line -> (from cell, to cell).
         self.teleports = {i for i, (*_r, sp, _t, _fs, _bs) in enumerate(geo.lines)
                           if sp in LINE_SPECIALS and LINE_SPECIALS[sp].kind == "teleport"}
         self.links = {}
         self._via = {}            # (from cell, to cell) -> teleport line, for go_to
-        self._pads = {}           # cell -> seen teleporter lines through it, for reach
-        self._guards, self._guard = {}, set()   # cells it keeps out of beside teleporters
+        self._pads = {}           # cell -> seen teleporter lines the box touches there, for reach
+        self._touch, self._guards, self._guard = {}, {}, set()   # cells it keeps out of beside teleporters
         self.again = set()        # repeatable switches pressed again since the last progress
 
     # -- seeing --------------------------------------------------------------
@@ -176,17 +181,18 @@ class Explorer(pt.Run):
 
     def learn(self, i, to):
         """Teleporter line i took it to cell `to`: so does the rest of its pad
-        (the lines like it round the same spot), if it can be used again."""
+        (the lines like it round the same spot). A one-shot line is spent."""
         g = self.geo
         self.seen_lines.add(i)
         _a, _b, _f, sp, tag, _fs, _bs = g.lines[i]
-        if LINE_SPECIALS[sp].trigger != "WR":
-            self.done.add(("line", i))
-            return
         mid = [(g.lines[i][0][k] + g.lines[i][1][k]) / 2 for k in (0, 1)]
         for j in self.teleports:
-            if j == i or (g.lines[j][3] == sp and g.lines[j][4] == tag and pt.seg_dist(mid, *g.lines[j][:2]) <= 128):
+            if j == i or (g.lines[j][3] == sp and g.lines[j][4] == tag and ("line", j) not in self.done
+                          and pt.seg_dist(mid, *g.lines[j][:2]) <= 128):
                 self.links[j] = (self.plan.cell(self.spot(j, 0)), to)
+        if LINE_SPECIALS[sp].trigger != "WR":
+            self.done.add(("line", i))
+            del self.links[i]
 
     def blocks(self, i, closed):
         _a, _b, _f, _sp, _t, fs, bs = self.geo.lines[i]
@@ -291,7 +297,7 @@ class Explorer(pt.Run):
         guard = set()
         for i in self.teleports & self.seen_lines:
             if ("line", i) not in self.done:
-                for c in self.line_cells[i]:
+                for c in self.touch(i):
                     pads.setdefault(c, []).append(i)
                 guard |= self.guard(i)
         self._guard = guard
@@ -332,31 +338,45 @@ class Explorer(pt.Run):
                     heapq.heappush(todo, (nd, n))
         return dist, prev
 
+    def touch(self, i):
+        """The cells where the player's box touches teleporter line i."""
+        if i not in self._touch:
+            self._touch[i] = self.cells_near(i, pt.RADIUS + 4, None)
+        return self._touch[i]
+
     def guard(self, i):
         """The cells on teleporter line i's working side close enough that
         the player's box, running past, could cross it."""
         if i not in self._guards:
-            g, plan = self.geo, self.plan
-            a, b = g.lines[i][:2]
-            r = pt.RADIUS + 8
-            c0, c1 = plan.cell((min(a[0], b[0]) - r, min(a[1], b[1]) - r)), \
-                plan.cell((max(a[0], b[0]) + r, max(a[1], b[1]) + r))
-            self._guards[i] = {(x, y) for x in range(c0[0], c1[0] + 1) for y in range(c0[1], c1[1] + 1)
-                               if pt.seg_dist(plan.centre((x, y)), a, b) <= r
-                               and self.side_of(i, plan.centre((x, y))) == 0}
+            self._guards[i] = self.cells_near(i, pt.RADIUS + 8, 0)
         return self._guards[i]
 
+    def cells_near(self, i, r, side):
+        g, plan = self.geo, self.plan
+        a, b = g.lines[i][:2]
+        c0 = plan.cell((min(a[0], b[0]) - r, min(a[1], b[1]) - r))
+        c1 = plan.cell((max(a[0], b[0]) + r, max(a[1], b[1]) + r))
+        return {(x, y) for x in range(c0[0], c1[0] + 1) for y in range(c0[1], c1[1] + 1)
+                if pt.seg_dist(plan.centre((x, y)), a, b) <= r
+                and (side is None or self.side_of(i, plan.centre((x, y))) == side)}
+
     def onto_pad(self, p, q):
-        """Walking p to q would cross a teleporter it has seen from the side
-        that works (as of the last reach)."""
+        """Walking p to q would set off a teleporter it has seen (as of the
+        last reach). As in Doom: the box touches the line on the way and the
+        centre goes from its front to its back (of the line extended, so a
+        pad's corner counts too)."""
         pads = self._pads
-        cells = {self.plan.cell(p), self.plan.cell(q)}
-        if not any(c in pads for c in cells):
-            n = max(1, int(math.dist(p, q) / 8))
-            cells = {self.plan.cell((p[0] + (q[0] - p[0]) * k / n, p[1] + (q[1] - p[1]) * k / n))
-                     for k in range(n + 1)}
-        lines = {i for c in cells for i in pads.get(c, ())}
-        return any(cross(p, q, *self.geo.lines[i][:2]) is not None and self.side_of(i, p) == 0 for i in lines)
+        n = max(1, int(math.dist(p, q) / 8))
+        cells = {self.plan.cell((p[0] + (q[0] - p[0]) * k / n, p[1] + (q[1] - p[1]) * k / n))
+                 for k in range(n + 1)}
+        for i in {i for c in cells for i in pads.get(c, ())}:
+            a, b = self.geo.lines[i][:2]
+            if self.side_of(i, p) == 0 and self.side_of(i, q) == 1 and (
+                    cross(p, q, a, b) is not None
+                    or min(pt.seg_dist(p, a, b), pt.seg_dist(q, a, b), pt.seg_dist(a, p, q),
+                           pt.seg_dist(b, p, q)) < pt.RADIUS):
+                return True
+        return False
 
     def near(self, p, dist, r=3):
         """The reachable cell nearest p, within r cells."""
@@ -413,7 +433,10 @@ class Explorer(pt.Run):
             elif spec.trigger == "W1" and spec.kind in EXITS:
                 kind, sides = "exit", (0, 1)
             elif i in self.teleports and i not in self.links:
-                # a pad it hasn't been through: step on from the side that works
+                # a pad it hasn't been through, if there's room to stand on it:
+                # step on from the side that works
+                if bs is None or h[bs][1] - h[bs][0] < pt.HEIGHT_P:
+                    continue
                 kind, sides = "teleport", (0,)
             else:
                 continue
