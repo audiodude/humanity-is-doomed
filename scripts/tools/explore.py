@@ -15,7 +15,8 @@ by walking distance over floor it has seen:
     edge when the lift is up against its ceiling, shut like a door; one that
     works when shot (a gun-activated line with a switch texture) it shoots
     ("shot" in the report)
-  - a door it hasn't opened, if it has the key
+  - a door it hasn't opened, if it has the key (a locked one a third: having
+    the key, that door is what it's after)
   - a teleporter it has seen and not been through (a player knows a pad),
     if the pad has room to stand on: it steps on from the side that works
   - the edge of what it has seen, where it goes and looks round
@@ -27,12 +28,16 @@ Before giving up it waits for anything it can see moving to stop.
 
 Lifts: it walks over a lift it can step or drop onto and off as it stands;
 otherwise it calls it, or (standing on it, going down) uses a lift switch on
-the lift's own edge and rides it. A lift it got stuck riding counts as a plain
-floor at its height until the next progress. A floor or ceiling it has seen
-moving (a walk-over line it crossed, a switch far off) makes the places it
-looked round from and couldn't reach worth another try, a few times between
-progress. Getting stuck on the same spot twice blocks the cells just past it
-toward where it was going.
+the lift's own edge and rides it. A switch it uses that sends a lift it has
+seen down (one it isn't standing on) has it run for that lift and ride it up
+before it goes back ("lift" in the report, not progress); a lift out of reach
+that a repeatable switch sent down before, it goes and calls with that switch
+(twice between progress, "switch ... again, to call ..."). A lift it got
+stuck riding counts as a plain floor at its height until the next progress.
+A floor or ceiling it has seen moving (a walk-over line it crossed, a switch
+far off) makes the places it looked round from and couldn't reach worth
+another try, a few times between progress. Getting stuck on the same spot
+twice blocks the cells just past it toward where it was going.
 
 Teleporters: a jump in position is a teleport, logged as an event (not
 progress). It looks round where it landed and carries on from there; it
@@ -114,6 +119,10 @@ class Teleported(Exception):
     """The player was teleported: whatever it was doing is over."""
 
 
+class Replan(Exception):
+    """What it was doing changed the map under it (it rode a lift up): think again."""
+
+
 def cross(p, q, a, b):
     """Where along p-q (0..1) it crosses segment a-b, or None."""
     rx, ry = q[0] - p[0], q[1] - p[1]
@@ -192,6 +201,10 @@ class Explorer(pt.Run):
         self._via = {}            # (from cell, to cell) -> teleport line, for go_to
         self._pads = {}           # cell -> seen teleporter lines the box touches there, for reach
         self._touch, self._guards, self._guard = {}, {}, set()   # cells it keeps out of beside teleporters
+        # Lifts a repeatable switch it used sent down: lift -> (line, side)
+        self.lift_switch = {}
+        self.calls = Counter()    # times it went back to such a switch per lift since the last progress
+        self._calling = False
 
     # -- seeing --------------------------------------------------------------
     def watch(self):
@@ -272,15 +285,14 @@ class Explorer(pt.Run):
             for s in range(1, SIGHT // RAY_STEP):
                 q = (x + dx * s, y + dy * s)
                 qc = plan.cell(q)
-                if not (0 <= qc[0] < g.nx and 0 <= qc[1] < g.ny):
-                    break
+                inside = 0 <= qc[0] < g.nx and 0 <= qc[1] < g.ny
                 hits = []
                 for c in {pc, qc, (pc[0], qc[1]), (qc[0], pc[1])}:
                     for i in self.cell_lines.get(c, ()):
                         t = cross(prev, q, *g.lines[i][:2])
                         if t is not None:
                             hits.append((t, i))
-                stop = False
+                stop = not inside   # (but a wall on the map's very edge is seen first)
                 for _t, i in sorted(hits):
                     self.seen_lines.add(i)
                     if self.blocks(i, closed):
@@ -323,6 +335,7 @@ class Explorer(pt.Run):
             self.again.clear()
             self.moves = 0
             self.stuck.clear()
+            self.calls.clear()
         self.note(kind, text, progress, at)
 
     def note(self, kind, text, progress=False, at=None):
@@ -442,6 +455,11 @@ class Explorer(pt.Run):
                 return True
         return False
 
+    def solid(self):
+        """Solid things in the way: (x, y, radius)."""
+        return [(round(o.position_x), round(o.position_y), pt.SOLID[o.name]) for o in self.state().objects
+                if o.name in pt.SOLID]
+
     def near(self, p, dist, lv=None, r=3):
         """The reachable cell nearest p, within r cells. Given lv, only cells with
         their floor within a step of the floor at p: a key on a ledge can't be
@@ -497,7 +515,7 @@ class Explorer(pt.Run):
                 if (flags & ML_SECRET and i not in self.door_lines) or bs is None or \
                         h[bs][1] - h[bs][0] >= pt.HEIGHT_P or ("door", bs) in self.done:
                     continue
-                kind, sides = "door", (0, 1)
+                kind, sides = "door", (0,)   # (as in Doom, a line used from its back does nothing)
             elif spec.trigger in ("S1", "SR") and not (spec.kind == "lift" and bs is not None and h[bs][1] > h[bs][0]
                                                        and {fs, bs} & self.tagged(_tag)):
                 # (a switch on the lift's own side calls it, which ride() does,
@@ -522,7 +540,9 @@ class Explorer(pt.Run):
             for side in sides:
                 c = self.near(self.spot(i, side), dist)
                 if c:
-                    out.append((dist[c], kind, c, ("line", i, spec, side)))
+                    # A locked door it has the key for now is what it's after, as a key is.
+                    d = dist[c] * (WEIGHT["key"] / WEIGHT["door"] if kind == "door" and spec.key else 1)
+                    out.append((d, kind, c, ("line", i, spec, side)))
         closed = {s for s, (f, c) in enumerate(h) if c - f <= 0}
         for c in dist:
             if c not in self.looked and ("cell", c) not in self.failed and self.lift_of(c) is None \
@@ -570,13 +590,22 @@ class Explorer(pt.Run):
         self.follow(path[start:], lv, final)
 
     def through(self, i):
-        """Cross teleporter line i from its front, and wait out the freeze."""
+        """Cross teleporter line i from its front, and wait out the freeze.
+        If it can't get across, or crossing takes it nowhere (the pad has
+        moved or shut since), it forgets where that pad goes."""
         try:
-            self.drive(self.spot(i, 1), 0, True)
-        except Teleported:
-            self.tic(n=18)
-            return
-        raise pt.Abort("the teleporter didn't take it anywhere")
+            try:
+                self.drive(self.spot(i, 1), 0, True)
+            except Teleported:
+                self.tic(n=18)
+                return
+            raise pt.Abort("the teleporter didn't take it anywhere")
+        except pt.Abort:
+            if i in self.links:
+                to = self.links[i][1]
+                for j in [j for j, (_a, b) in self.links.items() if b == to]:
+                    del self.links[j]
+            raise
 
     def follow(self, path, lv, final=None):
         k = 0
@@ -678,8 +707,23 @@ class Explorer(pt.Run):
             self.static.add(s)
             raise
 
+    def inside(self, c, lifts, margin):
+        """The player's box in cell c, and in the cells within `margin` of
+        it, is wholly on `lifts`."""
+        g, under, wall = self.geo, self.plan.under, self.plan.wall
+        return all(0 <= n[0] < g.nx and 0 <= n[1] < g.ny and not wall[n[1]][n[0]]
+                   and (under[n[1]][n[0]] or {None}) <= lifts
+                   for n in ((c[0] + i, c[1] + j) for i in range(-margin, margin + 1)
+                             for j in range(-margin, margin + 1)))
+
     def _ride(self, s, cells, after):
-        on = self.plan.centre(cells[len(cells) // 2])
+        # Where to stand on it: the cell nearest the middle of the way across
+        # where the box is well onto the lift (on its edge, the ledge beside
+        # it would hold the player up while it's down).
+        mid = cells[len(cells) // 2]
+        near = [(mid[0] + i, mid[1] + j) for i in range(-4, 5) for j in range(-4, 5)]
+        inner = [c for c in near if self.inside(c, {s}, 1)] or [c for c in near if self.inside(c, {s}, 0)]
+        on = self.plan.centre(min(inner, key=lambda c: math.dist(c, mid)) if inner else mid)
         g = self.geo
         z = lambda: self.var("POSITION_Z")  # noqa: E731
         lift = lambda: self.heights()[s][0]  # noqa: E731
@@ -694,6 +738,11 @@ class Explorer(pt.Run):
             self.walk(self.plan.centre(after), False)
             return
         if abs(lift() - z()) > 24:            # up (or down) out of reach: call it
+            if s in self.lift_switch and not self._calling and self.calls[s] < 2:
+                # from the switch it saw send it down before (twice between progress)
+                self.calls[s] += 1
+                self.call_from_switch(s)
+                raise Replan()
             self.face(on)
             self.press()
             for _ in range(175):
@@ -774,6 +823,7 @@ class Explorer(pt.Run):
             pass   # a step or a lip in the way: it may be in reach already
         if kind != "door":
             self.quiet(before)
+        pressed = self.heights()
         if spec.trigger in ("G1", "GR"):
             self.shoot(i, side)
         else:
@@ -794,10 +844,106 @@ class Explorer(pt.Run):
                        f"{spec.trigger} {spec.kind} by {self.name(fs)}"
                        + (f" -> {'/'.join(moved[:3])}{'...' if len(moved) > 3 else ''}" if moved else "")
                        + (" again" if kind == "again" else ""), False if kind == "again" else None)
-        for _ in range(70 if kind != "exit" else 35):
+        lifts = self.lifts_off() if kind in ("switch", "again") else set()
+        lowered = []
+        for t in range(70 if kind != "exit" else 35):
             self.tic()
+            if lifts and t >= 8:
+                lowered = [s for s in lifts if self.heights()[s][0] < pressed[s][0] - pt.STEP]
+                if lowered:
+                    break
+        if lowered:
+            if spec.trigger == "SR":
+                self.lift_switch.update((s, (i, side)) for s in lowered)
+            self.catch_lift(lowered, pressed)
         if kind in ("switch", "again"):
             self.look_round()   # as a player does: what did that do?
+
+    def seen_lifts(self):
+        """Lifts it has seen (a side of a line it has seen)."""
+        return {s for i in self.seen_lines for s in self.geo.lines[i][5:7] if s in self.geo.lifts}
+
+    def lifts_off(self):
+        """Lifts it has seen, but not one it's standing on."""
+        here = self.plan.cell(self.pos())
+        return self.seen_lifts() - set(self.plan.under[here[1]][here[0]] or ())
+
+    def call_from_switch(self, s):
+        """Lift s is out of reach and a repeatable switch it has used sent it
+        down before: go and use that switch again, and catch the lift."""
+        i, side = self.lift_switch[s]
+        a, b, _flags, sp, _tag, fs, _bs = self.geo.lines[i]
+        spec = LINE_SPECIALS[sp]
+        self._calling = True
+        try:
+            doors = self.doors()
+            lv = self.plan.levels(self.route_heights(doors), self.solid(), frozenset(self.static))
+            dist, prev = self.reach(lv, doors)
+            c = self.near(self.spot(i, side), dist)
+            if c is None:
+                raise pt.Abort("can't get to the switch that calls the lift")
+            self.go_to(c, prev, lv)
+            try:
+                self.drive(self.spot(i, side, 24), 0, True)
+            except pt.Abort:
+                pass
+            self.face(((a[0] + b[0]) / 2, (a[1] + b[1]) / 2))
+            if pt.seg_dist(self.pos(), a, b) > pt.USE_RANGE:
+                raise pt.Abort("couldn't get within reach of the switch that calls the lift")
+            pressed, lifts = self.heights(), self.lifts_off()
+            self.press()
+            self.event("switch", f"{spec.trigger} {spec.kind} by {self.name(fs)} again, to call {self.name(s)}",
+                       False)
+            for _ in range(40):
+                self.tic()
+                lowered = [t for t in lifts if self.heights()[t][0] < pressed[t][0] - pt.STEP]
+                if lowered:
+                    self.catch_lift(lowered, pressed)
+                    break
+            else:
+                self.note("lift", f"{self.name(s)} didn't go down")
+        finally:
+            self._calling = False
+
+    def catch_lift(self, lowered, was):
+        """A switch it used sent a lift it has seen down (heights `was`
+        before): as a player does, run and get on it before it goes back up,
+        and ride it up."""
+        # Once it's down, the lift is a floor like any other: plan a way onto
+        # it that doesn't clip the ledges round it.
+        for _ in range(40):
+            h = [self.heights()[s] for s in lowered]
+            self.tic()
+            if [self.heights()[s] for s in lowered] == h:
+                break
+        added = set(lowered) - self.static
+        self.static |= added
+        try:
+            doors = self.doors()
+            lv = self.plan.levels(self.route_heights(doors), self.solid(), frozenset(self.static))
+            dist, prev = self.reach(lv, doors)
+            # Standing well onto it, the nearest such spot (on a lift too
+            # narrow for that, the nearest spot on it at all).
+            low = set(lowered)
+            on = [c for c in dist if self.inside(c, low, 1)] or [c for c in dist if self.inside(c, low, 0)] or \
+                [c for c in dist if (self.plan.under[c[1]][c[0]] or set()) & low]
+            if not on:
+                self.note("lift", f"no way it knows onto {'/'.join(self.name(t) for t in lowered)}")
+                return
+            c = min(on, key=dist.get)
+            s = next(iter(self.plan.under[c[1]][c[0]] & low))
+            self.note("lift", f"runs for {self.name(s)}, which went down ({dist[c] * pt.GRID:.0f} away)")
+            try:
+                self.go_to(c, prev, lv)
+            except pt.Abort as e:
+                self.note("lift", f"missed {self.name(s)}: {e}")
+                return
+            still, f = 0, self.heights()[s][0]
+            while f < was[s][0] and still < 140:   # ride it back up (if it comes back up)
+                self.tic()
+                still, f = (still + 1 if self.heights()[s][0] == f else 0), self.heights()[s][0]
+        finally:
+            self.static -= added
 
     def quiet(self, before):
         """Before a switch, if anything near it moved since `before`, wait
@@ -995,10 +1141,8 @@ class Explorer(pt.Run):
         cap = self.args.max_time * 60 * 35
         while self.tics < cap:
             self.notice_moves()
-            solid = [(round(o.position_x), round(o.position_y), pt.SOLID[o.name]) for o in self.state().objects
-                     if o.name in pt.SOLID]
             doors = self.doors()
-            lv = self.plan.levels(self.route_heights(doors), solid, frozenset(self.static))
+            lv = self.plan.levels(self.route_heights(doors), self.solid(), frozenset(self.static))
             dist, prev = self.reach(lv, doors)
             # A key or switch it gave up on is worth another go a minute
             # later: it may have found another way up since.
@@ -1034,6 +1178,8 @@ class Explorer(pt.Run):
                     self.search(c, what, lv, prev)
                 else:
                     self.act(kind, c, what, lv, prev)
+            except Replan:
+                pass
             except Teleported:
                 if kind == "teleport":
                     self.learn(what[1], self._landed[1])   # it stepped on the pad it was making for
