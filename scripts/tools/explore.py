@@ -91,7 +91,6 @@ WEIGHT = {"exit": 0.25, "key": 1 / 3, "switch": 2 / 3, "door": 1.0, "frontier": 
 DOORISH = ("DOOR", "BIGDOOR", "SPCDOOR", "EXITDOOR")   # textures that read as a door (but door tracks don't)
 NOT_DOOR = ("DOORTRAK", "DOORSTOP")
 NEARBY = 512          # a floor or ceiling that moves this close to a wall it searched is what it found
-SEARCH = os.environ.get("EXPLORE_SEARCH", "cue")   # experiment: cue-weighted, every wall alike, cues only
 CUE = 0.25            # a wall that stands out costs this much of its walking distance to search
 
 
@@ -713,12 +712,7 @@ class Explorer(pt.Run):
                 c = self.near(self.spot(i, side, 32), dist)
                 if c is None:
                     continue
-                w = 1.0
-                if SEARCH != "all":
-                    if self.cue(i, side):
-                        w = CUE
-                    elif SEARCH == "cues":
-                        continue
+                w = CUE if self.cue(i, side) else 1.0
                 out.append((dist[c] * w * self.rng.uniform(0.85, 1.15), "wall", c, ("wall", i, side)))
         return out
 
