@@ -49,15 +49,6 @@ looked round from and couldn't reach worth another try, a few times between
 progress. Getting stuck on the same spot twice blocks the cells just past it
 toward where it was going.
 
-Running jumps: from a straight, level run-up of 6 cells, it jumps a gap of
-lower floor it has seen, up to 8 cells wide, onto seen floor across it that
-it couldn't climb to from the gap, when a straight run lands there both
-after the short run-up and at full speed (Doom's physics as levels/reach.py
-models them: no air control, a step of 24 at most in the air). A jump costs
-64 cells on top of its length, so it only jumps where walking round is much
-further or there is no other way; one it fell short on it doesn't try again.
-Each jump is logged ("jump", not progress).
-
 Teleporters: a jump in position is a teleport, logged as an event (not
 progress). It looks round where it landed and carries on from there; it
 knows only what it has seen, so the new place starts as unknown ground.
@@ -136,10 +127,6 @@ JUMP = 64             # moved further than this in a tic: it was teleported
 LINK = 4              # cells a teleporter it has used costs to go through
 HEAR = 1024           # a lift moving this close is heard
 RECENT = 6 * 35       # a sector that moved this recently before it used a wall moves by itself
-RUNUP = 6             # cells of straight, level run-up a running jump needs
-LEAP = 8              # widest gap (cells) it reads as one to jump
-LEAP_COST = 64        # cells a jump costs on top of its length: it walks round if it can
-LEAP_SPEEDS = (11.0, 16.67)   # a jump must land both after a short run-up and a full run
 PICK = 48             # a key on a ledge is in reach from a cell this close: it walks on to touch it
 
 
@@ -203,8 +190,6 @@ class Explorer(pt.Run):
         self.found_secs = set()   # sectors a wall search found: moving again isn't a find
         self.revived = False      # cleared the lifts that didn't come, as a last resort, since the last event
         self._sector_at, self._middle = {}, {}
-        self._leap, self._leaps_lv, self._leaps = set(), None, {}
-        self.bad_leaps = set()    # (from, to) cells of running jumps it fell short on
         self.moves = 0            # times since the last progress something it saw moved
         self._h_last, self._seen_n, self._seen_secs = None, -1, set()
         self.visited = set()      # cells within VISITED of where it has been
@@ -426,7 +411,7 @@ class Explorer(pt.Run):
                 guard |= self.guard(i)
         self._guard = guard
         jumps = {}
-        self._via, self._leap = {}, set()
+        self._via = {}
         for i, (a, b) in self.links.items():
             t = plan.free_near(b, lv)
             if t is not None:   # from anywhere just in front of the pad
@@ -443,11 +428,6 @@ class Explorer(pt.Run):
                     dist[t], prev[t] = d + LINK, c
                     self._via[(c, t)] = i
                     heapq.heappush(todo, (d + LINK, t))
-            for t, cost in self.leaps(c, lv):
-                if d + cost < dist.get(t, 1e18):
-                    dist[t], prev[t] = d + cost, c
-                    self._leap.add((c, t))
-                    heapq.heappush(todo, (d + cost, t))
             here = lv[c[1]][c[0]]
             for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
                 n = (c[0] + di, c[1] + dj)
@@ -466,77 +446,6 @@ class Explorer(pt.Run):
                     dist[n], prev[n] = nd, c
                     heapq.heappush(todo, (nd, n))
         return dist, prev
-
-    def leaps(self, c, lv):
-        """(landing cell, cost) of the running jumps it could make from cell c
-        over a gap it has seen (run-up, gap and landing all seen floor) onto a
-        ledge it can't walk to from the gap's floor, as Doom's physics carries a
-        running player: no step up over 24 in the air, falling under gravity."""
-        if lv is not self._leaps_lv:
-            self._leaps_lv, self._leaps = lv, {}
-        if c not in self._leaps:
-            self._leaps[c] = self.find_leaps(c, lv)
-        return [(t, cost) for t, cost, cells in self._leaps[c]
-                if (c, t) not in self.bad_leaps and t not in self.blocked and all(x in self.known for x in cells)]
-
-    def find_leaps(self, c, lv):
-        g = self.geo
-        here = lv[c[1]][c[0]]
-        if here is None or here[2]:
-            return []
-        inside = lambda x: 0 <= x[0] < g.nx and 0 <= x[1] < g.ny and lv[x[1]][x[0]] is not None  # noqa: E731
-        out = []
-        for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
-            n = (c[0] + di, c[1] + dj)
-            if not inside(n) or lv[n[1]][n[0]][2] or lv[n[1]][n[0]][0] >= here[0] - pt.STEP:
-                continue   # no drop ahead: it walks
-            back = [(c[0] - k * di, c[1] - k * dj) for k in range(1, RUNUP + 1)]
-            if not all(inside(b) and not lv[b[1]][b[0]][2] and abs(lv[b[1]][b[0]][0] - here[0]) <= pt.STEP
-                       for b in back):
-                continue   # no straight run-up
-            top = -1e9    # the highest floor in the gap
-            for k in range(1, LEAP + 1):
-                t = (c[0] + k * di, c[1] + k * dj)
-                if not inside(t) or lv[t[1]][t[0]][2]:
-                    break
-                f = lv[t[1]][t[0]][0]
-                if f >= here[0] - pt.STEP:
-                    if f <= here[0] + pt.STEP and f - top > pt.STEP and self.flies(c, (di, dj), k, lv):
-                        out.append((t, k + LEAP_COST, back + [(c[0] + m * di, c[1] + m * dj) for m in range(1, k + 1)]))
-                    break
-                top = max(top, f)
-        return out
-
-    def flies(self, c, d, k, lv):
-        """A straight run from cell c's centre along cell step d lands on the
-        floor k cells on, at both a short run-up's speed and a full run's (as
-        levels/reach.py's _simulate_run, over the cells' box levels)."""
-        plan = self.plan
-        x0, y0 = plan.centre(c)
-        step = math.hypot(*d) * pt.GRID      # units per cell step
-        want = lv[c[1] + k * d[1]][c[0] + k * d[0]][0]
-        for speed in LEAP_SPEEDS:
-            pos, z, momz, ok = 0.0, lv[c[1]][c[0]][0], 0, False
-            for _ in range(int((k + 3) * step / speed) + 2):
-                pos += speed / step              # in cell steps
-                q = plan.cell((x0 + d[0] * pt.GRID * pos, y0 + d[1] * pt.GRID * pos))
-                lq = lv[q[1]][q[0]] if 0 <= q[0] < self.geo.nx and 0 <= q[1] < self.geo.ny else None
-                if lq is None:
-                    break
-                floor, ceil = lq[0], lq[1]
-                if floor - z > pt.STEP or ceil - max(floor, z) < pt.HEIGHT_P:
-                    break
-                z += momz
-                if z <= floor:
-                    z, momz = floor, 0
-                else:
-                    momz = -2 if momz == 0 else momz - 1
-                if pos >= k - 0.5 and z == floor:
-                    ok = abs(floor - want) <= pt.STEP
-                    break
-            if not ok:
-                return False
-        return True
 
     def touch(self, i):
         """The cells where the player's box touches teleporter line i."""
@@ -710,7 +619,7 @@ class Explorer(pt.Run):
 
     def go_to(self, c, prev, lv, final=None):
         """Follow the way to c: walk the stretches off lifts, ride the lifts,
-        go through the teleporters it has used, jump the gaps."""
+        go through the teleporters it has used."""
         self._lv = lv
         path = [c]
         while path[-1] in prev:
@@ -719,34 +628,11 @@ class Explorer(pt.Run):
         start = 0
         for k in range(len(path) - 1):
             i = self._via.get((path[k], path[k + 1]))
-            if i is not None or (path[k], path[k + 1]) in self._leap:
+            if i is not None:
                 self.follow(path[start:k + 1], lv)
-                if i is not None:
-                    self.through(i)
-                else:
-                    self.leap(path[k], path[k + 1], lv)
+                self.through(i)
                 start = k + 1
         self.follow(path[start:], lv, final)
-
-    def leap(self, c, t, lv):
-        """Back up for a run-up behind cell c, then run straight at full tilt
-        over the gap to cell t. Landing anywhere else is a jump not to try
-        again."""
-        a, b = self.plan.centre(c), self.plan.centre(t)
-        d = math.dist(a, b)
-        ux, uy = (b[0] - a[0]) / d, (b[1] - a[1]) / d
-        run = 0.9 * RUNUP * pt.GRID / max(abs(ux), abs(uy))
-        self.walk((a[0] - ux * run, a[1] - uy * run), True)
-        self.face(b)
-        g = self.geo
-        self.note("jump", f"from {self.name(g.cell_sector[c[1]][c[0]])} to {self.name(g.cell_sector[t[1]][t[0]])}")
-        try:
-            self.drive((b[0] + ux * pt.GRID, b[1] + uy * pt.GRID), 0, False)
-        except pt.Abort:
-            pass
-        if abs(self.var("POSITION_Z") - lv[t[1]][t[0]][0]) > pt.STEP:
-            self.bad_leaps.add((c, t))
-            raise pt.Abort("the jump fell short")
 
     def through(self, i):
         """Cross teleporter line i from its front, and wait out the freeze."""
