@@ -515,7 +515,7 @@ class Explorer(pt.Run):
                 if (flags & ML_SECRET and i not in self.door_lines) or bs is None or \
                         h[bs][1] - h[bs][0] >= pt.HEIGHT_P or ("door", bs) in self.done:
                     continue
-                kind, sides = "door", (0,)   # (as in Doom, a line used from its back does nothing)
+                kind, sides = "door", (0, 1)
             elif spec.trigger in ("S1", "SR") and not (spec.kind == "lift" and bs is not None and h[bs][1] > h[bs][0]
                                                        and {fs, bs} & self.tagged(_tag)):
                 # (a switch on the lift's own side calls it, which ride() does,
