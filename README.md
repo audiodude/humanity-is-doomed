@@ -3,7 +3,7 @@
 Eight DOOM II maps that an AI wrote as Python, the level compiler it built to do it, and the research on id's 68 maps that it designed them from.
 
 > [!IMPORTANT]
-> **Looking for the levels from the YouTube videos?** They're in the [v0.9 release](https://github.com/audiodude/humanity-is-doomed/releases/tag/v0.9): the original `NUKAGE.WAD`, more or less raw AI output, built up one map at a time while the AI was still learning how DOOM levels should be structured and play. It still has Nukage Junction as MAP01, the first maps' original textures, and none of the later re-ordering and balance work. It's kept for history and research; for the polished set, play the `wads/NUKAGE.WAD` described below.
+> **Looking for the levels from the YouTube videos?** They're in the [v0.9 release](https://github.com/audiodude/humanity-is-doomed/releases/tag/v0.9): the original `NUKAGE.WAD`, more or less raw AI output, built up one map at a time while the AI was still learning how DOOM levels should be structured and play. It still has Nukage Junction as MAP01, the first maps' original textures, and none of the later re-ordering and balance work. It's kept for history and research; for the polished set, get [v1.0](https://github.com/audiodude/humanity-is-doomed/releases/tag/v1.0), described below.
 >
 > - [Claude made me a DOOM II level - Nukage Junction](https://youtu.be/o6tNhFPuYjE)
 > - [Claude made me ANOTHER DOOM II level - Nukage Crossing](https://youtu.be/8l30OIKdmmA)
@@ -12,7 +12,7 @@ Eight DOOM II maps that an AI wrote as Python, the level compiler it built to do
 
 *A nuclear meltdown at a UAC power plant opens a gate to hell.*
 
-`wads/NUKAGE.WAD` is an eight-map set for DOOM II. It needs `doom2.wad` and a port that reads UMAPINFO (see [Compatibility](#compatibility)).
+`NUKAGE.WAD` is an eight-map set for DOOM II: download it from the [v1.0 release](https://github.com/audiodude/humanity-is-doomed/releases/tag/v1.0), or use `wads/NUKAGE.WAD` from a checkout. It needs `doom2.wad` and a port that reads UMAPINFO (see [Compatibility](#compatibility)).
 
 **GZDoom** (4.6 or later): drag `NUKAGE.WAD` onto the GZDoom executable, or run it from a terminal. If GZDoom finds more than one IWAD it asks which to use; pick DOOM II.
 
