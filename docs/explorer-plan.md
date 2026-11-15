@@ -14,7 +14,7 @@ Scoring rules: [explore-rubric.md](explore-rubric.md). Tool: `scripts/tools/comp
 | Known blind spots | Running jumps, gun lines with no switch texture (barrel walls), timed doors and lifts it's too slow for, deliberate death pits, huge open areas it sweeps rather than reads |
 | `--play` | Done: L marks "I'm lost", K stops; the report uses the explorer's own bookkeeping |
 | Rubric and `compare.py` | v3 done: an L press marks the whole stretch it falls in; cause codes include B-perception |
-| Blind plays | 1 so far: Flames at the Canyon (Obsidian), Partial. Lost recall 1/2, stall recall 2/3, precision 3/3, from saved traces under v2. Its only scored folder is v1 (`compare-e15e9ce`), so it needs scoring again at the current commit. |
+| Blind plays | 1 so far: Flames at the Canyon (Obsidian), Partial at `9d0db0a` under v3 (`compare-9d0db0a`). Lost recall 1/2, stall recall 2/3, precision 3/3. Left to code: the 3:30–6:08 north-east stretch (3 L presses), predicted on 1 of 3 seeds. |
 | Not blind | OBSIDIAN01 MAP01 was analysed with the user, so it can't be in the pool. Its two 11-minute bot stalls are navigation bugs being fixed separately. |
 
 ## Ready means
@@ -102,7 +102,7 @@ Precision is the guard against overtuning. A bot that stalls everywhere would sc
 
 ## 6. Work list
 
-- [ ] Score the canyon play again at the current commit under rubric v3.
+- [x] Score the canyon play again at the current commit under rubric v3.
 - [ ] `compare.py`: read `codes.json`, add the codes up by stall time in `--pool`, and mark plays as tuning or holdout (from the every-third rule, stored in the play's `meta.json`). `--pool` reports the two sets separately, and holdout scores stay hidden until a gate C check.
 - [ ] `compare.py --pool` reports gates B, C and D.
 - [ ] Play the first wave (plays #2–#9; the canyon is #1).
