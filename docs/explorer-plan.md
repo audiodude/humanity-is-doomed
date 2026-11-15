@@ -42,6 +42,10 @@ The numbers below are fixed now, before the data. Changing one is a new version 
 
 Bot-limited plays (rubric section 5) don't count toward any gate.
 
+The lost-stretch minimums are the evidence each gate needs, not a quota for the player. A play where the user never gets lost still counts: toward the map minimums, toward order, and toward stall precision, since a recurring bot stall on a map they breezed through is a false alarm. The minimums can't be dropped, though. A bot that never stalls has no recurring stalls, so its precision passes as n/a, and only lost recall catches it.
+
+**Stopping rule:** if 15 tuning maps give fewer than 10 lost stretches, stop playing for gate B. That itself is a finding: maps of these kinds rarely lose this player. The plan is then rewritten around it (for instance, whether the explorer's job narrows to not raising false alarms) as a new version, before any more plays.
+
 ## 1. The blind pool
 
 A pool map must be one the user has never played or seen. That rules out their own levels, the id maps, OBSIDIAN01, and anything whose explorer report, `--describe` output, check output or top-down preview they've seen. The map must be a single map in Doom format (vanilla or Boom), since the explorer's map reader takes nothing else.
@@ -52,14 +56,14 @@ The pool comes from three sources, because each has a style and we can't let the
 - **SLIGE:** `../doomedit/slige/slige.sh -doom2`. Rooms and corridors, vanilla.
 - **Community:** single-map PWADs from idgames (`research/fetch_idgames.py`). These are closest to hand-built maps like ours. The user picks from a list showing only title, author and year. The top-down SVGs in `research/maps/community/` are spoilers; agents don't open the SVG of a candidate map.
 
-**First wave: 9 plays.** They're played in this source order: Obsidian, SLIGE, community, SLIGE, community, Obsidian, community, Obsidian, SLIGE. The canyon play is #1. **Every third play (#3, #6, #9 and so on) is holdout.** That's fixed before anyone sees a score, and it puts one map from each source in the holdout. The wave continues in the same pattern until gate B has its 10 lost stretches.
+**First wave: 9 plays.** They're played in this source order: Obsidian, SLIGE, community, SLIGE, community, Obsidian, community, Obsidian, SLIGE. The canyon play is #1. **Every third play (#3, #6, #9 and so on) is holdout.** That's fixed before anyone sees a score, and it puts one map from each source in the holdout. The wave continues in the same pattern until gate B has its 10 lost stretches, or the stopping rule above is reached.
 
 **Agents keep pool maps blind.** For a pool map, no agent runs `--explore`, `check_wad.py` or `--describe`, and none renders a preview or shows any of the map's contents until its play is recorded. Generating the WAD and starting `--play` is all an agent does before the play.
 
 ## 2. One play, start to finish
 
 1. **Generate or fetch** the map; for a community map, the user confirms they don't know it.
-2. **The user plays it:** `uv run --with vizdoom scripts/tools/playtest.py <WAD> MAP01 --play`. No monsters, god mode on. L when they realize they're lost, however late; K when they give up; 15 minutes at most. A play that is spoiled (crash, wrong controls, interrupted) is noted and dropped, not replayed.
+2. **The user plays it:** `uv run --with vizdoom scripts/tools/playtest.py <WAD> MAP01 --play`. No monsters, god mode on. Play naturally, heading for the exit; never try to get lost, and never press L more freely to help the count. L when they realize they're lost, however late; K when they give up; 15 minutes at most. A play that is spoiled (crash, wrong controls, interrupted) is noted and dropped, not replayed.
 3. **Ask about detours right away, while it's fresh:** was any stretch a deliberate detour (a secret, an item, sightseeing)? Those become `--choice M:SS-M:SS`.
 4. **Score:** `compare.py <play folder> [--choice ...]`. For a holdout play, scoring happens only at a gate C check (see section 4).
 5. **Give each mismatch a cause code** (rubric section 6). The agent proposes codes from frames of both demos at the stall times, and the user confirms them. Codes go in `compare-<commit>/codes.json`.
