@@ -156,6 +156,13 @@ uv run --with vizdoom scripts/tools/playtest.py nukage_tower --explore --seed 2
 uv run --with vizdoom scripts/tools/playtest.py nukage_tower --replay --explore --seed 2     # watch it
 ```
 
+`--play` is the same report for a person. The map opens in a window at normal speed for you to play, by default with no monsters and god mode on, as the explorer plays (`--monsters` keeps them). Press L whenever you feel lost and K to stop (reaching the exit stops it too; closing the window may lose the recording). Each play gets a folder in `~/.local/share/playtest/plays/` with the demo, a copy of every PWAD it loaded (so regenerating the map later doesn't break the demo) and its report. The report comes from playing the demo back headless through the explorer's bookkeeping, so it has the explorer's timeline, distance, share of the map seen and stall stretches, plus each L press and the stretch it fell in, all to the tic. It works on any Doom-format WAD, such as SLIGE or Obsidian output, as well as level modules. Play a map before running the explorer on it, so its report doesn't spoil the route.
+
+```sh
+uv run --with vizdoom scripts/tools/playtest.py ~/maps/slige1.wad MAP01 --play
+uv run --with vizdoom scripts/tools/playtest.py --play --recording ~/.local/share/playtest/plays/<folder>   # the report again
+```
+
 The runner turns on ZDoom's strict Doom compatibility, so a pass shows the map's wiring works under vanilla rules as far as ZDoom can follow them: the player can only use a line from its front side, pressing use stops at the first line with an action (so a walk-over trigger just in front of a door or switch blocks it), and monsters are infinitely tall. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
 
 `scripts/tools/wake.py` answers a narrower question with the same engine: which monsters one shot wakes. It starts the map fresh for each spot you give, warps there, fires once, waits (`--seconds`, default 10) and lists every monster that moved. With no spot it fires from the start. Use it after zoning a map with `SOUND_BETWEEN` (see [docs/monster-alerting.md](monster-alerting.md)):

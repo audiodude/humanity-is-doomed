@@ -1443,6 +1443,7 @@ class Explorer(pt.Run):
             top = ", ".join(f"{self.name(s)} {n / total:.0%}" + ("" if self.names else self.around(s, stretch))
                             for s, n in where.most_common(4))
             self.say(f"  {pt.clock(span)} from {pt.clock(a)} to {pt.clock(b)}: {top}")
+        return gaps
 
 
 def level_info(module, wads, slot):
