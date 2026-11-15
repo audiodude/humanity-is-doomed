@@ -215,9 +215,9 @@ THINGS = [Thing(*t) for t in [
     (IMP, -300, 1632, 90, "emha"), (IMP, 300, 1632, 90, "mha"),
     (CACO, -320, 1352, 90, "emh"),
     (IMP, -720, 1500, 90, "mha"), (IMP, 720, 1400, 90, "ha"),
-    # west: the corridor (dark) and its secret
+    # west: the corridor (dark) and its secret; the shell box pays for the pump hall and its closets
     (ZOMBIE, -900, 448, 0, "emh"), (SARGE, -1100, 470, 0, "mha"), (IMP, -1160, 410, 0, "ha"),
-    (CLIP, -850, 420), (SHELLS, -1180, 480),
+    (CLIP, -850, 420), (SHELLS, -1180, 480), (SHELLBOX, -960, 384),
     (GREENARMOR, -1024, 264), (STIM, -1080, 220),
     # west: the pump hall; the super shotgun opens its closets
     (IMP, -1350, 1150, 270, "emha"), (IMP, -900, 600, 90, "mha"), (SARGE, -1300, 1170, 270, "emha"),

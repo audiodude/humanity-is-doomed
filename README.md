@@ -31,11 +31,11 @@ dsda-doom -iwad doom2 -file wads/NUKAGE.WAD            # add -warp 2 and so on f
 | Slot | Map | What happens | New monster | Monsters (easy / medium / hard) |
 |---|---|---|---|---|
 | MAP01 | [Nukage Outskirts](docs/maps.md#nukage-outskirts-nukage_outskirts) | Up a hillside to the plant's monitoring station, with the spill hidden over the ridge. The easiest map. | | 12 / 22 / 31 |
-| MAP02 | [Nukage Crossing](docs/maps.md#nukage-crossing-nukage_crossing) | A sluice gate sinks into a nukage canal to become a bridge, and demons charge across it. | hell knight, cacodemon | 21 / 43 / 56 |
+| MAP02 | [Nukage Crossing](docs/maps.md#nukage-crossing-nukage_crossing) | A sluice gate sinks into a nukage canal to become a bridge, and demons charge across it. | chaingunner, spectre, hell knight, cacodemon | 22 / 43 / 56 |
 | MAP03 | [Nukage Tower](docs/maps.md#nukage-tower-nukage_tower) | Spiral up around a reactor core to the exit in its crown. | mancubus | 27 / 53 / 73 |
 | MAP04 | [Nukage Undercurrent](docs/maps.md#nukage-undercurrent-nukage_undercurrent) | Taking the yellow key sinks your platform into a pit, and the way back is under the gantry. | arachnotron, revenant | 26 / 46 / 64 |
 | MAP05 | [Nukage Drain](docs/maps.md#nukage-drain-nukage_drain) | Pump-house switches raise walkways out of a reservoir of nukage. | lost soul | 24 / 43 / 59 |
-| MAP06 | [Nukage Storage](docs/maps.md#nukage-storage-nukage_storage) | A maze of fuel casks sinks into the floor and frees six mancubi. | pain elemental | 30 / 54 / 75 |
+| MAP06 | [Nukage Storage](docs/maps.md#nukage-storage-nukage_storage) | A maze of fuel casks sinks into the floor and frees six mancubi. | pain elemental, baron | 30 / 54 / 75 |
 | MAP07 | [Nukage Lockdown](docs/maps.md#nukage-lockdown-nukage_lockdown) | A loop round a spill basin where every shutter opens only from its far side. | arch-vile | 33 / 53 / 72 |
 | MAP08 | [Nukage Meltdown](docs/maps.md#nukage-meltdown-nukage_meltdown) | Down a terraced canyon of falls to the cooling lake, where the Cyberdemon wades. | Cyberdemon | 40 / 63 / 84 |
 

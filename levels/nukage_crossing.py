@@ -334,7 +334,7 @@ THINGS = [Thing(*t) for t in [
     # south-east yard: pinkies pace the bank until the bridge is down
     (DEMON, 1264, 944, 90), (DEMON, 1408, 944, 90, "mh"), (DEMON, 1552, 944, 90, "h"),
     (IMP, 1632, 672, 90), (IMP, 1696, 672, 90, "mh"),
-    (SARGE, 1056, 544, 270, "emha"), (SARGE, 1632, 448, 270, "mha"), (CACO, 1216, 640, 90, "mh"),
+    (SARGE, 1056, 544, 270, "emha"), (SARGE, 1632, 448, 270, "mha"), (CACO, 1216, 640, 90),
     (REDKEY, 1408, 704),
     (TELEPORT_DEST, 1760, 976, 0),   # gag: in front of the switch
     (MEDI, 1024, 448), (SHELLS, 1536, 480), (STIM, 1152, 880), (STIM, 1744, 576), (ROCKET, 1600, 512),

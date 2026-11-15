@@ -309,7 +309,7 @@ THINGS = [Thing(*t) for t in [
     # filter house (optional): waiting behind its door
     (IMP, 400, 400, 270, "emha"), (IMP, 640, 416, 270, "mha"), (IMP, 928, 64, 90, "ha"),
     (SARGE, 896, 256, 180, "mha"), (SARGE, 352, 320, 0, "ha"), (DEMON, 624, 128, 90, "emh"),
-    (KNIGHT, 832, 384, 180, "ha"),
+    (IMP, 832, 384, 180, "ha"),
     (MEDI, 336, 16), (MEDI, 928, 432), (ROCKET, 624, 32), (ROCKET, 624, 256), (SHELLS, 832, 432),
     (PLASMA, 1040, 320), (CELL, 1040, 288),                                     # secret: filter closet
     # turret imps on the core's rim, hidden from the start by the crown
@@ -361,14 +361,14 @@ THINGS = [Thing(*t) for t in [
     (YELLOWKEY, 0, 2816), (SHELLS, -128, 2816), (STIM, 128, 2816),
     # pens, revealed when the yellow key is taken
     (KNIGHT, -672, 2400, 0, "mh"), (DEMON, -672, 2560, 0), (IMP, -672, 2640, 0, "h"),
-    (DEMON, 672, 2400, 180), (KNIGHT, 672, 2464, 180, "h"), (IMP, 672, 2320, 180, "mh"),
+    (DEMON, 672, 2400, 180), (DEMON, 672, 2464, 180, "h"), (IMP, 672, 2320, 180, "mh"),
     (BACKPACK, -648, 2784), (SHELLBOX, -688, 2752),                             # secret: turbine closet
     # north-east stair tower
     (SARGE, 1088, 1952, 180, "emha"), (IMP, 912, 1952, 0, "mha"), (CHAINGUY, 832, 1664, 0, "mha"),
     (SHELLS, 1104, 1664), (ROCKET, 1104, 1920),
     (SOUL, 976, 2128),                                                          # secret: tower closet
     # east gallery
-    (IMP, 672, 1504, 0, "emha"), (SARGE, 672, 960, 90, "mha"), (KNIGHT, 672, 800, 90, "h"),
+    (IMP, 672, 1504, 0, "emha"), (SARGE, 672, 960, 90, "mha"), (IMP, 672, 800, 90, "h"),
     (ZOMBIE, 704, 1280, 90, "emha"),
     (ROCKET, 640, 1568), (SHELLS, 640, 1056),
     # control room

@@ -25,7 +25,7 @@ Ammo and health are generous on purpose for a first map; the secret soulsphere i
 The original MAP01, Nukage Junction (`levels/nukage_junction.py`, a courtyard hub with a wing per key), is kept in the repo but is no longer in the set: `python3 -m levels nukage_junction` builds it to `wads/scratch/nukage_junction.WAD`.
 
 ## Nukage Crossing (`nukage_crossing`)
-MAP02, designed from the [research](../README.md#research-what-makes-doom-levels-fun) below: 99 sectors, 21/43/56 monsters on easy/medium/hard, four secrets, one hell knight and one cacodemon; the super shotgun is its secret. It was retextured after the texture research (design: `levels/designs/nukage_crossing.md`): one brick for the whole canal basin, a signature material per area, and trim where materials meet. The first version's textures are kept in `levels/nukage_crossing_original.py`, which isn't built into the WAD.
+MAP02, designed from the [research](../README.md#research-what-makes-doom-levels-fun) below: 99 sectors, 22/43/56 monsters on easy/medium/hard, four secrets, the first chaingunners and spectre, one hell knight and one cacodemon (the cacodemon on every skill); the super shotgun is its secret. It was retextured after the texture research (design: `levels/designs/nukage_crossing.md`): one brick for the whole canal basin, a signature material per area, and trim where materials meet. The first version's textures are kept in `levels/nukage_crossing_original.py`, which isn't built into the WAD.
 
 Measured with the research scripts against the DOOM II maps (median in brackets):
 
@@ -36,7 +36,7 @@ Measured with the research scripts against the DOOM II maps (median in brackets)
 | Light-effect sectors | 11 | 9 |
 | UV ammo per monster HP (pistol start) | 2.60 | 1.8 |
 | Health per 1000 monster HP | 73 | 40 |
-| Easy/UV and HMP/UV monster ratios | 0.38 / 0.77 | 0.33 / 0.70 |
+| Easy/UV and HMP/UV monster ratios | 0.39 / 0.77 | 0.33 / 0.70 |
 | Deaf monsters | 37% | 42% |
 | Nearest monster to the start | 487 | 300 |
 | Most-used wall texture (BRICK6) | 28% | 30% |
@@ -76,9 +76,9 @@ Measured with the research scripts against the DOOM II maps:
 | Distinct floor heights | 29 | 23 |
 | Light-effect sectors | 10 | 9 |
 | Optional share of the reachable area | 40% | 50% |
-| Heavy-monster share (UV) | 15% | 10% |
-| UV ammo per monster HP (pistol start) | 2.7 | 1.8 |
-| Health per 1000 monster HP | 38 | 40 |
+| Heavy-monster share (UV) | 11% | 10% |
+| UV ammo per monster HP (pistol start) | 3.1 | 1.8 |
+| Health per 1000 monster HP | 44 | 40 |
 | Easy/UV and HMP/UV monster ratios | 0.37 / 0.73 | 0.33 / 0.70 |
 | Deaf monsters | 48% | 42% |
 | Nearest monster to the start | 353 | 300 |
@@ -117,7 +117,7 @@ You start on the only dry catwalk of a reservoir full of nukage, with the exit v
 | Wall material changes with a border texture | 100% | 31% |
 | Light SD / light-effect sectors | 24 / 9 | 23 / 9 |
 | Optional share of the reachable area | 36% | 50% |
-| UV ammo per monster HP (pistol start) | 1.9 | 1.8 |
+| UV ammo per monster HP (pistol start) | 2.05 | 1.8 |
 | Health per 1000 monster HP | 35 | 40 |
 | Easy/UV and HMP/UV monster ratios | 0.41 / 0.73 | 0.33 / 0.70 |
 | Nearest monster to the start | 697 | 300 |
@@ -126,7 +126,7 @@ You start on the only dry catwalk of a reservoir full of nukage, with the exit v
 It has fewer floor heights than most id maps because the reservoir is one flat pool and each pump house is one floor; symmetry is high because it's a square reservoir with a pump house off each side.
 
 ## Nukage Storage (`nukage_storage`)
-MAP06: 187 sectors, 30/54/75 monsters on easy/medium/hard, four secrets, and the first pain elemental.
+MAP06: 187 sectors, 30/54/75 monsters on easy/medium/hard, four secrets, the first pain elemental, and a baron in the key trap on HMP and UV.
 
 You look over a spent-fuel store from a gallery: a maze of steel casks under lit aisles, the yellow key on a blue-lit cask stack, the control tower's window high in the far wall, and blast shutters under an EXIT sign. You thread the maze at floor level to the tower, and the switch in its cab sinks every cask into the floor at once. The maze becomes an open hall, and the six mancubi sealed among the casks are standing in it, each in the nukage its cask leaked. DOOM II's MAP07 rule, written into the map's UMAPINFO as a `bossaction` so it works in any slot, opens the way out: the shutters drop when the last mancubus dies.
 

@@ -645,7 +645,7 @@
 <circle cx="1254.4" cy="736.0" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3001 skills mh</title></circle>
 <circle cx="998.4" cy="787.2" r="8.0" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 9 skills emha</title></circle>
 <circle cx="1228.8" cy="825.6" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 9 skills mha</title></circle>
-<circle cx="1062.4" cy="748.8" r="12.4" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3005 skills mh</title></circle>
+<circle cx="1062.4" cy="748.8" r="12.4" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 3005 skills emh</title></circle>
 <rect x="1135.2" y="719.2" width="8" height="8" fill="#e02020" stroke="#000"/>
 <circle cx="1280.0" cy="614.4" r="1.8" fill="#888"/>
 <circle cx="985.6" cy="825.6" r="2.5" fill="#1f6fd0"/>
