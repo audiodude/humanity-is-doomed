@@ -324,8 +324,11 @@ def box_hits(a, b, cx, cy, r):
 class Planner:
     """Grid A* for the player's 32-unit box over the live map. Like Doom, a
     cell's floor is the highest floor anywhere under the box there and its
-    ceiling the lowest ceiling; the player can step up 24, drop any height,
-    and needs 56 of headroom. Lifts count as passable whatever their height."""
+    ceiling the lowest ceiling; the player can step up 24, drop any height
+    (but not through an opening lower than 56 over the floor it's on), and
+    needs 56 of headroom; the box may touch a wall. A cell the box only fits
+    in off its centre (a gap just 32 wide) is stood in there. Lifts count as
+    passable whatever their height."""
 
     def __init__(self, geo):
         self.g = g = geo

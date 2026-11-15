@@ -10,10 +10,25 @@ Each time it has nothing to do it picks the cheapest thing it knows about,
 by walking distance over floor it has seen:
 
   - an exit it has seen (a quarter of the distance: it's what the player is after)
-  - a key it has seen (a third)
-  - a switch it hasn't pressed (two thirds)
+  - a key it has seen, from a floor level with it (a third)
+  - a switch it hasn't pressed (two thirds), including a switch on a lift's
+    edge when the lift is up against its ceiling, shut like a door
   - a door it hasn't opened, if it has the key
   - the edge of what it has seen, where it goes and looks round
+
+When none is left it goes and stands in places it has only seen from afar,
+then uses again, once each, the repeatable switches it has used (a door it
+opened may have shut behind it: logged as "switch ... again", not progress).
+Before giving up it waits for anything it can see moving to stop.
+
+Lifts: it walks over a lift it can step or drop onto and off as it stands;
+otherwise it calls it, or (standing on it, going down) uses a lift switch on
+the lift's own edge and rides it. A lift it got stuck riding counts as a plain
+floor at its height until the next progress. A floor or ceiling it has seen
+moving (a walk-over line it crossed, a switch far off) makes the places it
+looked round from and couldn't reach worth another try, a few times between
+progress. Getting stuck on the same spot twice blocks the cells just past it
+toward where it was going.
 
 Costs are jittered by --seed, so seeds explore in different orders. Secret
 doors look like walls to it, and it never shoots a wall. Monsters are killed
