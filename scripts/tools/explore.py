@@ -148,6 +148,10 @@ class Teleported(Exception):
     """The player was teleported: whatever it was doing is over."""
 
 
+class OutOfTime(Exception):
+    """The game clock passed --max-time, whatever it was in the middle of."""
+
+
 class Replan(Exception):
     """What it was doing changed the map under it (it rode a lift up): think again."""
 
@@ -249,6 +253,8 @@ class Explorer(pt.Run):
 
     # -- seeing --------------------------------------------------------------
     def watch(self):
+        if self.tics > self.args.max_time * 60 * 35:
+            raise OutOfTime()   # checked every tic: no inner loop can run past the cap
         super().watch()
         held = self.had & KEY_ITEMS
         for name in held - getattr(self, "_held", set()):
@@ -1075,7 +1081,9 @@ class Explorer(pt.Run):
                 self.note("lift", f"missed {self.name(s)}: {e}")
                 return
             still, f = 0, self.heights()[s][0]
-            while f < was[s][0] and still < 140:   # ride it back up (if it comes back up)
+            for _ in range(10 * 35):   # ride it back up (if it comes back up); a lift that
+                if f >= was[s][0] or still >= 140:   # keeps moving short of that is given up on
+                    break
                 self.tic()
                 still, f = (still + 1 if self.heights()[s][0] == f else 0), self.heights()[s][0]
         finally:
@@ -1299,6 +1307,12 @@ class Explorer(pt.Run):
         return self.notice_moves() or moved
 
     def explore(self):
+        try:
+            return self._explore()
+        except OutOfTime:
+            return f"--max-time {self.args.max_time:g} min"
+
+    def _explore(self):
         for c in ("god", "notarget", "kill monsters"):
             self.game.send_game_command(c)
         self.tic(n=35)
