@@ -276,7 +276,10 @@ class Geometry:
                     x = x1 + (y - y1) * (x2 - x1) / (y2 - y1)
                     # The sector on the +x side: the front (right) side if the line runs upward.
                     hits.append((x, fs if y2 > y1 else bs))
-            hits.sort()
+            # Lines can cross the scanline at the same x (a duplicated line, or two
+            # meeting at a vertex); the last hit decides the cells after it, so a
+            # sector sorts after the void it ties with.
+            hits.sort(key=lambda h: (h[0], h[1] is not None))
             row = grid[j]
             k = 0
             for i in range(nx):

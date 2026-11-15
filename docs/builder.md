@@ -125,6 +125,13 @@ A decompiled module is minimal-diff: what the builder would infer anyway (sector
 
 Building a decompiled module gives back the same map: the same sectors, things, actions, flags, textures and offsets; only line order and where a straight wall is split into lines may differ. `--verify` proves it for each map and exits 1 on any difference. Sectors whose outlines don't close in the original (16 of id's 68 maps have some) are repaired with the fewest edits that close them, when that set of edits is unique, each noted in a `# repaired:` comment; otherwise the map is refused. Hexen-format and UDMF maps are refused.
 
+To check a WAD's maps without decompiling them, `scripts/tools/check_wad.py` runs the playability checks straight on the map lumps. These are the reach model's checks (exit, secret exit, secrets, every monster, softlock floors), the thing checks and the vanilla types. It honours a UMAPINFO lump's `bossaction`s, and it takes maps the decompiler refuses, such as those with two lines between the same vertices. The style, texture and measurement checks need a module, so they aren't run. It exits 1 if any map has a playability finding:
+
+```sh
+python3 scripts/tools/check_wad.py wads/NUKAGE.WAD          # every map
+python3 scripts/tools/check_wad.py ~/maps/SLIGE01.WAD MAP08 # just MAP08
+```
+
 ## Playtests
 `levels/playtests/<module>.playtest` scripts walk each map's intended route: doors, switches, lifts, key traps, secrets and the exit, checking floor and ceiling heights after each trigger. The runner, `scripts/tools/playtest.py`, plays them in [ViZDoom](https://vizdoom.farama.org/), a ZDoom-based engine packaged as a Python library. It drives the player with real inputs as fast as the machine runs the game, with god mode on and no window, so a whole route takes 4–10 seconds. Screenshots go to `/tmp/playtest-shots/<MAP>/`. The IWAD is `DOOM2_WAD` from `.env`; override with `--iwad` (for example with your `DOOM.WAD` for a decompiled `ExMy` map).
 
