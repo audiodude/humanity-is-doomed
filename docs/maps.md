@@ -34,7 +34,7 @@ Measured with the research scripts against the DOOM II maps (median in brackets)
 | Rule-1 flat changes without a height change | 1% | 3% |
 | Distinct floor heights | 22 | 23 |
 | Light-effect sectors | 11 | 9 |
-| UV ammo per monster HP (pistol start) | 2.60 | 1.8 |
+| UV ammo per monster HP (pistol start) | 2.91 | 1.8 |
 | Health per 1000 monster HP | 73 | 40 |
 | Easy/UV and HMP/UV monster ratios | 0.39 / 0.77 | 0.33 / 0.70 |
 | Deaf monsters | 37% | 42% |

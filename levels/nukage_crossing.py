@@ -338,6 +338,7 @@ THINGS = [Thing(*t) for t in [
     (REDKEY, 1408, 704),
     (TELEPORT_DEST, 1760, 976, 0),   # gag: in front of the switch
     (MEDI, 1024, 448), (SHELLS, 1536, 480), (STIM, 1152, 880), (STIM, 1744, 576), (ROCKET, 1600, 512),
+    (SHELLBOX, 1280, 848),   # on the way to the red key: pays for its closets and the guardroom
     # red-key closets: east and south of the yard, and the guardroom by the red door
     (DEMON, 1856, 848, 180), (DEMON, 1856, 944, 180, "mh"), (DEMON, 1920, 896, 180, "h"),
     (IMP, 1360, 288, 90), (IMP, 1456, 288, 90, "mh"), (CHAINGUY, 1408, 240, 90, "h"),
