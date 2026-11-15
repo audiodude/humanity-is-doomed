@@ -344,5 +344,5 @@
 <circle cx="147.2" cy="144.0" r="9.6" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 69 skills h</title></circle>
 <circle cx="313.6" cy="340.0" r="8.0" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 3001 skills emha</title></circle>
 <circle cx="357.6" cy="384.0" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3001 skills mha</title></circle>
-<text x="8" y="794" font-size="11" fill="#222">levels.speedy4_shaft (MAP05): grey = floor height (lighter is higher), brown = door, yellow = lift, purple = secret, green = liquid, red line = special, dashed = bars/fence; red circles = monsters (faint/dashed = not on easy), blue dots = pickups, green = start</text>
+<text x="8" y="794" font-size="11" fill="#222">levels.speedy4_shaft (MAP11): grey = floor height (lighter is higher), brown = door, yellow = lift, purple = secret, green = liquid, red line = special, dashed = bars/fence; red circles = monsters (faint/dashed = not on easy), blue dots = pickups, green = start</text>
 </svg>

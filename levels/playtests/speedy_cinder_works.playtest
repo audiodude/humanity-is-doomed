@@ -1,4 +1,4 @@
-# Cinder Works (SPEEDY1 MAP02) wiring test: every door, the stairs, the
+# Cinder Works (SPEEDY MAP02) wiring test: every door, the stairs, the
 # blue-key trap, both secrets, the foundry lift, the red-key trap, the crucible
 # ambush and the exit.
 #   uv run --with vizdoom scripts/tools/playtest.py speedy_cinder_works
@@ -18,7 +18,7 @@ expect secrets == 1
 expect has SuperShotgun
 
 # Up the stairs to the ledge; taking the blue key opens the yard closets.
-walk -980 1056 -448 1100 -448 1328 -600 1300 -928 1280
+walk -980 1056 -448 1100 -448 1328 -600 1300 -928 1248
 expect has BlueCard
 wait 70
 expect ceil -640 504 > 0
@@ -43,7 +43,7 @@ expect floor 1024 1024 == 0
 walk 1024 1024
 wait 120
 expect floor 1024 1024 == 128
-walk 1200 1072 1408 1072
+walk 1200 1072 1376 1056
 expect has RedCard
 wait 70
 expect ceil 1152 376 > 0

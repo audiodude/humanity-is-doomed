@@ -17,8 +17,8 @@
 <path d="M787.2,339.2 L806.4,339.2 L806.4,249.6 L787.2,249.6 Z" fill="rgb(170,170,170)" fill-rule="evenodd"><title>pstep1: floor 16 ceil 256 FLOOR1_6/CEIL3_6 light 160</title></path>
 <path d="M806.4,339.2 L825.6,339.2 L825.6,249.6 L806.4,249.6 Z" fill="rgb(190,190,190)" fill-rule="evenodd"><title>pstep2: floor 32 ceil 256 FLOOR1_6/CEIL3_6 light 160</title></path>
 <path d="M825.6,339.2 L844.8,339.2 L844.8,249.6 L825.6,249.6 Z" fill="rgb(210,210,210)" fill-rule="evenodd"><title>pstep3: floor 48 ceil 256 FLOOR1_6/CEIL3_6 light 160</title></path>
-<path d="M844.8,339.2 L921.6,339.2 L921.6,249.6 L844.8,249.6 Z M876.8,307.2 L902.4,307.2 L902.4,281.6 L876.8,281.6 Z" fill="rgb(230,230,230)" fill-rule="evenodd"><title>plat: floor 64 ceil 256 FLAT14/CEIL3_6 light 176</title></path>
-<path d="M876.8,307.2 L902.4,307.2 L902.4,281.6 L876.8,281.6 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>ped: floor 72 ceil 256 TLITE6_1/CEIL3_6 light 240</title></path>
+<path d="M844.8,339.2 L921.6,339.2 L921.6,249.6 L844.8,249.6 Z M864.0,316.8 L889.6,316.8 L889.6,291.2 L864.0,291.2 Z" fill="rgb(230,230,230)" fill-rule="evenodd"><title>plat: floor 64 ceil 256 FLAT14/CEIL3_6 light 176</title></path>
+<path d="M864.0,316.8 L889.6,316.8 L889.6,291.2 L864.0,291.2 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>ped: floor 72 ceil 256 TLITE6_1/CEIL3_6 light 240</title></path>
 <path d="M793.6,435.2 L844.8,435.2 L844.8,428.8 L793.6,428.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_pumpcl: floor 0 ceil 0 FLOOR1_6/FLAT20 light 144 tag 1</title></path>
 <path d="M787.2,499.2 L851.2,499.2 L851.2,435.2 L787.2,435.2 Z" fill="rgb(150,150,150)" fill-rule="evenodd"><title>pumpcl: floor 0 ceil 128 FLOOR1_6/CEIL5_1 light 96</title></path>
 <path d="M480.0,163.2 L531.2,163.2 L531.2,150.4 L480.0,150.4 Z" fill="rgb(150,150,150)" fill-rule="evenodd"><title>d_yel_alcove: floor 0 ceil 128 GRASS1/CEIL5_1 light 176</title></path>
@@ -108,10 +108,10 @@
 <line x1="844.8" y1="249.6" x2="844.8" y2="339.2" stroke="#777" stroke-width="0.6"/>
 <line x1="844.8" y1="249.6" x2="921.6" y2="249.6" stroke="#111" stroke-width="1.6"/>
 <line x1="921.6" y1="249.6" x2="921.6" y2="339.2" stroke="#111" stroke-width="1.6"/>
-<line x1="876.8" y1="307.2" x2="902.4" y2="307.2" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 1</title></line>
-<line x1="902.4" y1="307.2" x2="902.4" y2="281.6" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 1</title></line>
-<line x1="902.4" y1="281.6" x2="876.8" y2="281.6" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 1</title></line>
-<line x1="876.8" y1="281.6" x2="876.8" y2="307.2" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 1</title></line>
+<line x1="864.0" y1="316.8" x2="889.6" y2="316.8" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 1</title></line>
+<line x1="889.6" y1="316.8" x2="889.6" y2="291.2" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 1</title></line>
+<line x1="889.6" y1="291.2" x2="864.0" y2="291.2" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 1</title></line>
+<line x1="864.0" y1="291.2" x2="864.0" y2="316.8" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 1</title></line>
 <line x1="844.8" y1="428.8" x2="844.8" y2="435.2" stroke="#111" stroke-width="1.6"/>
 <line x1="793.6" y1="435.2" x2="844.8" y2="435.2" stroke="#777" stroke-width="0.6"/>
 <line x1="793.6" y1="435.2" x2="793.6" y2="428.8" stroke="#111" stroke-width="1.6"/>
@@ -158,8 +158,8 @@
 <text x="796.8" y="294.4" font-size="9" text-anchor="middle" fill="#333">pstep1 16</text>
 <text x="816.0" y="294.4" font-size="9" text-anchor="middle" fill="#333">pstep2 32</text>
 <text x="835.2" y="294.4" font-size="9" text-anchor="middle" fill="#333">pstep3 48</text>
-<text x="873.6" y="297.6" font-size="9" text-anchor="middle" fill="#333">plat 64</text>
-<text x="889.6" y="294.4" font-size="9" text-anchor="middle" fill="#333">ped 72</text>
+<text x="880.0" y="291.2" font-size="9" text-anchor="middle" fill="#333">plat 64</text>
+<text x="876.8" y="304.0" font-size="9" text-anchor="middle" fill="#333">ped 72</text>
 <text x="819.2" y="467.2" font-size="9" text-anchor="middle" fill="#333">pumpcl 0</text>
 <text x="505.6" y="89.6" font-size="9" text-anchor="middle" fill="#333">hall 0</text>
 <text x="422.4" y="92.8" font-size="9" text-anchor="middle" fill="#333">exitcl 0</text>
@@ -199,7 +199,7 @@
 <circle cx="819.2" cy="403.2" r="2.5" fill="#1f6fd0"/>
 <circle cx="912.0" cy="419.2" r="1.8" fill="#888"/>
 <circle cx="729.6" cy="259.2" r="1.8" fill="#888"/>
-<rect x="885.6" y="290.4" width="8" height="8" fill="#e0c000" stroke="#000"/>
+<rect x="872.8" y="300.0" width="8" height="8" fill="#e0c000" stroke="#000"/>
 <circle cx="803.2" cy="467.2" r="8.0" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 3001 skills emh</title></circle>
 <circle cx="835.2" cy="467.2" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3001 skills mh</title></circle>
 <circle cx="819.2" cy="487.2" r="12.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3002 skills h</title></circle>

@@ -41,9 +41,9 @@ SECTORS = [
              alcove_flat="FLOOR4_8", far_flat="RROCK09", flat="RROCK09"),
     Sector("yard", [rect(-1024, 512, -304, 1152)], 0, 320, "RROCK09", SKY, 208, "ROCK4"),
     *stairs("ystep", (-512, 1152, -384, 1344), "n", 4, 16, 24, 320, "RROCK11", SKY, 192, "ROCK4", "ROCK4"),
-    Sector("ledge", [rect(-1024, 1152, -512, 1344), rect(-960, 1248, -896, 1312)], 112, 320, "RROCK11", SKY,
+    Sector("ledge", [rect(-1024, 1152, -512, 1344), rect(-960, 1216, -896, 1280)], 112, 320, "RROCK11", SKY,
            192, "ROCK4"),
-    pedestal("bluepad", (-960, 1248, -896, 1312), 128, 320, "ROCK4", SKY),
+    pedestal("bluepad", (-960, 1216, -896, 1280), 128, 320, "ROCK4", SKY),
     *closet("ycl1", (-640, 512), "s", TAG_YARDCL, face="ROCK4", flat="RROCK09", wall="ROCK4",
              door_width=160),
     *closet("ycl2", (-1024, 832), "w", TAG_YARDCL, face="ROCK4", flat="RROCK09", wall="ROCK4",
@@ -62,9 +62,9 @@ SECTORS = [
     Sector("vat", [rect(1088, 512, 1344, 768)], -24, 288, "LAVA1", "CEIL5_1", 224, "METAL5",
            lower="ROCKRED1", special=DAMAGE_10),
     lift("flift", (960, 960, 1088, 1088), 128, 288, TAG_FLIFT, "CEIL5_1", 160, "METAL5", ftex="FLAT14", walk_on=True),
-    Sector("deck", [rect(1088, 960, 1472, 1152), rect(1376, 1040, 1440, 1104)], 128, 288, "FLAT14", "CEIL5_1",
+    Sector("deck", [rect(1088, 960, 1472, 1152), rect(1344, 1024, 1408, 1088)], 128, 288, "FLAT14", "CEIL5_1",
            176, "METAL5", lower="SUPPORT3"),
-    pedestal("redpad", (1376, 1040, 1440, 1104), 144, 288, "METAL5", "CEIL5_1"),
+    pedestal("redpad", (1344, 1024, 1408, 1088), 144, 288, "METAL5", "CEIL5_1"),
     *closet("fcl1", (1152, 384), "s", TAG_FOUNDCL, face="METAL5", flat="FLOOR5_1", wall="METAL5",
              door_width=160),
     # Secret: a hinted panel in the foundry's south wall.
@@ -123,7 +123,7 @@ THINGS = [Thing(*t) for t in [
     (IMP, -640, 1088, 270), (IMP, -352, 1088, 225, "h"),
     (BARREL, -560, 640), (BARREL, -912, 1104),
     # blue-key ledge
-    (BLUEKEY, -928, 1280), (IMP, -704, 1280, 270), (IMP, -800, 1200, 270, "mh"), (STIM, -576, 1296),
+    (BLUEKEY, -928, 1248), (IMP, -704, 1280, 270), (IMP, -800, 1200, 270, "mh"), (STIM, -576, 1296),
     # yard closets (open on taking the blue key)
     (IMP, -688, 448, 90), (IMP, -592, 448, 90, "mh"), (SARGE, -640, 384, 90, "h"),
     (IMP, -1104, 792, 0), (SARGE, -1104, 872, 0, "mh"), (DEMON, -1168, 832, 0, "h"),
@@ -136,7 +136,7 @@ THINGS = [Thing(*t) for t in [
     (SHELLBOX, 880, 896), (SHELLS, 1104, 896), (AMMOBOX, 880, 448), (MEDI, 1024, 896),
     (BARREL, 1056, 448), (BARREL, 1376, 896),
     # deck
-    (REDKEY, 1408, 1072), (IMP, 1216, 1120, 270), (SARGE, 1280, 1008, 270, "mh"),
+    (REDKEY, 1376, 1056), (IMP, 1216, 1120, 270), (SARGE, 1280, 1008, 270, "mh"),
     (MEDI, 1152, 1104), (SHELLBOX, 1296, 1104), (CLIP, 1216, 1000), (TECHLAMP, 1456, 1136),
     # foundry closets (open on taking the red key)
     (DEMON, 1120, 296, 90), (DEMON, 1184, 296, 90, "mh"), (IMP, 1152, 232, 90, "h"),

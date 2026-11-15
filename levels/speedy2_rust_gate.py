@@ -42,9 +42,9 @@ SECTORS = [
            0, 256, "FLOOR1_6", "CEIL3_6", 144, "TEKWALL4"),
     *stairs("pstep", (960, 840, 1104, 1064), "e", 3, 16, 16, 256, "FLOOR1_6", "CEIL3_6", 160,
             "TEKWALL4", "STEP6"),
-    Sector("plat", [rect(1104, 840, 1296, 1064), rect(1184, 920, 1248, 984)], 64, 256, "FLAT14",
+    Sector("plat", [rect(1104, 840, 1296, 1064), rect(1152, 896, 1216, 960)], 64, 256, "FLAT14",
            "CEIL3_6", 176, "TEKWALL4", lower="SUPPORT2"),
-    pedestal("ped", (1184, 920, 1248, 984), 72, 256, "TEKWALL4", "CEIL3_6"),
+    pedestal("ped", (1152, 896, 1216, 960), 72, 256, "TEKWALL4", "CEIL3_6"),
     *closet("pumpcl", (1040, 616), "s", TAG_PUMPCL, face="TEKWALL4", flat="FLOOR1_6", wall="TEKGREN2"),
 
     # North: yellow gate, exit hall with a closet that opens behind you.
@@ -87,7 +87,7 @@ THINGS = [Thing(*t) for t in [
     (SARGE, 1104, 720, 180), (SARGE, 880, 1000, 270, "mh"), (IMP, 1232, 720, 180),
     (IMP, 1232, 1032, 180, "mh"), (SHELLS, 832, 680), (SHELLS, 832, 760, 0, "e"), (MEDI, 1040, 680),
     (TECHLAMP, 1272, 640), (TECHLAMP, 816, 1040),
-    (YELLOWKEY, 1216, 952),
+    (YELLOWKEY, 1184, 928),
     # pump closet (opens when the key is taken)
     (IMP, 1000, 520, 90), (IMP, 1080, 520, 90, "mh"), (DEMON, 1040, 470, 90, "h"),
     (SARGE, 1040, 540, 90, "e"),

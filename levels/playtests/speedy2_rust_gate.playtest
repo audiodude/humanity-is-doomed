@@ -1,4 +1,4 @@
-# Rust Gate (SPEEDY1 MAP04) wiring test: every door, the shotgun, the
+# Rust Gate (SPEEDY MAP04) wiring test: every door, the shotgun, the
 # secret, the yellow key and its closet trap, the exit-hall closet, the exit.
 #   uv run --with vizdoom scripts/tools/playtest.py speedy2_rust_gate
 
@@ -23,7 +23,7 @@ walk -500 840 -240 840
 # Pump hall: up the stairs to the yellow key; the closet opens.
 walk 740 840
 open 784 840
-walk 900 950 1000 950 1150 950 1216 952
+walk 900 950 1000 950 1150 950 1184 928
 expect has YellowCard
 wait 70
 expect ceil 1040 608 > 0

@@ -1,4 +1,4 @@
-# The Hellforge (SPEEDY1 MAP06) wiring test: the secret, all three keys and
+# The Hellforge (SPEEDY MAP06) wiring test: the secret, all three keys and
 # their traps, the forge lift, the arena closets and the exit.
 #   uv run --with vizdoom scripts/tools/playtest.py speedy2_hellforge
 
@@ -14,7 +14,7 @@ open 256 368
 # Library: the blue skull opens the closet behind it.
 walk 256 600 -480 840
 open -528 840
-walk -800 760 -1056 840
+walk -800 760 -1056 864
 expect has BlueSkull
 wait 70
 expect ceil -840 1048 > 0
@@ -23,7 +23,7 @@ walk -800 840 -480 840 900 840
 
 # Crypt: stairs to the balcony; the yellow key opens both crypt closets.
 open 1056 840
-walk 1300 900 1312 1100 1312 1300 1504 1360
+walk 1300 900 1312 1100 1312 1300 1504 1312
 expect has YellowCard
 wait 70
 expect ceil 1200 632 > 0

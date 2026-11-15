@@ -1,4 +1,4 @@
-# The Long Way Down (SPEEDY2 MAP01): roof, shaft lift, cistern sluice, secret, ledge jump, exit.
+# The Long Way Down (SPEEDY MAP07): roof, shaft lift, cistern sluice, secret, ledge jump, exit.
 #   uv run -q --with vizdoom scripts/tools/playtest.py speedy3_long_way_down
 
 killall

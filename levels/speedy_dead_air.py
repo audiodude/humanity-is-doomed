@@ -34,11 +34,11 @@ SECTORS = [
     Sector("hall", [rect(160, 336, 352, 640)], 8, 136, "FLOOR4_8", "CEIL3_5", 112, "STARG3"),
     Sector("arch", [rect(512, 160, 544, 288)], 8, 104, "FLOOR4_8", "CEIL3_5", 144, "STARG3"),
     # Side passage: the shotgun on a lit pedestal, a hinted stash in its east wall.
-    Sector("gunhall", [rect(544, 96, 672, 608), rect(576, 352, 640, 416)], 8, 136, "FLOOR4_8", "CEIL3_5",
+    Sector("gunhall", [rect(544, 96, 672, 608), rect(576, 320, 640, 384)], 8, 136, "FLOOR4_8", "CEIL3_5",
            128, "STARG3"),
     *doorway("d_gun", (608, 640), "s", alcove=16, alcove_wall="STARG3", alcove_flat="FLOOR4_8", floor=8,
              flat="FLOOR4_8", action=D1_DOOR),   # stays open once used
-    pedestal("gunped", (576, 352, 640, 416), 16, 136, "STARG3", "CEIL3_5"),
+    pedestal("gunped", (576, 320, 640, 384), 16, 136, "STARG3", "CEIL3_5"),
     *doorway("d_stash", (672, 256), "e", floor=8, face="STARG3", track="STARG3", flat="FLOOR4_8"),
     Sector("stash", [rect(688, 160, 848, 352)], 8, 120, "FLOOR4_8", "TLITE6_1", 208, "STARG2",
            special=SECRET_AREA),
@@ -75,7 +75,7 @@ SECTORS = [
     lift("lift_c", (1360, 1216, 1488, 1344), 128, 256, TAG_LIFT, "CEIL3_6", 176, "TEKWALL4", ftex="FLAT14", walk_on=True),
     Sector("ledge", [rect(1040, 1216, 1360, 1344), rect(1088, 1248, 1152, 1312)], 128, 256, "FLAT14",
            "CEIL3_6", 176, "TEKWALL4", lower="SUPPORT2", tag=TAG_DARK),
-    pedestal("keyped", (1088, 1248, 1152, 1312), 136, 256, "TEKWALL4", "CEIL3_6"),
+    pedestal("keyped", (1088, 1248, 1152, 1312), 136, 256, "TEKWALL4", "CEIL3_6", flat="TLITE6_6"),
     *doorway("d_ledge", (1040, 1280), "w", floor=128, flat="FLAT14"),
     *closet("cl_c1", (1184, 768), "s", TAG_CLOSET, face="TEKWALL4", flat="FLOOR1_6", wall="TEKGREN2",
             depth=128, floor=8),
@@ -109,7 +109,7 @@ THINGS = [Thing(*t) for t in [
     # hall
     (ZOMBIE, 256, 576, 270),
     # side passage + stash
-    (SHOTGUN, 608, 384), (ZOMBIE, 608, 560, 270, "emha"), (ZOMBIE, 576, 496, 270, "mha"),
+    (SHOTGUN, 608, 352), (ZOMBIE, 608, 560, 270, "emha"), (ZOMBIE, 576, 496, 270, "mha"),
     (BERSERK, 784, 256), (SHELLS, 720, 304), (MEDI, 720, 208),
     # courtyard
     (SARGE, 128, 1216, 270), (SARGE, 640, 1216, 270), (SARGE, 384, 1280, 270, "mh"),

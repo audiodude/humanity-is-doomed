@@ -4,10 +4,10 @@
 <path d="M531.2,707.2 L582.4,707.2 L582.4,700.8 L531.2,700.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_post: floor 8 ceil 8 FLOOR4_8/FLAT20 light 144</title></path>
 <path d="M518.4,700.8 L595.2,700.8 L595.2,579.2 L518.4,579.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>hall: floor 8 ceil 136 FLOOR4_8/CEIL3_5 light 112</title></path>
 <path d="M659.2,771.2 L672.0,771.2 L672.0,720.0 L659.2,720.0 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>arch: floor 8 ceil 104 FLOOR4_8/CEIL3_5 light 144</title></path>
-<path d="M672.0,796.8 L723.2,796.8 L723.2,592.0 L672.0,592.0 Z M684.8,694.4 L710.4,694.4 L710.4,668.8 L684.8,668.8 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>gunhall: floor 8 ceil 136 FLOOR4_8/CEIL3_5 light 128</title></path>
+<path d="M672.0,796.8 L723.2,796.8 L723.2,592.0 L672.0,592.0 Z M684.8,707.2 L710.4,707.2 L710.4,681.6 L684.8,681.6 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>gunhall: floor 8 ceil 136 FLOOR4_8/CEIL3_5 light 128</title></path>
 <path d="M672.0,585.6 L723.2,585.6 L723.2,579.2 L672.0,579.2 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>d_gun_alcove: floor 8 ceil 136 FLOOR4_8/CEIL5_1 light 176</title></path>
 <path d="M672.0,592.0 L723.2,592.0 L723.2,585.6 L672.0,585.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_gun: floor 8 ceil 8 FLOOR4_8/FLAT20 light 144</title></path>
-<path d="M684.8,694.4 L710.4,694.4 L710.4,668.8 L684.8,668.8 Z" fill="rgb(165,165,165)" fill-rule="evenodd"><title>gunped: floor 16 ceil 136 TLITE6_1/CEIL3_5 light 240</title></path>
+<path d="M684.8,707.2 L710.4,707.2 L710.4,681.6 L684.8,681.6 Z" fill="rgb(165,165,165)" fill-rule="evenodd"><title>gunped: floor 16 ceil 136 TLITE6_1/CEIL3_5 light 240</title></path>
 <path d="M723.2,758.4 L729.6,758.4 L729.6,707.2 L723.2,707.2 Z" fill="#a0703c" fill-rule="evenodd"><title>d_stash: floor 8 ceil 8 FLOOR4_8/FLAT20 light 144</title></path>
 <path d="M729.6,771.2 L793.6,771.2 L793.6,694.4 L729.6,694.4 Z" fill="#c9a0f0" fill-rule="evenodd"><title>stash: floor 8 ceil 120 FLOOR4_8/TLITE6_1 light 208</title></path>
 <path d="M352.0,579.2 L864.0,579.2 L864.0,348.8 L812.8,348.8 L812.8,297.6 L864.0,297.6 L864.0,246.4 L352.0,246.4 Z M556.8,476.8 L659.2,476.8 L659.2,374.4 L556.8,374.4 Z M390.4,361.6 L416.0,361.6 L416.0,336.0 L390.4,336.0 Z M736.0,528.0 L761.6,528.0 L761.6,502.4 L736.0,502.4 Z M787.2,400.0 L812.8,400.0 L812.8,374.4 L787.2,374.4 Z" fill="rgb(155,155,155)" fill-rule="evenodd"><title>yard: floor 0 ceil 320 RROCK19/F_SKY1 light 208</title></path>
@@ -31,7 +31,7 @@
 <path d="M889.6,528.0 L1049.6,528.0 L1049.6,348.8 L889.6,348.8 Z M928.0,451.2 L953.6,451.2 L953.6,425.6 L928.0,425.6 Z M985.6,451.2 L1011.2,451.2 L1011.2,425.6 L985.6,425.6 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>ctrl: floor 8 ceil 256 FLOOR1_6/CEIL3_6 light 176 tag 2</title></path>
 <path d="M998.4,348.8 L1049.6,348.8 L1049.6,297.6 L998.4,297.6 Z" fill="#e8c547" fill-rule="evenodd"><title>lift_c: floor 128 ceil 256 FLAT14/CEIL3_6 light 176 tag 1</title></path>
 <path d="M870.4,348.8 L998.4,348.8 L998.4,297.6 L870.4,297.6 Z M889.6,336.0 L915.2,336.0 L915.2,310.4 L889.6,310.4 Z" fill="rgb(235,235,235)" fill-rule="evenodd"><title>ledge: floor 128 ceil 256 FLAT14/CEIL3_6 light 176 tag 2</title></path>
-<path d="M889.6,336.0 L915.2,336.0 L915.2,310.4 L889.6,310.4 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>keyped: floor 136 ceil 256 TLITE6_1/CEIL3_6 light 240</title></path>
+<path d="M889.6,336.0 L915.2,336.0 L915.2,310.4 L889.6,310.4 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>keyped: floor 136 ceil 256 TLITE6_6/CEIL3_6 light 240</title></path>
 <path d="M864.0,348.8 L870.4,348.8 L870.4,297.6 L864.0,297.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_ledge: floor 128 ceil 128 FLAT14/FLAT20 light 144</title></path>
 <path d="M902.4,534.4 L953.6,534.4 L953.6,528.0 L902.4,528.0 Z" fill="#a0703c" fill-rule="evenodd"><title>d_cl_c1: floor 8 ceil 8 FLOOR1_6/FLAT20 light 144 tag 3</title></path>
 <path d="M896.0,585.6 L960.0,585.6 L960.0,534.4 L896.0,534.4 Z" fill="rgb(160,160,160)" fill-rule="evenodd"><title>cl_c1: floor 8 ceil 136 FLOOR1_6/CEIL5_1 light 96</title></path>
@@ -72,10 +72,10 @@
 <line x1="723.2" y1="796.8" x2="672.0" y2="796.8" stroke="#111" stroke-width="1.6"/>
 <line x1="672.0" y1="796.8" x2="672.0" y2="771.2" stroke="#111" stroke-width="1.6"/>
 <line x1="672.0" y1="720.0" x2="672.0" y2="592.0" stroke="#111" stroke-width="1.6"/>
-<line x1="684.8" y1="694.4" x2="710.4" y2="694.4" stroke="#777" stroke-width="0.6"/>
-<line x1="710.4" y1="694.4" x2="710.4" y2="668.8" stroke="#777" stroke-width="0.6"/>
-<line x1="710.4" y1="668.8" x2="684.8" y2="668.8" stroke="#777" stroke-width="0.6"/>
-<line x1="684.8" y1="668.8" x2="684.8" y2="694.4" stroke="#777" stroke-width="0.6"/>
+<line x1="684.8" y1="707.2" x2="710.4" y2="707.2" stroke="#777" stroke-width="0.6"/>
+<line x1="710.4" y1="707.2" x2="710.4" y2="681.6" stroke="#777" stroke-width="0.6"/>
+<line x1="710.4" y1="681.6" x2="684.8" y2="681.6" stroke="#777" stroke-width="0.6"/>
+<line x1="684.8" y1="681.6" x2="684.8" y2="707.2" stroke="#777" stroke-width="0.6"/>
 <line x1="672.0" y1="579.2" x2="723.2" y2="579.2" stroke="#777" stroke-width="0.6"/>
 <line x1="723.2" y1="579.2" x2="723.2" y2="585.6" stroke="#111" stroke-width="1.6"/>
 <line x1="723.2" y1="585.6" x2="672.0" y2="585.6" stroke="#d0201a" stroke-width="2.5"><title>action 31 tag 0</title></line>
@@ -283,8 +283,8 @@
 <line x1="921.6" y1="348.8" x2="921.6" y2="297.6" stroke="#d0201a" stroke-width="2.5"><title>action 35 tag 2</title></line>
 <text x="556.8" y="771.2" font-size="9" text-anchor="middle" fill="#333">post 8</text>
 <text x="556.8" y="640.0" font-size="9" text-anchor="middle" fill="#333">hall 8</text>
-<text x="694.4" y="697.6" font-size="9" text-anchor="middle" fill="#333">gunhall 8</text>
-<text x="697.6" y="681.6" font-size="9" text-anchor="middle" fill="#333">gunped 16</text>
+<text x="681.6" y="697.6" font-size="9" text-anchor="middle" fill="#333">gunhall 8</text>
+<text x="697.6" y="694.4" font-size="9" text-anchor="middle" fill="#333">gunped 16</text>
 <text x="761.6" y="732.8" font-size="9" text-anchor="middle" fill="#333">stash 8</text>
 <text x="604.8" y="371.2" font-size="9" text-anchor="middle" fill="#333">yard 0</text>
 <text x="592.0" y="428.8" font-size="9" text-anchor="middle" fill="#333">dais 24</text>
@@ -310,7 +310,7 @@
 <circle cx="467.2" cy="720.0" r="1.8" fill="#888"/>
 <circle cx="646.4" cy="720.0" r="1.8" fill="#888"/>
 <circle cx="556.8" cy="604.8" r="8.0" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 3004 skills emh</title></circle>
-<circle cx="697.6" cy="681.6" r="2.5" fill="#1f6fd0"/>
+<circle cx="697.6" cy="694.4" r="2.5" fill="#1f6fd0"/>
 <circle cx="697.6" cy="611.2" r="8.0" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 3004 skills emha</title></circle>
 <circle cx="684.8" cy="636.8" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3004 skills mha</title></circle>
 <circle cx="768.0" cy="732.8" r="1.8" fill="#888"/>

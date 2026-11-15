@@ -1,4 +1,4 @@
-# Ash Cathedral (SPEEDY1 MAP03) wiring test: every door, both lifts, the
+# Ash Cathedral (SPEEDY MAP03) wiring test: every door, both lifts, the
 # three key traps, the bridge trap, the spire switch, the sanctum waves, all
 # three secrets and the exit.
 #   uv run --with vizdoom scripts/tools/playtest.py speedy_ash_cathedral
@@ -47,7 +47,7 @@ wait 35
 walk -1024 1072
 wait 120
 expect floor -1024 1072 == 128
-walk -1024 1220 -640 1200 -640 1264
+walk -1024 1220 -640 1200 -608 1248
 expect has YellowSkull
 wait 70
 expect ceil -880 616 > 0
@@ -87,7 +87,7 @@ checkpoint spire
 # Back down the stairs and across the bridge to the red skull: the nave closets open.
 walk 1600 1100 1600 800 1100 880
 open 928 880
-walk 600 880 256 880
+walk 600 880 256 896
 expect has RedSkull
 wait 70
 expect ceil -128 1400 > 0

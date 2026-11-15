@@ -1,11 +1,11 @@
-# Dead Air (SPEEDY1 MAP01) wiring test: the side passage and shotgun, all three
+# Dead Air (SPEEDY MAP01) wiring test: the side passage and shotgun, all three
 # secrets, the barracks, the control-room lift, the key trap (closets), the
 # porch door, the yellow door and the exit.
 #   uv run --with vizdoom scripts/tools/playtest.py speedy_dead_air
 
 killall
 # Side passage: the shotgun, then the hinted stash.
-walk 400 224 528 224 608 300 608 384
+walk 400 224 528 224 608 300 608 352
 expect has Shotgun
 open 672 256
 walk 768 256

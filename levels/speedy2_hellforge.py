@@ -40,9 +40,9 @@ SECTORS = [
     # West: dark library, blue skull on a pedestal; taking it opens a closet.
     *doorway("d_lib", (-512, 840), "w", alcove=16, far_alcove=16, alcove_wall="METAL", face="BIGDOOR2",
              alcove_flat="RROCK09", far_flat="FLOOR7_2", flat="RROCK09"),
-    Sector("library", [rect(-1152, 640, -560, 1040), rect(-1088, 808, -1024, 872)], 0, 160, "FLOOR7_2",
+    Sector("library", [rect(-1152, 640, -560, 1040), rect(-1088, 832, -1024, 896)], 0, 160, "FLOOR7_2",
            "CEIL5_2", 96, "WOOD1", special=LIGHT_BLINK_RANDOM),
-    pedestal("ped_blue", (-1088, 808, -1024, 872), 24, 160, "WOOD1", "CEIL5_2"),
+    pedestal("ped_blue", (-1088, 832, -1024, 896), 24, 160, "WOOD1", "CEIL5_2"),
     *closet("libcl", (-840, 1040), "n", TAG_LIB, face="WOOD1", flat="FLOOR7_2", wall="WOOD3"),
 
     # East: blue door -> crypt, stairs up to the yellow-key balcony.
@@ -51,9 +51,9 @@ SECTORS = [
     Sector("crypt", [rect(1088, 640, 1600, 1040)], 0, 256, "FLOOR5_2", "CEIL5_1", 128, "GSTONE1"),
     *stairs("cstep", (1216, 1040, 1408, 1232), "n", 4, 16, 16, 256, "FLOOR5_2", "CEIL5_1", 144,
             "GSTONE1", "STEP4"),
-    Sector("balcony", [rect(1088, 1232, 1600, 1424), rect(1472, 1328, 1536, 1392)], 80, 256, "FLOOR5_1",
+    Sector("balcony", [rect(1088, 1232, 1600, 1424), rect(1472, 1280, 1536, 1344)], 80, 256, "FLOOR5_1",
            "CEIL5_1", 176, "GSTONE1", lower="GSTONE2"),
-    pedestal("ped_yel", (1472, 1328, 1536, 1392), 96, 256, "GSTONE1", "CEIL5_1"),
+    pedestal("ped_yel", (1472, 1280, 1536, 1344), 96, 256, "GSTONE1", "CEIL5_1"),
     *closet("crcl_w", (1200, 640), "s", TAG_CRYPT, face="GSTONE1", flat="FLOOR5_2", wall="GSTONE2"),
     *closet("crcl_e", (1472, 640), "s", TAG_CRYPT, face="GSTONE1", flat="FLOOR5_2", wall="GSTONE2"),
 
@@ -123,7 +123,7 @@ THINGS = [Thing(*t) for t in [
     (CHAINGUN, -600, 760), (AMMOBOX, -1104, 1000), (SHELLS, -640, 960), (MEDI, -1104, 680),
     (ZOMBIE, -900, 700, 0), (ZOMBIE, -760, 980, 0), (ZOMBIE, -1100, 980, 0, "mh"),
     (SARGE, -960, 840, 0), (SARGE, -700, 700, 0, "mh"), (SPECTRE, -880, 960, 0, "h"),
-    (BLUESKULL, -1056, 840),
+    (BLUESKULL, -1056, 864),
     (IMP, -900, 1120, 270), (IMP, -780, 1120, 270, "mh"), (DEMON, -840, 1180, 270, "mh"),
     (IMP, -900, 1180, 270, "h"),
     # crypt
@@ -131,7 +131,7 @@ THINGS = [Thing(*t) for t in [
     (SARGE, 1300, 900, 180), (SARGE, 1500, 800, 180, "mh"), (IMP, 1520, 960, 180),
     (IMP, 1250, 700, 90, "mh"), (CHAINGUY, 1400, 1300, 270),
     (IMP, 1150, 1380, 270), (IMP, 1300, 1380, 270, "h"),
-    (YELLOWKEY, 1504, 1360), (MEDI, 1150, 1280), (SHELLS, 1560, 1270),
+    (YELLOWKEY, 1504, 1312), (MEDI, 1150, 1280), (SHELLS, 1560, 1270),
     (KNIGHT, 1200, 560, 90, "mh"), (DEMON, 1200, 560, 90, "e"), (DEMON, 1472, 560, 90),
     (IMP, 1530, 520, 90, "mh"),
     # forge hall
