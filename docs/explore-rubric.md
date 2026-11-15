@@ -1,4 +1,4 @@
-# Explorer vs human rubric, v2
+# Explorer vs human rubric, v3
 
 How well the `--explore` bot's stalls predict where a person gets lost, scored
 by fixed rules. `scripts/tools/compare.py` applies every rule except the cause
@@ -101,12 +101,26 @@ that time and place and give it one code:
   space, light, an item, or a place they could see but not reach.
 - **B-memory:** the bot found the way only because it never forgets floor it
   has seen and sweeps edges in order. The human had simply overlooked it.
+- **B-perception:** the bot found the way only because it noticed something a
+  person missed or didn't read as usable: a switch, door or exit it knows from
+  the line's action however small, dark or out of the way it is, or a key it
+  saw on screen that a person didn't make out.
 - **H-choice:** the human chose to detour (a secret, an item, sightseeing).
   These come out of the scores: rerun `compare.py` with `--choice M:SS-M:SS`
   for each such stretch of the human run.
 
-B-lure and B-memory point opposite ways: the first means the bot lacks a human
-pull, the second that it is better than a human. Each needs a different fix.
+Each bot code points to a different kind of fix:
+
+| Code | The bot is | Fix |
+|---|---|---|
+| B-blind, B-weak | worse than a person | add the mechanic, or fix its navigation |
+| B-memory | better than a person: remembers too well | limit its memory, or sweep edges less systematically |
+| B-perception | better than a person: notices too well | make small, dark or out-of-the-way things harder for it to notice |
+| B-lure | missing a human pull | give it a pull toward open space, light, items, places it can see |
+
+Making the bot "worse" (B-memory, B-perception) has to come from human-like
+limits, never from broken movement. Stall precision (S5) catches a bot that's
+simply worse everywhere.
 
 ## 7. Pooling, and when to trust the explorer
 
@@ -139,6 +153,8 @@ code) and `scores.json`.
 
 ## 9. Versions
 
+- **v3:** a new cause code, B-perception, for things the bot notices that a
+  person misses. Scores are unchanged from v2.
 - **v2:** an L press marks the whole stretch it falls in (lost stretches),
   not the spot where it was pressed: people press L late, after wandering.
 - **v1:** L presses were matched by where they were pressed.

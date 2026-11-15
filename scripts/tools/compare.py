@@ -31,7 +31,7 @@ import playtest as pt  # noqa: E402
 from explore import KEYS, line_textures  # noqa: E402
 from play import PLAYS, Observer  # noqa: E402
 
-RUBRIC = 2
+RUBRIC = 3
 TIC = 35
 CAP = 15 * 60 * TIC   # runs are cut off at 15 minutes
 STALL = 30 * TIC      # a stall, and a lure's or a trap's time
