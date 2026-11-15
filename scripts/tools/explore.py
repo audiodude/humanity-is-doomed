@@ -853,6 +853,7 @@ class Explorer(pt.Run):
                     self.searching = True
                     self.note("search", "nothing left it knows to try: searching the walls")
             _, kind, c, what = min(opts, key=lambda o: o[0])
+            blocked = set(self.blocked) if what[0] == "wall" else None
             try:
                 if what[0] == "wall":
                     self.search(c, what, lv, prev)
@@ -860,10 +861,13 @@ class Explorer(pt.Run):
                     self.act(kind, c, what, lv, prev)
             except pt.Abort:
                 if not self.game.is_episode_finished():
+                    if what[0] == "wall":
+                        # The wall is searched either way; what it bumped
+                        # into on the way shouldn't cut it off from the rest.
+                        self.blocked = blocked
+                        continue
                     # Getting stuck marked the way it tried as blocked, so a
                     # key or a switch is worth another way round, twice.
-                    if what[0] == "wall":
-                        continue
                     target = what[:2] if what[0] != "cell" else ("cell", c)
                     self.tries[target] += 1
                     if what[0] == "cell" or self.tries[target] >= 3:
