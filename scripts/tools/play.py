@@ -4,8 +4,11 @@
     uv run --with vizdoom scripts/tools/playtest.py LEVEL --play
     uv run --with vizdoom scripts/tools/playtest.py --play --recording DIR    # the report again
 
-The map opens in a window at normal speed, with keyboard and mouse as set in
-ViZDoom's config (~/.cache/playtest/vizdoom.ini). Two keys are added:
+The map opens in a window at normal speed, with modern-port controls (as in
+DOOM + DOOM II and dsda-doom): WASD to move and strafe, the mouse to turn
+(it doesn't move you forward or back), E or space to use, mouse 1 or Ctrl to
+fire, 1-7 or the wheel for weapons, always run (hold Shift to walk). Two
+more keys:
 
     L   "I'm lost": marks the moment, as often as you like
     K   stop: ends the play and records it (so does reaching the exit)
@@ -80,8 +83,16 @@ def play(args, vzd, geo, demo):
     """The live play, in a window: record it to `demo` until the exit, K, or death."""
     r = pt.Run(args, vzd, geo)
     g = r.game
-    g.send_game_command("bind l +reload")
-    g.send_game_command("bind k +zoom")
+    # Modern-port controls, as in DOOM + DOOM II (2024) and dsda-doom: WASD
+    # to move and strafe, the mouse to turn only (no forward/back on the
+    # mouse, no free look), E or space to use, mouse 1 or Ctrl to fire,
+    # the wheel to change weapons, always run (Shift walks).
+    for c in ("bind w +forward", "bind s +back", "bind a +moveleft", "bind d +moveright",
+              "bind e +use", "bind space +use", "bind mouse1 +attack", "bind ctrl +attack",
+              "bind mwheelup weapprev", "bind mwheeldown weapnext", "bind shift +speed",
+              "m_forward 0", "freelook 0", "lookstrafe 0", "cl_run 1",
+              "bind l +reload", "bind k +zoom"):
+        g.send_game_command(c)
     g.new_episode(demo)
     if not args.monsters:
         g.send_game_command("god")

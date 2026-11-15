@@ -727,14 +727,16 @@ class Run:
         g = self.game = vzd.DoomGame()
         g.set_doom_game_path(args.iwad)
         os.makedirs(CACHE, exist_ok=True)
-        g.set_doom_config_path(os.path.join(CACHE, "vizdoom.ini"))   # not the working directory
+        live = getattr(args, "play", False) and not args.recording   # a person plays (--play)
+        # Not the working directory. A person's controls (play.py: always run,
+        # WASD) get a config of their own: cl_run flips the bots' run button.
+        g.set_doom_config_path(os.path.join(CACHE, "vizdoom-play.ini" if live else "vizdoom.ini"))
         g.set_doom_scenario_path(args.wad[0])
         if args.wad[1:]:
             g.add_game_args("-file " + " ".join(args.wad[1:]))
         g.set_doom_map(args.map.upper())
         g.set_doom_skill(args.skill)
         g.set_seed(args.seed)   # the same seed plays out the same way
-        live = getattr(args, "play", False) and not args.recording   # a person plays (--play)
         replaying = getattr(args, "replaying", None)   # a --play recording, played back for its report
         g.set_window_visible(args.watch or live)
         g.set_mode(vzd.Mode.ASYNC_SPECTATOR if live else vzd.Mode.PLAYER)
