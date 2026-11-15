@@ -182,6 +182,104 @@ def seen_before(model, snaps, wave, target):
     return 0
 
 
+SOUND_RANGE = 1200   # S_CLIPPING_DIST: vanilla plays no sound from farther (P_AproxDistance)
+
+
+def _aprox(a, b):
+    """P_AproxDistance."""
+    dx, dy = abs(a[0] - b[0]), abs(a[1] - b[1])
+    return dx + dy - min(dx, dy) / 2
+
+
+def _offset(m, ln, t, d, along=0.0):
+    """The point d units to the right (front) of line ln at fraction t along
+    it, moved `along` units further along it."""
+    (x1, y1), (x2, y2) = m.verts[ln.v1], m.verts[ln.v2]
+    L = m.length(ln) or 1
+    x, y = x1 + (x2 - x1) * t + (x2 - x1) / L * along, y1 + (y2 - y1) * t + (y2 - y1) / L * along
+    return x + (y2 - y1) / L * d, y - (x2 - x1) / L * d
+
+
+def _seg_dist(p, a, b):
+    (ax, ay), (bx, by) = a, b
+    L2 = (bx - ax) ** 2 + (by - ay) ** 2 or 1
+    t = max(0.0, min(1.0, ((p[0] - ax) * (bx - ax) + (p[1] - ay) * (by - ay)) / L2))
+    return math.dist(p, (ax + (bx - ax) * t, ay + (by - ay) * t))
+
+
+def switch_views(md, res, effective, required):
+    """For each trigger group that changes the map (effective) and has a switch
+    or a shootable line the player sets off: can the player see the change
+    from where they set it off, and would they hear it. Returns dicts: group,
+    required, trigger (index into md.triggers), site (the region it's used
+    from), wave, eye (x, y), visible, dist (vanilla's approximate distance to
+    the nearest moved sector's sound origin), heard.
+
+    Seen: 2D line of sight, with the heights of the wave the switch is used
+    in, from anywhere the player can stand to use it (points 16-64 units in
+    front of the switch, up to 48 along it either way, within 64 of it, in a
+    region reachable then, with nothing between them and the switch; a
+    shootable line counts from either side) to a moved sector's floor (its
+    inner point) or to a face of it (points just outside its two-sided
+    boundary lines). The player may turn
+    round, so any direction counts; a floor sinking below a ledge's lip still
+    counts as seen. Heard: vanilla plays a door's, lift's or floor's sound
+    from its sector's bounding-box centre, to anyone within 1200 units
+    (P_AproxDistance; light changes make no sound and aren't modelled)."""
+    m = md.m
+    snaps = res["snaps"]
+    los = {}
+    origin = {}
+    for i, (fs, bs) in enumerate(md.osecs_of_line):
+        for s in (fs, bs):
+            if s is not None:
+                o = origin.setdefault(s, [math.inf, math.inf, -math.inf, -math.inf])
+                for v in (m.lines[i].v1, m.lines[i].v2):
+                    x, y = m.verts[v]
+                    o[:] = min(o[0], x), min(o[1], y), max(o[2], x), max(o[3], y)
+    out = []
+    for g in effective:
+        if g[0] == "boss":
+            continue
+        fired = [ti for ti, t in enumerate(md.triggers)
+                 if t["group"] == g and t["trig"][0] in "SG" and ti in res["trig_wave"]]
+        if not fired:
+            continue
+        moved = set(md.tagged.get(g[0], []))
+        targets = [md.inner[r] for s in moved for r in md.group[s]]
+        for i, (fs, bs) in enumerate(md.osecs_of_line):
+            if bs is None or (fs in moved) == (bs in moved):
+                continue
+            side = 2 if bs in moved else -2   # just outside the moved sector, facing it
+            targets += [_offset(m, m.lines[i], t, side) for t in (0.25, 0.5, 0.75)]
+        sounds = [((o[0] + o[2]) / 2, (o[1] + o[3]) / 2) for o in (origin[s] for s in moved if s in origin)]
+        best = None
+        for ti in fired:
+            w, site = res["trig_wave"][ti], res["trig_site"][ti]
+            t = md.triggers[ti]
+            ln = m.lines[t["line"]]
+            R = snaps[w][3]
+            if w not in los:
+                los[w] = LOS(md, snaps[w][0])
+            a, b = m.verts[ln.v1], m.verts[ln.v2]
+            half = (m.length(ln) or 1) / 2
+            eyes = [p for side in ((1,) if t["trig"][0] == "S" else (1, -1)) for d in (16, 32, 48, 64)
+                    for along in (0, -24, 24, -48, 48)
+                    if _seg_dist(p := _offset(m, ln, 0.5, side * d, along), a, b) <= 64
+                    and (r := md.region_of_point(*p)) is not None and r in R
+                    and los[w].clear(_offset(m, ln, 0.5, side, max(-half, min(half, along))), p)]   # not through a wall
+            for eye in eyes or [_offset(m, ln, 0.5, 16)]:
+                seen = any(los[w].clear(eye, p) for p in sorted(targets, key=lambda p: math.dist(p, eye)))
+                dist = min((_aprox(eye, p) for p in sounds), default=math.inf)
+                cand = dict(group=g, required=g in required, trigger=ti, site=site, wave=w, eye=eye, visible=seen,
+                            dist=dist if dist == math.inf else round(dist), heard=dist <= SOUND_RANGE)
+                if best is None or (cand["visible"], cand["heard"], -cand["dist"]) > \
+                        (best["visible"], best["heard"], -best["dist"]):
+                    best = cand
+        out.append(best)
+    return out
+
+
 def scc(graph):
     """Strongly connected components (iterative Tarjan) of {node: [succ]}."""
     index, low, on, stack, out = {}, {}, set(), [], []
@@ -526,8 +624,18 @@ def analyse(md, res):
         row["exit_teased"] = "" if v is None else v
     else:
         row["exit_teased"] = ""
+
+    # ---- switches: is what they do seen or heard from where they're used
+    views = switch_views(md, res, effective, required)
+    for pre, vs in (("", views), ("req_", [v for v in views if v["required"]])):
+        hidden = [v for v in vs if not v["visible"]]
+        row[pre + "switches"] = len(vs)
+        row[pre + "switches_hidden"] = len(hidden)
+        row[pre + "switches_unheard"] = sum(1 for v in hidden if not v["heard"])
+        row[pre + "switch_hidden_max_dist"] = max((v["dist"] for v in hidden if v["dist"] != math.inf), default="")
     debug = dict(model=md, res=res, goals=goals, keys_req=keys_req, required=required,
-                 effective=effective, key_dep=key_dep, crit_seq=crit_seq, legs=legs, room=room, exit=ex)
+                 effective=effective, key_dep=key_dep, crit_seq=crit_seq, legs=legs, room=room, exit=ex,
+                 switches=views)
     return row, debug
 
 

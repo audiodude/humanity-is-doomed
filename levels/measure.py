@@ -209,7 +209,39 @@ def measure(level, lines, found):
         flag = "  below" if v < q1 else "  above" if v > q3 else ""
         out.append(f"{LABELS[k]:<44} {fmt(v):>9}   {fmt(med)} [{fmt(q1)}-{fmt(q3)}]{flag}")
     lines, warnings = report(bal, level.game)
-    return out + lines, warnings
+    sw_lines, sw_warnings = switch_report(md, route["switches"], list(level.sectors))
+    return out + lines + sw_lines, warnings + sw_warnings
+
+
+def switch_report(md, views, names):
+    """(lines, warnings) on what each switch does: seen or heard from where
+    it's used (scripts/metrics/progression_metrics.py switch_views). On the
+    68 id maps, 26 of 132 required switches (20%) move something the player
+    can't see from the switch, 6 of the 13 in E1, so that alone is normal;
+    only 4 (3%: E1M5, E1M6, MAP12, MAP23) are out of earshot too. A required
+    switch like that is warned about; optional ones are only listed."""
+    if not views:
+        return [], []
+
+    def name(r):
+        o = md.nsec[r]
+        return names[o] if o < len(names) else f"sector {o}"
+    lines = ["switches: is what each one moves seen, or heard (within 1200), from where it's used"]
+    warnings = []
+    for v in sorted(views, key=lambda v: (not v["required"], v["wave"])):
+        t = md.triggers[v["trigger"]]
+        moved = sorted({name(r) for s in md.tagged.get(t["tag"], []) for r in md.group[s]})
+        what = "/".join(moved[:3]) + ("..." if len(moved) > 3 else "")
+        verdict = "seen" if v["visible"] else f"heard ({v['dist']:.0f})" if v["heard"] else \
+            f"NEITHER ({v['dist']:.0f} away)"
+        lines.append(f"  {'required' if v['required'] else 'optional':<8} {t['trig']} {t['action']} @ "
+                     f"{name(v['site'])} ({v['eye'][0]:.0f},{v['eye'][1]:.0f}) -> {what}: {verdict}")
+        if v["required"] and not v["visible"] and not v["heard"]:
+            warnings.append(f"required switch @ {name(v['site'])} ({v['eye'][0]:.0f},{v['eye'][1]:.0f}) moves {what} "
+                            f"out of sight and out of earshot ({v['dist']:.0f} away); 3% of the id maps' required "
+                            "switches do. Make the change visible from the switch, bring it within 1200, or show "
+                            "the player where it is")
+    return lines, warnings
 
 
 def fmt(v):
