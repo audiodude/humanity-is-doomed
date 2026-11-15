@@ -39,9 +39,11 @@ otherwise it calls it, or (standing on it, going down) uses a lift switch on
 the lift's own edge and rides it. A lift it got stuck riding counts as a plain
 floor at its height until the next progress. A lift it used from right beside
 it that didn't come counts as a plain floor until it hears it move (within
-1024 units): something else calls it. After a switch that set a lift moving
-within earshot it doesn't stand and look round but goes on at once: a lift
-waits only a few seconds. A floor or ceiling it has seen
+1024 units): something else calls it (or until, out of other things to try,
+it tries everything it got stuck on once more). After a switch that set a
+lift moving within earshot (not the one it stands on: that one it rides) it
+doesn't stand and look round but goes on at once: a lift waits only a few
+seconds. A floor or ceiling it has seen
 moving (a walk-over line it crossed, a switch far off) makes the places it
 looked round from and couldn't reach worth another try, a few times between
 progress. Getting stuck on the same spot twice blocks the cells just past it
@@ -134,7 +136,6 @@ JUMP = 64             # moved further than this in a tic: it was teleported
 LINK = 4              # cells a teleporter it has used costs to go through
 HEAR = 1024           # a lift moving this close is heard
 RECENT = 6 * 35       # a sector that moved this recently before it used a wall moves by itself
-CLOSE = int(os.environ.get("EXPLORE_CLOSE", "0"))   # EXPERIMENT: cells seen this close count as visited
 RUNUP = 6             # cells of straight, level run-up a running jump needs
 LEAP = 8              # widest gap (cells) it reads as one to jump
 LEAP_COST = 64        # cells a jump costs on top of its length: it walks round if it can
@@ -200,6 +201,7 @@ class Explorer(pt.Run):
         self.moved_at = {}        # sector -> tic of the last look it had moved since the one before
         self._h_look = None
         self.found_secs = set()   # sectors a wall search found: moving again isn't a find
+        self.revived = False      # cleared the lifts that didn't come, as a last resort, since the last event
         self._sector_at, self._middle = {}, {}
         self._leap, self._leaps_lv, self._leaps = set(), None, {}
         self.bad_leaps = set()    # (from, to) cells of running jumps it fell short on
@@ -347,8 +349,6 @@ class Explorer(pt.Run):
                 if stop:
                     break
                 self.known.add(qc)
-                if s * RAY_STEP <= CLOSE:
-                    self.visited.add(qc)
                 prev, pc = q, qc
 
     def look_round(self):
@@ -376,7 +376,7 @@ class Explorer(pt.Run):
             self.tries.clear()
             self.blocked.clear()
             self.static.clear()
-            self.retried = False
+            self.retried = self.revived = False
             self.searching = False
         progress = kind in ("key", "switch", "shot", "exit") if progress is None else progress
         if progress:
@@ -981,10 +981,14 @@ class Explorer(pt.Run):
                        + (" again" if kind == "again" else ""), False if kind == "again" else None)
         self.tic(n=8)
         p = self.pos()
+        c = self.plan.cell(p)
+        on = set(self.plan.under[c[1]][c[0]] or ()) | {self.geo.sector_at(p)}
         if kind in ("switch", "again") and any(
-                self.heights()[s] != pressed[s] and math.dist(p, self.middle(s)) <= HEAR for s in self.geo.lifts):
-            # It heard a lift set off: a lift waits only a few seconds at the
-            # bottom, so it goes now rather than stand and look round.
+                self.heights()[s] != pressed[s] and s not in on and math.dist(p, self.middle(s)) <= HEAR
+                for s in self.geo.lifts):
+            # It heard a lift set off (not one it's on: that one it rides): a
+            # lift waits only a few seconds at the bottom, so it goes now
+            # rather than stand and look round.
             return
         for _ in range(62 if kind != "exit" else 27):
             self.tic()
@@ -1204,13 +1208,15 @@ class Explorer(pt.Run):
                 self.failed.discard(t)
                 self.tries[t] = 0
             opts = self.options(lv, dist)
-            if not opts and (self.blocked or self.failed or self.static) and not self.retried:
+            if not opts and (self.blocked or self.failed or self.static or self.dead) and not self.retried:
                 # Before giving up, try again what it got stuck on once: a lift
-                # may be down now, a door it bumped into open.
+                # may be down now, a door it bumped into open, a lift that didn't
+                # come may come now.
                 self.retried = True
                 self.blocked.clear()
                 self.failed.clear()
                 self.static.clear()
+                self.dead.clear()
                 continue
             if not opts and self.moves < MOVES and self.settle():
                 continue
@@ -1218,6 +1224,11 @@ class Explorer(pt.Run):
                 # Nothing left it knows of: as a stuck player does, go along
                 # the walls it has seen using them and shooting them.
                 opts = self.search_options(dist)
+                if not opts and self.dead and not self.revived:
+                    # Trapped behind lifts that didn't come: try them once more.
+                    self.revived = True
+                    self.dead.clear()
+                    continue
                 if not opts:
                     return "nothing left it knows to try" + (
                         f" (searched {len(self.searched)} walls)" if self.searched else "")
