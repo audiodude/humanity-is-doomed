@@ -5,6 +5,8 @@
     uv run --with vizdoom scripts/tools/playtest.py LEVEL --fight [--seed N] [--watch]
     uv run --with vizdoom scripts/tools/playtest.py LEVEL --explore [--seed N] [--watch]
     uv run --with vizdoom scripts/tools/playtest.py LEVEL --replay [--explore] [--video FILE.mp4 [--hd]]
+    uv run --with vizdoom scripts/tools/playtest.py LEVEL --play [--monsters]   # you play; then a report
+    uv run --with vizdoom scripts/tools/playtest.py --play --recording DIR       # a play's report again
     python3 scripts/tools/playtest.py LEVEL --describe     # start, keys, special lines (no ViZDoom needed)
 
 LEVEL is a level module (e.g. nukage_drain): the WAD and slot its set gives it
@@ -89,6 +91,10 @@ plays the same way). Every --fight run is recorded to
 its own way to the exit, to show where players get lost (scripts/tools/explore.py
 says how). Its runs are recorded too, apart from --fight's.
 
+--play opens the map for you to play, in a window at normal speed, and
+records it, so the explorer's runs can be held up against a person's
+(scripts/tools/play.py says how). L marks "I'm lost", K ends the play.
+
 --watch shows the game in a window at normal speed. --replay plays back the
 last --fight recording (with --explore, the last --explore one) of MAP at
 --skill and --seed (or --recording FILE) in a window;
@@ -96,7 +102,7 @@ add --video FILE.mp4 to render it, with sound, using ffmpeg instead (--hd: at 19
 widescreen, instead of 640x480). A recording only plays
 back right with the WAD it was made with.
 
-Exit status: 0 all checks passed (--explore: it exited), 1 a check failed,
+Exit status: 0 all checks passed (--explore, --play: it exited), 1 a check failed,
 the wiring run got stuck, a fight hit --max-time or an explore run found no
 exit, 2 the engine or script broke. Deaths and skipped steps in a --fight run
 are in its report, not its exit status.
@@ -138,6 +144,7 @@ PICKUPS = {"PowerIronFeet": ("RadSuit",), "BasicArmor": ("GreenArmor", "BlueArmo
 
 RADIUS, HEIGHT_P, STEP, USE_RANGE = 16, 56, 24, 64
 GRID = 16
+SHIFT = 7.5   # how far off a cell's centre the planner may stand the player's box, to fit a gap
 DAMAGING = {4, 5, 7, 11, 16}
 LIFTS = {10, 21, 62, 88, 120, 121, 122, 123}   # lift specials: their tagged sectors move up and down
 USE_DOORS = {1, 26, 27, 28, 31, 32, 33, 34, 117, 118}   # doors the player opens by using them
@@ -320,88 +327,189 @@ def box_hits(a, b, cx, cy, r):
     return True
 
 
+def segs_cross(p, q, a, b):
+    """Segment p-q crosses (or touches) segment a-b."""
+    rx, ry, sx, sy = q[0] - p[0], q[1] - p[1], b[0] - a[0], b[1] - a[1]
+    d = rx * sy - ry * sx
+    if d == 0:
+        return False
+    t = ((a[0] - p[0]) * sy - (a[1] - p[1]) * sx) / d
+    u = ((a[0] - p[0]) * ry - (a[1] - p[1]) * rx) / d
+    return 0 <= t <= 1 and 0 <= u <= 1
+
+
 class Planner:
     """Grid A* for the player's 32-unit box over the live map. Like Doom, a
     cell's floor is the highest floor anywhere under the box there and its
-    ceiling the lowest ceiling; the player can step up 24, drop any height,
-    and needs 56 of headroom. Lifts count as passable whatever their height."""
+    ceiling the lowest ceiling; the player can step up 24, drop any height
+    (but not through an opening lower than 56 over the floor it's on), and
+    needs 56 of headroom; the box may touch a wall. A cell the box only fits
+    in off its centre (a gap just 32 wide) is stood in there, but there's no
+    step between two such cells with a wall between them (walkways either
+    side of a railing); so is a cell whose centre a solid thing blocks but
+    whose box fits beside it off the centre (between barrels 64 apart).
+    Lifts count as passable whatever their height."""
 
     def __init__(self, geo):
         self.g = g = geo
-        self._levels = (None, None)
-        fine = g.raster(GRID // 2)
+        self._levels = (None, None, {})
+        self._fine = g.raster(GRID // 2)
         self.under = []   # per cell: the sectors under the player's box there
         self.wall = []    # per cell: a wall (one-sided or blocking line) cuts the box
+        self.shift = {}   # cell -> (dx, dy): where in it the box fits, if not at its centre
+        self.tshift = {}  # the same for cells a solid thing blocks the centre of, as of the last levels()
         walls = [(a, b) for a, b, flags, _sp, _t, _fs, bs in g.lines if bs is None or flags & 1]
+        self._bucket = {}  # 128-unit square -> walls near it, for the box-off-centre checks
+        for a, b in walls:
+            for bj in range(int((min(a[1], b[1]) - 32 - g.y0) // 128), int((max(a[1], b[1]) + 32 - g.y0) // 128) + 1):
+                for bi in range(int((min(a[0], b[0]) - 32 - g.x0) // 128),
+                                int((max(a[0], b[0]) + 32 - g.x0) // 128) + 1):
+                    self._bucket.setdefault((bi, bj), []).append((a, b))
+        self._clear = {}   # (cell, offset) -> no wall cuts the box there
+        r = RADIUS - 1   # a box edge touching a wall is fine, as in Doom
+
+        def hits(offsets, cells):
+            """{(cell, offset)} where a wall cuts the box at cell centre + offset."""
+            out = set()
+            for a, b in walls:
+                i0 = max(0, int((min(a[0], b[0]) - RADIUS - SHIFT - g.x0) // GRID))
+                i1 = min(g.nx - 1, int((max(a[0], b[0]) + RADIUS + SHIFT - g.x0) // GRID))
+                j0 = max(0, int((min(a[1], b[1]) - RADIUS - SHIFT - g.y0) // GRID))
+                j1 = min(g.ny - 1, int((max(a[1], b[1]) + RADIUS + SHIFT - g.y0) // GRID))
+                for jj in range(j0, j1 + 1):
+                    for ii in range(i0, i1 + 1):
+                        if cells is not None and (ii, jj) not in cells:
+                            continue
+                        cx, cy = g.x0 + ii * GRID + GRID / 2, g.y0 + jj * GRID + GRID / 2
+                        for o in offsets:
+                            if box_hits(a, b, cx + o[0], cy + o[1], r):
+                                out.add(((ii, jj), o))
+            return out
+        walled = {c for c, _o in hits([(0, 0)], None)}
+        # A gap just the box's width (bars 32 apart) never has a cell centred
+        # in it: a walled cell whose box fits a little off its centre, toward
+        # a neighbour that is walled too (so not just the edge of a room), is
+        # a cell the player can stand in, there.
+        offsets = [(dx, dy) for dx in (-SHIFT, 0, SHIFT) for dy in (-SHIFT, 0, SHIFT) if dx or dy]
+        cut = hits(offsets, walled)
+        for c in walled:
+            o = next((o for o in offsets if (c, o) not in cut
+                      and (c[0] + (o[0] > 0) - (o[0] < 0), c[1] + (o[1] > 0) - (o[1] < 0)) in walled), None)
+            if o:
+                self.shift[c] = o
+        # Two cells stood in off their centres can face each other across a
+        # wall (a railing between two walkways 32 apart): no step between them.
+        self.cut = set()   # (cell, neighbour) pairs a wall lies between
+        for c in self.shift:
+            pc = self.centre(c)
+            near = self._bucket.get((int((pc[0] - g.x0) // 128), int((pc[1] - g.y0) // 128)), ())
+            for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
+                n = (c[0] + di, c[1] + dj)
+                if any(segs_cross(pc, self.centre(n), a, b) for a, b in near):
+                    self.cut |= {(c, n), (n, c)}
         for j in range(g.ny):
             urow, wrow = [], []
-            cy = g.y0 + j * GRID + GRID / 2
             for i in range(g.nx):
-                cx = g.x0 + i * GRID + GRID / 2
-                ss = {fine[jj][ii] for jj in range(2 * j - 1, 2 * j + 4) for ii in range(2 * i - 1, 2 * i + 4)
-                      if 0 <= jj < len(fine) and 0 <= ii < len(fine[0])}
-                urow.append(frozenset(s for s in ss if s is not None) if None not in ss else None)
-                wrow.append(False)
+                dx, dy = self.shift.get((i, j), (0, 0))
+                urow.append(self._under(i, j, (dx > 0) - (dx < 0), (dy > 0) - (dy < 0)))
+                wrow.append((i, j) in walled and (i, j) not in self.shift)
             self.under.append(urow)
             self.wall.append(wrow)
-        for a, b in walls:
-            i0 = max(0, int((min(a[0], b[0]) - RADIUS - g.x0) // GRID))
-            i1 = min(g.nx - 1, int((max(a[0], b[0]) + RADIUS - g.x0) // GRID))
-            j0 = max(0, int((min(a[1], b[1]) - RADIUS - g.y0) // GRID))
-            j1 = min(g.ny - 1, int((max(a[1], b[1]) + RADIUS - g.y0) // GRID))
-            for jj in range(j0, j1 + 1):
-                for ii in range(i0, i1 + 1):
-                    if box_hits(a, b, g.x0 + ii * GRID + GRID / 2, g.y0 + jj * GRID + GRID / 2, RADIUS):
-                        self.wall[jj][ii] = True
+
+    def _under(self, i, j, si, sj):
+        """The sectors under the box in cell (i, j), shifted half a cell by si, sj
+        (None if any of it is off the map): the 8-unit cells whose centres are
+        inside the 32-unit box."""
+        fine = self._fine
+        ss = {fine[jj][ii] for jj in range(2 * j - 1 + sj, 2 * j + 3 + sj)
+              for ii in range(2 * i - 1 + si, 2 * i + 3 + si)
+              if 0 <= jj < len(fine) and 0 <= ii < len(fine[0])}
+        return frozenset(s for s in ss if s is not None) if None not in ss else None
+
+    def _box_clear(self, c, o):
+        """No wall cuts the box in cell c moved by offset o."""
+        k = (c, o)
+        if k not in self._clear:
+            g = self.g
+            cx, cy = g.x0 + c[0] * GRID + GRID / 2 + o[0], g.y0 + c[1] * GRID + GRID / 2 + o[1]
+            walls = self._bucket.get((int((cx - g.x0) // 128), int((cy - g.y0) // 128)), ())
+            self._clear[k] = not any(box_hits(a, b, cx, cy, RADIUS - 1) for a, b in walls)
+        return self._clear[k]
 
     def cell(self, p):
         return (int((p[0] - self.g.x0) // GRID), int((p[1] - self.g.y0) // GRID))
 
     def centre(self, c):
-        return (self.g.x0 + c[0] * GRID + GRID / 2, self.g.y0 + c[1] * GRID + GRID / 2)
+        """Where the player stands in cell c: its centre, or where its box fits."""
+        dx, dy = self.shift.get(c) or self.tshift.get(c, (0, 0))
+        return (self.g.x0 + c[0] * GRID + GRID / 2 + dx, self.g.y0 + c[1] * GRID + GRID / 2 + dy)
 
-    def levels(self, h, things):
+    def levels(self, h, things, static=frozenset()):
         """Per cell: (floor, ceiling, on a lift) for the box there, or None if the
-        player can't stand there at all. Reused until a height or a thing moves."""
-        key = (tuple(h), tuple(things))
+        player can't stand there at all. Reused until a height or a thing moves.
+        Lifts in `static` count as the floors they are now (lifts it can't ride).
+        Sets tshift: where in a cell next to a solid thing the box fits."""
+        key = (tuple(h), tuple(things), static)
         if self._levels[0] == key:
+            self.tshift = self._levels[2]
             return self._levels[1]
-        out = self._levels_for(h, things)
-        self._levels = (key, out)
+        out, self.tshift = self._levels_for(h, things, static)
+        self._levels = (key, out, self.tshift)
         return out
 
-    def _levels_for(self, h, things):
+    def _level(self, ss, h, static):
+        f = max(h[s][0] for s in ss)
+        c = min(h[s][1] for s in ss)
+        lift = any(s in self.g.lifts and s not in static for s in ss)
+        return None if c - f < HEIGHT_P and not lift else (f, c, lift)
+
+    def _levels_for(self, h, things, static=frozenset()):
         g = self.g
         out = []
         for j in range(g.ny):
             row = []
             for i in range(g.nx):
                 ss = self.under[j][i]
-                if ss is None or self.wall[j][i]:
-                    row.append(None)
-                    continue
-                f = max(h[s][0] for s in ss)
-                c = min(h[s][1] for s in ss)
-                lift = any(s in g.lifts for s in ss)
-                row.append(None if c - f < HEIGHT_P and not lift else (f, c, lift))
+                row.append(None if ss is None or self.wall[j][i] else self._level(ss, h, static))
             out.append(row)
+        near = {}   # cell -> the things that could block its box, off its centre too
         for x, y, tr in things:   # Doom blocks things as squares
-            reach = tr + RADIUS
+            reach = tr + RADIUS + SHIFT
             for j in range(max(0, int((y - reach - g.y0) // GRID)), min(g.ny, int((y + reach - g.y0) // GRID) + 1)):
                 for i in range(max(0, int((x - reach - g.x0) // GRID)), min(g.nx, int((x + reach - g.x0) // GRID) + 1)):
-                    cx, cy = self.centre((i, j))
-                    if abs(cx - x) < reach and abs(cy - y) < reach:
-                        out[j][i] = None
-        return out
+                    near.setdefault((i, j), []).append((x, y, tr + RADIUS))
+        tshift = {}
+        offsets = [(SHIFT, 0), (-SHIFT, 0), (0, SHIFT), (0, -SHIFT)] + [
+            (dx, dy) for dx in (-SHIFT, SHIFT) for dy in (-SHIFT, SHIFT)]
+        for (i, j), ts in near.items():
+            cx, cy = self.g.x0 + i * GRID + GRID / 2, self.g.y0 + j * GRID + GRID / 2
+            dx, dy = self.shift.get((i, j), (0, 0))
+            if not any(abs(cx + dx - x) < r and abs(cy + dy - y) < r for x, y, r in ts):
+                continue
+            was, out[j][i] = out[j][i], None
+            if was is None or (i, j) in self.shift:
+                continue
+            for o in offsets:
+                if any(abs(cx + o[0] - x) < r and abs(cy + o[1] - y) < r for x, y, r in ts) \
+                        or not self._box_clear((i, j), o):
+                    continue
+                ss = self._under(i, j, (o[0] > 0) - (o[0] < 0), (o[1] > 0) - (o[1] < 0))
+                lvl = ss and self._level(ss, h, static)
+                if lvl:
+                    out[j][i], tshift[(i, j)] = lvl, o
+                    break
+        return out, tshift
 
     @staticmethod
     def step_ok(a, b):
-        """The player can move from a cell at level a to one at level b."""
+        """The player can move from a cell at level a to one at level b: up a
+        step at most, and (as in Doom) b's ceiling high enough over the floor
+        it's standing on, so it can't drop through a low opening."""
         if a is None or b is None:
             return False
         if a[2] or b[2]:
             return True
-        return b[0] - a[0] <= STEP and min(a[1], b[1]) - b[0] >= HEIGHT_P
+        return b[0] - a[0] <= STEP and min(a[1], b[1]) - max(a[0], b[0]) >= HEIGHT_P
 
     def free_near(self, c, lv, reach=3):
         best = None
@@ -433,7 +541,8 @@ class Planner:
             here = lv[c[1]][c[0]]
             for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
                 n = (c[0] + di, c[1] + dj)
-                if not (0 <= n[0] < g.nx and 0 <= n[1] < g.ny) or not self.step_ok(here, lv[n[1]][n[0]]):
+                if not (0 <= n[0] < g.nx and 0 <= n[1] < g.ny) or not self.step_ok(here, lv[n[1]][n[0]]) \
+                        or (c, n) in self.cut:
                     continue
                 if di and dj and not (self.step_ok(here, lv[c[1]][n[0]]) and self.step_ok(here, lv[n[1]][c[0]])):
                     continue   # no cutting corners
@@ -465,20 +574,27 @@ class Planner:
         return out or [self.centre(path[-1])]
 
     def straight(self, a, b, lv, along):
+        """A straight run from cell a to b keeps to floor it can walk on, off
+        damaging floor the path didn't take, and doesn't cut past a solid
+        thing: a cell it fits beside one in only off its centre is a waypoint."""
         g = self.g
         dmg_ok = {g.cell_sector[c[1]][c[0]] for c in along} & g.damaging
         pa, pb = self.centre(a), self.centre(b)
         n = max(1, int(math.dist(pa, pb) / 4))
-        prev = lv[a[1]][a[0]]
+        prev, pc = lv[a[1]][a[0]], a
         for k in range(1, n + 1):
             c = self.cell((pa[0] + (pb[0] - pa[0]) * k / n, pa[1] + (pb[1] - pa[1]) * k / n))
+            if c in self.tshift and c != a and c != b:
+                return False
+            if (pc, c) in self.cut:
+                return False
             here = lv[c[1]][c[0]]
             if here is not prev and not self.step_ok(prev, here):
                 return False
             s = g.cell_sector[c[1]][c[0]]
             if s in g.damaging and s not in dmg_ok:
                 return False
-            prev = here
+            prev, pc = here, c
         return True
 
 
@@ -615,18 +731,27 @@ class Run:
         g.set_doom_map(args.map.upper())
         g.set_doom_skill(args.skill)
         g.set_seed(args.seed)   # the same seed plays out the same way
-        g.set_window_visible(args.watch)
-        g.set_mode(vzd.Mode.PLAYER)
-        g.set_screen_resolution(vzd.ScreenResolution.RES_640X480)
+        live = getattr(args, "play", False) and not args.recording   # a person plays (--play)
+        replaying = getattr(args, "replaying", None)   # a --play recording, played back for its report
+        g.set_window_visible(args.watch or live)
+        g.set_mode(vzd.Mode.ASYNC_SPECTATOR if live else vzd.Mode.PLAYER)
+        g.set_screen_resolution(vzd.ScreenResolution.RES_1280X960 if live else vzd.ScreenResolution.RES_640X480)
         g.set_screen_format(vzd.ScreenFormat.RGB24)
         g.set_render_hud(True)
         g.set_sectors_info_enabled(True)
         g.set_objects_info_enabled(True)
-        g.set_labels_buffer_enabled(args.fight or args.explore)   # which monsters and keys are on screen
-        g.set_sound_enabled(args.watch)
+        g.set_labels_buffer_enabled(bool(args.fight or args.explore or replaying))   # monsters and keys on screen
+        g.set_sound_enabled(args.watch or live)
         B = vzd.Button
         self.buttons = ["MOVE_FORWARD_BACKWARD_DELTA", "MOVE_LEFT_RIGHT_DELTA", "TURN_LEFT_RIGHT_DELTA",
                         "LOOK_UP_DOWN_DELTA", "USE", "ATTACK", "SPEED", *(f"SELECT_WEAPON{n}" for n in range(1, 8))]
+        if live:   # a person's input only gets through on the buttons made available
+            self.buttons = ["MOVE_FORWARD", "MOVE_BACKWARD", "MOVE_LEFT", "MOVE_RIGHT", "TURN_LEFT", "TURN_RIGHT",
+                            "STRAFE", "SPEED", "USE", "ATTACK", "SELECT_NEXT_WEAPON", "SELECT_PREV_WEAPON",
+                            *(f"SELECT_WEAPON{n}" for n in range(1, 8)),
+                            "TURN_LEFT_RIGHT_DELTA", "LOOK_UP_DOWN_DELTA", "MOVE_FORWARD_BACKWARD_DELTA"]
+        if live or replaying:
+            self.buttons += ["RELOAD", "ZOOM"]   # --play's "I'm lost" (L) and "stop" (K) keys
         g.set_available_buttons([getattr(B, b) for b in self.buttons])
         V = vzd.GameVariable
         self.vars = ["POSITION_X", "POSITION_Y", "POSITION_Z", "ANGLE", "PITCH", "VELOCITY_X", "VELOCITY_Y",
@@ -634,7 +759,11 @@ class Run:
                      *(f"WEAPON{n}" for n in range(1, 8))]
         g.set_available_game_variables([getattr(V, v) for v in self.vars])
         g.add_game_args("+sv_cheats 1 " + VANILLA_ARGS)
+        if (live or replaying) and not args.monsters:
+            g.add_game_args("-nomonsters")
         g.init()
+        if replaying:
+            g.replay_episode(replaying)
         self.recording = None
         if args.fight or args.explore:
             os.makedirs(RECORDINGS, exist_ok=True)
@@ -1305,6 +1434,9 @@ def run(args):
     if args.explore:
         from explore import run as explore
         return explore(args, vzd)
+    if args.play:
+        from play import run as play
+        return play(args, vzd)
     if args.fight and args.start_from:
         print("--from can't be used with --fight: a fight starts from the beginning")
         return 2
@@ -1475,7 +1607,7 @@ def describe(args):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("wad", nargs="+", help="PWAD(s) to load, then the map, e.g. wads/X.WAD MAP02")
+    p.add_argument("wad", nargs="*", help="PWAD(s) to load, then the map, e.g. wads/X.WAD MAP02")
     p.add_argument("--script", help="step script (or give it as the last positional argument)")
     p.add_argument("--describe", action="store_true", help="list the map's start, keys and special lines")
     p.add_argument("--iwad", default=DEFAULT_IWAD, help="DOOM II IWAD (default: DOOM2_WAD from .env)")
@@ -1485,9 +1617,13 @@ def main():
     p.add_argument("--fight", action="store_true", help="play for real: no god mode, the bot fights (see above)")
     p.add_argument("--explore", action="store_true", help="find the way with no route, knowing only what it has seen "
                    "(scripts/tools/explore.py)")
+    p.add_argument("--play", action="store_true", help="you play the map (L: I'm lost, K: stop); then the explorer's "
+                   "report on your play (scripts/tools/play.py)")
+    p.add_argument("--monsters", action="store_true", help="with --play: keep the monsters (default: none, god mode)")
     p.add_argument("--watch", action="store_true", help="show the game in a window, at normal speed")
     p.add_argument("--replay", action="store_true", help="watch the last --fight recording of MAP at --skill and --seed")
-    p.add_argument("--recording", metavar="FILE", help="with --replay: the recording to play (default: the last)")
+    p.add_argument("--recording", metavar="FILE", help="with --replay: the recording to play (default: the last); "
+                   "with --play: a play's folder, to report on again")
     p.add_argument("--video", metavar="FILE", help="with --replay: render it to an MP4 instead (needs ffmpeg)")
     p.add_argument("--hd", action="store_true", help="with --replay: render at 1920x1080 (widescreen) instead of 640x480")
     p.add_argument("--seed", type=int, default=1, help="random seed (default 1): the same seed plays the same way")
@@ -1498,12 +1634,17 @@ def main():
         p.error("no IWAD: set DOOM2_WAD in .env (see .env.example) or pass --iwad")
     pos = args.wad
     args.module = None
+    if args.play and args.recording:
+        sys.exit(run(args))   # everything else is in the play's folder
+    if not pos:
+        p.error("give WAD... MAP, or a level module")
     if re.fullmatch(r"[\w.]+", pos[0]) and not pos[0].lower().endswith(".wad") and find_spec(f"levels.{pos[0]}"):
         at = place(pos[0])
         args.module = pos[0]
         script = os.path.join(LEVELS, "playtests", pos[0].rsplit(".", 1)[-1] + ".playtest")
         pos = [os.path.join(ROOT, "wads", at.wad), at.slot, *pos[1:]]
-        if len(pos) == 2 and not (args.script or args.replay or args.describe or args.explore) and os.path.exists(script):
+        if len(pos) == 2 and not (args.script or args.replay or args.describe or args.explore or args.play) \
+                and os.path.exists(script):
             pos.append(script)
     if args.replay:
         args.watch = True
@@ -1511,7 +1652,7 @@ def main():
             p.error("give WAD... MAP")
         args.map, args.wad = pos[-1], pos[:-1]
         sys.exit(run(args))
-    if not args.describe and not args.script and not args.explore:
+    if not args.describe and not args.script and not args.explore and not args.play:
         if len(pos) < 3:
             p.error("give WAD... MAP SCRIPT")
         args.script = pos.pop()
