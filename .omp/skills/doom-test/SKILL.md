@@ -88,9 +88,11 @@ uv run -q --with vizdoom scripts/tools/playtest.py <module> --explore --seed N
 
 Read each report: the timeline (keys, switches with what they moved, doors, exit; also `teleport`, `lift`, `shot`, `switch ... again`, `search` and `found`, which aren't progress), walked distance against the critical path, how much of the map it saw, and the longest stretches with no key, switch, locked door or exit, with the sectors it spent them in. A stretch in the same sectors on every seed is a place players get lost: the way on is out of sight, a switch's effect is far off and unseen, or the goal looks reachable and isn't. A `search` inside it means the bot ran out of ideas and started pressing walls; a `found` there is a secret door or hidden switch the route depends on. A stretch on one seed only is the seed's order. `NO EXIT ... nothing left it knows to try` on a map without a `bossaction` gate means the way on needs something the explorer can't find (a running jump, a gun line or barrel with no switch texture, a timed door or lift it's too slow for) or a bot weakness; watch it with `--replay --explore --seed N` before calling it.
 
-Fix lost spots in the map: a window or sightline onto what a switch moves, light or a texture cue on the way on, the key or exit visible from where the player stalls. Then rerun the three seeds.
+A recurring stretch is a description, not a defect. Some searching is part of DOOM, and side areas and lures that pull players off the route add fun and dimension; a map with no wrong turns is one strangely shaped corridor. Report each recurring stretch with its likely cause and leave the call to the designer. Change the map only when the stretch is unintended *and* unfair: the way on gives no cue at all, a switch's effect can't be seen or heard, or a goal looks reachable and isn't. Then the fix is a cue (a window or sightline onto what a switch moves, light or a texture on the way on, the key or exit visible from where the player stalls), not a shorter or more linear map. Rerun the three seeds after any change.
 
-Done when all three seeds have been run and read, and every stretch that recurs across seeds is fixed or written into the doc's Targets section with why it stays.
+Until the explorer passes the bar in [docs/explore-rubric.md](../../../docs/explore-rubric.md) (scored by `scripts/tools/compare.py` against people's `--play` runs), its stretches are hints about where players search, not evidence.
+
+Done when all three seeds have been run and read, and every stretch that recurs across seeds is written into the doc's Targets section as intended (and why) or fixed with a cue.
 
 ## 7. Report
 

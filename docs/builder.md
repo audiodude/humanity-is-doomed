@@ -170,6 +170,13 @@ uv run --with vizdoom scripts/tools/playtest.py ~/maps/slige1.wad MAP01 --play
 uv run --with vizdoom scripts/tools/playtest.py --play --recording ~/.local/share/playtest/plays/<folder>   # the report again
 ```
 
+`scripts/tools/compare.py` scores the explorer against a play by the fixed rules in [docs/explore-rubric.md](explore-rubric.md): does the bot stall where the person stalled and pressed L, in the same phase of the map? It runs seeds 1–3 on the play's copy of the WAD, plays every demo back through the same bookkeeping, and writes `compare-<commit>/` into the play folder with the scores, a verdict, and the mismatches to give a cause code. `--pool` adds the scores up over every play scored at a commit. It scores the explorer, never the map: stalls and lures in a map can be good design.
+
+```sh
+uv run --with vizdoom scripts/tools/compare.py ~/.local/share/playtest/plays/<folder>
+uv run --with vizdoom scripts/tools/compare.py --pool
+```
+
 The runner turns on ZDoom's strict Doom compatibility, so a pass shows the map's wiring works under vanilla rules as far as ZDoom can follow them: the player can only use a line from its front side, pressing use stops at the first line with an action (so a walk-over trigger just in front of a door or switch blocks it), and monsters are infinitely tall. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
 
 `scripts/tools/wake.py` answers a narrower question with the same engine: which monsters one shot wakes. It starts the map fresh for each spot you give, warps there, fires once, waits (`--seconds`, default 10) and lists every monster that moved. With no spot it fires from the start. Use it after zoning a map with `SOUND_BETWEEN` (see [docs/monster-alerting.md](monster-alerting.md)):
