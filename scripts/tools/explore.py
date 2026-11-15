@@ -16,6 +16,8 @@ by walking distance over floor it has seen:
     works when shot (a gun-activated line with a switch texture) it shoots
     ("shot" in the report)
   - a door it hasn't opened, if it has the key
+  - a teleporter it has seen and not been through (a player knows a pad),
+    if the pad has room to stand on: it steps on from the side that works
   - the edge of what it has seen, where it goes and looks round
 
 When none is left it goes and stands in places it has only seen from afar,
@@ -31,6 +33,17 @@ moving (a walk-over line it crossed, a switch far off) makes the places it
 looked round from and couldn't reach worth another try, a few times between
 progress. Getting stuck on the same spot twice blocks the cells just past it
 toward where it was going.
+
+Teleporters: a jump in position is a teleport, logged as an event (not
+progress). It looks round where it landed and carries on from there; it
+knows only what it has seen, so the new place starts as unknown ground.
+A teleporter it has been through (and the rest of that pad) then counts as
+a way from the pad to where it landed, a few cells long, so it goes back
+and forth through it like through a door (a one-shot line once). It keeps
+off the pads it has seen unless it means to use one: no step that would set
+one off (box touching, centre crossing from the front, as Doom does), and
+cells just in front cost extra. A target it keeps being teleported away
+from on the way to is given up after three goes.
 
 Costs are jittered by --seed, so seeds explore in different orders. Secret
 doors look like walls to it. Monsters are killed at the start and it plays
@@ -87,11 +100,18 @@ VISITED = 6            # cells round where it has been that count as visited
 STALL = 30 * 35        # a stretch this long with no progress is reported
 RETRY = 60 * 35        # tics before a key or switch it gave up on is tried again
 MOVES = 10             # times between progress that something it saw moving makes it look again
-WEIGHT = {"exit": 0.25, "key": 1 / 3, "switch": 2 / 3, "door": 1.0, "frontier": 1.0, "unvisited": 1.0, "again": 1.0}
+WEIGHT = {"exit": 0.25, "key": 1 / 3, "switch": 2 / 3, "door": 1.0, "teleport": 1.0, "frontier": 1.0,
+          "unvisited": 1.0, "again": 1.0}
 DOORISH = ("DOOR", "BIGDOOR", "SPCDOOR", "EXITDOOR")   # textures that read as a door (but door tracks don't)
 NOT_DOOR = ("DOORTRAK", "DOORSTOP")
 NEARBY = 512          # a floor or ceiling that moves this close to a wall it searched is what it found
 CUE = 0.25            # a wall that stands out costs this much of its walking distance to search
+JUMP = 64             # moved further than this in a tic: it was teleported
+LINK = 4              # cells a teleporter it has used costs to go through
+
+
+class Teleported(Exception):
+    """The player was teleported: whatever it was doing is over."""
 
 
 def cross(p, q, a, b):
@@ -164,6 +184,14 @@ class Explorer(pt.Run):
             self.line_ends.setdefault(b, []).append(i)
         self.searched = set()     # (line, side) of walls it used and shot at
         self.searching = False    # searching the walls since the last progress
+        # Teleporters: a player knows one by its pad. Once it has used a
+        # repeatable one it knows where that goes: line -> (from cell, to cell).
+        self.teleports = {i for i, (*_r, sp, _t, _fs, _bs) in enumerate(geo.lines)
+                          if sp in LINE_SPECIALS and LINE_SPECIALS[sp].kind == "teleport"}
+        self.links = {}
+        self._via = {}            # (from cell, to cell) -> teleport line, for go_to
+        self._pads = {}           # cell -> seen teleporter lines the box touches there, for reach
+        self._touch, self._guards, self._guard = {}, {}, set()   # cells it keeps out of beside teleporters
 
     # -- seeing --------------------------------------------------------------
     def watch(self):
@@ -177,11 +205,50 @@ class Explorer(pt.Run):
                 self.spotted[lb.object_id] = (lb.object_name, lb.object_position_x, lb.object_position_y)
         p = self.pos()
         if self._last:
-            self.walked += math.dist(p, self._last)
+            jump = math.dist(p, self._last)
+            if jump > JUMP:
+                self.teleported(self._last, p)
+            self.walked += jump
         self._last = p
         if self.tics - self._look_at >= LOOK_EVERY:
             self._look_at = self.tics
             self.look()
+
+    def teleported(self, was, p):
+        """It moved further than it can walk in a tic: a teleporter. Note
+        where the pad it stepped on (the teleporter line nearest where it was,
+        crossed from the front) took it, and stop whatever it was doing: the
+        way it was following is gone."""
+        self._last = p
+        g = self.geo
+        near = [(self.side_of(i, was), pt.seg_dist(was, *g.lines[i][:2]), i) for i in self.teleports]
+        near = [n for n in near if n[1] <= 48]
+        i = min(near)[2] if near else None
+        here = g.sector_at(p)
+        self._landed = (i, self.plan.cell(p))
+        if i is None:
+            self.event("teleport", f"to {self.name(here)}", progress=False, clear=False, at=was)
+        else:
+            self.learn(i, self.plan.cell(p))
+            spec = LINE_SPECIALS[g.lines[i][3]]
+            self.event("teleport", f"{spec.trigger} by {self.name(g.lines[i][5])} -> {self.name(here)}",
+                       progress=False, clear=False, at=was)
+        raise Teleported()
+
+    def learn(self, i, to):
+        """Teleporter line i took it to cell `to`: so does the rest of its pad
+        (the lines like it round the same spot). A one-shot line is spent."""
+        g = self.geo
+        self.seen_lines.add(i)
+        _a, _b, _f, sp, tag, _fs, _bs = g.lines[i]
+        mid = [(g.lines[i][0][k] + g.lines[i][1][k]) / 2 for k in (0, 1)]
+        for j in self.teleports:
+            if j == i or (g.lines[j][3] == sp and g.lines[j][4] == tag and ("line", j) not in self.done
+                          and pt.seg_dist(mid, *g.lines[j][:2]) <= 128):
+                self.links[j] = (self.plan.cell(self.spot(j, 0)), to)
+        if LINE_SPECIALS[sp].trigger != "WR":
+            self.done.add(("line", i))
+            del self.links[i]
 
     def blocks(self, i, closed):
         _a, _b, _f, _sp, _t, fs, bs = self.geo.lines[i]
@@ -239,26 +306,28 @@ class Explorer(pt.Run):
         pts = [(x, y) for t, x, y in stretch if t == s]
         return f" ({sum(p[0] for p in pts) / len(pts):.0f},{sum(p[1] for p in pts) / len(pts):.0f})"
 
-    def event(self, kind, text, progress=None):
-        """Note progress. The map may have changed, so the edges it has looked
-        round from, and the places it couldn't reach, are worth another try."""
-        self.looked.clear()
-        self.failed.clear()
-        self.tries.clear()
-        self.blocked.clear()
-        self.static.clear()
-        self.retried = False
-        self.searching = False
+    def event(self, kind, text, progress=None, clear=True, at=None):
+        """Note what it did. After it the map may have changed, so the edges
+        it has looked round from, and the places it couldn't reach, are worth
+        another try (a teleport changes nothing: clear=False)."""
+        if clear:
+            self.looked.clear()
+            self.failed.clear()
+            self.tries.clear()
+            self.blocked.clear()
+            self.static.clear()
+            self.retried = False
+            self.searching = False
         progress = kind in ("key", "switch", "shot", "exit") if progress is None else progress
         if progress:
             self.again.clear()
             self.moves = 0
             self.stuck.clear()
-        self.note(kind, text, progress)
+        self.note(kind, text, progress, at)
 
-    def note(self, kind, text, progress=False):
+    def note(self, kind, text, progress=False, at=None):
         """Log what it did, without counting it as progress."""
-        x, y = self._last if self.game.is_episode_finished() else self.pos()
+        x, y = at or (self._last if self.game.is_episode_finished() else self.pos())
         self.events.append((self.tics, kind, text, x, y, progress))
         self.say(f"  {pt.clock(self.tics)} {kind:<8} {text} at {x:.0f},{y:.0f}")
 
@@ -280,31 +349,98 @@ class Explorer(pt.Run):
 
     def reach(self, lv, doors):
         """Walking distance (cells) from the player to every seen cell it can
-        get to over seen floor and through doors it can open, and the way back."""
+        get to over seen floor, through doors it can open and teleporters it
+        has used, and the way back. It doesn't step onto teleporters it has
+        seen (they'd take it away), except to go through one on purpose."""
         plan, g = self.plan, self.geo
         s = plan.free_near(plan.cell(self.pos()), lv)
         if s is None:
             return {}, {}
+        # A margin outside each pad as well: running past at full tilt can clip one.
+        self._pads = pads = {}
+        guard = set()
+        for i in self.teleports & self.seen_lines:
+            if ("line", i) not in self.done:
+                for c in self.touch(i):
+                    pads.setdefault(c, []).append(i)
+                guard |= self.guard(i)
+        self._guard = guard
+        jumps = {}
+        self._via = {}
+        for i, (a, b) in self.links.items():
+            t = plan.free_near(b, lv)
+            if t is not None:   # from anywhere just in front of the pad
+                for di in range(-2, 3):
+                    for dj in range(-2, 3):
+                        jumps.setdefault((a[0] + di, a[1] + dj), []).append((t, i))
         dist, prev, todo = {s: 0.0}, {}, [(0.0, s)]
         while todo:
             d, c = heapq.heappop(todo)
             if d > dist[c]:
                 continue
+            for t, i in jumps.get(c, ()):
+                if d + LINK < dist.get(t, 1e18):
+                    dist[t], prev[t] = d + LINK, c
+                    self._via[(c, t)] = i
+                    heapq.heappush(todo, (d + LINK, t))
             here = lv[c[1]][c[0]]
             for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
                 n = (c[0] + di, c[1] + dj)
                 if not (0 <= n[0] < g.nx and 0 <= n[1] < g.ny) or n in self.blocked or (
                         n not in self.known and g.cell_sector[n[1]][n[0]] not in doors):
                     continue
+                if (c in pads or n in pads) and self.onto_pad(plan.centre(c), plan.centre(n)):
+                    continue
                 if not plan.step_ok(here, lv[n[1]][n[0]]):
                     continue
                 if di and dj and not (plan.step_ok(here, lv[c[1]][n[0]]) and plan.step_ok(here, lv[n[1]][c[0]])):
                     continue
-                nd = d + math.hypot(di, dj) * (20 if g.cell_sector[n[1]][n[0]] in g.damaging else 1)
+                nd = d + math.hypot(di, dj) * (20 if g.cell_sector[n[1]][n[0]] in g.damaging else
+                                               10 if n in guard else 1)
                 if nd < dist.get(n, 1e18):
                     dist[n], prev[n] = nd, c
                     heapq.heappush(todo, (nd, n))
         return dist, prev
+
+    def touch(self, i):
+        """The cells where the player's box touches teleporter line i."""
+        if i not in self._touch:
+            self._touch[i] = self.cells_near(i, pt.RADIUS + 4, None)
+        return self._touch[i]
+
+    def guard(self, i):
+        """The cells on teleporter line i's working side close enough that
+        the player's box, running past, could cross it."""
+        if i not in self._guards:
+            self._guards[i] = self.cells_near(i, pt.RADIUS + 8, 0)
+        return self._guards[i]
+
+    def cells_near(self, i, r, side):
+        g, plan = self.geo, self.plan
+        a, b = g.lines[i][:2]
+        c0 = plan.cell((min(a[0], b[0]) - r, min(a[1], b[1]) - r))
+        c1 = plan.cell((max(a[0], b[0]) + r, max(a[1], b[1]) + r))
+        return {(x, y) for x in range(c0[0], c1[0] + 1) for y in range(c0[1], c1[1] + 1)
+                if pt.seg_dist(plan.centre((x, y)), a, b) <= r
+                and (side is None or self.side_of(i, plan.centre((x, y))) == side)}
+
+    def onto_pad(self, p, q):
+        """Walking p to q would set off a teleporter it has seen (as of the
+        last reach). As in Doom: the box touches the line on the way and the
+        centre goes from its front to its back (of the line extended, so a
+        pad's corner counts too)."""
+        pads = self._pads
+        n = max(1, int(math.dist(p, q) / 8))
+        cells = {self.plan.cell((p[0] + (q[0] - p[0]) * k / n, p[1] + (q[1] - p[1]) * k / n))
+                 for k in range(n + 1)}
+        for i in {i for c in cells for i in pads.get(c, ())}:
+            a, b = self.geo.lines[i][:2]
+            if self.side_of(i, p) == 0 and self.side_of(i, q) == 1 and (
+                    cross(p, q, a, b) is not None
+                    or min(pt.seg_dist(p, a, b), pt.seg_dist(q, a, b), pt.seg_dist(a, p, q),
+                           pt.seg_dist(b, p, q)) < pt.RADIUS):
+                return True
+        return False
 
     def near(self, p, dist, lv=None, r=3):
         """The reachable cell nearest p, within r cells. Given lv, only cells with
@@ -375,6 +511,12 @@ class Explorer(pt.Run):
                 if not sides:
                     continue
                 kind = "switch"
+            elif i in self.teleports and i not in self.links:
+                # a pad it hasn't been through, if there's room to stand on it:
+                # step on from the side that works
+                if bs is None or h[bs][1] - h[bs][0] < pt.HEIGHT_P:
+                    continue
+                kind, sides = "teleport", (0,)
             else:
                 continue
             for side in sides:
@@ -411,12 +553,32 @@ class Explorer(pt.Run):
                     None)
 
     def go_to(self, c, prev, lv, final=None):
-        """Follow the way to c: walk the stretches off lifts, ride the lifts."""
+        """Follow the way to c: walk the stretches off lifts, ride the lifts,
+        go through the teleporters it has used."""
         self._lv = lv
         path = [c]
         while path[-1] in prev:
             path.append(prev[path[-1]])
         path.reverse()
+        start = 0
+        for k in range(len(path) - 1):
+            i = self._via.get((path[k], path[k + 1]))
+            if i is not None:
+                self.follow(path[start:k + 1], lv)
+                self.through(i)
+                start = k + 1
+        self.follow(path[start:], lv, final)
+
+    def through(self, i):
+        """Cross teleporter line i from its front, and wait out the freeze."""
+        try:
+            self.drive(self.spot(i, 1), 0, True)
+        except Teleported:
+            self.tic(n=18)
+            return
+        raise pt.Abort("the teleporter didn't take it anywhere")
+
+    def follow(self, path, lv, final=None):
         k = 0
         while k < len(path):
             j = k
@@ -444,11 +606,25 @@ class Explorer(pt.Run):
         while i < len(path) - 1:
             j = min(len(path) - 1, i + span)
             while j > i + 1 and not (self.plan.straight(path[i], path[j], lv, path[i:j + 1])
-                                     and not self.through_blocked(path[i], path[j])):
+                                     and not self.through_blocked(path[i], path[j])
+                                     and not self.past_pad(path[i], path[j], path[i:j + 1])):
                 j -= 1
             out.append(self.plan.centre(path[j]))
             i = j
         return out or [self.plan.centre(path[-1])]
+
+    def past_pad(self, a, b, along):
+        """Cutting straight from cell a to b would cross a teleporter it has
+        seen, or pass closer to one than the path does."""
+        pa, pb = self.plan.centre(a), self.plan.centre(b)
+        if self.onto_pad(pa, pb):
+            return True
+        if not self._guard:
+            return False
+        n = max(1, int(math.dist(pa, pb) / 4))
+        return any(c in self._guard and c not in along for c in
+                   {self.plan.cell((pa[0] + (pb[0] - pa[0]) * k / n, pa[1] + (pb[1] - pa[1]) * k / n))
+                    for k in range(n + 1)})
 
     def through_blocked(self, a, b):
         pa, pb = self.plan.centre(a), self.plan.centre(b)
@@ -581,6 +757,11 @@ class Explorer(pt.Run):
         _, i, spec, side = what
         (x1, y1), (x2, y2) = self.geo.lines[i][:2]
         mid = ((x1 + x2) / 2, (y1 + y2) / 2)
+        if kind == "teleport":
+            self.go_to(c, prev, lv)
+            self.through(i)
+            self.look_round()   # where is this?
+            return
         if spec.trigger == "W1":   # a walk-over exit: cross it
             self.go_to(c, prev, lv)
             self.drive(self.spot(i, 1 - side), 0, True)
@@ -853,6 +1034,19 @@ class Explorer(pt.Run):
                     self.search(c, what, lv, prev)
                 else:
                     self.act(kind, c, what, lv, prev)
+            except Teleported:
+                if kind == "teleport":
+                    self.learn(what[1], self._landed[1])   # it stepped on the pad it was making for
+                else:
+                    # It stepped on a teleporter on the way. It knows that one now
+                    # and keeps off it, but if the only way there is over pads
+                    # it can't tell apart, give the target up after a few goes.
+                    self.missed(what, c, 3)
+                self.tic(n=18)
+                try:
+                    self.look_round()   # where is this?
+                except Teleported:
+                    pass
             except pt.Abort:
                 if not self.game.is_episode_finished():
                     if what[0] == "wall":
@@ -862,17 +1056,21 @@ class Explorer(pt.Run):
                         continue
                     # Getting stuck marked the way it tried as blocked, so a
                     # key or a switch is worth another way round, twice.
-                    target = what[:2] if what[0] != "cell" else ("cell", c)
-                    self.tries[target] += 1
-                    if what[0] == "cell" or self.tries[target] >= 3:
-                        self.failed.add(target)
-                        if what[0] != "cell":
-                            self.gave_up[target] = self.tics
+                    self.missed(what, c, 1 if what[0] == "cell" else 3)
             if self.game.is_episode_finished():
                 if not self.events or self.events[-1][1] != "exit":
                     self.event("exit", "walked over the exit")
                 return None
         return f"--max-time {self.args.max_time:g} min"
+
+    def missed(self, what, c, chances):
+        """It didn't get to `what` (at cell c): after `chances` goes give up on it."""
+        target = what[:2] if what[0] != "cell" else ("cell", c)
+        self.tries[target] += 1
+        if self.tries[target] >= chances:
+            self.failed.add(target)
+            if what[0] != "cell":
+                self.gave_up[target] = self.tics
 
     # -- report --------------------------------------------------------------
     def report(self, stopped, crit, boss):
