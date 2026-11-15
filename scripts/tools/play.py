@@ -96,7 +96,8 @@ def play(args, vzd, geo, demo):
               "m_forward 0", "freelook 0", "lookstrafe 0", "cl_run 1",
               "bind l +reload", "bind k +zoom"):
         g.send_game_command(c)
-    g.new_episode(demo)
+    part = pt.short_demo_path()   # ViZDoom hangs recording to a long path
+    g.new_episode(part)
     if not args.monsters:
         g.send_game_command("god")
     lost, stop = r.buttons.index("RELOAD"), r.buttons.index("ZOOM")
@@ -125,6 +126,8 @@ def play(args, vzd, geo, demo):
             g.close()   # ends the episode, which writes the demo
         except Exception:   # noqa: BLE001  (the game may be gone already)
             pass
+        if os.path.exists(part):
+            pt.move_demo(part, demo)
     return ended
 
 

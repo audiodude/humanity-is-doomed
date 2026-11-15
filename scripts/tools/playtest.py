@@ -639,6 +639,27 @@ def clock(tics):
     return f"{secs // 60}:{secs % 60:02d}"
 
 
+def short_demo_path():
+    """A demo path short enough to record to. ViZDoom hangs, with no error,
+    when asked to record to a path much over 100 characters (long WAD file
+    names make long recording names), so a run records here and the demo is
+    moved into place after (move_demo)."""
+    return os.path.join(tempfile.mkdtemp(prefix="pt-"), "demo.lmp")
+
+
+def move_demo(part, final):
+    """Move a demo recorded at short_demo_path() to `final`."""
+    shutil.move(part, final)
+    os.rmdir(os.path.dirname(part))
+
+
+def short_copy(demo):
+    """A copy of a demo at a short path, to play back (see short_demo_path)."""
+    part = short_demo_path()
+    shutil.copyfile(demo, part)
+    return part
+
+
 def recording_path(args):
     """Where the last --fight run of these WADs, map, skill and seed is kept.
     The WADs' full paths are hashed in, so two WADs that share a file name
@@ -768,14 +789,14 @@ class Run:
             g.add_game_args("-nomonsters")
         g.init()
         if replaying:
-            g.replay_episode(replaying)
+            g.replay_episode(short_copy(replaying))   # long paths hang ViZDoom
         self.recording = None
         if args.fight or args.explore:
             os.makedirs(RECORDINGS, exist_ok=True)
             self.recording = recording_path(args)
-            # Record to a file of this run's own, renamed into place at the end,
-            # so runs at the same time never write the same file.
-            self.recording_part = f"{self.recording[:-4]}.{os.getpid()}.part.lmp"
+            # Record to a short path of this run's own, moved into place at the
+            # end, so runs at the same time never write the same file.
+            self.recording_part = short_demo_path()
             g.new_episode(self.recording_part)   # record the run, for --replay
         self.ignore = {}      # monster id -> tic until which the bot stops trying to hit it
         self.skip = set()     # pickups the bot couldn't get to
@@ -1483,11 +1504,9 @@ def run(args):
             r.report()
         r.game.close()
     if r.recording:
-        os.replace(r.recording_part, r.recording)
-        part = f"{r.recording_part}.json"
-        with open(part, "w") as f:
+        move_demo(r.recording_part, r.recording)
+        with open(r.recording + ".json", "w") as f:
             json.dump({"wad": wad_hash(args.wad)}, f)
-        os.replace(part, r.recording + ".json")
         print(f"recorded to {r.recording}; watch it with --replay")
     print(f"DONE checks={r.checks} fails={r.fails} ({time.time() - t0:.1f} s)")
     return status if status is not None else (1 if r.fails else 0)
@@ -1530,7 +1549,7 @@ def replay(args, vzd):
     g.set_mode(vzd.Mode.PLAYER)
     g.add_game_args(VANILLA_ARGS)
     g.init()
-    g.replay_episode(path)
+    g.replay_episode(short_copy(path))   # long paths hang ViZDoom
     enc = tmp = None
     if args.video:
         if not shutil.which("ffmpeg"):

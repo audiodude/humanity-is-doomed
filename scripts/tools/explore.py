@@ -1489,7 +1489,7 @@ def run(args, vzd):
         r.report(stopped, crit, boss)
         r.game.close()
         if r.recording:
-            os.replace(r.recording_part, r.recording)
+            pt.move_demo(r.recording_part, r.recording)
             with open(r.recording + ".json", "w") as f:
                 json.dump({"wad": pt.wad_hash(args.wad)}, f)
             print(f"recorded to {r.recording}; watch it with --replay --explore")
