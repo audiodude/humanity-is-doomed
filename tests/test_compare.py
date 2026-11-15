@@ -51,3 +51,13 @@ def test_sharing_only_the_start_does_not_predict():
     b = run([(50, (0, 0)), (40 * 35, (0, 0))], [(50, KEY)])
     sc = compare.score(h, {1: b, 2: b, 3: b})
     assert sc["S4"] == [0, 1] and sc["S5"] == [0, 1]
+
+
+def test_l_press_marks_its_whole_stretch():
+    # A minute wandering by (5,5), then off to (12,12), where L is pressed late:
+    # the bots stalled by (5,5) and never went near (12,12).
+    h = run([(100, (0, 0)), (60 * 35, (5, 5)), (15 * 35, (12, 12))], [(100, KEY)])
+    h["lost"] = [(100 + 70 * 35, 12 * S + 10, 12 * S + 10)]
+    b = run([(50, (0, 0)), (60 * 35, (5, 6))], [(50, KEY)])
+    sc = compare.score(h, {1: b, 2: b, 3: b})
+    assert sc["S3"] == [1, 1]

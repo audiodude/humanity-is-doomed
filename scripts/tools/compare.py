@@ -31,13 +31,12 @@ import playtest as pt  # noqa: E402
 from explore import KEYS, line_textures  # noqa: E402
 from play import PLAYS, Observer  # noqa: E402
 
-RUBRIC = 1
+RUBRIC = 2
 TIC = 35
 CAP = 15 * 60 * TIC   # runs are cut off at 15 minutes
-STALL = 30 * TIC      # a stall, a lure's or a trap's time, and the L press merge window
+STALL = 30 * TIC      # a stall, and a lure's or a trap's time
 SQUARE = 256
-SAME = 0.25          # two stalls are in the same place: a quarter of their time in common
-PRESS = 0.10         # a stall is where an L press was: a tenth of its time within one square of it
+SAME = 0.25          # two stretches are in the same place: a quarter of their time in common
 
 
 # ------------------------------------------------------------ the demos ---
@@ -116,10 +115,15 @@ def explore(folder, meta, seed, iwad, out):
 
 # ------------------------------------------------------------- scoring ---
 
-def stalls(run):
-    """(start, end) of each stretch of STALL tics or more with no milestone."""
+def stretches(run):
+    """(start, end) of each stretch between milestones, the last to the run's end."""
     marks = [0] + [t for t, _m in run["milestones"]] + [run["end"]]
-    return [(a, b) for a, b in itertools.pairwise(marks) if b - a >= STALL]
+    return [(a, b) for a, b in itertools.pairwise(marks) if b > a]
+
+
+def stalls(run):
+    """The stretches of STALL tics or more."""
+    return [(a, b) for a, b in stretches(run) if b - a >= STALL]
 
 
 def area(squares, a, b):
@@ -139,18 +143,8 @@ def overlap(f, g):
     return sum(min(v, g[q]) for q, v in f.items() if q in g)
 
 
-def near(f, sq):
-    """The share of an area's time within one square of sq (each tic put
-    1/9 of its share on every square of its block, sq's among them)."""
-    return 9 * f.get(sq, 0)
-
-
 def phase(run, common, t):
     return frozenset(m for tm, m in run["milestones"] if tm <= t and m in common)
-
-
-def square(x, y):
-    return math.floor(x / SQUARE), math.floor(y / SQUARE)
 
 
 def hot(f):
@@ -168,30 +162,33 @@ def score(human, bots, choice=()):
     seeds = sorted(bots)
     need = math.ceil(2 * len(seeds) / 3)
     common = {m for _t, m in human["milestones"]} & {m for b in bots.values() for _t, m in b["milestones"]}
-    # The human's stalls and L presses, H-choice dropped.
-    hst = [dict(span=(a, b), phase=phase(human, common, a), area=area(human["squares"], a, b))
-           for a, b in stalls(human) if not any(a < y and x < b for x, y in choice)]
-    presses = []
-    for t, x, y in human["lost"]:
-        if chosen(t):
+    # The human's stalls and lost stretches (any stretch with an L press in it:
+    # a person presses L after wandering, so the press marks the whole stretch,
+    # not where they stood), H-choice dropped.
+    presses = [t for t, _x, _y in human["lost"] if not chosen(t)]
+    spans = stretches(human)
+    items = []
+    for k, (a, b) in enumerate(spans):
+        if any(a < y and x < b for x, y in choice):
             continue
-        if presses and t - presses[-1]["t"] <= STALL and square(x, y) == presses[-1]["sq"]:
-            presses[-1]["t"] = t
-            continue
-        presses.append(dict(t=t, at=t, sq=square(x, y), xy=(x, y), phase=phase(human, common, t)))
+        last = k == len(spans) - 1
+        mine = [t for t in presses if a <= t < b or (last and t == b)]
+        if b - a >= STALL or mine:
+            items.append(dict(span=(a, b), phase=phase(human, common, a), area=area(human["squares"], a, b),
+                              stall=b - a >= STALL, presses=mine))
+    hst = [i for i in items if i["stall"]]
+    lost = [i for i in items if i["presses"]]
     bst = {s: [dict(seed=s, span=(a, b), phase=phase(bots[s], common, a), area=area(bots[s]["squares"], a, b))
                for a, b in stalls(bots[s])] for s in seeds}
 
     def matches(st, other):
-        """A bot stall matches a human stall or L press: same phase, same place."""
-        if st["phase"] != other["phase"]:
-            return False
-        return near(st["area"], other["sq"]) >= PRESS if "sq" in other else overlap(st["area"], other["area"]) >= SAME
+        """A bot stall matches a human stretch: same phase, same place."""
+        return st["phase"] == other["phase"] and overlap(st["area"], other["area"]) >= SAME
 
     def predicted(item):
         on = [s for s in seeds if any(matches(st, item) for st in bst[s])]
         return len(on) >= need, on
-    for item in hst + presses:
+    for item in items:
         item["ok"], item["on"] = predicted(item)
     # Recurring bot stalls: same phase and same place across seeds, grouped.
     every = [st for s in seeds for st in bst[s]]
@@ -212,7 +209,7 @@ def score(human, bots, choice=()):
     recurring = []
     for sts in groups.values():
         if len({st["seed"] for st in sts}) >= need:
-            ok = any(matches(st, x) for st in sts for x in hst + presses)
+            ok = any(matches(st, x) for st in sts for x in items)
             recurring.append(dict(stalls=sts, ok=ok))
     # Order: pairs of common milestones both sides reached, in the same order.
     order = []
@@ -233,7 +230,7 @@ def score(human, bots, choice=()):
         return [sum(1 for i in items if i["ok"]), len(items)]
     s1 = human["exited"] == (sum(b["exited"] for b in bots.values()) * 2 > len(seeds))
     s2 = sum(order) / len(order) if order else None
-    s3, s4, s5 = frac(presses), frac(hst), frac(recurring)
+    s3, s4, s5 = frac(lost), frac(hst), frac(recurring)
 
     def rate(f):
         return f[0] / f[1] if f[1] else None
@@ -245,7 +242,7 @@ def score(human, bots, choice=()):
         verdict = "Partial"
     else:
         verdict = "Misses"
-    return dict(common=common, human_stalls=hst, presses=presses, bot_stalls=bst, recurring=recurring,
+    return dict(common=common, items=items, bot_stalls=bst, recurring=recurring,
                 lures=lures, traps=traps, S1=s1, S2=s2, S3=s3, S4=s4, S5=s5, verdict=verdict,
                 reached={"human": sum(1 for _t, m in human["milestones"] if m in common),
                          **{s: sum(1 for _t, m in bots[s]["milestones"] if m in common) for s in seeds}})
@@ -296,17 +293,14 @@ def write_report(sc, human, bots, head):
             f"verdict: {sc['verdict']} (unless the mismatches below make it Bot-limited)",
             "", "to give a cause code (docs/explore-rubric.md section 6):"]
     todo = 0
-    for p in sc["presses"]:
-        if not p["ok"]:
-            todo += 1
-            out.append(f"  L press at {pt.clock(p['at'])}, ({p['xy'][0]:.0f},{p['xy'][1]:.0f}): "
-                       f"a seed stalled there in the same phase on {len(p['on'])} of {len(seeds)}")
-    for h in sc["human_stalls"]:
+    for h in sc["items"]:
         if not h["ok"]:
             todo += 1
             a, b = h["span"]
-            out.append(f"  your stall {pt.clock(a)}-{pt.clock(b)} around {hot(h['area'])}: "
-                       f"predicted on {len(h['on'])} of {len(seeds)} seeds")
+            ls = ", ".join(f"{pt.clock(t)} ({pt.clock(t - a)} in)" for t in h["presses"])
+            out.append(f"  {'lost stretch' if ls else 'your stall'} {pt.clock(a)}-{pt.clock(b)}"
+                       + (f", L at {ls}," if ls else "")
+                       + f" around {hot(h['area'])}: predicted on {len(h['on'])} of {len(seeds)} seeds")
     for g in sc["recurring"]:
         if not g["ok"]:
             todo += 1
@@ -355,7 +349,7 @@ def pool(at):
     met = len(files) >= 5 and s3[1] >= 10 and r3 >= 0.6 and r5 >= 0.5
     print(f"pooled over {len(files)} maps at {at}: lost recall {s3[0]}/{s3[1]}, stall precision {s5[0]}/{s5[1]}")
     print("the explorer's stalls are evidence for map review" if met else
-          "not yet evidence (needs 5 maps, 10 L presses, lost recall 60%, precision 50%): hints only")
+          "not yet evidence (needs 5 maps, 10 lost stretches, lost recall 60%, precision 50%): hints only")
     return 0
 
 
