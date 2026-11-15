@@ -56,7 +56,7 @@ Every map is checked against vanilla rules (see [Playtests](docs/builder.md#play
 
 ## The level builder
 
-`levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the lines and texture alignment, checks that the map can be finished (every key, secret and monster reachable, no softlocks), measures it against id's maps, and writes it into a WAD with a top-down preview. A decompiler turns any Doom-format map back into this form, and a ViZDoom runner playtests the routes.
+`levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the lines and texture alignment, checks that the map can be finished (every key, secret and monster reachable, no softlocks), measures it against id's maps, and writes it into a WAD with a top-down preview. A decompiler turns any Doom-format map back into this form, and a ViZDoom runner playtests the routes, fights through them, and explores each map with no route to find where players get lost.
 
 ```sh
 python3 -m levels nukage_outskirts          # check, then write it into its set's WAD and slot (MAP01 of wads/NUKAGE.WAD)

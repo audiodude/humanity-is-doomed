@@ -1,6 +1,6 @@
 ---
 name: doom-test
-description: Playtest a DOOM II level in this repo: the build's static balance curve, then ViZDoom route script, wiring run, combat-bot balance runs, screenshots. Use after building or changing a map, or when asked whether a map works or is balanced.
+description: Playtest a DOOM II level in this repo: the build's static balance curve, then ViZDoom route script, wiring run, combat-bot balance runs, explore runs for where players get lost, screenshots. Use after building or changing a map, or when asked whether a map works, is balanced, or is easy to find the way through.
 ---
 
 Prove the map plays: the intended route works end to end, and a fight through it is survivable with the health and ammo the map provides. The map comes from `doom-build`; its design doc (`levels/designs/<module>.md`) says what the route is.
@@ -78,6 +78,20 @@ Then extract frames around the death times (`ffmpeg -ss M:SS -i … -frames:v 1 
 
 Done when all three seeds have been run and read, every death cluster and skipped step is classified, every map problem is fixed or written down with why it stays, and the wiring run still passes.
 
-## 6. Report
+## 6. Explore runs
 
-The wiring result (checks, fails), the curve's low points (lowest detour ratio and the leg, any leg short on the thorough curve, health at the exit) and every static warning with its fix or reason, each seed's totals (kills, deaths by label, skipped steps, ammo left), the death clusters with their map/bot call, the doc targets the map misses, and what a human should look at in dsda-doom: vanilla rendering, and whether it's fun, which none of this measures.
+Run `--explore` on seeds 1, 2 and 3, in parallel. No script: the bot finds its own way knowing only what it has seen, with monsters removed and god mode on, so the run measures finding the way, not fighting.
+
+```sh
+uv run -q --with vizdoom scripts/tools/playtest.py <module> --explore --seed N
+```
+
+Read each report: the timeline (keys, switches with what they moved, doors, exit), walked distance against the critical path, how much of the map it saw, and the longest stretches with no key, switch, locked door or exit, with the sectors it spent them in. A stretch in the same sectors on every seed is a place players get lost: the way on is out of sight, a switch's effect is far off and unseen, or the goal looks reachable and isn't. A stretch on one seed only is the seed's order. `NO EXIT ... nothing left it knows to try` on a map without a `bossaction` gate means the way on needs something the explorer can't find (a secret door, a shootable switch) or a bot weakness; watch it with `--replay --explore --seed N` before calling it.
+
+Fix lost spots in the map: a window or sightline onto what a switch moves, light or a texture cue on the way on, the key or exit visible from where the player stalls. Then rerun the three seeds.
+
+Done when all three seeds have been run and read, and every stretch that recurs across seeds is fixed or written into the doc's Targets section with why it stays.
+
+## 7. Report
+
+The wiring result (checks, fails), the curve's low points (lowest detour ratio and the leg, any leg short on the thorough curve, health at the exit) and every static warning with its fix or reason, each seed's totals (kills, deaths by label, skipped steps, ammo left), the death clusters with their map/bot call, each explore seed's exit time and walked/critical-path ratio and the stretches that recur across seeds, the doc targets the map misses, and what a human should look at in dsda-doom: vanilla rendering, and whether it's fun, which none of this measures.

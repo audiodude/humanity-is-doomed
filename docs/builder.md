@@ -149,6 +149,13 @@ uv run --with vizdoom scripts/tools/playtest.py nukage_tower --replay --seed 2  
 uv run --with vizdoom scripts/tools/playtest.py nukage_tower --replay --seed 2 --video run.mp4  # needs ffmpeg
 ```
 
+With `--explore` there is no script: the bot finds its own way, knowing only what a player would. It sees the map as it looks (rays across its view, stopped by walls and shut doors), counts keys once they've been on screen, and each time picks the cheapest thing it knows about by walking distance: an exit it has seen, a key, a switch it hasn't pressed, a door it can open, or the edge of what it has seen, where it goes and looks round. With nothing new in sight it goes to places it has only seen from afar. Secret doors look like walls to it. Monsters are removed and it plays in god mode, so this measures finding the way, not fighting. It reports what it did and when, how far it walked against the reach model's critical path, how much of the map it saw, and the longest stretches with no key, switch, locked door or exit, with where it spent them: the places a player wanders. Seeds explore in different orders; a stretch that turns up in the same place on every seed is the map's. An exit behind a UMAPINFO `bossaction` (Storage, Meltdown) never opens in ViZDoom, and the report says so.
+
+```sh
+uv run --with vizdoom scripts/tools/playtest.py nukage_tower --explore --seed 2
+uv run --with vizdoom scripts/tools/playtest.py nukage_tower --replay --explore --seed 2     # watch it
+```
+
 The runner turns on ZDoom's strict Doom compatibility, so a pass shows the map's wiring works under vanilla rules as far as ZDoom can follow them: the player can only use a line from its front side, pressing use stops at the first line with an action (so a walk-over trigger just in front of a door or switch blocks it), and monsters are infinitely tall. Vanilla rendering limits and the feel of the map still need a playthrough in dsda-doom.
 
 `scripts/tools/wake.py` answers a narrower question with the same engine: which monsters one shot wakes. It starts the map fresh for each spot you give, warps there, fires once, waits (`--seconds`, default 10) and lists every monster that moved. With no spot it fires from the start. Use it after zoning a map with `SOUND_BETWEEN` (see [docs/monster-alerting.md](monster-alerting.md)):

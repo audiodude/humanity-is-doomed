@@ -3,7 +3,8 @@
 
     uv run --with vizdoom scripts/tools/playtest.py LEVEL [--skill 4] [--shots DIR] [--from NAME]
     uv run --with vizdoom scripts/tools/playtest.py LEVEL --fight [--seed N] [--watch]
-    uv run --with vizdoom scripts/tools/playtest.py LEVEL --replay [--video FILE.mp4 [--hd]]
+    uv run --with vizdoom scripts/tools/playtest.py LEVEL --explore [--seed N] [--watch]
+    uv run --with vizdoom scripts/tools/playtest.py LEVEL --replay [--explore] [--video FILE.mp4 [--hd]]
     python3 scripts/tools/playtest.py LEVEL --describe     # start, keys, special lines (no ViZDoom needed)
 
 LEVEL is a level module (e.g. nukage_drain): the WAD and slot its set gives it
@@ -84,15 +85,21 @@ plays the same way). Every --fight run is recorded to
 ~/.cache/playtest/recordings/, one recording per WAD, map, skill and seed
 (the latest run replaces it).
 
+--explore plays with no script: a bot that knows only what it has seen finds
+its own way to the exit, to show where players get lost (scripts/tools/explore.py
+says how). Its runs are recorded too, apart from --fight's.
+
 --watch shows the game in a window at normal speed. --replay plays back the
-last --fight recording of MAP at --skill and --seed (or --recording FILE) in a window;
+last --fight recording (with --explore, the last --explore one) of MAP at
+--skill and --seed (or --recording FILE) in a window;
 add --video FILE.mp4 to render it, with sound, using ffmpeg instead (--hd: at 1920x1080,
 widescreen, instead of 640x480). A recording only plays
 back right with the WAD it was made with.
 
-Exit status: 0 all checks passed, 1 a check failed, the wiring run got stuck
-or a fight hit --max-time, 2 the engine or script broke. Deaths and skipped
-steps in a --fight run are in its report, not its exit status.
+Exit status: 0 all checks passed (--explore: it exited), 1 a check failed,
+the wiring run got stuck, a fight hit --max-time or an explore run found no
+exit, 2 the engine or script broke. Deaths and skipped steps in a --fight run
+are in its report, not its exit status.
 """
 import argparse
 import hashlib
@@ -519,7 +526,7 @@ def recording_path(args):
     don't overwrite each other's recordings."""
     where = hashlib.sha256("\0".join(os.path.abspath(w) for w in args.wad).encode()).hexdigest()[:8]
     return os.path.join(RECORDINGS, f"{os.path.basename(args.wad[-1])}-{where}-{args.map.upper()}"
-                                    f"-skill{args.skill}-seed{args.seed}.lmp")
+                                    f"-skill{args.skill}-seed{args.seed}{'-explore' if args.explore else ''}.lmp")
 
 
 def check_step(ln, cmd, args, raw):
@@ -615,7 +622,7 @@ class Run:
         g.set_render_hud(True)
         g.set_sectors_info_enabled(True)
         g.set_objects_info_enabled(True)
-        g.set_labels_buffer_enabled(args.fight)   # which monsters are on screen
+        g.set_labels_buffer_enabled(args.fight or args.explore)   # which monsters and keys are on screen
         g.set_sound_enabled(args.watch)
         B = vzd.Button
         self.buttons = ["MOVE_FORWARD_BACKWARD_DELTA", "MOVE_LEFT_RIGHT_DELTA", "TURN_LEFT_RIGHT_DELTA",
@@ -629,7 +636,7 @@ class Run:
         g.add_game_args("+sv_cheats 1 " + VANILLA_ARGS)
         g.init()
         self.recording = None
-        if args.fight:
+        if args.fight or args.explore:
             os.makedirs(RECORDINGS, exist_ok=True)
             self.recording = recording_path(args)
             # Record to a file of this run's own, renamed into place at the end,
@@ -1295,6 +1302,9 @@ def run(args):
         return 2
     if args.replay:
         return replay(args, vzd)
+    if args.explore:
+        from explore import run as explore
+        return explore(args, vzd)
     if args.fight and args.start_from:
         print("--from can't be used with --fight: a fight starts from the beginning")
         return 2
@@ -1473,6 +1483,8 @@ def main():
     p.add_argument("--shots", help="screenshot directory (default /tmp/playtest-shots/MAP)")
     p.add_argument("--from", dest="start_from", metavar="NAME", help="start at `checkpoint NAME` (see above)")
     p.add_argument("--fight", action="store_true", help="play for real: no god mode, the bot fights (see above)")
+    p.add_argument("--explore", action="store_true", help="find the way with no route, knowing only what it has seen "
+                   "(scripts/tools/explore.py)")
     p.add_argument("--watch", action="store_true", help="show the game in a window, at normal speed")
     p.add_argument("--replay", action="store_true", help="watch the last --fight recording of MAP at --skill and --seed")
     p.add_argument("--recording", metavar="FILE", help="with --replay: the recording to play (default: the last)")
@@ -1480,16 +1492,18 @@ def main():
     p.add_argument("--hd", action="store_true", help="with --replay: render at 1920x1080 (widescreen) instead of 640x480")
     p.add_argument("--seed", type=int, default=1, help="random seed (default 1): the same seed plays the same way")
     p.add_argument("--max-time", type=float, default=15, metavar="MIN",
-                   help="with --fight: stop when the game clock passes this many minutes (default 15)")
+                   help="with --fight or --explore: stop when the game clock passes this many minutes (default 15)")
     args = p.parse_args()
     if not args.iwad and not args.describe:
         p.error("no IWAD: set DOOM2_WAD in .env (see .env.example) or pass --iwad")
     pos = args.wad
+    args.module = None
     if re.fullmatch(r"[\w.]+", pos[0]) and not pos[0].lower().endswith(".wad") and find_spec(f"levels.{pos[0]}"):
         at = place(pos[0])
+        args.module = pos[0]
         script = os.path.join(LEVELS, "playtests", pos[0].rsplit(".", 1)[-1] + ".playtest")
         pos = [os.path.join(ROOT, "wads", at.wad), at.slot, *pos[1:]]
-        if len(pos) == 2 and not (args.script or args.replay or args.describe) and os.path.exists(script):
+        if len(pos) == 2 and not (args.script or args.replay or args.describe or args.explore) and os.path.exists(script):
             pos.append(script)
     if args.replay:
         args.watch = True
@@ -1497,7 +1511,7 @@ def main():
             p.error("give WAD... MAP")
         args.map, args.wad = pos[-1], pos[:-1]
         sys.exit(run(args))
-    if not args.describe and not args.script:
+    if not args.describe and not args.script and not args.explore:
         if len(pos) < 3:
             p.error("give WAD... MAP SCRIPT")
         args.script = pos.pop()
