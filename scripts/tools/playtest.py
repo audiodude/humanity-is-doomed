@@ -138,6 +138,7 @@ PICKUPS = {"PowerIronFeet": ("RadSuit",), "BasicArmor": ("GreenArmor", "BlueArmo
 
 RADIUS, HEIGHT_P, STEP, USE_RANGE = 16, 56, 24, 64
 GRID = 16
+SHIFT = 7.5   # how far off a cell's centre the planner may stand the player's box, to fit a gap
 DAMAGING = {4, 5, 7, 11, 16}
 LIFTS = {10, 21, 62, 88, 120, 121, 122, 123}   # lift specials: their tagged sectors move up and down
 USE_DOORS = {1, 26, 27, 28, 31, 32, 33, 34, 117, 118}   # doors the player opens by using them
@@ -323,8 +324,11 @@ def box_hits(a, b, cx, cy, r):
 class Planner:
     """Grid A* for the player's 32-unit box over the live map. Like Doom, a
     cell's floor is the highest floor anywhere under the box there and its
-    ceiling the lowest ceiling; the player can step up 24, drop any height,
-    and needs 56 of headroom. Lifts count as passable whatever their height."""
+    ceiling the lowest ceiling; the player can step up 24, drop any height
+    (but not through an opening lower than 56 over the floor it's on), and
+    needs 56 of headroom; the box may touch a wall. A cell the box only fits
+    in off its centre (a gap just 32 wide) is stood in there. Lifts count as
+    passable whatever their height."""
 
     def __init__(self, geo):
         self.g = g = geo
@@ -332,45 +336,73 @@ class Planner:
         fine = g.raster(GRID // 2)
         self.under = []   # per cell: the sectors under the player's box there
         self.wall = []    # per cell: a wall (one-sided or blocking line) cuts the box
+        self.shift = {}   # cell -> (dx, dy): where in it the box fits, if not at its centre
         walls = [(a, b) for a, b, flags, _sp, _t, _fs, bs in g.lines if bs is None or flags & 1]
+        r = RADIUS - 1   # a box edge touching a wall is fine, as in Doom
+
+        def hits(offsets, cells):
+            """{(cell, offset)} where a wall cuts the box at cell centre + offset."""
+            out = set()
+            for a, b in walls:
+                i0 = max(0, int((min(a[0], b[0]) - RADIUS - SHIFT - g.x0) // GRID))
+                i1 = min(g.nx - 1, int((max(a[0], b[0]) + RADIUS + SHIFT - g.x0) // GRID))
+                j0 = max(0, int((min(a[1], b[1]) - RADIUS - SHIFT - g.y0) // GRID))
+                j1 = min(g.ny - 1, int((max(a[1], b[1]) + RADIUS + SHIFT - g.y0) // GRID))
+                for jj in range(j0, j1 + 1):
+                    for ii in range(i0, i1 + 1):
+                        if cells is not None and (ii, jj) not in cells:
+                            continue
+                        cx, cy = g.x0 + ii * GRID + GRID / 2, g.y0 + jj * GRID + GRID / 2
+                        for o in offsets:
+                            if box_hits(a, b, cx + o[0], cy + o[1], r):
+                                out.add(((ii, jj), o))
+            return out
+        walled = {c for c, _o in hits([(0, 0)], None)}
+        # A gap just the box's width (bars 32 apart) never has a cell centred
+        # in it: a walled cell whose box fits a little off its centre, toward
+        # a neighbour that is walled too (so not just the edge of a room), is
+        # a cell the player can stand in, there.
+        offsets = [(dx, dy) for dx in (-SHIFT, 0, SHIFT) for dy in (-SHIFT, 0, SHIFT) if dx or dy]
+        cut = hits(offsets, walled)
+        for c in walled:
+            o = next((o for o in offsets if (c, o) not in cut
+                      and (c[0] + (o[0] > 0) - (o[0] < 0), c[1] + (o[1] > 0) - (o[1] < 0)) in walled), None)
+            if o:
+                self.shift[c] = o
         for j in range(g.ny):
             urow, wrow = [], []
-            cy = g.y0 + j * GRID + GRID / 2
             for i in range(g.nx):
-                cx = g.x0 + i * GRID + GRID / 2
-                ss = {fine[jj][ii] for jj in range(2 * j - 1, 2 * j + 4) for ii in range(2 * i - 1, 2 * i + 4)
+                dx, dy = self.shift.get((i, j), (0, 0))
+                si, sj = (dx > 0) - (dx < 0), (dy > 0) - (dy < 0)
+                # The 8-unit cells whose centres are inside the 32-unit box.
+                ss = {fine[jj][ii] for jj in range(2 * j - 1 + sj, 2 * j + 3 + sj)
+                      for ii in range(2 * i - 1 + si, 2 * i + 3 + si)
                       if 0 <= jj < len(fine) and 0 <= ii < len(fine[0])}
                 urow.append(frozenset(s for s in ss if s is not None) if None not in ss else None)
-                wrow.append(False)
+                wrow.append((i, j) in walled and (i, j) not in self.shift)
             self.under.append(urow)
             self.wall.append(wrow)
-        for a, b in walls:
-            i0 = max(0, int((min(a[0], b[0]) - RADIUS - g.x0) // GRID))
-            i1 = min(g.nx - 1, int((max(a[0], b[0]) + RADIUS - g.x0) // GRID))
-            j0 = max(0, int((min(a[1], b[1]) - RADIUS - g.y0) // GRID))
-            j1 = min(g.ny - 1, int((max(a[1], b[1]) + RADIUS - g.y0) // GRID))
-            for jj in range(j0, j1 + 1):
-                for ii in range(i0, i1 + 1):
-                    if box_hits(a, b, g.x0 + ii * GRID + GRID / 2, g.y0 + jj * GRID + GRID / 2, RADIUS):
-                        self.wall[jj][ii] = True
 
     def cell(self, p):
         return (int((p[0] - self.g.x0) // GRID), int((p[1] - self.g.y0) // GRID))
 
     def centre(self, c):
-        return (self.g.x0 + c[0] * GRID + GRID / 2, self.g.y0 + c[1] * GRID + GRID / 2)
+        """Where the player stands in cell c: its centre, or where its box fits."""
+        dx, dy = self.shift.get(c, (0, 0))
+        return (self.g.x0 + c[0] * GRID + GRID / 2 + dx, self.g.y0 + c[1] * GRID + GRID / 2 + dy)
 
-    def levels(self, h, things):
+    def levels(self, h, things, static=frozenset()):
         """Per cell: (floor, ceiling, on a lift) for the box there, or None if the
-        player can't stand there at all. Reused until a height or a thing moves."""
-        key = (tuple(h), tuple(things))
+        player can't stand there at all. Reused until a height or a thing moves.
+        Lifts in `static` count as the floors they are now (lifts it can't ride)."""
+        key = (tuple(h), tuple(things), static)
         if self._levels[0] == key:
             return self._levels[1]
-        out = self._levels_for(h, things)
+        out = self._levels_for(h, things, static)
         self._levels = (key, out)
         return out
 
-    def _levels_for(self, h, things):
+    def _levels_for(self, h, things, static=frozenset()):
         g = self.g
         out = []
         for j in range(g.ny):
@@ -382,7 +414,7 @@ class Planner:
                     continue
                 f = max(h[s][0] for s in ss)
                 c = min(h[s][1] for s in ss)
-                lift = any(s in g.lifts for s in ss)
+                lift = any(s in g.lifts and s not in static for s in ss)
                 row.append(None if c - f < HEIGHT_P and not lift else (f, c, lift))
             out.append(row)
         for x, y, tr in things:   # Doom blocks things as squares
@@ -396,12 +428,14 @@ class Planner:
 
     @staticmethod
     def step_ok(a, b):
-        """The player can move from a cell at level a to one at level b."""
+        """The player can move from a cell at level a to one at level b: up a
+        step at most, and (as in Doom) b's ceiling high enough over the floor
+        it's standing on, so it can't drop through a low opening."""
         if a is None or b is None:
             return False
         if a[2] or b[2]:
             return True
-        return b[0] - a[0] <= STEP and min(a[1], b[1]) - b[0] >= HEIGHT_P
+        return b[0] - a[0] <= STEP and min(a[1], b[1]) - max(a[0], b[0]) >= HEIGHT_P
 
     def free_near(self, c, lv, reach=3):
         best = None
