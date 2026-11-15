@@ -28,6 +28,7 @@ stretches with no progress (no key, switch, door or exit) and where it spent
 them: the places a player wanders. Run several seeds; one seed's wandering
 is a coin flip, the same place in every seed is the map.
 """
+import csv
 import heapq
 import importlib
 import json
@@ -134,7 +135,7 @@ class Explorer(pt.Run):
         self.known.add(here)
         self.visited |= {(here[0] + i, here[1] + j) for i in range(-VISITED, VISITED + 1)
                          for j in range(-VISITED, VISITED + 1) if i * i + j * j <= VISITED * VISITED}
-        self.samples.append((self.tics, g.cell_sector[plan.cell((x, y))[1]][plan.cell((x, y))[0]]))
+        self.samples.append((self.tics, g.cell_sector[plan.cell((x, y))[1]][plan.cell((x, y))[0]], x, y))
         ang = self.var("ANGLE")
         for k in range(RAYS):
             a = math.radians(ang - FOV / 2 + FOV * k / (RAYS - 1))
@@ -171,6 +172,11 @@ class Explorer(pt.Run):
     # -- deciding ------------------------------------------------------------
     def name(self, s):
         return self.names[s] if self.names and s is not None and s < len(self.names) else f"sector {s}"
+
+    def around(self, s, stretch):
+        """ (x,y): where in sector s it was, on average, for a map without names."""
+        pts = [(x, y) for t, x, y in stretch if t == s]
+        return f" ({sum(p[0] for p in pts) / len(pts):.0f},{sum(p[1] for p in pts) / len(pts):.0f})"
 
     def event(self, kind, text, progress=None):
         """Note progress. The map may have changed, so the edges it has looked
@@ -534,18 +540,29 @@ class Explorer(pt.Run):
         if gaps:
             self.say("longest stretches with no key, switch, locked door or exit (where it spent them):")
         for span, a, b in gaps:
-            where = Counter(s for t, s in self.samples if a <= t < b and s is not None)
+            stretch = [(s, x, y) for t, s, x, y in self.samples if a <= t < b and s is not None]
+            where = Counter(s for s, _x, _y in stretch)
             total = sum(where.values()) or 1
-            top = ", ".join(f"{self.name(s)} {n / total:.0%}" for s, n in where.most_common(4))
+            top = ", ".join(f"{self.name(s)} {n / total:.0%}" + ("" if self.names else self.around(s, stretch))
+                            for s, n in where.most_common(4))
             self.say(f"  {pt.clock(span)} from {pt.clock(a)} to {pt.clock(b)}: {top}")
 
 
-def level_info(module):
+def level_info(module, wads, slot):
     """Sector names (SECTORS order), the reach model's critical path length,
     and whether a monster's death opens the exit (UMAPINFO bossaction), of a
-    level module, or (None, None, False)."""
+    level module. For an id map (an IWAD given as the WAD) the critical path
+    comes from data/metrics/metrics_progression.csv. Otherwise (None, None, False)."""
     if not module:
-        return None, None, False
+        from levels.wad import IWADS
+        iwads = {os.path.realpath(p) for p in IWADS.values() if p}
+        crit = None
+        if len(wads) == 1 and os.path.realpath(wads[0]) in iwads:
+            with open(os.path.join(pt.ROOT, "data", "metrics", "metrics_progression.csv")) as f:
+                row = next((r for r in csv.DictReader(f) if r["map"] == slot.upper()), None)
+            if row and row.get("crit_path_len"):
+                crit = float(row["crit_path_len"])
+        return None, crit, False
     from levels import checks
     from levels.mapgen import compile_level
     from levels.model import load
@@ -564,7 +581,7 @@ def run(args, vzd):
         print(f"{args.map} not found as a Doom-format map in {args.wad}")
         return 2
     t0 = time.time()
-    names, crit, boss = level_info(args.module)
+    names, crit, boss = level_info(args.module, args.wad, args.map)
     r = Explorer(args, vzd, pt.Geometry(m))
     r.names = names
     stopped = "error"
