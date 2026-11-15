@@ -10,7 +10,7 @@ walk -100 200 -160 540
 open -160 576
 walk -152 616 -152 680
 wait 20
-walk -152 740 -152 768
+walk -160 740 -160 800
 expect secrets == 1
 wait 140
 walk -152 680 -152 610

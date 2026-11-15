@@ -126,7 +126,8 @@ SECTORS = [
     Sector("w_pump", [[(-1408, 544), (-832, 544), (-832, 928), (-944, 928), (-944, 1024), (-832, 1024), (-832, 1216), (-1024, 1216), (-1024, 1120), (-1408, 1120)],
                        rect(-1056, 832, -992, 896)], WING, WING + 192, W_FLAT,
            W_CEIL, 144, W_WALL, pillars=[rect(-1280, 704, -1184, 800), rect(-1280, 960, -1184, 1056)]),
-    pedestal("ped_ssg", (-1056, 832, -992, 896), WING + 16, WING + 192, W_WALL, W_CEIL),
+    # Centred on the arch, half a tile off the 64 grid: TLITE6_6's lamps sit whole on the 32 grid.
+    pedestal("ped_ssg", (-1056, 832, -992, 896), WING + 16, WING + 192, W_WALL, W_CEIL, flat="TLITE6_6"),
     *stairs("wgst", (-1120, 1120, -1024, 1216), "w", 3, WING + 16, 16, WING + 192, W_FLAT, W_CEIL, 160,
             W_WALL, TRIM),
     Sector("w_gal", [rect(-1408, 1120, -1120, 1216)], WING + 64, WING + 192, W_FLAT, W_CEIL, 176, W_WALL,
@@ -150,12 +151,12 @@ SECTORS = [
     *doorway("d_nhall", (-512, 1856), "e", alcove=24, far_alcove=24, alcove_wall=TRIM, face=DOOR, floor=WING,
              alcove_flat=N_FLAT, flat=N_FLAT),
     Sector("n_hall", [[(-448, 1760), (208, 1760), (208, 1872), (304, 1872), (304, 1760), (512, 1760), (512, 2336), (256, 2336), (256, 2208), (-256, 2208),
-                       (-256, 2336), (-448, 2336)], rect(64, 1952, 128, 2016)], WING, WING + 256, N_FLAT,
+                       (-256, 2336), (-448, 2336)], rect(64, 1920, 128, 1984)], WING, WING + 256, N_FLAT,
            "CEIL5_1", 176, N_WALL, pillars=[rect(-320, 1952, -224, 2048), rect(288, 1952, 384, 2048)]),
     # The revenant's ledge, 96 up: it can jump down to you, you can't climb up.
     Sector("n_ledge", [rect(-256, 2208, 256, 2336)], WING + 96, WING + 256, N_FLAT, "CEIL5_1", 208,
            N_WALL, lower=TRIM),
-    pedestal("ped_y", (64, 1952, 128, 2016), WING + 16, WING + 256, N_WALL, "CEIL5_1"),
+    pedestal("ped_y", (64, 1920, 128, 1984), WING + 16, WING + 256, N_WALL, "CEIL5_1"),
     window("w_nwin", (0, 1696, 192, 1760), WING, WING + 144, TRIM, 176, flat=N_FLAT, lower=BASE),
     niche_n,
     *closet("ncl1", (512, 1920), "e", TAG_NCL, **N_CL),
@@ -232,7 +233,7 @@ THINGS = [Thing(*t) for t in [
     (REVENANT, 0, 2272, 270, "emh"),
     (KNIGHT, 400, 1880, 180, "h"), (IMP, -200, 2150, 270, "emha"),
     (SARGE, -300, 1832, 90, "emha"), (IMP, 400, 2132, 180, "mha"), (CHAINGUY, -350, 2232, 0, "ha"),
-    (YELLOWKEY, 96, 1984), (MEDI, -380, 1812), (SHELLS, 420, 2282), (SHELLS, 440, 1812),
+    (YELLOWKEY, 96, 1952), (MEDI, -380, 1812), (SHELLS, 420, 2282), (SHELLS, 440, 1812),
     # the yellow key's closets
     (REVENANT, 608, 1920, 180, "mh"), (IMP, 630, 1872, 180, "h"),
     (IMP, 608, 2112, 180), (DEMON, 608, 2182, 180, "mh"), (SHELLS, 560, 2202),

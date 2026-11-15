@@ -14,10 +14,10 @@
 <path d="M166.4,780.8 L217.6,780.8 L217.6,697.6 L166.4,697.6 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>corr2: floor 0 ceil 128 FLOOR5_2/CEIL5_2 light 112</title></path>
 <path d="M140.8,697.6 L409.6,697.6 L409.6,595.2 L217.6,595.2 L217.6,441.6 L115.2,441.6 L115.2,672.0 Z M294.4,672.0 L345.6,672.0 L345.6,620.8 L294.4,620.8 Z" fill="rgb(182,182,182)" fill-rule="evenodd"><title>hall_s: floor -16 ceil 256 FLOOR5_2/CEIL3_5 light 176</title></path>
 <path d="M115.2,441.6 L217.6,441.6 L217.6,428.8 L115.2,428.8 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>hstep: floor 0 ceil 256 FLOOR5_2/CEIL3_5 light 176</title></path>
-<path d="M115.2,428.8 L217.6,428.8 L217.6,441.6 L396.8,441.6 L396.8,288.0 L166.4,288.0 L115.2,339.2 Z M320.0,390.4 L371.2,390.4 L371.2,339.2 L320.0,339.2 Z M243.2,377.6 L294.4,377.6 L294.4,326.4 L243.2,326.4 Z" fill="rgb(195,195,195)" fill-rule="evenodd"><title>hall_n: floor 16 ceil 256 FLOOR5_2/CEIL3_5 light 176</title></path>
+<path d="M115.2,428.8 L217.6,428.8 L217.6,441.6 L396.8,441.6 L396.8,288.0 L166.4,288.0 L115.2,339.2 Z M320.0,390.4 L371.2,390.4 L371.2,339.2 L320.0,339.2 Z M243.2,390.4 L294.4,390.4 L294.4,339.2 L243.2,339.2 Z" fill="rgb(195,195,195)" fill-rule="evenodd"><title>hall_n: floor 16 ceil 256 FLOOR5_2/CEIL3_5 light 176</title></path>
 <path d="M294.4,672.0 L345.6,672.0 L345.6,620.8 L294.4,620.8 Z" fill="rgb(207,207,207)" fill-rule="evenodd"><title>pump_s: floor 48 ceil 256 FLOOR4_8/CEIL3_5 light 176</title></path>
 <path d="M320.0,390.4 L371.2,390.4 L371.2,339.2 L320.0,339.2 Z" fill="rgb(220,220,220)" fill-rule="evenodd"><title>pump_n: floor 80 ceil 256 FLOOR4_8/CEIL3_5 light 176</title></path>
-<path d="M243.2,377.6 L294.4,377.6 L294.4,326.4 L243.2,326.4 Z" fill="rgb(204,204,204)" fill-rule="evenodd"><title>ped_b: floor 40 ceil 256 TLITE6_1/CEIL3_5 light 240</title></path>
+<path d="M243.2,390.4 L294.4,390.4 L294.4,339.2 L243.2,339.2 Z" fill="rgb(204,204,204)" fill-rule="evenodd"><title>ped_b: floor 40 ceil 256 TLITE6_1/CEIL3_5 light 240</title></path>
 <path d="M256.0,595.2 L268.8,595.2 L268.8,441.6 L256.0,441.6 Z" fill="rgb(156,156,156)" fill-rule="evenodd"><title>isteps1: floor -80 ceil 256 FLOOR5_2/CEIL3_5 light 160</title></path>
 <path d="M243.2,595.2 L256.0,595.2 L256.0,441.6 L243.2,441.6 Z" fill="rgb(162,162,162)" fill-rule="evenodd"><title>isteps2: floor -64 ceil 256 FLOOR5_2/CEIL3_5 light 160</title></path>
 <path d="M230.4,595.2 L243.2,595.2 L243.2,441.6 L230.4,441.6 Z" fill="rgb(169,169,169)" fill-rule="evenodd"><title>isteps3: floor -48 ceil 256 FLOOR5_2/CEIL3_5 light 160</title></path>
@@ -191,10 +191,10 @@
 <line x1="371.2" y1="390.4" x2="371.2" y2="339.2" stroke="#777" stroke-width="0.6"/>
 <line x1="371.2" y1="339.2" x2="320.0" y2="339.2" stroke="#777" stroke-width="0.6"/>
 <line x1="320.0" y1="339.2" x2="320.0" y2="390.4" stroke="#777" stroke-width="0.6"/>
-<line x1="243.2" y1="377.6" x2="294.4" y2="377.6" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 2</title></line>
-<line x1="294.4" y1="377.6" x2="294.4" y2="326.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 2</title></line>
-<line x1="294.4" y1="326.4" x2="243.2" y2="326.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 2</title></line>
-<line x1="243.2" y1="326.4" x2="243.2" y2="377.6" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 2</title></line>
+<line x1="243.2" y1="390.4" x2="294.4" y2="390.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 2</title></line>
+<line x1="294.4" y1="390.4" x2="294.4" y2="339.2" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 2</title></line>
+<line x1="294.4" y1="339.2" x2="243.2" y2="339.2" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 2</title></line>
+<line x1="243.2" y1="339.2" x2="243.2" y2="390.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 2</title></line>
 <line x1="268.8" y1="441.6" x2="268.8" y2="595.2" stroke="#777" stroke-width="0.6"/>
 <line x1="256.0" y1="595.2" x2="256.0" y2="441.6" stroke="#777" stroke-width="0.6"/>
 <line x1="243.2" y1="595.2" x2="243.2" y2="441.6" stroke="#777" stroke-width="0.6"/>
@@ -515,7 +515,7 @@
 <text x="240.0" y="368.0" font-size="9" text-anchor="middle" fill="#333">hall_n 16</text>
 <text x="320.0" y="646.4" font-size="9" text-anchor="middle" fill="#333">pump_s 48</text>
 <text x="345.6" y="364.8" font-size="9" text-anchor="middle" fill="#333">pump_n 80</text>
-<text x="268.8" y="352.0" font-size="9" text-anchor="middle" fill="#333">ped_b 40</text>
+<text x="268.8" y="364.8" font-size="9" text-anchor="middle" fill="#333">ped_b 40</text>
 <text x="339.2" y="518.4" font-size="9" text-anchor="middle" fill="#333">intake -96</text>
 <text x="73.6" y="518.4" font-size="9" text-anchor="middle" fill="#333">hall_cl -16</text>
 <text x="700.8" y="518.4" font-size="9" text-anchor="middle" fill="#333">river_w -96</text>
@@ -591,7 +591,7 @@
 <circle cx="140.8" cy="467.2" r="2.5" fill="#1f6fd0"/>
 <circle cx="140.8" cy="403.2" r="2.5" fill="#1f6fd0"/>
 <circle cx="371.2" cy="416.0" r="2.5" fill="#1f6fd0"/>
-<rect x="264.8" y="348.0" width="8" height="8" fill="#2255ff" stroke="#000"/>
+<rect x="264.8" y="360.8" width="8" height="8" fill="#2255ff" stroke="#000"/>
 <circle cx="83.2" cy="544.0" r="12.0" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 3002 skills emh</title></circle>
 <circle cx="83.2" cy="492.8" r="12.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3002 skills mh</title></circle>
 <circle cx="96.0" cy="518.4" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3001 skills mh</title></circle>

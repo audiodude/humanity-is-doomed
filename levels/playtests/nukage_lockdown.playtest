@@ -134,7 +134,7 @@ expect has Soulsphere
 walk 2700 1088 2432 900
 look 180 4
 shot east_bank
-walk 2432 832
+walk 2464 864
 expect has PowerIronFeet
 
 # The wade: the island and its megasphere, then the culvert.

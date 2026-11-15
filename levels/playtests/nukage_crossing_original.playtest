@@ -27,7 +27,7 @@ open -400 624
 walk -450 624 -960 624 -960 800
 look 90
 shot pump-hall      # PIPE2 hall, PIPES pump plinths, METAL risers
-walk -1024 1380 -1024 1500 -768 1632
+walk -1024 1380 -1024 1500 -768 1600
 expect has BlueCard
 wait 70
 expect ceil -1160 1216 > 64        # the closet behind you opened

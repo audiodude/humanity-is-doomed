@@ -52,9 +52,9 @@
 <path d="M358.4,684.8 L364.8,684.8 L364.8,633.6 L358.4,633.6 Z" fill="rgb(170,170,170)" fill-rule="evenodd"><title>d_tank_alcove: floor 56 ceil 184 FLOOR5_2/CEIL5_1 light 176</title></path>
 <path d="M352.0,684.8 L358.4,684.8 L358.4,633.6 L352.0,633.6 Z" fill="#a0703c" fill-rule="evenodd"><title>d_tank: floor 56 ceil 56 FLOOR5_2/FLAT20 light 144</title></path>
 <path d="M345.6,684.8 L352.0,684.8 L352.0,633.6 L345.6,633.6 Z" fill="rgb(170,170,170)" fill-rule="evenodd"><title>d_tank_far: floor 56 ceil 184 FLOOR5_2/CEIL5_1 light 176</title></path>
-<path d="M108.8,748.8 L345.6,748.8 L345.6,569.6 L108.8,569.6 Z M201.6,684.8 L252.8,684.8 L252.8,633.6 L201.6,633.6 Z M134.4,723.2 L172.8,723.2 L172.8,684.8 L134.4,684.8 Z M281.6,723.2 L320.0,723.2 L320.0,684.8 L281.6,684.8 Z M134.4,633.6 L172.8,633.6 L172.8,595.2 L134.4,595.2 Z M281.6,633.6 L320.0,633.6 L320.0,595.2 L281.6,595.2 Z" fill="rgb(169,169,169)" fill-rule="evenodd"><title>tank: floor 48 ceil 256 FLAT9/CEIL4_1 light 208 tag 2</title></path>
-<path d="M201.6,684.8 L252.8,684.8 L252.8,633.6 L201.6,633.6 Z M214.4,672.0 L240.0,672.0 L240.0,646.4 L214.4,646.4 Z" fill="rgb(169,169,169)" fill-rule="evenodd"><title>ring_b: floor 48 ceil 256 FLAT9/CEIL4_1 light 208 tag 2</title></path>
-<path d="M214.4,672.0 L240.0,672.0 L240.0,646.4 L214.4,646.4 Z" fill="rgb(174,174,174)" fill-rule="evenodd"><title>ped_b: floor 72 ceil 256 TLITE6_1/CEIL4_1 light 240</title></path>
+<path d="M108.8,748.8 L345.6,748.8 L345.6,569.6 L108.8,569.6 Z M198.4,684.8 L249.6,684.8 L249.6,633.6 L198.4,633.6 Z M134.4,723.2 L172.8,723.2 L172.8,684.8 L134.4,684.8 Z M281.6,723.2 L320.0,723.2 L320.0,684.8 L281.6,684.8 Z M134.4,633.6 L172.8,633.6 L172.8,595.2 L134.4,595.2 Z M281.6,633.6 L320.0,633.6 L320.0,595.2 L281.6,595.2 Z" fill="rgb(169,169,169)" fill-rule="evenodd"><title>tank: floor 48 ceil 256 FLAT9/CEIL4_1 light 208 tag 2</title></path>
+<path d="M198.4,684.8 L249.6,684.8 L249.6,633.6 L198.4,633.6 Z M211.2,672.0 L236.8,672.0 L236.8,646.4 L211.2,646.4 Z" fill="rgb(169,169,169)" fill-rule="evenodd"><title>ring_b: floor 48 ceil 256 FLAT9/CEIL4_1 light 208 tag 2</title></path>
+<path d="M211.2,672.0 L236.8,672.0 L236.8,646.4 L211.2,646.4 Z" fill="rgb(174,174,174)" fill-rule="evenodd"><title>ped_b: floor 72 ceil 256 TLITE6_1/CEIL4_1 light 240</title></path>
 <path d="M134.4,723.2 L172.8,723.2 L172.8,684.8 L134.4,684.8 Z" fill="#7ccf4a" fill-rule="evenodd"><title>pool0: floor 32 ceil 256 NUKAGE1/CEIL4_1 light 192</title></path>
 <path d="M281.6,723.2 L320.0,723.2 L320.0,684.8 L281.6,684.8 Z" fill="#7ccf4a" fill-rule="evenodd"><title>pool1: floor 32 ceil 256 NUKAGE1/CEIL4_1 light 192</title></path>
 <path d="M134.4,633.6 L172.8,633.6 L172.8,595.2 L134.4,595.2 Z" fill="#7ccf4a" fill-rule="evenodd"><title>pool2: floor 32 ceil 256 NUKAGE1/CEIL4_1 light 192</title></path>
@@ -87,7 +87,7 @@
 <path d="M531.2,262.4 L582.4,262.4 L595.2,249.6 L595.2,198.4 L582.4,185.6 L531.2,185.6 L518.4,198.4 L518.4,249.6 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>turbine_w: floor 400 ceil 400 CEIL5_1/CEIL5_1 light 160</title></path>
 <path d="M761.6,262.4 L812.8,262.4 L825.6,249.6 L825.6,198.4 L812.8,185.6 L761.6,185.6 L748.8,198.4 L748.8,249.6 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>turbine_e: floor 400 ceil 400 CEIL5_1/CEIL5_1 light 160</title></path>
 <path d="M595.2,115.2 L748.8,115.2 L748.8,38.4 L595.2,38.4 Z M659.2,70.4 L684.8,70.4 L684.8,44.8 L659.2,44.8 Z" fill="rgb(193,193,193)" fill-rule="evenodd"><title>dais: floor 168 ceil 400 FLOOR4_8/CEIL5_1 light 208</title></path>
-<path d="M659.2,70.4 L684.8,70.4 L684.8,44.8 L659.2,44.8 Z" fill="rgb(196,196,196)" fill-rule="evenodd"><title>ped_y: floor 184 ceil 400 TLITE6_1/CEIL5_1 light 240</title></path>
+<path d="M659.2,70.4 L684.8,70.4 L684.8,44.8 L659.2,44.8 Z" fill="rgb(196,196,196)" fill-rule="evenodd"><title>ped_y: floor 184 ceil 400 TLITE6_6/CEIL5_1 light 240</title></path>
 <path d="M441.6,275.2 L454.4,275.2 L454.4,108.8 L441.6,108.8 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>pwall_w: floor 400 ceil 400 FLOOR0_2/CEIL5_1 light 160 tag 4</title></path>
 <path d="M364.8,275.2 L441.6,275.2 L441.6,108.8 L364.8,108.8 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>pen_w: floor 144 ceil 272 FLOOR0_2/CEIL5_1 light 96</title></path>
 <path d="M889.6,275.2 L902.4,275.2 L902.4,172.8 L889.6,172.8 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>pwall_e: floor 400 ceil 400 FLOOR0_2/CEIL5_1 light 160 tag 4</title></path>
@@ -361,10 +361,10 @@
 <line x1="108.8" y1="748.8" x2="108.8" y2="684.8" stroke="#111" stroke-width="1.6"/>
 <line x1="108.8" y1="684.8" x2="108.8" y2="633.6" stroke="#777" stroke-width="0.6"/>
 <line x1="108.8" y1="633.6" x2="108.8" y2="569.6" stroke="#111" stroke-width="1.6"/>
-<line x1="201.6" y1="684.8" x2="252.8" y2="684.8" stroke="#d0201a" stroke-width="2.5"><title>action 35 tag 2</title></line>
-<line x1="252.8" y1="684.8" x2="252.8" y2="633.6" stroke="#d0201a" stroke-width="2.5"><title>action 35 tag 2</title></line>
-<line x1="252.8" y1="633.6" x2="201.6" y2="633.6" stroke="#d0201a" stroke-width="2.5"><title>action 35 tag 2</title></line>
-<line x1="201.6" y1="633.6" x2="201.6" y2="684.8" stroke="#d0201a" stroke-width="2.5"><title>action 35 tag 2</title></line>
+<line x1="198.4" y1="684.8" x2="249.6" y2="684.8" stroke="#d0201a" stroke-width="2.5"><title>action 35 tag 2</title></line>
+<line x1="249.6" y1="684.8" x2="249.6" y2="633.6" stroke="#d0201a" stroke-width="2.5"><title>action 35 tag 2</title></line>
+<line x1="249.6" y1="633.6" x2="198.4" y2="633.6" stroke="#d0201a" stroke-width="2.5"><title>action 35 tag 2</title></line>
+<line x1="198.4" y1="633.6" x2="198.4" y2="684.8" stroke="#d0201a" stroke-width="2.5"><title>action 35 tag 2</title></line>
 <line x1="134.4" y1="723.2" x2="172.8" y2="723.2" stroke="#777" stroke-width="0.6"/>
 <line x1="172.8" y1="723.2" x2="172.8" y2="684.8" stroke="#777" stroke-width="0.6"/>
 <line x1="172.8" y1="684.8" x2="134.4" y2="684.8" stroke="#777" stroke-width="0.6"/>
@@ -381,10 +381,10 @@
 <line x1="320.0" y1="633.6" x2="320.0" y2="595.2" stroke="#777" stroke-width="0.6"/>
 <line x1="320.0" y1="595.2" x2="281.6" y2="595.2" stroke="#777" stroke-width="0.6"/>
 <line x1="281.6" y1="595.2" x2="281.6" y2="633.6" stroke="#777" stroke-width="0.6"/>
-<line x1="214.4" y1="672.0" x2="240.0" y2="672.0" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 3</title></line>
-<line x1="240.0" y1="672.0" x2="240.0" y2="646.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 3</title></line>
-<line x1="240.0" y1="646.4" x2="214.4" y2="646.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 3</title></line>
-<line x1="214.4" y1="646.4" x2="214.4" y2="672.0" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 3</title></line>
+<line x1="211.2" y1="672.0" x2="236.8" y2="672.0" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 3</title></line>
+<line x1="236.8" y1="672.0" x2="236.8" y2="646.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 3</title></line>
+<line x1="236.8" y1="646.4" x2="211.2" y2="646.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 3</title></line>
+<line x1="211.2" y1="646.4" x2="211.2" y2="672.0" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 3</title></line>
 <line x1="102.4" y1="633.6" x2="108.8" y2="633.6" stroke="#111" stroke-width="1.6"/>
 <line x1="108.8" y1="684.8" x2="102.4" y2="684.8" stroke="#111" stroke-width="1.6"/>
 <line x1="102.4" y1="633.6" x2="102.4" y2="684.8" stroke="#777" stroke-width="0.6"/>
@@ -618,8 +618,8 @@
 <text x="99.2" y="940.8" font-size="9" text-anchor="middle" fill="#333">sec1 0</text>
 <text x="313.6" y="787.2" font-size="9" text-anchor="middle" fill="#333">pland 48</text>
 <text x="252.8" y="662.4" font-size="9" text-anchor="middle" fill="#333">tank 48 t2</text>
-<text x="211.2" y="662.4" font-size="9" text-anchor="middle" fill="#333">ring_b 48 t2</text>
-<text x="227.2" y="659.2" font-size="9" text-anchor="middle" fill="#333">ped_b 72</text>
+<text x="208.0" y="662.4" font-size="9" text-anchor="middle" fill="#333">ring_b 48 t2</text>
+<text x="224.0" y="659.2" font-size="9" text-anchor="middle" fill="#333">ped_b 72</text>
 <text x="153.6" y="704.0" font-size="9" text-anchor="middle" fill="#333">pool0 32</text>
 <text x="300.8" y="704.0" font-size="9" text-anchor="middle" fill="#333">pool1 32</text>
 <text x="153.6" y="614.4" font-size="9" text-anchor="middle" fill="#333">pool2 32</text>
@@ -707,7 +707,7 @@
 <circle cx="288.0" cy="582.4" r="8.0" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 3004 skills emha</title></circle>
 <circle cx="160.0" cy="582.4" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 9 skills mha</title></circle>
 <circle cx="121.6" cy="736.0" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3001 skills ha</title></circle>
-<rect x="223.2" y="655.2" width="8" height="8" fill="#2255ff" stroke="#000"/>
+<rect x="220.0" y="655.2" width="8" height="8" fill="#2255ff" stroke="#000"/>
 <circle cx="320.0" cy="736.0" r="2.5" fill="#1f6fd0"/>
 <circle cx="320.0" cy="582.4" r="2.5" fill="#1f6fd0"/>
 <circle cx="121.6" cy="582.4" r="2.5" fill="#1f6fd0"/>

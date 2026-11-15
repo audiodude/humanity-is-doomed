@@ -5,7 +5,7 @@ from conftest import module, needs_iwad
 from levels import build, checks
 from levels.doom2 import BLUEKEY, DAMAGE_5, DEMON, DR_BLUE, DR_DOOR, PLAYER1, S1_DOOR_OPEN, S1_EXIT, W1_EXIT
 from levels.mapgen import compile_level
-from levels.model import Line, LevelError, Sector, Special, Thing, door, load, rect
+from levels.model import Line, LevelError, Sector, Special, Thing, door, load, pedestal, rect
 
 pytestmark = needs_iwad("doom2")
 SEALED = "DEMON at 592,256 in closet can't be reached and can't come to the player"
@@ -94,3 +94,21 @@ def test_style_findings_fail_our_maps_but_only_warn_on_imported_ones(tmp_path, c
         build(pit_map(), check_only=True, wad=out)
     build(pit_map(IMPORTED=True), check_only=True, wad=out)
     assert "warning: damaging floor pool" in capsys.readouterr().out
+
+
+def pedestal_map(box, flat):
+    return module(
+        SECTORS=[Sector("room", [rect(0, 0, 512, 512), rect(*box)], 0, 128, "FLOOR4_8", "CEIL3_5", 160, "STARTAN3"),
+                 pedestal("ped", box, 16, 128, "STARTAN3", "CEIL3_5", flat=flat)],
+        FREE_LINES={((256, 400), (320, 400)): Special(W1_EXIT)}, THINGS=[Thing(PLAYER1, 64, 64)])
+
+
+@pytest.mark.parametrize("box, flat, problem", [
+    ((256, 192, 320, 256), "TLITE6_1", None),                  # on the 64 grid: one whole diamond, centred
+    ((288, 192, 352, 256), "TLITE6_1", "cut by its edge"),     # half a tile off: the diamond in halves
+    ((272, 192, 336, 256), "TLITE6_1", "off-centre"),          # 16 off: whole, but against one side
+    ((288, 192, 352, 256), "TLITE6_6", None),                  # four lamps, whole on the 32 grid
+])
+def test_a_light_floor_shows_its_lights_whole_and_centred(box, flat, problem):
+    found = [s for s in findings(pedestal_map(box, flat)).style if "lights are" in s]
+    assert (not found) if problem is None else (len(found) == 1 and problem in found[0])

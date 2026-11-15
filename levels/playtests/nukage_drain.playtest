@@ -67,7 +67,7 @@ open -880 1856
 
 # North hall: the yellow key opens two closets; pump 2 raises the north walkway.
 open -488 1856
-walk 96 1984
+walk 96 1952
 expect has YellowCard
 look 90
 shot north-hall

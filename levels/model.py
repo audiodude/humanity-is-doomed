@@ -523,8 +523,9 @@ def closet(name, at, facing, tag, *, face, flat, wall, floor=0, width=160, depth
 def pedestal(name, box, floor, ceil, wall, ctex, *, flat="TLITE6_1", glow=True) -> Sector:
     """A lit pedestal for a key, weapon or power-up, with metal sides; its
     top is `floor`. Stand it clear of the room's walls and build() cuts it
-    out of the room. Put a W1 trigger on its edge (SPECIAL_BETWEEN with the
-    room) to make taking the item spring a trap."""
+    out of the room. Put its edges on multiples of 64 so TLITE6_1's diamond
+    sits whole in its middle (the build checks it). Put a W1 trigger on its
+    edge (SPECIAL_BETWEEN with the room) to make taking the item spring a trap."""
     return Sector(name, [rect(*box)], floor, ceil, flat, ctex, 240, wall, lower="METAL",
                   special=LIGHT_GLOW if glow else 0)
 

@@ -85,7 +85,7 @@ TUBS = [(2496, y, 2688, y + 192) for y in (1600, 1920, 2240)]
 # The east bank, round the sampling shed and the shore step.
 eb_loop = [(2304, 704), (2944, 704), (2944, 960), (2752, 960), (2752, 1216), (2944, 1216), (2944, 1408),
            (2304, 1408), (2304, 1344), (2368, 1344), (2368, 768), (2304, 768)]
-SUIT_PED = (2400, 800, 2464, 864)
+SUIT_PED = (2432, 832, 2496, 896)
 
 # The basin, round the wade strip; the island stands free in it.
 sb_loop = [(768, 704), (1792, 704), (1792, 896), (2304, 896), (2304, 1920), (768, 1920)]
@@ -148,7 +148,8 @@ SECTORS = [
              special=DAMAGE_5) for i, y in enumerate((1088, 1344))],
     *[Sector(f"plinth{i}", [r], 24, 176, "FLAT23", "CEIL5_2", 96, "PIPE2", lower="PIPES")
       for i, r in enumerate(PLINTHS)],
-    Sector("column", [COLUMN], 56, 176, "TLITE6_1", "CEIL5_2", 208, "PIPE2", lower="PIPES", tag=TAG_COL,
+    # TLITE6_6: the column is half a tile off the 64 grid (it can't move: the channels and the jump from the lift).
+    Sector("column", [COLUMN], 56, 176, "TLITE6_6", "CEIL5_2", 208, "PIPE2", lower="PIPES", tag=TAG_COL,
            special=LIGHT_GLOW),
     *closet("kcl", (320, 1920), "n", TAG_KCL, face=BASE, flat="SLIME14", wall=BASE, floor=72, width=160,
             depth=128, ctex="CEIL3_5"),
@@ -185,8 +186,8 @@ SECTORS = [
     # Secret 3: a shifted screen in the annex, a lift up to the lit alcove over the hall.
     door("d_s3", rect(1600, 2880, 1616, 2944), face="COMPSTA2", track="COMPSTA2", flat="FLAT14"),
     Sector("s3r", [rect(1472, 2848, 1600, 2976)], 0, 128, "FLAT14", "CEIL5_1", 128, "COMPSTA2"),
-    lift("s3l", (1344, 2848, 1472, 2912), 192, 288, TAG_S3, "CEIL5_1", 160, "COMPSTA2", ftex="TLITE6_1"),
-    Sector("al", [rect(1344, 2752, 1472, 2848)], 192, 288, "TLITE6_1", "CEIL5_1", 240, "COMPSTA2",
+    lift("s3l", (1344, 2848, 1472, 2912), 192, 288, TAG_S3, "CEIL5_1", 160, "COMPSTA2", ftex="TLITE6_6"),
+    Sector("al", [rect(1344, 2752, 1472, 2848)], 192, 288, "TLITE6_6", "CEIL5_1", 240, "COMPSTA2",
            lower="BROWN144", special=SECRET_AREA),
 
     # ------------------------------------------------ filter house
@@ -241,7 +242,7 @@ SECTORS = [
     Sector("ev", [rect(1424, 320, 1728, 688)], 0, 128, "FLOOR1_7", "TLITE6_5", 224, "SHAWN2",
            special=LIGHT_GLOW),
     sw_bl_niche,
-    Sector("ev_console", [rect(1504, 560, 1520, 592)], 72, 128, "TLITE6_5", "TLITE6_5", 255, "LITE5"),
+    Sector("ev_console", [rect(1504, 560, 1520, 592)], 72, 128, "CONS1_5", "TLITE6_5", 255, "LITE5"),
     Sector("ev_sign", [rect(1472, 544, 1488, 608)], 0, 112, "FLOOR1_7", "TLITE6_5", 255, "SHAWN2"),
 ]
 
@@ -410,7 +411,7 @@ THINGS = [Thing(*t) for t in [
     (FATSO, 2848, 832, 180, "mha"), (IMP, 2848, 832, 180, "ea"),
     (IMP, 2592, 1344, 180, "emha"), (IMP, 2656, 800, 180, "mha"), (IMP, 2560, 1024, 180, "ha"),
     (CACO, 2016, 1280, 0, "emha"), (CACO, 1600, 1728, 0, "ha"),
-    (RADSUIT, 2432, 832), (ROCKETBOX, 2880, 1376), (MEDI, 2400, 1376),
+    (RADSUIT, 2464, 864), (ROCKETBOX, 2880, 1376), (MEDI, 2400, 1376),
     (STIM, 2848, 1120), (SHELLS, 2848, 1040),                                          # sampling shed
     (SOUL, 3008, 1088),                                                                # secret 4
     # the basin: the megasphere on the island, armor bonuses round it

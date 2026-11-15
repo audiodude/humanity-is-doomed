@@ -1,6 +1,6 @@
 # The level builder
 
-`levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All nine maps in `NUKAGE.WAD` came out of it, and the [decompiler](#decompiling-existing-maps) turns any Doom-format map back into this form.
+`levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the linedefs, sidedefs and texture alignment, checks that the map is actually playable, and writes it into a WAD with a top-down preview. All eight maps in `NUKAGE.WAD` came out of it, and the [decompiler](#decompiling-existing-maps) turns any Doom-format map back into this form.
 
 ## Building a map
 
@@ -13,7 +13,7 @@ python3 -m levels nukage_tower_original                   # in no set: wads/scra
 python3 -m levels nukage_drain --wad TEST.WAD --map MAP12 # anywhere else: wads/TEST.WAD, MAP12
 ```
 
-Which WAD a map goes in, and in which slot, belongs to its set, not to the map. `levels/sets/<set>.py` lists one WAD's maps by slot (`levels/sets/nukage.py` is `NUKAGE.WAD`'s running order), so reordering a WAD is an edit to that list. A set can also give a slot `UMAPINFO` lines of its own, whichever map is in it: NUKAGE gives MAP06 `intertext = clear` and MAP09 the ending. A map's `UMAPINFO` without `music` or `next` gets its slot's (the spec's defaults), so a moved map plays its new slot's DOOM II track and the maps chain in slot order. A module in no set builds to its own scratch WAD, `wads/scratch/<module>.WAD` (gitignored), as MAP01, and skips the slot checks below because it isn't in its slot; `--wad`/`--map` put it anywhere, with them.
+Which WAD a map goes in, and in which slot, belongs to its set, not to the map. `levels/sets/<set>.py` lists one WAD's maps by slot (`levels/sets/nukage.py` is `NUKAGE.WAD`'s running order), so reordering a WAD is an edit to that list. A set can also give a slot `UMAPINFO` lines of its own, whichever map is in it: NUKAGE gives MAP06 `intertext = clear` and MAP08 the ending. A map's `UMAPINFO` without `music` or `next` gets its slot's (the spec's defaults), so a moved map plays its new slot's DOOM II track and the maps chain in slot order. A module in no set builds to its own scratch WAD, `wads/scratch/<module>.WAD` (gitignored), as MAP01, and skips the slot checks below because it isn't in its slot; `--wad`/`--map` put it anywhere, with them.
 
 To rebuild a whole WAD, build each map in its set: `for m in $(python3 -c "import levels.sets.nukage as s; print(*s.MAPS.values())"); do python3 -m levels $m; done`.
 
@@ -37,6 +37,7 @@ Findings come in two kinds. **Playability** findings fail every build:
 **Style** findings fail our own maps; in an imported map (`IMPORTED = True`) they are warnings:
 - Damaging floors sit lower than every neighbouring floor that isn't damaging.
 - Pictures such as switches and door faces fit their wall exactly. Bars and fences can't use textures built from overlapping patches, which vanilla draws as garbage on two-sided lines (the medusa effect).
+- A floor in a spot-light flat (TLITE6_1 and TLITE6_4's diamond, TLITE6_5 and TLITE6_6's four lamps) shows its lights whole and centred. Flats are pinned to the world's 64 grid, so a pedestal half a tile off it shows its diamond in pieces, and one 16 off shows it against one side. A TLITE6_1 pedestal needs its edges on multiples of 64. One that has to stay centred on a multiple of 32 can take `flat="TLITE6_6"`, whose lamps are whole on the 32 grid.
 - The exit can be reached without a running jump. Jumps only count when the exit can't be reached any other way.
 
 Textures vanilla can't tile cleanly, and line actions or thing types that aren't vanilla, get a warning. So does anything the engine does by map slot that the map doesn't account for (`levels/checks.py` `check_slot`, from id's source and the UMAPINFO spec). A scratch build only gets its `UMAPINFO` checked (the quoted `"clear"` below):
@@ -87,7 +88,7 @@ Three skills in `.omp/skills/` (linked as `.claude/skills/` for Claude Code) tak
 - `doom-build`: turn the doc into a level module that builds clean and matches it, with the builder's known gotchas.
 - `doom-test`: route script, wiring run, screenshots, and combat-bot runs on three seeds, with each death cluster called as a map or bot problem.
 
-They came out of four timed rounds of agents building maps from scratch: the six maps in `SPEEDY1.WAD`, built from feature checklists, all came out as the same hub with a wing per key, while the six in `SPEEDY2.WAD`, each built around a layout idea, didn't.
+They came out of four timed rounds of agents building maps from scratch, all twelve now in `SPEEDY.WAD`: the six in MAP01–MAP06, built from feature checklists, all came out as the same hub with a wing per key, while the six in MAP07–MAP12, each built around a layout idea, didn't.
 
 Agents choose textures by name unless they can see them, which is how a map ends up a collage. `scripts/tools/texture_sheets.py` renders the IWAD's wall textures (grouped into families by name, border textures labelled in yellow) and flats onto contact sheets in `/tmp/texture-sheets/<iwad>/`, with an `index.txt` of which sheet holds which family. The design skill has the agent look at them before writing the doc's materials plan:
 

@@ -35,7 +35,7 @@ walk 768 928                      # door shuts, it runs straight at the door and
 walk 776 800 864 800              # round the pedestal: the key comes after the window
 look 270 25
 shot control-window
-walk 864 896
+walk 864 864
 expect has BlueCard
 wait 70
 expect ceil 784 1224 > 200

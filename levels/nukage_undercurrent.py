@@ -148,7 +148,7 @@ SECTORS = [
     Sector("desk", [rect(752, 992, 912, 1024)], 216, 304, "CONS1_1", "TLITE6_1", 192, CTRL, lower="COMPSTA2"),
     Sector("cr_back", [[(752, 1024), (912, 1024), (912, 992), (976, 992), (976, 1088), (752, 1088)]], 176, 304,
            F_CTRL, "TLITE6_1", 192, CTRL, lower="COMPSTA1"),
-    pedestal("ped_b", (832, 864, 896, 928), 200, 304, CTRL, "TLITE6_1"),
+    pedestal("ped_b", (832, 832, 896, 896), 200, 304, CTRL, "TLITE6_1"),
     # ... secret 2: a server room behind a lit panel in the corridor's west wall
     *doorway("d_sr", (576, 1024), "w", 64, far_alcove=8, floor=GANTRY, face=CONN, track="LITE5", flat=F_CONN,
              alcove_wall="LITE5", alcove_flat=F_CONN),
@@ -291,7 +291,7 @@ THINGS = [Thing(*t) for t in [
     # annex
     (IMP, 640, 760, 90, "emh"), (IMP, 640, 1150, 270, "mha"),
     (SARGE, 790, 1056, 270, "emh"), (SARGE, 940, 1056, 270, "mh"), (CHAINGUY, 860, 1056, 270, "h"),
-    (BLUEKEY, 864, 896), (CHAINGUN, 760, 800), (CLIP, 960, 800), (MEDI, 768, 896),
+    (BLUEKEY, 864, 864), (CHAINGUN, 760, 800), (CLIP, 960, 800), (MEDI, 768, 896),
     (DEMON, 784, 1296, 270, "emh"), (DEMON, 944, 1296, 270, "mh"),
     # switchgear vault
     (CACO, 1300, 1100, 180, "mh"), (IMP, 1240, 1000, 90, "emh"), (IMP, 1380, 1180, 180, "h"),

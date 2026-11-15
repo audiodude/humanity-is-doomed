@@ -44,7 +44,7 @@ SKYC, RIVER = 256, -96                                   # outdoor ceiling, cana
 
 housing = [(512, 608), (576, 672), (512, 736), (448, 672)]   # diamond-shaped pump housing
 pump_s, pump_n = rect(-704, 832, -576, 960), rect(-640, 1536, -512, 1664)
-ped_b, ped_r, plat_se = (-832, 1568, -704, 1696), (1344, 640, 1472, 768), rect(1600, 576, 1728, 768)
+ped_b, ped_r, plat_se = (-832, 1536, -704, 1664), (1344, 640, 1472, 768), rect(1600, 576, 1728, 768)
 ped_s = (416, 1096, 480, 1144)   # soulsphere pedestal, visible over the parapets from the start
 crates_n = [rect(1248, 1616, 1312, 1680), rect(832, 1696, 896, 1760)]
 crates_f = [rect(-288, 2288, -224, 2352), rect(32, 2176, 96, 2240), rect(-96, 2320, -32, 2384)]
@@ -132,7 +132,7 @@ SECTORS = [
     Sector("island", [[(320, 1088), (576, 1088), (576, 1216), (512, 1216), (512, 1152), (384, 1152),
                        (384, 1216), (320, 1216)], rect(*ped_s)], 8, SKYC, "FLAT5_4", SKY, 224, "SILVER2",
            lower="METAL", special=SECRET_AREA),
-    pedestal("ped_s", ped_s, 32, SKYC, "SILVER2", SKY),
+    pedestal("ped_s", ped_s, 32, SKYC, "SILVER2", SKY, flat="TLITE6_6"),
     lift("lift_i", (384, 1152, 512, 1216), 96, SKYC, TAG_ILIFT, SKY, 208, "SILVER2", ftex="FLAT23", walk_on=True),
     Sector("pier", [rect(384, 1216, 512, 1408)], 96, SKYC, "FLAT23", SKY, 208, "SILVER2", lower="SUPPORT3"),
 
@@ -239,7 +239,7 @@ THINGS = [Thing(*t) for t in [
     (CHAINGUY, -576, 1600, 180, "ha"), (SARGE, -576, 1600, 180, "ma"),
     (CHAINGUN, -960, 896), (SHELLS, -1056, 864), (MEDI, -512, 1000),
     (RADSUIT, -960, 1088), (STIM, -1088, 1344), (SHELLS, -1088, 1504), (CLIP, -512, 1472),
-    (BLUEKEY, -768, 1632),
+    (BLUEKEY, -768, 1600),
     # pump hall closet (opens when you step onto the blue key's pedestal)
     (DEMON, -1232, 1152), (DEMON, -1232, 1280, 0, "mh"), (IMP, -1200, 1216, 0, "mh"),
     (SPECTRE, -1296, 1216, 0, "h"),

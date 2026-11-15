@@ -72,7 +72,7 @@ def findings(level, compiled) -> Findings:
         md, res = solve(m, (sizes, next(iter(sizes.values()))[1] if sizes else 0), boss)
         found.reach = (m, md, res)
         check_reach(level, md, res, names, found)
-    found.style += check_hazards(level, compiled.lines)
+    found.style += check_hazards(level, compiled.lines) + check_light_floors(compiled.lines)
     return found
 
 
@@ -361,6 +361,64 @@ def check_hazards(level, lines):
             if n.floor <= h.floor:
                 bad.add((h.name, h.floor, n.name, n.floor))
     return [f"damaging floor {h} ({hf}) isn't below its neighbour {n} ({nf})" for h, hf, n, nf in sorted(bad)]
+
+
+# Light flats whose lights are spots on a dark field: (grid the pattern repeats on, each spot's pixel box
+# u1, v1, u2, v2 in the 64x64 flat, measured in doom2.wad). Flats are pinned to the world, pixel
+# (x mod 64, -y mod 64) (R_MapPlane), so a floor edge off that grid can run through a light, and a
+# floor whose middle is off the pattern's middle shows its lights off-centre.
+SPOT_LIGHTS = {
+    "TLITE6_1": (64, [(18, 18, 45, 45)]),   # one diamond in the middle of the tile
+    "TLITE6_4": (64, [(18, 18, 45, 45)]),
+    "TLITE6_5": (32, [(u, v, u + 10, v + 10) for u in (11, 43) for v in (11, 43)]),   # four lamps
+    "TLITE6_6": (32, [(u, v, u + 10, v + 10) for u in (11, 43) for v in (11, 43)]),
+}
+
+
+def cuts_spot(p, q, spots):
+    """Whether segment p-q runs through the inside of a spot. Pixel box u1..u2
+    covers u1 <= u < u2 + 1, so an edge along a spot's border leaves it whole."""
+    (x1, y1), (x2, y2) = p, q
+    n = max(1, round(4 * max(abs(x2 - x1), abs(y2 - y1))))
+    for i in range(n + 1):
+        u, v = (x1 + (x2 - x1) * i / n) % 64, -(y1 + (y2 - y1) * i / n) % 64
+        if any(u1 < u < u2 + 1 and v1 < v < v2 + 1 for u1, v1, u2, v2 in spots):
+            return True
+    return False
+
+
+def check_light_floors(lines):
+    """A floor in a spot-light flat (TLITE6_1's diamond, TLITE6_5's four
+    lamps) shows its lights whole and centred: no edge where the floor ends
+    (a wall, a step, another flat, a floor that moves) runs through one, and
+    the box of those edges is centred on the pattern (a multiple of half its
+    grid), so a pedestal's diamond sits in its middle."""
+    movers = floor_movers(lines)
+    edges_of, cut = defaultdict(list), defaultdict(list)
+    for l in lines:
+        for s in (l.front, l.back):
+            if s is None or s.ftex not in SPOT_LIGHTS:
+                continue
+            o = l.other(s)
+            if o is s or (o is not None and o.ftex == s.ftex
+                          and floor_range(o, lines, movers) == floor_range(s, lines, movers) == (s.floor, s.floor)):
+                continue
+            edges_of[s].append(l)
+            if cuts_spot(l.v1, l.v2, SPOT_LIGHTS[s.ftex][1]):
+                cut[s].append(l)
+    out = []
+    for s, ls in edges_of.items():
+        grid = SPOT_LIGHTS[s.ftex][0]
+        xs, ys = [p[0] for l in ls for p in (l.v1, l.v2)], [p[1] for l in ls for p in (l.v1, l.v2)]
+        box = (min(xs), min(ys), max(xs), max(ys))
+        fix = f"flats are pinned to the 64 grid, so put its edges on multiples of {grid}"
+        if cut[s]:
+            more = f" (+{len(cut[s]) - 1} more)" if len(cut[s]) > 1 else ""
+            out.append(f"{s.name}: its {s.ftex} floor's lights are cut by its edge {cut[s][0].v1}-{cut[s][0].v2}"
+                       f"{more}; {fix}")
+        elif (box[0] + box[2]) % grid or (box[1] + box[3]) % grid:
+            out.append(f"{s.name}: its {s.ftex} floor's lights are off-centre in its box {box}; {fix}")
+    return out
 
 
 def check_textures(level, lines, sides, iwad, found):

@@ -42,18 +42,18 @@ W_WALL, E_WALL = "BROWN1", "TEKWALL6"   # the two paths' materials
 
 # The pit between the antechambers, notched at its south-east corner for
 # the secret lift and island.
-pit = [(-192, 640), (112, 640), (112, 816), (192, 816), (192, 1264), (-192, 1264)]
-ped_s = rect(136, 752, 168, 784)
+pit = [(-192, 640), (112, 640), (112, 832), (192, 832), (192, 1264), (-192, 1264)]
+ped_s = rect(144, 784, 176, 816)
 
 w_pool, w_tank = rect(-1280, 736, -1120, 896), rect(-1056, 960, -896, 1120)
-ped_r = rect(-1152, 1632, -1088, 1696)
+ped_r = rect(-1152, 1664, -1088, 1728)
 
 yard = [(496, 128), (1216, 128), (1216, 704), (688, 704), (688, 640), (496, 640)]
 e_pool = rect(736, 320, 992, 512)
 lab_pillars = [rect(896, 880, 992, 944), rect(1184, 992, 1248, 1120), rect(960, 1184, 1088, 1248),
                rect(1248, 1248, 1312, 1312)]
 s_pools = [rect(960, 1536, 1088, 1664), rect(1216, 1664, 1344, 1792)]
-ped_b = rect(1120, 1728, 1184, 1792)
+ped_b = rect(1088, 1728, 1152, 1792)
 
 arena = [(-704, 1280), (704, 1280), (704, 1984), (128, 1984), (128, 1856), (-128, 1856), (-128, 1984),
          (-704, 1984)]
@@ -70,7 +70,7 @@ SECTORS = [
          flat="FLOOR4_8"),
     Sector("p_land", [rect(112, 592, 192, 640)], -16, 112, "FLOOR4_8", "CEIL5_1", 96, "STARGR2"),
     lift("p_lift", (112, 640, 192, 720), -16, SKYC, TAG_PLIFT, SKY, 160, "SUPPORT3", ftex="FLAT23"),
-    Sector("p_isle", [rect(112, 720, 192, 816), ped_s], -40, SKYC, "FLAT5_4", SKY, 208, "SUPPORT3",
+    Sector("p_isle", [rect(112, 720, 192, 832), ped_s], -40, SKYC, "FLAT5_4", SKY, 208, "SUPPORT3",
            lower="METAL", special=SECRET_AREA),
     Sector("p_ped", [ped_s], -24, SKYC, "TLITE6_1", SKY, 240, "SUPPORT3", lower="METAL", special=LIGHT_GLOW),
     Sector("pit", [pit], -64, SKYC, "NUKAGE1", SKY, 160, "SUPPORT3", special=DAMAGE_5),
@@ -195,7 +195,7 @@ THINGS = [Thing(*t) for t in [
     # fork hall: at range, facing away
     (ZOMBIE, -320, 480, 90), (ZOMBIE, 320, 480, 90, "mh"), (SARGE, -192, 520, 90, "h"),
     (SHELLS, -256, 320), (STIM, 256, 320),
-    (SOUL, 152, 768),                                                           # secret: pit island
+    (SOUL, 160, 800),                                                           # secret: pit island
     # west: pipe corridor (dark)
     (IMP, -920, 416, 0, "emha"), (ZOMBIE, -700, 360, 0, "mh"), (SARGE, -800, 470, 0, "emha"),
     (SPECTRE, -620, 430, 0, "h"),
@@ -210,7 +210,7 @@ THINGS = [Thing(*t) for t in [
     # west: the loft
     (SARGE, -1300, 1450, 90, "emha"), (IMP, -880, 1720, 180, "emha"), (IMP, -1000, 1430, 90, "mha"),
     (CACO, -1150, 1500, 270, "h"), (CHAINGUY, -1350, 1740, 0, "ha"),
-    (REDKEY, -1120, 1664), (MEDI, -880, 1400), (SHELLS, -1360, 1680),
+    (REDKEY, -1120, 1696), (MEDI, -880, 1400), (SHELLS, -1360, 1680),
     (LAUNCHER, -1488, 1536), (ROCKETBOX, -1488, 1500),                       # secret: loft closet
     # west antechamber
     (IMP, -300, 1150, 180, "emha"), (SARGE, -640, 770, 0, "mha"), (CHAINGUY, -620, 1150, 270, "ha"),
@@ -228,7 +228,7 @@ THINGS = [Thing(*t) for t in [
     (BACKPACK, 832, 1464), (SHELLS, 800, 1464),                                 # secret: lab closet
     # east: the sump
     (IMP, 1000, 1800, 270, "emha"), (SARGE, 1350, 1520, 90, "mha"), (KNIGHT, 1340, 1800, 180, "h"),
-    (BLUEKEY, 1152, 1760), (MEDI, 940, 1500), (SHELLS, 1180, 1520),
+    (BLUEKEY, 1120, 1760), (MEDI, 940, 1500), (SHELLS, 1180, 1520),
     # lab and sump closets, opened by the blue key
     (DEMON, 1504, 1088, 180), (IMP, 1550, 1140, 180, "mh"), (SHELLS, 1460, 1140),
     (IMP, 1504, 1620, 180), (KNIGHT, 1504, 1700, 180, "h"), (SHELLS, 1560, 1700),

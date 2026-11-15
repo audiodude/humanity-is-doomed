@@ -33,7 +33,7 @@
 <path d="M230.4,896.0 L294.4,896.0 L294.4,838.4 L230.4,838.4 Z" fill="#c9a0f0" fill-rule="evenodd"><title>w_sec: floor 40 ceil 136 FLOOR3_3/CEIL5_2 light 144</title></path>
 <path d="M236.8,768.0 L288.0,768.0 L288.0,755.2 L236.8,755.2 Z" fill="rgb(183,183,183)" fill-rule="evenodd"><title>w_arch: floor 40 ceil 168 FLOOR3_3/CEIL5_2 light 112</title></path>
 <path d="M108.8,755.2 L339.2,755.2 L339.2,601.6 L294.4,601.6 L294.4,563.2 L339.2,563.2 L339.2,486.4 L262.4,486.4 L262.4,524.8 L108.8,524.8 Z M249.6,640.0 L275.2,640.0 L275.2,614.4 L249.6,614.4 Z M160.0,691.2 L198.4,691.2 L198.4,652.8 L160.0,652.8 Z M160.0,588.8 L198.4,588.8 L198.4,550.4 L160.0,550.4 Z" fill="rgb(183,183,183)" fill-rule="evenodd"><title>w_pump: floor 40 ceil 232 FLOOR3_3/CEIL5_2 light 144</title></path>
-<path d="M249.6,640.0 L275.2,640.0 L275.2,614.4 L249.6,614.4 Z" fill="rgb(192,192,192)" fill-rule="evenodd"><title>ped_ssg: floor 56 ceil 232 TLITE6_1/CEIL5_2 light 240</title></path>
+<path d="M249.6,640.0 L275.2,640.0 L275.2,614.4 L249.6,614.4 Z" fill="rgb(192,192,192)" fill-rule="evenodd"><title>ped_ssg: floor 56 ceil 232 TLITE6_6/CEIL5_2 light 240</title></path>
 <path d="M249.6,524.8 L262.4,524.8 L262.4,486.4 L249.6,486.4 Z" fill="rgb(192,192,192)" fill-rule="evenodd"><title>wgst1: floor 56 ceil 232 FLOOR3_3/CEIL5_2 light 160</title></path>
 <path d="M236.8,524.8 L249.6,524.8 L249.6,486.4 L236.8,486.4 Z" fill="rgb(202,202,202)" fill-rule="evenodd"><title>wgst2: floor 72 ceil 232 FLOOR3_3/CEIL5_2 light 160</title></path>
 <path d="M224.0,524.8 L236.8,524.8 L236.8,486.4 L224.0,486.4 Z" fill="rgb(211,211,211)" fill-rule="evenodd"><title>wgst3: floor 88 ceil 232 FLOOR3_3/CEIL5_2 light 160</title></path>
@@ -53,9 +53,9 @@
 <path d="M467.2,256.0 L476.8,256.0 L476.8,204.8 L467.2,204.8 Z" fill="rgb(183,183,183)" fill-rule="evenodd"><title>d_nhall_alcove: floor 40 ceil 168 FLOOR0_3/CEIL5_1 light 176</title></path>
 <path d="M476.8,256.0 L483.2,256.0 L483.2,204.8 L476.8,204.8 Z" fill="#a0703c" fill-rule="evenodd"><title>d_nhall: floor 40 ceil 40 FLOOR0_3/FLAT20 light 144</title></path>
 <path d="M483.2,256.0 L492.8,256.0 L492.8,204.8 L483.2,204.8 Z" fill="rgb(183,183,183)" fill-rule="evenodd"><title>d_nhall_far: floor 40 ceil 168 FLOOR0_3/CEIL5_1 light 176</title></path>
-<path d="M492.8,268.8 L755.2,268.8 L755.2,224.0 L793.6,224.0 L793.6,268.8 L876.8,268.8 L876.8,38.4 L774.4,38.4 L774.4,89.6 L569.6,89.6 L569.6,38.4 L492.8,38.4 Z M697.6,192.0 L723.2,192.0 L723.2,166.4 L697.6,166.4 Z M544.0,192.0 L582.4,192.0 L582.4,153.6 L544.0,153.6 Z M787.2,192.0 L825.6,192.0 L825.6,153.6 L787.2,153.6 Z" fill="rgb(183,183,183)" fill-rule="evenodd"><title>n_hall: floor 40 ceil 296 FLOOR0_3/CEIL5_1 light 176</title></path>
+<path d="M492.8,268.8 L755.2,268.8 L755.2,224.0 L793.6,224.0 L793.6,268.8 L876.8,268.8 L876.8,38.4 L774.4,38.4 L774.4,89.6 L569.6,89.6 L569.6,38.4 L492.8,38.4 Z M697.6,204.8 L723.2,204.8 L723.2,179.2 L697.6,179.2 Z M544.0,192.0 L582.4,192.0 L582.4,153.6 L544.0,153.6 Z M787.2,192.0 L825.6,192.0 L825.6,153.6 L787.2,153.6 Z" fill="rgb(183,183,183)" fill-rule="evenodd"><title>n_hall: floor 40 ceil 296 FLOOR0_3/CEIL5_1 light 176</title></path>
 <path d="M569.6,89.6 L774.4,89.6 L774.4,38.4 L569.6,38.4 Z" fill="rgb(240,240,240)" fill-rule="evenodd"><title>n_ledge: floor 136 ceil 296 FLOOR0_3/CEIL5_1 light 208</title></path>
-<path d="M697.6,192.0 L723.2,192.0 L723.2,166.4 L697.6,166.4 Z" fill="rgb(192,192,192)" fill-rule="evenodd"><title>ped_y: floor 56 ceil 296 TLITE6_1/CEIL5_1 light 240</title></path>
+<path d="M697.6,204.8 L723.2,204.8 L723.2,179.2 L697.6,179.2 Z" fill="rgb(192,192,192)" fill-rule="evenodd"><title>ped_y: floor 56 ceil 296 TLITE6_1/CEIL5_1 light 240</title></path>
 <path d="M672.0,294.4 L748.8,294.4 L748.8,268.8 L672.0,268.8 Z" fill="rgb(183,183,183)" fill-rule="evenodd"><title>w_nwin: floor 40 ceil 184 FLOOR0_3/CEIL5_1 light 176</title></path>
 <path d="M761.6,268.8 L787.2,268.8 L787.2,224.0 L761.6,224.0 Z" fill="rgb(187,187,187)" fill-rule="evenodd"><title>niche_n: floor 48 ceil 176 FLAT23/CEIL5_1 light 176</title></path>
 <path d="M876.8,230.4 L883.2,230.4 L883.2,179.2 L876.8,179.2 Z" fill="#a0703c" fill-rule="evenodd"><title>d_ncl1: floor 40 ceil 40 FLOOR0_3/FLAT20 light 144 tag 5</title></path>
@@ -355,10 +355,10 @@
 <line x1="672.0" y1="268.8" x2="492.8" y2="268.8" stroke="#111" stroke-width="1.6"/>
 <line x1="492.8" y1="268.8" x2="492.8" y2="256.0" stroke="#111" stroke-width="1.6"/>
 <line x1="492.8" y1="204.8" x2="492.8" y2="38.4" stroke="#111" stroke-width="1.6"/>
-<line x1="697.6" y1="192.0" x2="723.2" y2="192.0" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 5</title></line>
-<line x1="723.2" y1="192.0" x2="723.2" y2="166.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 5</title></line>
-<line x1="723.2" y1="166.4" x2="697.6" y2="166.4" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 5</title></line>
-<line x1="697.6" y1="166.4" x2="697.6" y2="192.0" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 5</title></line>
+<line x1="697.6" y1="204.8" x2="723.2" y2="204.8" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 5</title></line>
+<line x1="723.2" y1="204.8" x2="723.2" y2="179.2" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 5</title></line>
+<line x1="723.2" y1="179.2" x2="697.6" y2="179.2" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 5</title></line>
+<line x1="697.6" y1="179.2" x2="697.6" y2="204.8" stroke="#d0201a" stroke-width="2.5"><title>action 2 tag 5</title></line>
 <line x1="544.0" y1="192.0" x2="582.4" y2="192.0" stroke="#111" stroke-width="1.6"/>
 <line x1="582.4" y1="192.0" x2="582.4" y2="153.6" stroke="#111" stroke-width="1.6"/>
 <line x1="582.4" y1="153.6" x2="544.0" y2="153.6" stroke="#111" stroke-width="1.6"/>
@@ -514,7 +514,7 @@
 <text x="291.2" y="230.4" font-size="9" text-anchor="middle" fill="#333">n_sec 40</text>
 <text x="684.8" y="153.6" font-size="9" text-anchor="middle" fill="#333">n_hall 40</text>
 <text x="672.0" y="64.0" font-size="9" text-anchor="middle" fill="#333">n_ledge 136</text>
-<text x="710.4" y="179.2" font-size="9" text-anchor="middle" fill="#333">ped_y 56</text>
+<text x="710.4" y="192.0" font-size="9" text-anchor="middle" fill="#333">ped_y 56</text>
 <text x="710.4" y="281.6" font-size="9" text-anchor="middle" fill="#333">w_nwin 40</text>
 <text x="774.4" y="246.4" font-size="9" text-anchor="middle" fill="#333">niche_n 48</text>
 <text x="915.2" y="204.8" font-size="9" text-anchor="middle" fill="#333">ncl1 40</text>
@@ -579,7 +579,7 @@
 <circle cx="552.0" cy="240.0" r="8.0" fill="#e03030" fill-opacity="0.75" stroke="#900" stroke-width="0.8"><title>monster 9 skills emha</title></circle>
 <circle cx="832.0" cy="120.0" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3001 skills mha</title></circle>
 <circle cx="532.0" cy="80.0" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 65 skills ha</title></circle>
-<rect x="706.4" y="175.2" width="8" height="8" fill="#e0c000" stroke="#000"/>
+<rect x="706.4" y="188.0" width="8" height="8" fill="#e0c000" stroke="#000"/>
 <circle cx="520.0" cy="248.0" r="2.5" fill="#1f6fd0"/>
 <circle cx="840.0" cy="60.0" r="2.5" fill="#1f6fd0"/>
 <circle cx="848.0" cy="248.0" r="2.5" fill="#1f6fd0"/>

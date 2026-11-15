@@ -52,15 +52,15 @@ H_DOOR, C_DOOR = "BIGDOOR4", "BIGDOOR1"   # 128 and 96 tall: a burnt UAC door an
 start = [(-192, -96), (0, -96), (192, -96), (192, 256), (64, 256), (0, 256), (-64, 256), (-192, 256)]
 # The pit between the antechambers, notched at its south-west corner for the
 # secret lift and island.
-pit = [(-112, 640), (192, 640), (192, 1264), (-192, 1264), (-192, 816), (-112, 816)]
-ped_s = (-168, 752, -136, 784)
+pit = [(-112, 640), (192, 640), (192, 1264), (-192, 1264), (-192, 832), (-112, 832)]
+ped_s = (-176, 784, -144, 816)
 
 w_pool, w_furnace, ped_ssg = rect(-1312, 800, -1152, 960), rect(-1056, 960, -896, 1120), (-1120, 672, -1056, 736)
 ped_r = (-320, 928, -256, 992)
 
 hall = [(496, 128), (1216, 128), (1216, 704), (688, 704), (688, 640), (496, 640)]
 coolant = rect(736, 320, 992, 512)
-racks = [rect(896, 880, 992, 944), rect(1184, 992, 1248, 1120), rect(960, 1184, 1088, 1248),
+racks = [rect(896, 896, 992, 960), rect(1184, 992, 1248, 1120), rect(960, 1184, 1088, 1248),
          rect(1248, 1248, 1312, 1312), rect(864, 1088, 928, 1216)]
 s_pools = [rect(960, 1536, 1088, 1664), rect(1216, 1664, 1344, 1792)]
 ped_c = (1120, 1728, 1184, 1792)
@@ -106,7 +106,7 @@ SECTORS = [
     door("d_pit", rect(-192, 576, -128, 592), face=HOT, track=HOT, floor=-16, light=176, flat=H_FLOOR),
     Sector("p_land", [rect(-192, 592, -112, 640)], -16, 112, H_FLOOR, H_CEIL, 96, HOT),
     lift("p_lift", (-192, 640, -112, 720), -16, SKYC, TAG_PLIFT, SKY, 160, "SUPPORT3", ftex="FLAT23", walk_on=True),
-    Sector("p_isle", [rect(-192, 720, -112, 816), rect(*ped_s)], -40, SKYC, "FLAT5_4", SKY, 208, "SUPPORT3",
+    Sector("p_isle", [rect(-192, 720, -112, 832), rect(*ped_s)], -40, SKYC, "FLAT5_4", SKY, 208, "SUPPORT3",
            lower="METAL", special=SECRET_AREA),
     pedestal("p_ped", ped_s, -24, SKYC, "SUPPORT3", SKY),
     Sector("pit", [pit], -64, SKYC, "NUKAGE1", SKY, 160, "SUPPORT3", special=DAMAGE_5),
@@ -275,7 +275,7 @@ THINGS = [Thing(*t) for t in [
     (REDTORCH, -424, 320), (REDTORCH, -424, 512), (TORCH, 424, 320), (TORCH, 424, 512),
     (IMP, -300, 540, 180, "emha"), (ZOMBIE, 300, 540, 0, "mha"),
     (SHELLS, -300, 300), (STIM, 300, 300),
-    (SOUL, -152, 768),                                                          # secret: pit island
+    (SOUL, -160, 800),                                                          # secret: pit island
     # hot: the fire corridor
     (DEMON, -760, 416, 0, "emha"), (SPECTRE, -620, 430, 0, "ha"), (IMP, -920, 470, 0, "mha"),
     (CLIP, -560, 350), (SHELLS, -950, 350),

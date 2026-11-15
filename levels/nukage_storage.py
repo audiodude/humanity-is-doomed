@@ -324,7 +324,7 @@ SECTORS = [
     Sector("trs2", [rect(1992, 1072, 2032, 1168)], 240, 320, "FLAT1", "CEIL5_2", 176, HALL_WALL,
            lower="SUPPORT2"),
     Sector("tr", [rect(2032, 1024, 2224, 1280)], 256, CP_C, "FLAT1", SKY, 192, HALL_WALL, special=SECRET_AREA),
-    Sector("beacon", [rect(2160, 1184, 2192, 1216)], 320, CP_C, "TLITE6_5", SKY, 255, "LITE3", lower="LITE3",
+    Sector("beacon", [rect(2176, 1184, 2208, 1216)], 320, CP_C, "TLITE6_5", SKY, 255, "LITE3", lower="LITE3",
            special=LIGHT_BLINK_FAST),
 
     # ------------------------------------------------ cooling pond yard (optional)

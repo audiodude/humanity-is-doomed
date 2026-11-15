@@ -184,7 +184,7 @@ expect floor 1024 520 < 368
 
 # The floodgate: back east along the crest, the radiation suit, over the gap into the lake.
 open -48 880
-walk 200 900 1216 900 1216 816
+walk 200 900 1248 900 1248 800
 expect has PowerIronFeet
 walk 1024 800
 wait 35

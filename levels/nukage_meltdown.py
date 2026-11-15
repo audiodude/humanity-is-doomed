@@ -266,7 +266,8 @@ SECTORS = [
     Sector("fgg_lamp", [rect(896, 784, 1152, 800)], S4[1], S4[2], BANK, SKY, 240, BASE, special=LIGHT_BLINK_SLOW),
     # At the crest's pond edge beside the floodgate, clear of the walk along the crest: it lasts a
     # minute, so a player heading west to the gatehouse mustn't take it on the way.
-    lit_pedestal("rsp", (1184, 784, 1248, 848), 264, S4[2], BASE, SKY),
+    # 48 deep, centred on y 800, a diamond's middle: 64 would touch the pond edge.
+    lit_pedestal("rsp", (1216, 776, 1280, 824), 264, S4[2], BASE, SKY),
 
     # ------------------------------------------------ gatehouse, armory
     *doorway("d_b4c", (0, 880), "w", **door_kw(256, "FLAT19", BANK)),
@@ -523,7 +524,7 @@ THINGS = [Thing(*t) for t in [
     (IMP, 384, 864, 270, "emha"), (IMP, 1504, 864, 270, "mha"), (IMP, 1760, 880, 270, "mha"),
     (PAIN, 2144, 640, 180, "mh"),
     (ARACHNO, 1920, 864, 180, "mha"),
-    (RADSUIT, 1216, 816), (ROCKETBOX, 256, 800), (MEDI, 1600, 800), (SHELLBOX, 640, 928),
+    (RADSUIT, 1248, 800), (ROCKETBOX, 256, 800), (MEDI, 1600, 800), (SHELLBOX, 640, 928),
     (ROCKETBOX, 1792, 928), (MEDI, 1408, 928), (MEDI, 1024, 992),
     # gatehouse: 2 revenants (1, 0; easy: an imp for one), 2 chaingunners (1, 0), 2 imps (1, 1)
     (REVENANT, -384, 992, 0, "mha"), (IMP, -384, 992, 0, "ea"), (REVENANT, -384, 672, 0, "ha"),

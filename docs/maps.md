@@ -1,6 +1,6 @@
 # The maps
 
-The nine maps in `wads/NUKAGE.WAD`, each measured against the DOOM II maps with the research scripts (see the [builder docs](builder.md#what-every-build-checks)). Routes and secrets are in [SPOILERS.md](../SPOILERS.md).
+The eight maps in `wads/NUKAGE.WAD`, and Nukage Divided, cut from it, each measured against the DOOM II maps with the research scripts (see the [builder docs](builder.md#what-every-build-checks)). Routes and secrets are in [SPOILERS.md](../SPOILERS.md).
 
 ## Nukage Outskirts (`nukage_outskirts`)
 MAP01, the easiest map in the set: 104 sectors, 12/22/31 monsters on easy/medium/hard, four secrets, nothing heavier than a demon. Its design doc is `levels/designs/nukage_outskirts.md`, with the playtest results; the route script is `levels/playtests/nukage_outskirts.playtest`.

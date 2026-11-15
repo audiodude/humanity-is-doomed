@@ -53,7 +53,7 @@ expect has SuperShotgun
 # Tank room: the blue key blacks the room out and opens both closets.
 walk -700 1312 -750 1312
 open -784 1312
-walk -900 1312 -1112 1312
+walk -900 1312 -1120 1312
 expect has BlueCard
 wait 70
 shot blackout

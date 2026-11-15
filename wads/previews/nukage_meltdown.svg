@@ -96,12 +96,12 @@
 <path d="M1331.2,915.2 L1337.6,915.2 L1337.6,864.0 L1331.2,864.0 Z" fill="#a0703c" fill-rule="evenodd"><title>d_b3n: floor 256 ceil 256 SLIME13/FLAT20 light 144</title></path>
 <path d="M1337.6,915.2 L1344.0,915.2 L1344.0,864.0 L1337.6,864.0 Z" fill="#7ccf4a" fill-rule="evenodd"><title>d_b3n_far: floor 256 ceil 384 SLIME13/CEIL5_1 light 176</title></path>
 <path d="M499.2,844.8 L1318.4,844.8 L1318.4,819.2 L960.0,819.2 L857.6,819.2 L499.2,819.2 Z" fill="#7ccf4a" fill-rule="evenodd"><title>s4t: floor 240 ceil 640 NUKAGE1/F_SKY1 light 208</title></path>
-<path d="M499.2,921.6 L857.6,921.6 L960.0,921.6 L1318.4,921.6 L1318.4,915.2 L1318.4,864.0 L1318.4,844.8 L499.2,844.8 L499.2,851.2 L499.2,902.4 Z M857.6,915.2 L960.0,915.2 L960.0,908.8 L857.6,908.8 Z M972.8,915.2 L998.4,915.2 L998.4,889.6 L972.8,889.6 Z" fill="rgb(176,176,176)" fill-rule="evenodd"><title>s4b: floor 256 ceil 640 FLAT1/F_SKY1 light 208</title></path>
+<path d="M499.2,921.6 L857.6,921.6 L960.0,921.6 L1318.4,921.6 L1318.4,915.2 L1318.4,864.0 L1318.4,844.8 L499.2,844.8 L499.2,851.2 L499.2,902.4 Z M857.6,915.2 L960.0,915.2 L960.0,908.8 L857.6,908.8 Z M985.6,918.4 L1011.2,918.4 L1011.2,899.2 L985.6,899.2 Z" fill="rgb(176,176,176)" fill-rule="evenodd"><title>s4b: floor 256 ceil 640 FLAT1/F_SKY1 light 208</title></path>
 <path d="M499.2,1024.0 L806.4,1024.0 L857.6,1024.0 L857.6,1017.6 L857.6,921.6 L499.2,921.6 L499.2,947.2 L499.2,992.0 Z M960.0,1024.0 L1011.2,1024.0 L1318.4,1024.0 L1318.4,998.4 L1318.4,947.2 L1318.4,921.6 L960.0,921.6 L960.0,1017.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>s4p: floor 240 ceil 640 NUKAGE1/F_SKY1 light 208</title></path>
 <path d="M857.6,1017.6 L883.2,1017.6 L908.8,1017.6 L934.4,1017.6 L960.0,1017.6 L960.0,921.6 L857.6,921.6 Z" fill="#7ccf4a" fill-rule="evenodd"><title>s4p_x: floor 240 ceil 640 NUKAGE1/F_SKY1 light 208</title></path>
 <path d="M857.6,1024.0 L960.0,1024.0 L960.0,1017.6 L934.4,1017.6 L908.8,1017.6 L883.2,1017.6 L857.6,1017.6 Z" fill="rgb(188,188,188)" fill-rule="evenodd"><title>fgg: floor 368 ceil 640 FLAT23/F_SKY1 light 208 tag 4</title></path>
 <path d="M857.6,915.2 L960.0,915.2 L960.0,908.8 L857.6,908.8 Z" fill="rgb(176,176,176)" fill-rule="evenodd"><title>fgg_lamp: floor 256 ceil 640 FLAT1/F_SKY1 light 240</title></path>
-<path d="M972.8,915.2 L998.4,915.2 L998.4,889.6 L972.8,889.6 Z" fill="rgb(177,177,177)" fill-rule="evenodd"><title>rsp: floor 264 ceil 640 TLITE6_1/F_SKY1 light 240</title></path>
+<path d="M985.6,918.4 L1011.2,918.4 L1011.2,899.2 L985.6,899.2 Z" fill="rgb(177,177,177)" fill-rule="evenodd"><title>rsp: floor 264 ceil 640 TLITE6_1/F_SKY1 light 240</title></path>
 <path d="M486.4,902.4 L499.2,902.4 L499.2,851.2 L486.4,851.2 Z" fill="rgb(176,176,176)" fill-rule="evenodd"><title>d_b4c_alcove: floor 256 ceil 384 FLAT1/CEIL5_1 light 176</title></path>
 <path d="M480.0,902.4 L486.4,902.4 L486.4,851.2 L480.0,851.2 Z" fill="#a0703c" fill-rule="evenodd"><title>d_b4c: floor 256 ceil 256 FLAT19/FLAT20 light 144</title></path>
 <path d="M473.6,902.4 L480.0,902.4 L480.0,851.2 L473.6,851.2 Z" fill="rgb(176,176,176)" fill-rule="evenodd"><title>d_b4c_far: floor 256 ceil 384 FLAT19/CEIL5_1 light 176</title></path>
@@ -566,10 +566,10 @@
 <line x1="960.0" y1="915.2" x2="960.0" y2="908.8" stroke="#777" stroke-width="0.6"/>
 <line x1="960.0" y1="908.8" x2="857.6" y2="908.8" stroke="#777" stroke-width="0.6"/>
 <line x1="857.6" y1="908.8" x2="857.6" y2="915.2" stroke="#777" stroke-width="0.6"/>
-<line x1="972.8" y1="915.2" x2="998.4" y2="915.2" stroke="#777" stroke-width="0.6"/>
-<line x1="998.4" y1="915.2" x2="998.4" y2="889.6" stroke="#777" stroke-width="0.6"/>
-<line x1="998.4" y1="889.6" x2="972.8" y2="889.6" stroke="#777" stroke-width="0.6"/>
-<line x1="972.8" y1="889.6" x2="972.8" y2="915.2" stroke="#777" stroke-width="0.6"/>
+<line x1="985.6" y1="918.4" x2="1011.2" y2="918.4" stroke="#777" stroke-width="0.6"/>
+<line x1="1011.2" y1="918.4" x2="1011.2" y2="899.2" stroke="#777" stroke-width="0.6"/>
+<line x1="1011.2" y1="899.2" x2="985.6" y2="899.2" stroke="#777" stroke-width="0.6"/>
+<line x1="985.6" y1="899.2" x2="985.6" y2="918.4" stroke="#777" stroke-width="0.6"/>
 <line x1="499.2" y1="992.0" x2="499.2" y2="947.2" stroke="#777" stroke-width="0.6"/>
 <line x1="499.2" y1="947.2" x2="499.2" y2="921.6" stroke="#111" stroke-width="1.6"/>
 <line x1="857.6" y1="921.6" x2="857.6" y2="1017.6" stroke="#777" stroke-width="0.6"/>
@@ -831,7 +831,7 @@
 <text x="678.4" y="972.8" font-size="9" text-anchor="middle" fill="#333">s4p 240</text>
 <text x="1139.2" y="972.8" font-size="9" text-anchor="middle" fill="#333">s4p 240</text>
 <text x="908.8" y="969.6" font-size="9" text-anchor="middle" fill="#333">s4p_x 240</text>
-<text x="985.6" y="902.4" font-size="9" text-anchor="middle" fill="#333">rsp 264</text>
+<text x="998.4" y="908.8" font-size="9" text-anchor="middle" fill="#333">rsp 264</text>
 <text x="316.8" y="899.2" font-size="9" text-anchor="middle" fill="#333">b4c 256</text>
 <text x="486.4" y="969.6" font-size="9" text-anchor="middle" fill="#333">b4c_win 288</text>
 <text x="345.6" y="896.0" font-size="9" text-anchor="middle" fill="#333">bfg_ped 264</text>
@@ -994,7 +994,7 @@
 <circle cx="1203.2" cy="876.8" r="8.0" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 3001 skills mha</title></circle>
 <circle cx="1356.8" cy="972.8" r="12.4" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 71 skills mh</title></circle>
 <circle cx="1267.2" cy="883.2" r="25.6" fill="#e03030" fill-opacity="0.25" stroke="#900" stroke-width="0.8" stroke-dasharray="2,1.5"><title>monster 68 skills mha</title></circle>
-<circle cx="985.6" cy="902.4" r="1.8" fill="#888"/>
+<circle cx="998.4" cy="908.8" r="1.8" fill="#888"/>
 <circle cx="601.6" cy="908.8" r="2.5" fill="#1f6fd0"/>
 <circle cx="1139.2" cy="908.8" r="2.5" fill="#1f6fd0"/>
 <circle cx="755.2" cy="857.6" r="2.5" fill="#1f6fd0"/>

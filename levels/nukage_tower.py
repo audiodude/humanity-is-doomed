@@ -80,8 +80,8 @@ moat = [(-560, 720), (-64, 720), (-64, 752), (64, 752), (64, 720), (560, 720), (
 pump_pillars = [rect(-1248, 560, -1152, 656), rect(-1088, 560, -992, 656)]
 pools = [rect(-1344, 1152, -1248, 1248), rect(-976, 1152, -880, 1248), rect(-1344, 1376, -1248, 1472),
          rect(-976, 1376, -880, 1472)]
-PED_B = (-1144, 1280, -1080, 1344)
-ped_b, ring_b = rect(*PED_B), rect(-1176, 1248, -1048, 1376)
+PED_B = (-1152, 1280, -1088, 1344)   # on the 64 grid, so its diamond is centred; 8 west of the room's axis
+ped_b, ring_b = rect(*PED_B), rect(-1184, 1248, -1056, 1376)
 beds = [rect(352, 48, 576, 208), rect(672, 48, 896, 208)]
 crates_f = [rect(448, 288, 512, 352), rect(704, 320, 768, 384)]
 # Storage crates: one wide crate for cover, and a stack climbed in three 24-unit steps.
@@ -218,7 +218,8 @@ SECTORS = [
     Sector("turbine_w", [turbine_w], 400, 400, "CEIL5_1", "CEIL5_1", 160, "METAL", lower="METAL"),
     Sector("turbine_e", [turbine_e], 400, 400, "CEIL5_1", "CEIL5_1", 160, "METAL", lower="METAL"),
     Sector("dais", [dais, ped_y], GN + 24, 400, "FLOOR4_8", "CEIL5_1", 208, TURB, lower="METAL"),
-    pedestal("ped_y", PED_Y, GN + 40, 400, TURB, "CEIL5_1"),
+    # Centred on the dais, half a tile off the 64 grid: TLITE6_6's lamps sit whole on the 32 grid.
+    pedestal("ped_y", PED_Y, GN + 40, 400, TURB, "CEIL5_1", flat="TLITE6_6"),
     Sector("pwall_w", [rect(-576, 2272, -544, 2688)], 400, 400, "FLOOR0_2", "CEIL5_1", 160, TURB,
            lower=TURB, tag=TAG_PENS),
     Sector("pen_w", [rect(-768, 2272, -576, 2688)], GN, 272, "FLOOR0_2", "CEIL5_1", 96, "TEKBRON2",
@@ -332,7 +333,7 @@ THINGS = [Thing(*t) for t in [
     (MEDI, -448, 1440), (SHELLS, -448, 1504),                                   # the pier
     # tank room; grabbing the blue key blacks it out and opens both closets
     (ZOMBIE, -960, 1504, 180, "emha"), (SARGE, -1280, 1504, 0, "mha"), (IMP, -1376, 1120, 0, "ha"),
-    (BLUEKEY, -1112, 1312),
+    (BLUEKEY, -1120, 1312),
     (SHELLS, -880, 1120), (MEDI, -880, 1504), (CLIP, -1376, 1504),
     (SPECTRE, -1504, 1272, 0), (SPECTRE, -1504, 1352, 0, "h"), (IMP, -1448, 1312, 0, "mh"),
     (DEMON, -1288, 992, 90, "emh"), (DEMON, -1208, 992, 90, "mh"),
