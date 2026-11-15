@@ -241,7 +241,8 @@ class Explorer(pt.Run):
         # Teleporters: a player knows one by its pad. Once it has used a
         # repeatable one it knows where that goes: line -> (from cell, to cell).
         self.teleports = {i for i, (*_r, sp, _t, _fs, _bs) in enumerate(geo.lines)
-                          if sp in SPECIALS and SPECIALS[sp].kind == "teleport"}
+                          if sp in SPECIALS and SPECIALS[sp].kind == "teleport"
+                          and SPECIALS[sp].trigger[0] == "W"}   # a switch teleport (Boom) is a switch
         self.links = {}
         self._via = {}            # (from cell, to cell) -> teleport line, for go_to
         self._pads = {}           # cell -> seen teleporter lines the box touches there, for reach

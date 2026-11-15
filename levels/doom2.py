@@ -221,6 +221,37 @@ for _item in _LS.split(";"):
     LINE_SPECIALS[int(_p[0])] = LineSpecial("" if _p[1] == "_" else _p[1], _p[2], _p[3] if len(_p) > 3 else None)
 
 
+# Boom's extended types (142-269) that move the player's way, as triggers
+# and kinds like the vanilla table's. Left out, as they move nothing a
+# player walks: scrollers, friction, wind and currents, light transfer,
+# translucency, sky transfer, deep water (fake floors) and texture changes.
+_BOOM = """
+142 W1 floor_raise; 143 W1 floor_raise; 144 W1 floor_raise; 145 W1 ceiling_lower; 146 W1 donut;
+147 WR floor_raise; 148 WR floor_raise; 149 WR floor_raise; 150 WR crusher; 151 WR ceiling_raise;
+152 WR ceiling_lower; 155 WR donut; 156 WR light; 157 WR light; 158 S1 floor_raise; 159 S1 floor_lower;
+160 S1 floor_raise; 161 S1 floor_raise; 162 S1 platform; 163 S1 platform_stop; 164 S1 crusher;
+165 S1 crusher; 166 S1 ceiling_raise; 167 S1 ceiling_lower; 168 S1 crusher_stop; 169 S1 light;
+170 S1 light; 171 S1 light; 172 S1 light; 173 S1 light; 174 S1 teleport; 175 S1 door_close;
+176 SR floor_raise; 177 SR floor_lower; 178 SR floor_raise; 179 SR floor_raise; 180 SR floor_raise;
+181 SR platform; 182 SR platform_stop; 183 SR crusher; 184 SR crusher; 185 SR crusher;
+186 SR ceiling_raise; 187 SR ceiling_lower; 188 SR crusher_stop; 191 SR donut; 192 SR light;
+193 SR light; 194 SR light; 195 SR teleport; 196 SR door_close; 197 G1 exit; 198 G1 secret_exit;
+199 W1 ceiling_lower; 200 W1 ceiling_lower; 201 WR ceiling_lower; 202 WR ceiling_lower;
+203 S1 ceiling_lower; 204 S1 ceiling_lower; 205 SR ceiling_lower; 206 SR ceiling_lower;
+207 W1 teleport; 208 WR teleport; 209 S1 teleport; 210 SR teleport; 211 SR platform; 212 WR platform;
+219 W1 floor_lower; 220 WR floor_lower; 221 S1 floor_lower; 222 SR floor_lower;
+227 W1 lift; 228 WR lift; 229 S1 lift; 230 SR lift; 231 W1 lift; 232 WR lift; 233 S1 lift; 234 SR lift;
+235 W1 lift; 236 WR lift; 237 S1 lift; 238 SR lift; 243 W1 teleport; 244 WR teleport;
+256 WR stairs; 257 WR stairs; 258 SR stairs; 259 SR stairs; 262 W1 teleport; 263 WR teleport;
+264 W1 monster_teleport; 265 WR monster_teleport; 266 W1 monster_teleport; 267 WR monster_teleport;
+268 W1 monster_teleport; 269 WR monster_teleport
+"""
+BOOM_EXTENDED = {}
+for _item in _BOOM.split(";"):
+    _p = _item.split()
+    BOOM_EXTENDED[int(_p[0])] = LineSpecial(_p[1], _p[2])
+
+
 def generalized(sp):
     """A Boom generalized line type (0x2F80-0x7FFF) as a LineSpecial, or None.
     The trigger is bits 0-2; the kind comes from the type's range and, for
@@ -248,11 +279,11 @@ def generalized(sp):
 
 
 class _Specials(Mapping):
-    """LINE_SPECIALS plus Boom's generalized types, for the tools that play
+    """LINE_SPECIALS plus Boom's extended and generalized types, for the tools that play
     any WAD (the explorer, --play). The build and the metrics keep to vanilla."""
 
     def __getitem__(self, sp):
-        spec = LINE_SPECIALS.get(sp) or generalized(sp)
+        spec = LINE_SPECIALS.get(sp) or BOOM_EXTENDED.get(sp) or generalized(sp)
         if spec is None:
             raise KeyError(sp)
         return spec
