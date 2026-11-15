@@ -36,16 +36,19 @@ Costs are jittered by --seed, so seeds explore in different orders. Secret
 doors look like walls to it. Monsters are killed at the start and it plays
 in god mode: this measures finding the way, not fighting (--fight does that).
 
+Before using a switch it waits (up to 3 s) for anything moving near it to
+stop: a switch used on a door still on the move does nothing.
+
 When it has nothing left it knows to try, it does what a stuck player does:
-it searches the walls it has seen ("search" in the report), walking up to
-each, using it, and shooting it if that did nothing. Walls that stand out
-(a switch or door texture, or a texture the faces either side of it in the
-room don't have) cost a quarter of their walking distance, so it tries
-those first. If a floor or ceiling near that wall (within 512 units, not
-one already moving or a door it knows) moves, that's "found": a secret
-door found that way is a door it can open again. Neither the search nor a
-find counts as progress, so a map whose way on is hidden shows the whole
-search as a stretch with no progress.
+it searches the walls it has seen ("search" in the report), and the faces
+of ledges too high to climb, walking up to each, using it, and shooting it
+if that did nothing. Walls that stand out (a switch or door texture, or a
+texture the faces either side of it in the room don't have) cost a quarter
+of their walking distance, so it tries those first. If a floor or ceiling
+near that wall (within 512 units, not one already moving or a door it
+knows) moves, that's "found": a secret door found that way is a door it
+can open again. Neither the search nor a find counts as progress, so a map
+whose way on is hidden shows the whole search as a stretch with no progress.
 
 It stops at the exit, when it has nothing left to try, or at --max-time. The
 report lists what it did and when, how far it walked against the map's
@@ -664,15 +667,19 @@ class Explorer(pt.Run):
         tex = self.textures[i][side]
         return {t for t in tex or () if t != "-"}
 
-    def wall_sides(self, i, closed):
+    def wall_sides(self, i, h):
         """The sides of line i that are a wall to stand at: a one-sided
-        line's front, or the open side of a line onto a shut sector."""
+        line's front, or the side of a two-sided line that faces a shut
+        sector or a ledge too high to step up (heights `h`)."""
         _a, _b, _f, _sp, _t, fs, bs = self.geo.lines[i]
         if bs is None:
             return (0,)
-        if (fs in closed) != (bs in closed):
-            return (1,) if fs in closed else (0,)
-        return ()
+        out = []
+        for side, (near, far) in enumerate(((fs, bs), (bs, fs))):
+            (nf, nc), (ff, fc) = h[near], h[far]
+            if nc - nf >= pt.HEIGHT_P and (fc - ff <= 0 or ff - nf > pt.STEP):
+                out.append(side)
+        return tuple(out)
 
     def cue(self, i, side):
         """Whether the wall stands out as a player would notice: a switch or
@@ -695,13 +702,12 @@ class Explorer(pt.Run):
     def search_options(self, dist):
         """(cost, "wall", cell, what): walls it has seen and not searched."""
         h = self.heights()
-        closed = {s for s, (f, c) in enumerate(h) if c - f <= 0}
         out = []
         for i in self.seen_lines:
             a, b, _flags, sp, _tag, _fs, _bs = self.geo.lines[i]
             if i in self.door_lines or ("line", i) in self.done or math.dist(a, b) < 16:
                 continue
-            for side in self.wall_sides(i, closed):
+            for side in self.wall_sides(i, h):
                 if (i, side) in self.searched:
                     continue
                 c = self.near(self.spot(i, side, 32), dist)
