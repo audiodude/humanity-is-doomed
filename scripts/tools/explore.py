@@ -11,14 +11,25 @@ by walking distance over floor it has seen:
 
   - an exit it has seen (a quarter of the distance: it's what the player is after)
   - a key it has seen (a third)
-  - a switch it hasn't pressed (two thirds)
+  - a switch it hasn't pressed (two thirds); one that works when shot (a
+    gun-activated line with a switch texture) it shoots ("shot" in the report)
   - a door it hasn't opened, if it has the key
   - the edge of what it has seen, where it goes and looks round
 
 Costs are jittered by --seed, so seeds explore in different orders. Secret
-doors look like walls to it, and it never shoots a wall. Monsters are killed
-at the start and it plays in god mode: this measures finding the way, not
-fighting (--fight does that).
+doors look like walls to it. Monsters are killed at the start and it plays
+in god mode: this measures finding the way, not fighting (--fight does that).
+
+When it has nothing left it knows to try, it does what a stuck player does:
+it searches the walls it has seen ("search" in the report), walking up to
+each, using it, and shooting it if that did nothing. Walls that stand out
+(a switch or door texture, or a texture the faces either side of it in the
+room don't have) cost a quarter of their walking distance, so it tries
+those first. If a floor or ceiling near that wall (within 512 units, not
+one already moving or a door it knows) moves, that's "found": a secret
+door found that way is a door it can open again. Neither the search nor a
+find counts as progress, so a map whose way on is hidden shows the whole
+search as a stretch with no progress.
 
 It stops at the exit, when it has nothing left to try, or at --max-time. The
 report lists what it did and when, how far it walked against the map's
@@ -35,6 +46,7 @@ import json
 import math
 import os
 import random
+import struct
 import sys
 import time
 from collections import Counter
@@ -56,6 +68,11 @@ VISITED = 6            # cells round where it has been that count as visited
 STALL = 30 * 35        # a stretch this long with no progress is reported
 RETRY = 60 * 35        # tics before a key or switch it gave up on is tried again
 WEIGHT = {"exit": 0.25, "key": 1 / 3, "switch": 2 / 3, "door": 1.0, "frontier": 1.0, "unvisited": 1.0}
+DOORISH = ("DOOR", "BIGDOOR", "SPCDOOR", "EXITDOOR")   # textures that read as a door (but door tracks don't)
+NOT_DOOR = ("DOORTRAK", "DOORSTOP")
+NEARBY = 512          # a floor or ceiling that moves this close to a wall it searched is what it found
+SEARCH = os.environ.get("EXPLORE_SEARCH", "cue")   # experiment: cue-weighted, every wall alike, cues only
+CUE = 0.25            # a wall that stands out costs this much of its walking distance to search
 
 
 def cross(p, q, a, b):
@@ -70,9 +87,23 @@ def cross(p, q, a, b):
     return t if 0 <= t <= 1 and 0 <= u <= 1 else None
 
 
+def line_textures(m):
+    """Per line, the textures on each side a player sees: ((upper, lower,
+    mid), back side's or None), '-' for none."""
+    sides = [tuple(t.rstrip(b"\0").decode("ascii", "replace").upper() for t in s[2:5])
+             for s in struct.iter_unpack("<hh8s8s8sh", m["SIDEDEFS"])]
+    return [(sides[f], sides[b] if b >= 0 else None)
+            for _v1, _v2, _fl, _sp, _tag, f, b in struct.iter_unpack("<hhhhhhh", m["LINEDEFS"])]
+
+
+def is_switch(tex):
+    return any(t.startswith(("SW1", "SW2")) for t in tex)
+
+
 class Explorer(pt.Run):
-    def __init__(self, args, vzd, geo):
+    def __init__(self, args, vzd, geo, textures):
         super().__init__(args, vzd, geo)
+        self.textures = textures  # per line: ((upper, lower, mid), back side's or None)
         self.rng = random.Random(args.seed)
         self.names = None         # sector names, for a level module
         self.retried = False      # cleared what it got stuck on since the last progress
@@ -103,6 +134,12 @@ class Explorer(pt.Run):
             for k in range(n + 1):
                 c = self.plan.cell((a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n))
                 self.cell_lines.setdefault(c, []).append(i)
+        self.line_ends = {}       # vertex -> lines that end there
+        for i, (a, b, *_rest) in enumerate(geo.lines):
+            self.line_ends.setdefault(a, []).append(i)
+            self.line_ends.setdefault(b, []).append(i)
+        self.searched = set()     # (line, side) of walls it used and shot at
+        self.searching = False    # searching the walls since the last progress
 
     # -- seeing --------------------------------------------------------------
     def watch(self):
@@ -186,8 +223,13 @@ class Explorer(pt.Run):
         self.tries.clear()
         self.blocked.clear()
         self.retried = False
+        self.searching = False
+        progress = kind in ("key", "switch", "shot", "exit") if progress is None else progress
+        self.note(kind, text, progress)
+
+    def note(self, kind, text, progress=False):
+        """Log what it did, without counting it as progress."""
         x, y = self._last if self.game.is_episode_finished() else self.pos()
-        progress = kind in ("key", "switch", "exit") if progress is None else progress
         self.events.append((self.tics, kind, text, x, y, progress))
         self.say(f"  {pt.clock(self.tics)} {kind:<8} {text} at {x:.0f},{y:.0f}")
 
@@ -281,7 +323,8 @@ class Explorer(pt.Run):
             if spec.key and spec.key not in have:
                 continue
             if spec.trigger == "D":
-                if flags & ML_SECRET or bs is None or h[bs][1] - h[bs][0] >= pt.HEIGHT_P or ("door", bs) in self.done:
+                if (flags & ML_SECRET and i not in self.door_lines) or bs is None or \
+                        h[bs][1] - h[bs][0] >= pt.HEIGHT_P or ("door", bs) in self.done:
                     continue
                 kind, sides = "door", (0, 1)
             elif spec.trigger in ("S1", "SR") and not (spec.kind == "lift" and {fs, bs} & self.tagged(_tag)):
@@ -289,6 +332,12 @@ class Explorer(pt.Run):
                 kind, sides = ("exit" if spec.kind in EXITS else "switch"), (0,)
             elif spec.trigger == "W1" and spec.kind in EXITS:
                 kind, sides = "exit", (0, 1)
+            elif spec.trigger in ("G1", "GR"):
+                # A switch that using doesn't work on: a player shoots it.
+                sides = tuple(s for s, tex in enumerate(self.textures[i]) if tex and is_switch(tex))
+                if not sides:
+                    continue
+                kind = "switch"
             else:
                 continue
             for side in sides:
@@ -452,10 +501,13 @@ class Explorer(pt.Run):
             self.drive(self.spot(i, side, 24), 0, True)
         except pt.Abort:
             pass   # a step or a lip in the way: it may be in reach already
-        self.face(mid)
-        if pt.seg_dist(self.pos(), (x1, y1), (x2, y2)) > pt.USE_RANGE:
-            raise pt.Abort("couldn't get within reach of the line")
-        self.press()
+        if spec.trigger in ("G1", "GR"):
+            self.shoot(i, side)
+        else:
+            self.face(mid)
+            if pt.seg_dist(self.pos(), (x1, y1), (x2, y2)) > pt.USE_RANGE:
+                raise pt.Abort("couldn't get within reach of the line")
+            self.press()
         a, b, _flags, _sp, tag, fs, bs = self.geo.lines[i]
         if kind == "door":
             self.done.add(("door", bs))
@@ -463,12 +515,142 @@ class Explorer(pt.Run):
         else:
             self.done.add(("line", i))
             moved = sorted({self.name(t) for t in self.tagged(tag)})
-            self.event(kind, f"{spec.trigger} {spec.kind} by {self.name(fs)}"
+            self.event("shot" if spec.trigger in ("G1", "GR") else kind,
+                       f"{spec.trigger} {spec.kind} by {self.name(fs)}"
                        + (f" -> {'/'.join(moved[:3])}{'...' if len(moved) > 3 else ''}" if moved else ""))
         for _ in range(70 if kind != "exit" else 35):
             self.tic()
         if kind == "switch":
             self.look_round()   # as a player does: what did that do?
+
+    def aim_z(self, i, side):
+        """Height of the middle of what's showing of line i's `side`: the
+        switch texture of a shootable switch, else the wall face."""
+        _a, _b, _f, _sp, _t, fs, bs = self.geo.lines[i]
+        h = self.heights()
+        near, far = (fs, bs) if side == 0 else (bs, fs)
+        if far is None:
+            return sum(h[near]) / 2
+        (nf, nc), (ff, fc) = h[near], h[far]
+        upper, lower, mid = self.textures[i][side]
+        parts = [(upper, (max(fc, nf), nc)), (lower, (nf, min(ff, nc))), (mid, (max(nf, ff), min(nc, fc)))]
+        lo, hi = next((span for tex, span in parts if is_switch((tex,)) and span[1] > span[0]),
+                      max((span for _tex, span in parts), key=lambda s: s[1] - s[0]))
+        return (lo + hi) / 2
+
+    def shoot(self, i, side):
+        """Fire at line i's middle, aiming up or down at what's showing."""
+        (x1, y1), (x2, y2) = self.geo.lines[i][:2]
+        mid = ((x1 + x2) / 2, (y1 + y2) / 2)
+        d = max(1.0, math.dist(self.pos(), mid))
+        rise = self.aim_z(i, side) - (self.var("POSITION_Z") + 41)
+        self.face(mid, pitch=-math.degrees(math.atan2(rise, d)))
+        self.press("attack")
+        self.tic(n=8)
+        self.face(self.var("ANGLE"), pitch=0.0)
+
+    # -- searching -----------------------------------------------------------
+    def showing(self, i, side):
+        """The textures on line i's `side`."""
+        tex = self.textures[i][side]
+        return {t for t in tex or () if t != "-"}
+
+    def wall_sides(self, i, closed):
+        """The sides of line i that are a wall to stand at: a one-sided
+        line's front, or the open side of a line onto a shut sector."""
+        _a, _b, _f, _sp, _t, fs, bs = self.geo.lines[i]
+        if bs is None:
+            return (0,)
+        if (fs in closed) != (bs in closed):
+            return (1,) if fs in closed else (0,)
+        return ()
+
+    def cue(self, i, side):
+        """Whether the wall stands out as a player would notice: a switch or
+        a door's texture, or a texture none of the faces either side of it in
+        the same room has."""
+        tex = self.showing(i, side)
+        if is_switch(tex) or any(t.startswith(DOORISH) and not t.startswith(NOT_DOOR) for t in tex):
+            return True
+        a, b, _f, _sp, _t, fs, bs = self.geo.lines[i]
+        room = fs if side == 0 else bs
+        others = []
+        for j in set(self.line_ends[a]) | set(self.line_ends[b]):
+            if j == i:
+                continue
+            _a2, _b2, _f2, _sp2, _t2, fs2, bs2 = self.geo.lines[j]
+            others += [self.showing(j, s2) for s2, sec in ((0, fs2), (1, bs2)) if sec == room]
+        others = [o for o in others if o]
+        return bool(tex and others) and all(not tex & o for o in others)
+
+    def search_options(self, dist):
+        """(cost, "wall", cell, what): walls it has seen and not searched."""
+        h = self.heights()
+        closed = {s for s, (f, c) in enumerate(h) if c - f <= 0}
+        out = []
+        for i in self.seen_lines:
+            a, b, _flags, sp, _tag, _fs, _bs = self.geo.lines[i]
+            if i in self.door_lines or ("line", i) in self.done or math.dist(a, b) < 16:
+                continue
+            for side in self.wall_sides(i, closed):
+                if (i, side) in self.searched:
+                    continue
+                c = self.near(self.spot(i, side, 32), dist)
+                if c is None:
+                    continue
+                w = 1.0
+                if SEARCH != "all":
+                    if self.cue(i, side):
+                        w = CUE
+                    elif SEARCH == "cues":
+                        continue
+                out.append((dist[c] * w * self.rng.uniform(0.85, 1.15), "wall", c, ("wall", i, side)))
+        return out
+
+    def heard(self, i, before, moving):
+        """Sectors near line i that moved since `before` (not ones already on
+        the move, nor doors it knows of): what using or shooting it did."""
+        a, b = self.geo.lines[i][:2]
+        mid = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
+        now, known, g = self.heights(), self.doors(), self.geo
+        return [s for s, hs in enumerate(now) if hs != before[s] and s not in moving and s not in known and any(
+            pt.seg_dist(mid, *g.lines[k][:2]) <= NEARBY for k in g.sector_lines[s])]
+
+    def search(self, c, what, lv, prev):
+        """Walk up to a wall, use it, and if nothing moves, shoot it."""
+        _, i, side = what
+        self.searched.add((i, side))
+        self.go_to(c, prev, lv)
+        a, b, _flags, sp, _tag, fs, bs = self.geo.lines[i]
+        try:
+            self.drive(self.spot(i, side, 24), 0, True)
+        except pt.Abort:
+            pass
+        if pt.seg_dist(self.pos(), a, b) > pt.USE_RANGE:
+            raise pt.Abort("couldn't get within reach of the wall")
+        self.face(((a[0] + b[0]) / 2, (a[1] + b[1]) / 2))
+        h0 = self.heights()
+        self.tic(n=4)
+        before = self.heights()
+        moving = {s for s, hs in enumerate(before) if hs != h0[s]}
+        how = "using"
+        self.press()
+        self.tic(n=20)
+        moved = self.heard(i, before, moving)
+        if not moved:
+            how = "shooting"
+            self.shoot(i, side)
+            self.tic(n=20)
+            moved = self.heard(i, before, moving)
+        if not moved:
+            return
+        spec = LINE_SPECIALS.get(sp)
+        if spec and spec.trigger == "D" and bs is not None:
+            self.door_lines[i] = (bs, spec.key)   # a door: now it knows, it can open it again
+        names = sorted({self.name(s) for s in moved})
+        self.event("found", f"{how} a wall by {self.name(fs if side == 0 else bs)} moved "
+                   f"{'/'.join(names[:3])}{'...' if len(names) > 3 else ''}")
+        self.look_round()
 
     def explore(self):
         for c in ("god", "notarget", "kill monsters"):
@@ -499,14 +681,27 @@ class Explorer(pt.Run):
                 self.failed.clear()
                 continue
             if not opts:
-                return "nothing left it knows to try"
+                # Nothing left it knows of: as a stuck player does, go along
+                # the walls it has seen using them and shooting them.
+                opts = self.search_options(dist)
+                if not opts:
+                    return "nothing left it knows to try" + (
+                        f" (searched {len(self.searched)} walls)" if self.searched else "")
+                if not self.searching:
+                    self.searching = True
+                    self.note("search", "nothing left it knows to try: searching the walls")
             _, kind, c, what = min(opts, key=lambda o: o[0])
             try:
-                self.act(kind, c, what, lv, prev)
+                if what[0] == "wall":
+                    self.search(c, what, lv, prev)
+                else:
+                    self.act(kind, c, what, lv, prev)
             except pt.Abort:
                 if not self.game.is_episode_finished():
                     # Getting stuck marked the way it tried as blocked, so a
                     # key or a switch is worth another way round, twice.
+                    if what[0] == "wall":
+                        continue
                     target = what[:2] if what[0] != "cell" else ("cell", c)
                     self.tries[target] += 1
                     if what[0] == "cell" or self.tries[target] >= 3:
@@ -582,7 +777,7 @@ def run(args, vzd):
         return 2
     t0 = time.time()
     names, crit, boss = level_info(args.module, args.wad, args.map)
-    r = Explorer(args, vzd, pt.Geometry(m))
+    r = Explorer(args, vzd, pt.Geometry(m), line_textures(m))
     r.names = names
     stopped = "error"
     try:
