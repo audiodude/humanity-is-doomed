@@ -584,10 +584,13 @@ class Explorer(pt.Run):
             self.drive(self.spot(i, 1 - side), 0, True)
             return
         self.go_to(c, prev, lv)
+        before = self.heights()
         try:
             self.drive(self.spot(i, side, 24), 0, True)
         except pt.Abort:
             pass   # a step or a lip in the way: it may be in reach already
+        if kind != "door":
+            self.quiet(before)
         if spec.trigger in ("G1", "GR"):
             self.shoot(i, side)
         else:
@@ -612,6 +615,22 @@ class Explorer(pt.Run):
             self.tic()
         if kind in ("switch", "again"):
             self.look_round()   # as a player does: what did that do?
+
+    def quiet(self, before):
+        """Before a switch, if anything near it moved since `before`, wait
+        (up to 3 s) for it to stop, as a player does after a door slams
+        behind them: a switch used on a door still on the move does nothing."""
+        g = self.geo
+        p = self.pos()
+        near = [s for s in range(len(g.sectors))
+                if any(pt.seg_dist(p, *g.lines[k][:2]) <= NEARBY for k in g.sector_lines[s])]
+        h = before
+        for _ in range(35):
+            now = self.heights()
+            if all(now[s] == h[s] for s in near):
+                return
+            h = now
+            self.tic(n=3)
 
     def aim_z(self, i, side):
         """Height of the middle of what's showing of line i's `side`: the
