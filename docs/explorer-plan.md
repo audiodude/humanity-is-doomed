@@ -63,7 +63,7 @@ The pool comes from three sources, because each has a style and we can't let the
 ## 2. One play, start to finish
 
 1. **Generate or fetch** the map; for a community map, the user confirms they don't know it.
-2. **The user plays it:** `uv run --with vizdoom scripts/tools/playtest.py <WAD> MAP01 --play`. No monsters, god mode on. Play naturally, heading for the exit; never try to get lost, and never press L more freely to help the count. L when they realize they're lost, however late; K when they give up; 15 minutes at most. A play that is spoiled (crash, wrong controls, interrupted) is noted and dropped, not replayed.
+2. **The user plays it:** `uv run --with vizdoom scripts/tools/playtest.py <WAD> MAP01 --play`. No monsters, god mode on. Play naturally, heading for the exit; never try to get lost, and never press L more freely to help the count. L when they realize they're lost, however late; K when they give up; the play stops itself at 15:00. A play that is spoiled (crash, wrong controls, interrupted) is noted and dropped, not replayed.
 3. **Ask about detours right away, while it's fresh:** was any stretch a deliberate detour (a secret, an item, sightseeing)? Those become `--choice M:SS-M:SS`.
 4. **Score:** `compare.py <play folder> [--choice ...]`. For a holdout play, scoring happens only at a gate C check (see section 4).
 5. **Give each mismatch a cause code** (rubric section 6). The agent proposes codes from frames of both demos at the stall times, and the user confirms them. Codes go in `compare-<commit>/codes.json`.
@@ -118,7 +118,7 @@ Precision is the guard against overtuning. A bot that stalls everywhere would sc
 
 - **One player:** with only the user, this tests how well the bot predicts the user. A second blind player would test it on people in general. Whether to look for one is open.
 - **Blindness wears off:** the user learns each generator's habits. That's another reason community maps are a third of the pool. If a generator starts to feel predictable, the user should say so, and its later plays should be read with that in mind.
-- **No monsters:** fighting changes where people go and how long they stay. A later rubric version could score `--monsters` plays.
+- **No monsters:** fighting changes where people go and how long they stay. A later rubric version could score `--monsters` plays. Corpses also act as waypoints: in a real play the bodies left behind mark where you've been, which makes a loop easier to spot (the user, after replaying CHORD_NG with monsters). Without them, rooms that look alike stay alike, so no-monster plays likely get the user lost more than normal play would. That leans toward B-memory, since the bot never forgets floor it has seen and doesn't need corpses.
 - **The bot never gives up:** a person quits and the bot doesn't, so S1 will often fail where the person gave up. It isn't part of gates B–D.
 - **Cost:** each play takes about 10–15 minutes of the user's time. Each `compare.py` run takes about 3–4 minutes and 8 CPU-minutes locally. Scoring all plays again on each explorer change belongs in the cloud batch.
 - **The thresholds are guesses:** they were set before any data. If they're plainly wrong, they change through a new version of this plan, never by fitting them to results.

@@ -47,6 +47,7 @@ from explore import Explorer, Teleported, level_info, line_textures
 from levels.doom2 import BOOM_SPECIALS as SPECIALS
 
 PLAYS = os.path.expanduser("~/.local/share/playtest/plays")
+LIMIT = 15 * 60 * 35   # a play stops itself at 15 minutes, the rubric's cut-off
 
 
 def run(args, vzd):
@@ -82,8 +83,9 @@ def run(args, vzd):
 
 
 def play(args, vzd, geo, demo):
-    """The live play, in a window: record it to `demo` until the exit, K, or
-    death. Returns how it ended: "stopped", "died", "exited" or "closed"."""
+    """The live play, in a window: record it to `demo` until the exit, K,
+    death or 15 minutes. Returns how it ended: "stopped", "time", "died",
+    "exited" or "closed"."""
     r = pt.Run(args, vzd, geo)
     g = r.game
     # Modern-port controls, as in DOOM + DOOM II (2024) and dsda-doom: WASD
@@ -102,7 +104,7 @@ def play(args, vzd, geo, demo):
         g.send_game_command("god")
     lost, stop = r.buttons.index("RELOAD"), r.buttons.index("ZOOM")
     print(f"playing {args.map.upper()}{'' if args.monsters else ' (no monsters, god mode)'}: "
-          "L = I'm lost, K = stop", flush=True)
+          "L = I'm lost, K = stop; it stops itself at 15:00", flush=True)
     marks, held, ended = 0, False, "closed"
     try:
         while not g.is_episode_finished():
@@ -111,6 +113,10 @@ def play(args, vzd, geo, demo):
             if a[stop]:
                 print("stopped (K)")
                 ended = "stopped"
+                break
+            if g.get_episode_time() >= LIMIT:
+                print("15 minutes up: stopped")
+                ended = "time"
                 break
             if a[lost] and not held:
                 marks += 1
@@ -185,6 +191,8 @@ class Observer(Explorer):
             held = bool(a[lost])
         if self.ended == "closed":   # the demo just runs out where the window went
             return "the window was closed: the recording stops there"
+        if self.ended == "time":
+            return "15 minutes up"
         if g.is_player_dead():
             return "you died"
         self.event("exit", "exited")
