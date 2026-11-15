@@ -480,7 +480,7 @@ class Explorer(pt.Run):
         ends = g.lines[use][:2] if use is not None else None
         cells = [(c[0] + i, c[1] + j) for i in range(-r, r + 1) for j in range(-r, r + 1)]
         return min((n for n in cells if n in dist and (f is None or abs(lv[n[1]][n[0]][0] - f) <= pt.STEP)
-                    and (ends is None or pt.seg_dist(self.plan.centre(n), *ends) <= pt.USE_RANGE - 8)),
+                    and (ends is None or pt.seg_dist(self.plan.centre(n), *ends) < pt.USE_RANGE)),
                    key=lambda n: math.dist(self.plan.centre(n), p), default=None)
 
     def frontier(self, c, closed):
