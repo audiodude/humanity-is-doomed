@@ -489,9 +489,6 @@ class Explorer(pt.Run):
 
     def through(self, i):
         """Cross teleporter line i from its front, and wait out the freeze."""
-        if os.environ.get("EXPLORE_DEBUG"):
-            print(f"DBG   through {i} at {self.pos()[0]:.0f},{self.pos()[1]:.0f} link {self.links.get(i)}"
-                  f" -> {self.plan.centre(self.links[i][1]) if i in self.links else None}")
         try:
             self.drive(self.spot(i, 1), 0, True)
         except Teleported:
@@ -703,30 +700,8 @@ class Explorer(pt.Run):
                 self.failed.clear()
                 continue
             if not opts:
-                if os.environ.get("EXPLORE_DEBUG"):
-                    tps = sorted(self.teleports & self.seen_lines)
-                    print("DBG end at", self.pos(), "sector", self.geo.sector_at(self.pos()), "reach", len(dist),
-                          "known", len(self.known), "blocked", len(self.blocked))
-                    here = self.plan.cell(self.pos())
-                    for dj in range(4, -5, -1):
-                        row = []
-                        for di in range(-4, 5):
-                            n = (here[0] + di, here[1] + dj)
-                            v = lv[n[1]][n[0]]
-                            row.append(("#" if v is None else f"{v[0]:.0f}/{v[1]:.0f}")
-                                       + ("k" if n in self.known else "-") + ("d" if n in dist else "-")
-                                       + ("g" if n in self._guard else "-"))
-                        print("DBG  ", " ".join(f"{r:>12}" for r in row))
-                    print("DBG end: seen teleports", tps, "links", sorted(self.links), "failed", self.failed,
-                          "done", [d for d in self.done if d[0] == "line" and d[1] in self.teleports])
-                    for i in tps:
-                        print("DBG   tp", i, self.geo.lines[i], "front spot", self.spot(i, 0),
-                              "near", self.near(self.spot(i, 0), dist))
                 return "nothing left it knows to try"
             _, kind, c, what = min(opts, key=lambda o: o[0])
-            if os.environ.get("EXPLORE_DEBUG"):
-                print(f"DBG {pt.clock(self.tics)} at {self.pos()[0]:.0f},{self.pos()[1]:.0f} -> {kind} "
-                      f"{self.plan.centre(c)} {what[:2] if what[0] != 'line' else ('line', what[1])} d={dist[c]:.0f}")
             try:
                 self.act(kind, c, what, lv, prev)
             except Teleported:
@@ -742,9 +717,7 @@ class Explorer(pt.Run):
                     self.look_round()   # where is this?
                 except Teleported:
                     pass
-            except pt.Abort as e:
-                if os.environ.get("EXPLORE_DEBUG"):
-                    print(f"DBG   abort {e}")
+            except pt.Abort:
                 if not self.game.is_episode_finished():
                     # Getting stuck marked the way it tried as blocked, so a
                     # key or a switch is worth another way round, twice.
