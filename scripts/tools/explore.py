@@ -25,15 +25,21 @@ by walking distance over floor it has seen:
   - the edge of what it has seen, where it goes and looks round
 
 A switch or door it goes to from a floor level with it or from close enough
-to reach it (a switch on a ledge can be used from below); a walk-over exit
-only from a floor level with it. A key or switch it couldn't get to is given
-up after three goes and tried again a minute later, two minutes after the
-second time it gives up on it, and so on.
+to reach it (a switch on a ledge can be used from below), and only from where
+it can get within reach of it (a switch on a ledge it can't climb to isn't
+one to walk under); a walk-over exit only from a floor level with it. A key
+or switch it couldn't get to is given up after three goes and tried again a
+minute later, two minutes after the second time it gives up on it, and so on.
+A switch whose use opened what was shut right behind it (a door with switches
+on its faces) is a door from then on: it walks through it, using it, as
+through any door.
 
-When none is left it goes and stands in places it has only seen from afar,
-then uses again, once each, the repeatable switches it has used (a door it
-opened may have shut behind it: logged as "switch ... again", not progress).
-Before giving up it waits for anything it can see moving to stop.
+With no edge left, it goes and looks round beside walls it has seen the floor
+up to but never the face of (seen from afar at a slant: a switch in a niche),
+once each. When none is left it goes and stands in places it has only seen
+from afar, then uses again, once each, the repeatable switches it has used (a
+door it opened may have shut behind it: logged as "switch ... again", not
+progress). Before giving up it waits for anything it can see moving to stop.
 
 Lifts: it walks over a lift it can step or drop onto and off as it stands;
 otherwise it calls it, or (standing on it, going down) uses a lift switch on
@@ -50,8 +56,10 @@ until it hears it move (within 1024 units): something else calls it (or
 until, out of other things to try, it tries everything it got stuck on once
 more). A floor or ceiling it has seen moving (a walk-over line it crossed, a
 switch far off) makes the places it looked round from and couldn't reach
-worth another try, a few times between progress. Getting stuck on the same
-spot twice blocks the cells just past it toward where it was going.
+worth another try, once for each one that moves (a crusher goes on moving)
+and a few times at most between progress. Getting stuck on the same spot
+twice blocks the cells just past it toward where it was going. If what it
+has blocked off walls it in where it stands, it forgets it before giving up.
 
 Teleporters: a jump in position is a teleport, logged as an event (not
 progress). It looks round where it landed and carries on from there; it
@@ -80,9 +88,11 @@ of their walking distance, so it tries those first. If a floor or ceiling
 near that wall (within 512 units, not one already moving or a door it
 knows, nor one that moved in the 6 s before or was found before: a lift on
 its way back, a platform that goes up and down by itself) moves, that's
-"found": a secret door found that way is a door it
-can open again. Neither the search nor a find counts as progress, so a map
-whose way on is hidden shows the whole search as a stretch with no progress.
+"found": a secret door found that way is a door it can open again. Along
+with the walls it walks across each edge between two floors it has seen and
+never walked between, once: a walk-over line can't be seen. Neither the
+search nor a find counts as progress, so a map whose way on is hidden shows
+the whole search as a stretch with no progress.
 
 It stops at the exit, when it has nothing left to try, or at --max-time. The
 report lists what it did and when, how far it walked against the map's
@@ -199,6 +209,7 @@ class Explorer(pt.Run):
         self.revived = False      # cleared the lifts that didn't come, as a last resort, since the last event
         self._sector_at, self._middle = {}, {}
         self.moves = 0            # times since the last progress something it saw moved
+        self.movers = set()       # the sectors it has seen move since the last progress
         self._h_last, self._seen_n, self._seen_secs = None, -1, set()
         self.visited = set()      # cells within VISITED of where it has been
         # Doors a player can open by hand: line -> (door sector, key). Once
@@ -220,6 +231,9 @@ class Explorer(pt.Run):
             self.line_ends.setdefault(b, []).append(i)
         self.searched = set()     # (line, side) of walls it used and shot at
         self.searching = False    # searching the walls since the last progress
+        self.crossed = set()      # {sector, sector} pairs of floors it has walked between
+        self.tried = set()        # the same it went out of its way to walk between, searching
+        self.peeked = set()       # walls it looked round from near and still didn't see
         # Teleporters: a player knows one by its pad. Once it has used a
         # repeatable one it knows where that goes: line -> (from cell, to cell).
         self.teleports = {i for i, (*_r, sp, _t, _fs, _bs) in enumerate(geo.lines)
@@ -249,6 +263,12 @@ class Explorer(pt.Run):
             if jump > JUMP:
                 self.teleported(self._last, p)
             self.walked += jump
+            if jump:   # the floors it walked between: the lines its centre crossed
+                q = self._last
+                cells = {self.plan.cell(q), self.plan.cell(p), self.plan.cell(((q[0] + p[0]) / 2, (q[1] + p[1]) / 2))}
+                for k in {k for c in cells for k in self.cell_lines.get(c, ())}:
+                    if self.geo.lines[k][6] is not None and cross(self._last, p, *self.geo.lines[k][:2]) is not None:
+                        self.crossed.add(frozenset(self.geo.lines[k][5:7]))
         self._last = p
         if self.tics - self._look_at >= LOOK_EVERY:
             self._look_at = self.tics
@@ -351,7 +371,11 @@ class Explorer(pt.Run):
         for _ in range(24):
             self.tic(turn=15)
         c = self.plan.cell(self.pos())
-        self.looked |= {(c[0] + i, c[1] + j) for i in range(-LOOKED, LOOKED + 1) for j in range(-LOOKED, LOOKED + 1)}
+        square = {(c[0] + i, c[1] + j) for i in range(-LOOKED, LOOKED + 1) for j in range(-LOOKED, LOOKED + 1)}
+        self.looked |= square
+        # Walls round here it still hasn't seen can't be seen from here: not
+        # worth coming back to look for.
+        self.peeked |= {i for n in square for i in self.cell_lines.get(n, ()) if i not in self.seen_lines}
 
     # -- deciding ------------------------------------------------------------
     def name(self, s):
@@ -378,6 +402,7 @@ class Explorer(pt.Run):
         if progress:
             self.again.clear()
             self.moves = 0
+            self.movers.clear()
             self.stuck.clear()
             self.calls.clear()
         self.note(kind, text, progress, at)
@@ -448,7 +473,7 @@ class Explorer(pt.Run):
                     continue
                 if (c in pads or n in pads) and self.onto_pad(plan.centre(c), plan.centre(n)):
                     continue
-                if not plan.step_ok(here, lv[n[1]][n[0]]):
+                if not plan.step_ok(here, lv[n[1]][n[0]]) or (c, n) in plan.cut:
                     continue
                 if di and dj and not (plan.step_ok(here, lv[c[1]][n[0]]) and plan.step_ok(here, lv[n[1]][c[0]])):
                     continue
@@ -504,24 +529,27 @@ class Explorer(pt.Run):
         return [(round(o.position_x), round(o.position_y), pt.SOLID[o.name]) for o in self.state().objects
                 if o.name in pt.SOLID]
 
-    def near(self, p, dist, lv=None, r=3, line=None, pick=False):
+    def near(self, p, dist, lv=None, r=3, line=None, pick=False, use=None):
         """The reachable cell nearest p, within r cells. Given lv, only cells with
         their floor within a step of the floor of the sector p is in (a pad isn't
         stepped on from below); given a line, also cells near enough to it to
         use it (using a line doesn't look at heights: a switch on a ledge can be
         used from below); to `pick` up a thing at p, also cells close by with
         their floor no more than the player's height below it (as Doom's
-        P_TouchSpecialThing: a key on a low ledge is picked up from beside it)."""
+        P_TouchSpecialThing: a key on a low ledge is picked up from beside it).
+        Given a line to `use`, only cells it's within reach of from there."""
         c = self.plan.cell(p)
         s = self.sector_at(p) if lv else None
         f = None if s is None else self.heights()[s][0]
         ends = self.geo.lines[line][:2] if line is not None else None
+        reach = self.geo.lines[use][:2] if use is not None else None
 
         def ok(n):
             fn = lv[n[1]][n[0]][0] if f is not None else None
-            return f is None or abs(fn - f) <= pt.STEP or (
+            return (f is None or abs(fn - f) <= pt.STEP or (
                 ends is not None and pt.seg_dist(self.plan.centre(n), *ends) <= pt.USE_RANGE - 8) or (
-                pick and -8 <= f - fn <= pt.HEIGHT_P and math.dist(self.plan.centre(n), p) <= PICK)
+                pick and -8 <= f - fn <= pt.HEIGHT_P and math.dist(self.plan.centre(n), p) <= PICK)) and (
+                reach is None or pt.seg_dist(self.plan.centre(n), *reach) < pt.USE_RANGE)
         cells = [(c[0] + i, c[1] + j) for i in range(-r, r + 1) for j in range(-r, r + 1)]
         return min((n for n in cells if n in dist and ok(n)),
                    key=lambda n: math.dist(self.plan.centre(n), p), default=None)
@@ -545,6 +573,17 @@ class Explorer(pt.Run):
                        for i in set(self.cell_lines.get(c, ())) | set(self.cell_lines.get(n, ()))):
                 return True
         return False
+
+    def unlooked(self, c, closed):
+        """A seen cell right up against a wall it hasn't seen: floor seen from
+        afar at a slant, up to a wall whose face it never looked at (a switch
+        in a niche), and hasn't looked round from beside."""
+        g = self.geo
+        p = self.plan.centre(c)
+        return any(i not in self.seen_lines and i not in self.peeked and self.blocks(i, closed)
+                   and pt.seg_dist(p, *g.lines[i][:2]) <= 32
+                   for di, dj in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1))
+                   for i in self.cell_lines.get((c[0] + di, c[1] + dj), ()))
 
     def spot(self, i, side, d=40):
         """A point d units off line i's middle, on `side` (0 front, 1 back)."""
@@ -599,10 +638,13 @@ class Explorer(pt.Run):
                 continue
             for side in sides:
                 # A line it has to cross from a floor level with the spot by it; one
-                # it uses from there or near enough to reach it; one it shoots from anywhere.
+                # it uses from there or near enough to reach it, and only from where
+                # it's within reach; one it shoots from anywhere.
                 p = self.spot(i, side)
+                use = i if spec.trigger in ("D", "S1", "SR") else None
                 c = self.near(p, dist) if spec.trigger in ("G1", "GR") else \
-                    self.near(p, dist, lv) if spec.trigger.startswith("W") else self.near(p, dist, lv, line=i)
+                    self.near(p, dist, lv) if spec.trigger.startswith("W") else \
+                    self.near(p, dist, lv, line=i, use=use)
                 if c:
                     # A locked door it has the key for now is what it's after, as a key is.
                     d = dist[c] * (WEIGHT["key"] / WEIGHT["door"] if kind == "door" and spec.key else 1)
@@ -612,6 +654,12 @@ class Explorer(pt.Run):
             if c not in self.looked and ("cell", c) not in self.failed and self.lift_of(c) is None \
                     and self.frontier(c, closed):
                 out.append((dist[c], "frontier", c, ("cell", c)))
+        if not out:
+            # No edge left: go and look at the walls it has only seen the floor
+            # up to, from a slant (a switch set in a niche).
+            out = [(dist[c], "frontier", c, ("cell", c)) for c in dist
+                   if c not in self.looked and ("cell", c) not in self.failed and self.lift_of(c) is None
+                   and self.unlooked(c, closed)]
         if not out:
             # Nothing new in sight: go and stand in places it has only seen from
             # afar, as a player does when stuck (a newly opened way, a far ledge).
@@ -623,8 +671,8 @@ class Explorer(pt.Run):
             for i in self.seen_lines:
                 spec = LINE_SPECIALS.get(self.geo.lines[i][3])
                 if spec and spec.trigger == "SR" and spec.kind not in EXITS and ("line", i) in self.done \
-                        and i not in self.again and ("line", i) not in self.failed:
-                    c = self.near(self.spot(i, 0), dist, lv, line=i)
+                        and i not in self.again and i not in self.door_lines and ("line", i) not in self.failed:
+                    c = self.near(self.spot(i, 0), dist, lv, line=i, use=i)
                     if c:
                         out.append((dist[c], "again", c, ("line", i, spec, 0)))
         return [(d * WEIGHT[k] * self.rng.uniform(0.85, 1.15), k, c, w) for d, k, c, w in out]
@@ -899,6 +947,7 @@ class Explorer(pt.Run):
             self.face(mid)
             if pt.seg_dist(self.pos(), (x1, y1), (x2, y2)) > pt.USE_RANGE:
                 raise pt.Abort("couldn't get within reach of the line")
+            pressed = self.heights()
             self.press()
         a, b, _flags, _sp, tag, fs, bs = self.geo.lines[i]
         if kind == "door":
@@ -936,6 +985,13 @@ class Explorer(pt.Run):
             if spec.trigger == "SR":
                 self.lift_switch.update((s, (i, side)) for s in lowered)
             self.catch_lift(lowered, pressed)
+        far = (bs, fs)[side] if kind in ("switch", "again") and spec.trigger == "SR" else None
+        if far is not None and pressed[far][1] - pressed[far][0] < pt.HEIGHT_P \
+                and self.heights()[far][1] > pressed[far][1]:
+            # Using it opened what was shut right behind it: a door it can
+            # open again with it, from this side (another switch on the far
+            # face is another door line, once it has used that one).
+            self.door_lines[i] = (far, spec.key)
         if kind in ("switch", "again") and not heard:
             self.look_round()   # as a player does: what did that do?
 
@@ -1105,23 +1161,47 @@ class Explorer(pt.Run):
         others = [o for o in others if o]
         return bool(tex and others) and all(not tex & o for o in others)
 
-    def search_options(self, dist):
-        """(cost, "wall", cell, what): walls it has seen and not searched."""
+    def search_options(self, dist, lv):
+        """(cost, kind, cell, what): walls it has seen and not searched
+        ("wall"), and edges between two floors it has seen, can walk across
+        and has never walked between ("cross": a walk-over line is invisible,
+        so a stuck player crosses where they haven't)."""
         h = self.heights()
+        g, plan = self.geo, self.plan
         out = []
         for i in self.seen_lines:
-            a, b, _flags, sp, _tag, _fs, _bs = self.geo.lines[i]
+            a, b, flags, sp, _tag, fs, bs = g.lines[i]
             if i in self.door_lines or ("line", i) in self.done or math.dist(a, b) < 16:
                 continue
             for side in self.wall_sides(i, h):
                 if (i, side) in self.searched:
                     continue
-                c = self.near(self.spot(i, side, 32), dist)
+                c = self.near(self.spot(i, side, 32), dist, use=i)
                 if c is None:
                     continue
                 w = CUE if self.cue(i, side) else 1.0
                 out.append((dist[c] * w * self.rng.uniform(0.85, 1.15), "wall", c, ("wall", i, side)))
+            pair = frozenset((fs, bs))
+            if bs is None or len(pair) < 2 or flags & 1 or i in self.teleports or pair in self.crossed \
+                    or pair in self.tried or math.dist(a, b) < 32:
+                continue
+            for side in (0, 1):
+                p, q = plan.cell(self.spot(i, side, 24)), plan.cell(self.spot(i, 1 - side, 24))
+                if p not in dist or not (0 <= q[0] < g.nx and 0 <= q[1] < g.ny) or (p, q) in plan.cut \
+                        or not plan.step_ok(lv[p[1]][p[0]], lv[q[1]][q[0]]):
+                    continue
+                out.append((dist[p] * self.rng.uniform(0.85, 1.15), "cross", p, ("cross", i, side)))
         return out
+
+    def cross_edge(self, c, what, lv, prev):
+        """Walk across line i from `side` to the floor on its other side."""
+        _, i, side = what
+        self.tried.add(frozenset(self.geo.lines[i][5:7]))
+        self.go_to(c, prev, lv)
+        try:
+            self.drive(self.spot(i, 1 - side, 24), 0, True)
+        except pt.Abort:
+            pass
 
     def heard(self, i, before, moving):
         """Sectors near line i that moved since `before` (not ones already on
@@ -1185,13 +1265,16 @@ class Explorer(pt.Run):
         """A floor or ceiling it has seen moved since it last looked (a walk-over
         line it crossed, a switch far off): the edges it has looked round from
         and the places it couldn't reach are worth another try, as for progress,
-        a few times between real progress (a crusher or a platform goes on moving)."""
+        a few times between real progress, and once for each thing that moves
+        (a crusher or a platform goes on moving)."""
         h = self.heights()
         last, self._h_last = self._h_last, h
         if last is None or self.moves >= MOVES:
             return False
-        if not any(h[s] != last[s] for s in self.seen_sectors()):
+        moved = {s for s in self.seen_sectors() if h[s] != last[s]}
+        if not moved - self.movers:
             return False
+        self.movers |= moved
         self.moves += 1
         self.looked.clear()
         self.failed.clear()
@@ -1251,23 +1334,31 @@ class Explorer(pt.Run):
             if not opts:
                 # Nothing left it knows of: as a stuck player does, go along
                 # the walls it has seen using them and shooting them.
-                opts = self.search_options(dist)
+                opts = self.search_options(dist, lv)
+                if not opts and self.blocked:
+                    # What it marked as in the way may wall it in where it
+                    # stands: look again without it before giving up.
+                    self.blocked.clear()
+                    continue
                 if not opts and self.dead and not self.revived:
                     # Trapped behind lifts that didn't come: try them once more.
                     self.revived = True
                     self.dead.clear()
                     continue
                 if not opts:
-                    return "nothing left it knows to try" + (
-                        f" (searched {len(self.searched)} walls)" if self.searched else "")
+                    done = [f"searched {len(self.searched)} walls"] if self.searched else []
+                    done += [f"crossed {len(self.tried)} edges"] if self.tried else []
+                    return "nothing left it knows to try" + (f" ({', '.join(done)})" if done else "")
                 if not self.searching:
                     self.searching = True
                     self.note("search", "nothing left it knows to try: searching the walls")
             _, kind, c, what = min(opts, key=lambda o: o[0])
-            blocked = set(self.blocked) if what[0] == "wall" else None
+            blocked = set(self.blocked) if what[0] in ("wall", "cross") else None
             try:
                 if what[0] == "wall":
                     self.search(c, what, lv, prev)
+                elif what[0] == "cross":
+                    self.cross_edge(c, what, lv, prev)
                 else:
                     self.act(kind, c, what, lv, prev)
             except Replan:
@@ -1287,7 +1378,7 @@ class Explorer(pt.Run):
                     pass
             except pt.Abort:
                 if not self.game.is_episode_finished():
-                    if what[0] == "wall":
+                    if what[0] in ("wall", "cross"):
                         # The wall is searched either way; what it bumped
                         # into on the way shouldn't cut it off from the rest.
                         self.blocked = blocked
