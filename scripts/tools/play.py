@@ -71,7 +71,9 @@ def run(args, vzd):
                 module=args.module, wad_hash=pt.wad_hash(args.wad), played=time.strftime("%Y-%m-%d %H:%M:%S"))
     with open(os.path.join(folder, "meta.json"), "w") as f:
         json.dump(meta, f, indent=1)
-    play(args, vzd, pt.Geometry(m), os.path.join(folder, "play.lmp"))
+    meta["ended"] = play(args, vzd, pt.Geometry(m), os.path.join(folder, "play.lmp"))
+    with open(os.path.join(folder, "meta.json"), "w") as f:
+        json.dump(meta, f, indent=1)
     if not os.path.exists(os.path.join(folder, "play.lmp")):
         print(f"no recording was written: the game window closed before the play ended ({folder})")
         return 2
@@ -80,7 +82,8 @@ def run(args, vzd):
 
 
 def play(args, vzd, geo, demo):
-    """The live play, in a window: record it to `demo` until the exit, K, or death."""
+    """The live play, in a window: record it to `demo` until the exit, K, or
+    death. Returns how it ended: "stopped", "died", "exited" or "closed"."""
     r = pt.Run(args, vzd, geo)
     g = r.game
     # Modern-port controls, as in DOOM + DOOM II (2024) and dsda-doom: WASD
@@ -99,20 +102,22 @@ def play(args, vzd, geo, demo):
     lost, stop = r.buttons.index("RELOAD"), r.buttons.index("ZOOM")
     print(f"playing {args.map.upper()}{'' if args.monsters else ' (no monsters, god mode)'}: "
           "L = I'm lost, K = stop", flush=True)
-    marks, held = 0, False
+    marks, held, ended = 0, False, "closed"
     try:
         while not g.is_episode_finished():
             g.advance_action()
             a = g.get_last_action()
             if a[stop]:
                 print("stopped (K)")
+                ended = "stopped"
                 break
             if a[lost] and not held:
                 marks += 1
                 print(f"  marked lost ({marks})", flush=True)
             held = bool(a[lost])
         else:
-            print("died" if g.is_player_dead() else "exited")
+            ended = "died" if g.is_player_dead() else "exited"
+            print(ended)
     except (vzd.ViZDoomUnexpectedExitException, vzd.ViZDoomIsNotRunningException):
         print("the game window closed")
     finally:
@@ -120,6 +125,7 @@ def play(args, vzd, geo, demo):
             g.close()   # ends the episode, which writes the demo
         except Exception:   # noqa: BLE001  (the game may be gone already)
             pass
+    return ended
 
 
 class Observer(Explorer):
@@ -174,6 +180,8 @@ class Observer(Explorer):
                 self.lost.append((self.tics, x, y, self.geo.sector_at((x, y))))
                 self.note("lost", "you pressed L")
             held = bool(a[lost])
+        if self.ended == "closed":   # the demo just runs out where the window went
+            return "the window was closed: the recording stops there"
         if g.is_player_dead():
             return "you died"
         self.event("exit", "exited")
@@ -219,6 +227,7 @@ def report(vzd, folder, iwad=None):
     names, crit, boss = level_info(args.module, meta["sources"] if args.module else wads, args.map)
     r = Observer(args, vzd, pt.Geometry(m), line_textures(m))
     r.names = names
+    r.ended = meta.get("ended")
     try:
         stopped = r.follow()
         gaps = r.report(stopped, crit, boss) or []
