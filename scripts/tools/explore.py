@@ -441,6 +441,15 @@ class Explorer(pt.Run):
         z = lambda: self.var("POSITION_Z")  # noqa: E731
         lift = lambda: self.heights()[s][0]  # noqa: E731
         want = self.heights()[g.cell_sector[after[1]][after[0]]][0] if after else lift()
+        lf, lc = self.heights()[s]
+        a = self._lv[after[1]][after[0]] if after else None
+        if a and lift() - z() <= 24 and lc - max(lf, z()) >= pt.HEIGHT_P and a[0] - lf <= 24 \
+                and a[1] - max(lf, a[0]) >= pt.HEIGHT_P:
+            # It can step or drop onto the lift as it is, and step or drop off
+            # it where it's going: just walk over it.
+            self.walk(on, False)
+            self.walk(self.plan.centre(after), False)
+            return
         if abs(lift() - z()) > 24:            # up (or down) out of reach: call it
             self.face(on)
             self.press()
@@ -451,20 +460,36 @@ class Explorer(pt.Run):
             else:
                 raise pt.Abort("the lift didn't come")
         elif want < z() - 24:                 # level with the player, going down: set it off
-            if self.geo.sector_at(self.pos()) == s:   # from beside it: step off first
-                here = self.plan.cell(self.pos())
-                lv = self._lv
-                # A cell the player's box fits in, off the lift and level with it.
-                off = min((c for c in ((here[0] + i, here[1] + j) for i in range(-5, 6) for j in range(-5, 6))
-                           if 0 <= c[0] < g.nx and 0 <= c[1] < g.ny and c in self.known and c not in self.blocked
-                           and self.lift_of(c) is None and lv[c[1]][c[0]] is not None
-                           and abs(lv[c[1]][c[0]][0] - z()) <= 24),
-                          key=lambda c: math.dist(c, here), default=None)
-                if off is None:
-                    raise pt.Abort("on a lift with nowhere level to step off to")
-                self.walk(self.plan.centre(off), True)
-            self.face(on)
-            self.press()
+            # A lift switch it has seen on the lift's own edge (a switch in the
+            # room that is the lift): use it from where it is, and ride down.
+            switch = min((i for i in self.seen_lines if self.geo.lines[i][5] == s
+                          and self.geo.lines[i][3] in LINE_SPECIALS
+                          and LINE_SPECIALS[self.geo.lines[i][3]].kind == "lift"
+                          and LINE_SPECIALS[self.geo.lines[i][3]].trigger in ("S1", "SR")),
+                         key=lambda i: pt.seg_dist(self.pos(), *self.geo.lines[i][:2]), default=None)
+            if self.geo.sector_at(self.pos()) == s and switch is not None:
+                (x1, y1), (x2, y2) = self.geo.lines[switch][:2]
+                try:
+                    self.drive(self.spot(switch, 0, 24), 0, True)
+                except pt.Abort:
+                    pass
+                self.face(((x1 + x2) / 2, (y1 + y2) / 2))
+                self.press()
+            else:
+                if self.geo.sector_at(self.pos()) == s:   # from beside it: step off first
+                    here = self.plan.cell(self.pos())
+                    lv = self._lv
+                    # A cell the player's box fits in, off the lift and level with it.
+                    off = min((c for c in ((here[0] + i, here[1] + j) for i in range(-5, 6) for j in range(-5, 6))
+                               if 0 <= c[0] < g.nx and 0 <= c[1] < g.ny and c in self.known and c not in self.blocked
+                               and self.lift_of(c) is None and lv[c[1]][c[0]] is not None
+                               and abs(lv[c[1]][c[0]][0] - z()) <= 24),
+                              key=lambda c: math.dist(c, here), default=None)
+                    if off is None:
+                        raise pt.Abort("on a lift with nowhere level to step off to")
+                    self.walk(self.plan.centre(off), True)
+                self.face(on)
+                self.press()
         self.walk(on, True)
         if after is None:
             return
