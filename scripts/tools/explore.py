@@ -472,7 +472,6 @@ class Explorer(pt.Run):
                     dist[t], prev[t] = d + LINK, c
                     self._via[(c, t)] = i
                     heapq.heappush(todo, (d + LINK, t))
-            here = lv[c[1]][c[0]]
             for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
                 n = (c[0] + di, c[1] + dj)
                 if not (0 <= n[0] < g.nx and 0 <= n[1] < g.ny) or n in self.blocked or (
@@ -480,9 +479,9 @@ class Explorer(pt.Run):
                     continue
                 if (c in pads or n in pads) and self.onto_pad(plan.centre(c), plan.centre(n)):
                     continue
-                if not plan.step_ok(here, lv[n[1]][n[0]]) or (c, n) in plan.cut:
+                if not plan.can_step(c, n, lv) or (c, n) in plan.cut or plan.blocked(c, n):
                     continue
-                if di and dj and not (plan.step_ok(here, lv[c[1]][n[0]]) and plan.step_ok(here, lv[n[1]][c[0]])):
+                if di and dj and not (plan.can_step(c, (n[0], c[1]), lv) and plan.can_step(c, (c[0], n[1]), lv)):
                     continue
                 nd = d + math.hypot(di, dj) * (20 if g.cell_sector[n[1]][n[0]] in g.damaging else
                                                10 if n in guard else 1)

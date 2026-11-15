@@ -350,8 +350,11 @@ class Planner:
     in off its centre (a gap just 32 wide) is stood in there, but there's no
     step between two such cells with a wall between them (walkways either
     side of a railing); so is a cell whose centre a solid thing blocks but
-    whose box fits beside it off the centre (between barrels 64 apart).
-    Lifts count as passable whatever their height."""
+    whose box fits beside it off the centre (between barrels 64 apart), and
+    there's no step to or from such a cell that runs the box into a solid
+    thing on the way. A rise of more than 24 between two cells is still a
+    step when the floors between are stairs narrower than a cell, each step
+    low enough (climbs()). Lifts count as passable whatever their height."""
 
     def __init__(self, geo):
         self.g = g = geo
@@ -368,7 +371,19 @@ class Planner:
                 for bi in range(int((min(a[0], b[0]) - 32 - g.x0) // 128),
                                 int((max(a[0], b[0]) + 32 - g.x0) // 128) + 1):
                     self._bucket.setdefault((bi, bj), []).append((a, b))
+        self._edges = {}   # 128-unit square -> two-sided lines near it, for climbs()
+        for a, b, _f, _sp, _t, fs, bs in g.lines:
+            if bs is None or bs == fs:
+                continue
+            for bj in range(int((min(a[1], b[1]) - 32 - g.y0) // 128), int((max(a[1], b[1]) + 32 - g.y0) // 128) + 1):
+                for bi in range(int((min(a[0], b[0]) - 32 - g.x0) // 128),
+                                int((max(a[0], b[0]) + 32 - g.x0) // 128) + 1):
+                    self._edges.setdefault((bi, bj), []).append((a, b, fs, bs))
+        self._climbs = {}  # (cell, neighbour, floor, floor) -> climbs()
+        self._h = ()
         self._clear = {}   # (cell, offset) -> no wall cuts the box there
+        self._steps = {}   # (spot, spot) -> the step between them is blocked (blocked()), for the things now
+        self._things = ()
         r = RADIUS - 1   # a box edge touching a wall is fine, as in Doom
 
         def hits(offsets, cells):
@@ -452,6 +467,9 @@ class Planner:
         player can't stand there at all. Reused until a height or a thing moves.
         Lifts in `static` count as the floors they are now (lifts it can't ride).
         Sets tshift: where in a cell next to a solid thing the box fits."""
+        if tuple(things) != tuple(self._things):
+            self._steps = {}
+        self._things, self._h = things, h
         key = (tuple(h), tuple(things), static)
         if self._levels[0] == key:
             self.tshift = self._levels[2]
@@ -503,6 +521,59 @@ class Planner:
                     break
         return out, tshift
 
+    def blocked(self, c, n):
+        """A step from cell c to its neighbour n can't be walked, though both
+        can be stood in: one of them is stood in off its centre, and between
+        the two spots the box runs into a solid thing (spots either side of a
+        barrel, or past one squeezed against a wall). Walls a box grazes on
+        the way the player slides along, as in Doom."""
+        if not self._things or (c not in self.shift and c not in self.tshift
+                                and n not in self.shift and n not in self.tshift):
+            return False
+        p, q = self.centre(c), self.centre(n)
+        k = (p, q)
+        if k not in self._steps:
+            mids = [(p[0] + (q[0] - p[0]) * t / 4, p[1] + (q[1] - p[1]) * t / 4) for t in range(1, 4)]
+            self._steps[k] = any(abs(x - tx) < tr + RADIUS and abs(y - ty) < tr + RADIUS
+                                 for x, y in mids for tx, ty, tr in self._things)
+        return self._steps[k]
+
+    def can_step(self, c, n, lv):
+        """The player can move from cell c to its neighbour n (levels lv)."""
+        a, b = lv[c[1]][c[0]], lv[n[1]][n[0]]
+        return self.step_ok(a, b) or (a is not None and b is not None and self.climbs(c, n, a, b))
+
+    def climbs(self, c, n, a, b):
+        """Up from cell c at level a to its neighbour n at level b, more than a
+        step higher, can still be walked when the floors between are stairs
+        narrower than a cell (a steep run of 4-unit steps): Doom checks each
+        small move, not the cell. Moves the box across a unit at a time and
+        looks for a rise of more than a step, the box's floor being the highest
+        either side of any line it overlaps; a railing between them stops it."""
+        if b[0] - a[0] <= STEP or min(a[1], b[1]) - b[0] < HEIGHT_P:
+            return False
+        k = (c, n, a[0], b[0])
+        if k not in self._climbs:
+            g, h = self.g, self._h
+            p, q = self.centre(c), self.centre(n)
+            steps = max(1, int(math.dist(p, q)))
+            prev, ok = a[0], not any(segs_cross(p, q, la, lb) for la, lb in self._bucket.get(
+                (int((p[0] - g.x0) // 128), int((p[1] - g.y0) // 128)), ()))
+            for t in range(steps + 1 if ok else 0):
+                x, y = p[0] + (q[0] - p[0]) * t / steps, p[1] + (q[1] - p[1]) * t / steps
+                near = self._edges.get((int((x - g.x0) // 128), int((y - g.y0) // 128)), ())
+                fl = [max(h[fs][0], h[bs][0]) for la, lb, fs, bs in near if box_hits(la, lb, x, y, RADIUS - 1)]
+                if not fl:
+                    s = self._fine[int((y - g.y0) // (GRID // 2))][int((x - g.x0) // (GRID // 2))]
+                    fl = [h[s][0]] if s is not None else []
+                f = max(fl, default=prev)
+                if f - prev > STEP:
+                    ok = False
+                    break
+                prev = f
+            self._climbs[k] = ok
+        return self._climbs[k]
+
     @staticmethod
     def step_ok(a, b):
         """The player can move from a cell at level a to one at level b: up a
@@ -541,13 +612,12 @@ class Planner:
                 break
             if d > dist[c]:
                 continue
-            here = lv[c[1]][c[0]]
             for di, dj in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
                 n = (c[0] + di, c[1] + dj)
-                if not (0 <= n[0] < g.nx and 0 <= n[1] < g.ny) or not self.step_ok(here, lv[n[1]][n[0]]) \
-                        or (c, n) in self.cut:
+                if not (0 <= n[0] < g.nx and 0 <= n[1] < g.ny) or not self.can_step(c, n, lv) \
+                        or (c, n) in self.cut or self.blocked(c, n):
                     continue
-                if di and dj and not (self.step_ok(here, lv[c[1]][n[0]]) and self.step_ok(here, lv[n[1]][c[0]])):
+                if di and dj and not (self.can_step(c, (n[0], c[1]), lv) and self.can_step(c, (c[0], n[1]), lv)):
                     continue   # no cutting corners
                 nd = d + math.hypot(di, dj) * (20 if dmg(n) else 1)
                 if nd < dist.get(n, 1e18):
@@ -592,7 +662,7 @@ class Planner:
             if (pc, c) in self.cut:
                 return False
             here = lv[c[1]][c[0]]
-            if here is not prev and not self.step_ok(prev, here):
+            if here is not prev and not self.can_step(pc, c, lv):
                 return False
             s = g.cell_sector[c[1]][c[0]]
             if s in g.damaging and s not in dmg_ok:
