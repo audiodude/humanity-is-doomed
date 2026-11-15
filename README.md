@@ -1,6 +1,6 @@
 # Humanity is Doomed
 
-Nine DOOM II maps that an AI wrote as Python, the level compiler it built to do it, and the research on id's 68 maps that it designed them from.
+Eight DOOM II maps that an AI wrote as Python, the level compiler it built to do it, and the research on id's 68 maps that it designed them from.
 
 > [!IMPORTANT]
 > **Looking for the levels from the YouTube videos?** They're in the [v0.9 release](https://github.com/audiodude/humanity-is-doomed/releases/tag/v0.9): the original `NUKAGE.WAD`, more or less raw AI output, built up one map at a time while the AI was still learning how DOOM levels should be structured and play. It still has Nukage Junction as MAP01, the first maps' original textures, and none of the later re-ordering and balance work. It's kept for history and research; for the polished set, play the `wads/NUKAGE.WAD` described below.
@@ -52,7 +52,7 @@ Each map has four secrets (MAP03 has five). Every map's design notes and measure
 | dsda-doom, Woof | open | yes |
 | `doom2.exe`, Chocolate Doom, and any port without UMAPINFO | never open | no: DOOM II's own names, and MAP08 leads to MAP09 |
 
-Every map is checked against vanilla rules (see [Playtests](docs/builder.md#playtests)). Meltdown has been played through in the 2024 re-release, bossaction gate included: the exit opened when the Cyberdemon died. Storage's bossaction is new with the move off MAP07 and hasn't been played in a port yet.
+Every map is checked against vanilla rules (see [Playtests](docs/builder.md#playtests)). Both bossaction gates have been played in a port: Meltdown's exit opened when the Cyberdemon died (the 2024 re-release, played through), and Storage's shutters dropped when the last mancubus died.
 
 ## The level builder
 
