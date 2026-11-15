@@ -28,4 +28,5 @@ wads/imported/
 
 # Scratch builds (levels/sets: a module in no set) and decompiled sets (levels.decompile)
 wads/scratch/
+wads/obsidian
 levels/sets/imported_*.py
