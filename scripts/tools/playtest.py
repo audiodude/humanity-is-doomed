@@ -338,7 +338,8 @@ class Planner:
             cy = g.y0 + j * GRID + GRID / 2
             for i in range(g.nx):
                 cx = g.x0 + i * GRID + GRID / 2
-                ss = {fine[jj][ii] for jj in range(2 * j - 1, 2 * j + 4) for ii in range(2 * i - 1, 2 * i + 4)
+                # The 8-unit cells whose centres are inside the 32-unit box.
+                ss = {fine[jj][ii] for jj in range(2 * j - 1, 2 * j + 3) for ii in range(2 * i - 1, 2 * i + 3)
                       if 0 <= jj < len(fine) and 0 <= ii < len(fine[0])}
                 urow.append(frozenset(s for s in ss if s is not None) if None not in ss else None)
                 wrow.append(False)
@@ -351,7 +352,8 @@ class Planner:
             j1 = min(g.ny - 1, int((max(a[1], b[1]) + RADIUS - g.y0) // GRID))
             for jj in range(j0, j1 + 1):
                 for ii in range(i0, i1 + 1):
-                    if box_hits(a, b, g.x0 + ii * GRID + GRID / 2, g.y0 + jj * GRID + GRID / 2, RADIUS):
+                    # (a box edge touching a wall is fine, as in Doom)
+                    if box_hits(a, b, g.x0 + ii * GRID + GRID / 2, g.y0 + jj * GRID + GRID / 2, RADIUS - 0.5):
                         self.wall[jj][ii] = True
 
     def cell(self, p):
@@ -360,17 +362,18 @@ class Planner:
     def centre(self, c):
         return (self.g.x0 + c[0] * GRID + GRID / 2, self.g.y0 + c[1] * GRID + GRID / 2)
 
-    def levels(self, h, things):
+    def levels(self, h, things, static=frozenset()):
         """Per cell: (floor, ceiling, on a lift) for the box there, or None if the
-        player can't stand there at all. Reused until a height or a thing moves."""
-        key = (tuple(h), tuple(things))
+        player can't stand there at all. Reused until a height or a thing moves.
+        Lifts in `static` count as the floors they are now (lifts it can't ride)."""
+        key = (tuple(h), tuple(things), static)
         if self._levels[0] == key:
             return self._levels[1]
-        out = self._levels_for(h, things)
+        out = self._levels_for(h, things, static)
         self._levels = (key, out)
         return out
 
-    def _levels_for(self, h, things):
+    def _levels_for(self, h, things, static=frozenset()):
         g = self.g
         out = []
         for j in range(g.ny):
@@ -382,7 +385,7 @@ class Planner:
                     continue
                 f = max(h[s][0] for s in ss)
                 c = min(h[s][1] for s in ss)
-                lift = any(s in g.lifts for s in ss)
+                lift = any(s in g.lifts and s not in static for s in ss)
                 row.append(None if c - f < HEIGHT_P and not lift else (f, c, lift))
             out.append(row)
         for x, y, tr in things:   # Doom blocks things as squares
@@ -396,12 +399,14 @@ class Planner:
 
     @staticmethod
     def step_ok(a, b):
-        """The player can move from a cell at level a to one at level b."""
+        """The player can move from a cell at level a to one at level b: up a
+        step at most, and (as in Doom) b's ceiling high enough over the floor
+        it's standing on, so it can't drop through a low opening."""
         if a is None or b is None:
             return False
         if a[2] or b[2]:
             return True
-        return b[0] - a[0] <= STEP and min(a[1], b[1]) - b[0] >= HEIGHT_P
+        return b[0] - a[0] <= STEP and min(a[1], b[1]) - max(a[0], b[0]) >= HEIGHT_P
 
     def free_near(self, c, lv, reach=3):
         best = None
