@@ -130,6 +130,7 @@ class Explorer(pt.Run):
         self._via = {}            # (from cell, to cell) -> teleport line, for go_to
         self._pads = {}           # cell -> seen teleporter lines through it, for reach
         self._guards, self._guard = {}, set()   # cells it keeps out of beside teleporters
+        self.again = set()        # repeatable switches pressed again since the last progress
 
     # -- seeing --------------------------------------------------------------
     def watch(self):
@@ -255,6 +256,8 @@ class Explorer(pt.Run):
             self.retried = False
         x, y = at or (self._last if self.game.is_episode_finished() else self.pos())
         progress = kind in ("key", "switch", "exit") if progress is None else progress
+        if progress:
+            self.again.clear()
         self.events.append((self.tics, kind, text, x, y, progress))
         self.say(f"  {pt.clock(self.tics)} {kind:<8} {text} at {x:.0f},{y:.0f}")
 
@@ -425,9 +428,17 @@ class Explorer(pt.Run):
                 out.append((dist[c], "frontier", c, ("cell", c)))
         if not out:
             # Nothing new in sight: go and stand in places it has only seen from
-            # afar, as a player does when stuck (a newly opened way, a far ledge).
+            # afar, as a player does when stuck (a newly opened way, a far ledge),
+            # or press a repeatable switch again (a door it opened that shut again).
             out = [(dist[c], "unvisited", c, ("cell", c)) for c in dist
                    if c not in self.visited and ("cell", c) not in self.failed and self.lift_of(c) is None]
+            for i in self.seen_lines:
+                spec = LINE_SPECIALS.get(self.geo.lines[i][3])
+                if spec and spec.trigger == "SR" and spec.kind not in EXITS and ("line", i) in self.done \
+                        and i not in self.again and ("line", i) not in self.failed:
+                    c = self.near(self.spot(i, 0), dist)
+                    if c:
+                        out.append((dist[c], "switch", c, ("line", i, spec, 0)))
         return [(d * WEIGHT[k] * self.rng.uniform(0.85, 1.15), k, c, w) for d, k, c, w in out]
 
     def tagged(self, tag):
@@ -626,10 +637,15 @@ class Explorer(pt.Run):
             self.done.add(("door", bs))
             self.event(kind, f"{self.name(bs)}" + (f" ({spec.key} key)" if spec.key else ""), bool(spec.key))
         else:
-            self.done.add(("line", i))
             moved = sorted({self.name(t) for t in self.tagged(tag)})
-            self.event(kind, f"{spec.trigger} {spec.kind} by {self.name(fs)}"
-                       + (f" -> {'/'.join(moved[:3])}{'...' if len(moved) > 3 else ''}" if moved else ""))
+            text = f"{spec.trigger} {spec.kind} by {self.name(fs)}" \
+                + (f" -> {'/'.join(moved[:3])}{'...' if len(moved) > 3 else ''}" if moved else "")
+            if ("line", i) in self.done:   # pressed again, stuck: not progress
+                self.again.add(i)
+                self.event(kind, text + " (again)", progress=False)
+            else:
+                self.done.add(("line", i))
+                self.event(kind, text)
         for _ in range(70 if kind != "exit" else 35):
             self.tic()
         if kind == "switch":
@@ -668,6 +684,16 @@ class Explorer(pt.Run):
                     tps = sorted(self.teleports & self.seen_lines)
                     print("DBG end at", self.pos(), "sector", self.geo.sector_at(self.pos()), "reach", len(dist),
                           "known", len(self.known), "blocked", len(self.blocked))
+                    here = self.plan.cell(self.pos())
+                    for dj in range(4, -5, -1):
+                        row = []
+                        for di in range(-4, 5):
+                            n = (here[0] + di, here[1] + dj)
+                            v = lv[n[1]][n[0]]
+                            row.append(("#" if v is None else f"{v[0]:.0f}/{v[1]:.0f}")
+                                       + ("k" if n in self.known else "-") + ("d" if n in dist else "-")
+                                       + ("g" if n in self._guard else "-"))
+                        print("DBG  ", " ".join(f"{r:>12}" for r in row))
                     print("DBG end: seen teleports", tps, "links", sorted(self.links), "failed", self.failed,
                           "done", [d for d in self.done if d[0] == "line" and d[1] in self.teleports])
                     for i in tps:
