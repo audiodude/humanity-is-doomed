@@ -465,6 +465,14 @@ class Explorer(pt.Run):
                 for di in range(-2, 3):
                     for dj in range(-2, 3):
                         jumps.setdefault((a[0] + di, a[1] + dj), []).append((t, i))
+        # A cell whose box stands on a step its centre is beside (the side of
+        # a stair, a ledge's lip) holds the player up only while it doesn't
+        # drift off: a way up the middle costs less than one along the edge.
+        h = self.heights()
+
+        def edge(n):
+            f, s = lv[n[1]][n[0]], g.cell_sector[n[1]][n[0]]
+            return f is not None and not f[2] and s is not None and f[0] - h[s][0] > pt.STEP
         dist, prev, todo = {s: 0.0}, {}, [(0.0, s)]
         while todo:
             d, c = heapq.heappop(todo)
@@ -487,7 +495,7 @@ class Explorer(pt.Run):
                 if di and dj and not (plan.can_step(c, (n[0], c[1]), lv) and plan.can_step(c, (c[0], n[1]), lv)):
                     continue
                 nd = d + math.hypot(di, dj) * (20 if g.cell_sector[n[1]][n[0]] in g.damaging else
-                                               10 if n in guard else 1)
+                                               10 if n in guard else 4 if edge(n) else 1)
                 if nd < dist.get(n, 1e18):
                     dist[n], prev[n] = nd, c
                     heapq.heappush(todo, (nd, n))
