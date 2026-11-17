@@ -174,6 +174,8 @@ Also, the last leg of each wave is checked under the next wave's state too, beca
 
 Warnings fire on legs below the id maps' 10th percentile of the detour ratio (0.147 DOOM II, 0.402 Ultimate), above the 90th percentile of the hitscan peak (88.4 and 46), on any leg where the thorough curve runs short, on traps that release more HP than the ammo in hand, and on starts under fire.
 
+**Our maps' floor.** Our own maps (not `IMPORTED`) also warn on any leg whose detour ratio is below `OWN_DETOUR_FLOOR`, 1.2, whatever the id maps do. The curves count every shot as a hit, so a ratio near 1 leaves a player who misses nothing. Added after Cursed Altar (2026-11-16, then called The Procession): a person starved twice on UV with its yellow-key leg at 0.85, a ratio the id threshold passes and the fight bot, which aims far better, played through. One data point: 1.2 is a judgment, not a calibration. When it was added, it flagged three NUKAGE maps, which haven't been changed: Storage (1.02 and 1.15), Drain (1.15) and Undercurrent (1.17, the curve the validation below judged sufficient against the bot). Whether people starve on them isn't known.
+
 **Health.** The cost per HP is the DOOM II median of the highest rate each map's detour route can afford (17.3 per 1000 HP). So the column reads "health left if the fights cost what the median id map's route can afford". That rate, per map, is the new "health per 1000 HP the route affords" measure.
 
 **Side rooms** are listed but don't warn: the id maps routinely have closets that cost more ammo than they hold.

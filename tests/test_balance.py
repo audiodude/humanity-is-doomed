@@ -5,7 +5,7 @@ import sys
 from conftest import ROOT, module, needs_iwad
 
 from levels import checks
-from levels.balance import route_balance
+from levels.balance import Balance, Leg, report, route_balance
 from levels.doom2 import IMP, PLAYER1, SHELLBOX, SHOTGUN, W1_EXIT
 from levels.mapgen import compile_level
 from levels.model import Sector, Special, Thing, load, rect
@@ -61,3 +61,10 @@ def test_an_engaged_monster_is_paid_for_from_the_ammo_carried():
     (leg,) = balance(corridor_map(Thing(IMP, 900, 256, 0))).legs
     assert leg.engaged_hp == 60
     assert leg.detour[0] == 500 + 8 * 70 + 20 * 70 - 60
+
+
+def test_our_maps_warn_below_the_detour_floor_imported_maps_only_below_ids():
+    leg = Leg("yellow key", "fountain", 0, [], 3816, 4230, thorough=(6000, 2.4, 50, 0), detour=(-700, 0.85, 40, 0))
+    bal = Balance(legs=[leg])
+    assert any("1.2x the monster HP on leg(s) 1" in w for w in report(bal, own=True)[1])
+    assert not any("resource curve" in w for w in report(bal)[1])   # 0.85 is above id's 10th percentile

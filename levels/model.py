@@ -1,5 +1,6 @@
 """Level data model: the dataclasses level modules are written in, geometry
 primitives, and shape helpers (doorway, stairs, lift)."""
+import math
 import os
 import re
 from dataclasses import dataclass, field
@@ -466,6 +467,76 @@ def strip(at: Point, facing: str, start: int, depth: int, width: int) -> Loop:
         return rect(x1, y - width // 2, x2, y + width // 2)
     y1, y2 = sorted((y + dy * start, y + dy * (start + depth)))
     return rect(x - width // 2, y1, x + width // 2, y2)
+
+
+def regular(cx, cy, r, n, rot=None) -> Loop:
+    """Regular n-gon centred on (cx, cy), `r` from the centre to each vertex,
+    vertices rounded to whole units. By default (rot=None) one edge lies flat
+    at the bottom, so an n divisible by 4 has edges on both axes, where doors
+    and switches go; `rot` is the first vertex's angle in degrees otherwise.
+    Concentric calls nest: an island, a ring round it and a room round that."""
+    a0 = math.radians(-90 - 180 / n if rot is None else rot)
+    return [(round(cx + r * math.cos(a0 + 2 * math.pi * i / n)), round(cy + r * math.sin(a0 + 2 * math.pi * i / n)))
+            for i in range(n)]
+
+
+def chamfer(x1, y1, x2, y2, c) -> Loop:
+    """rect() with each corner cut off `c` along both walls (at 45 degrees)."""
+    if not 0 < 2 * c < min(x2 - x1, y2 - y1):
+        raise LevelError(f"chamfer {c} doesn't fit {x2 - x1}x{y2 - y1}")
+    return [(x1 + c, y1), (x2 - c, y1), (x2, y1 + c), (x2, y2 - c), (x2 - c, y2), (x1 + c, y2), (x1, y2 - c),
+            (x1, y1 + c)]
+
+
+def arc(cx, cy, r, a0, a1, n) -> list[Point]:
+    """n + 1 points on a circle round (cx, cy), from angle a0 to a1 in degrees
+    (counter-clockwise if a1 > a0), rounded to whole units: a curved wall in n
+    segments. Join arcs and points into a loop: a quarter-round room is
+    [(cx, cy)] + arc(cx, cy, 512, 0, 90, 6); a curved band between two radii
+    is arc(cx, cy, 512, 0, 90, 6) + arc(cx, cy, 384, 90, 0, 6)."""
+    return [(round(cx + r * math.cos(math.radians(a0 + (a1 - a0) * i / n))),
+             round(cy + r * math.sin(math.radians(a0 + (a1 - a0) * i / n)))) for i in range(n + 1)]
+
+
+def inset(loop, d) -> Loop:
+    """loop moved `d` inward along every edge (outward for negative d),
+    rounded to whole units: [outer, inset(outer, 64)] is a ledge or walkway
+    64 wide round the inside of a room, and inset(outer, 64) the floor it
+    surrounds. Edges must stay longer than they shrink: fine for convex
+    shapes, check the preview for concave ones."""
+    n, sign = len(loop), (1 if area2(loop) > 0 else -1)   # inward is left of each edge on a counter-clockwise loop
+    lines = []
+    for (ax, ay), (bx, by) in edges(loop):
+        L = math.hypot(bx - ax, by - ay)
+        nx, ny = -sign * (by - ay) / L, sign * (bx - ax) / L
+        lines.append(((ax + nx * d, ay + ny * d), (bx - ax, by - ay)))
+    out = []
+    for i in range(n):
+        (px, py), (ux, uy) = lines[i - 1]
+        (qx, qy), (vx, vy) = lines[i]
+        den = ux * vy - uy * vx
+        if abs(den) < 1e-9:   # straight on: the corner moves along the normal
+            out.append((round(qx), round(qy)))
+            continue
+        t = ((qx - px) * vy - (qy - py) * vx) / den
+        out.append((round(px + t * ux), round(py + t * uy)))
+    return out
+
+
+def curved_stairs(name, centre, r1, r2, a0, a1, steps, floor, rise, ceil, ftex, ctex, light, wall, riser,
+                  segs=1) -> list[Sector]:
+    """`steps` wedge-shaped steps between radii r1 < r2 round `centre`, from
+    angle a0 to a1 in degrees (a1 > a0 turns counter-clockwise), changing
+    height by `rise` per step from `floor` (negative rise goes down). Each
+    step's inner and outer edges are `segs` straight segments, on the same
+    points as arc(cx, cy, r, a0, a1, steps * segs), so a room or ring built
+    from that arc shares the stair's edge. Keep steps at least 48 deep along
+    the middle radius, as for stairs(): (r1 + r2) / 2 * radians(a1 - a0) /
+    steps. Sectors are named <name>1..N."""
+    cx, cy = centre
+    outer, inner = arc(cx, cy, r2, a0, a1, steps * segs), arc(cx, cy, r1, a0, a1, steps * segs)
+    return [Sector(f"{name}{i + 1}", [outer[i * segs:(i + 1) * segs + 1] + inner[i * segs:(i + 1) * segs + 1][::-1]],
+                   floor + i * rise, ceil, ftex, ctex, light, wall, lower=riser) for i in range(steps)]
 
 
 def door(name, loop, face="BIGDOOR2", track="DOORTRAK", action=None, tag=0, light=144, floor=0,

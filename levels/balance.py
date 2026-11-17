@@ -37,7 +37,9 @@ path under that wave's heights. Along it:
 
 Every finding is a warning judged against the id maps (THRESHOLDS, from
 scripts/metrics/route_metrics.py): a quarter of them run short on the
-thorough curve too. docs/balance-metrics.md has the design and calibration.
+thorough curve too. Our own maps (report's own=True) are held to a higher
+floor on the detour curve, OWN_DETOUR_FLOOR. docs/balance-metrics.md has the
+design and calibration.
 
     lines, warnings = report(route_balance(m, md, res, legs, names=names), m.game)
 """
@@ -70,6 +72,11 @@ HITSCAN_DPS = {ZOMBIE: 4, SARGE: 10, SS: 6, CHAINGUY: 20, SPIDER: 60}
 # 10th percentile of the lowest detour ratio along the route, and the 90th of
 # the long-range hitscan peak.
 THRESHOLDS = {"doom2": (0.147, 88.4), "doom": (0.402, 46)}
+# Our maps warn when the detour ratio on any leg is below this, whatever id's
+# maps do: the curves count every shot as a hit, so a ratio near 1 leaves a
+# player who misses nothing. A person starved twice on UV in Cursed Altar at
+# 0.85; the fight bot, which aims far better, didn't.
+OWN_DETOUR_FLOOR = 1.2
 
 
 @dataclass
@@ -390,20 +397,22 @@ def health_rate(bal):
     return lo
 
 
-def report(bal, game="doom2", detour=DETOUR):
+def report(bal, game="doom2", detour=DETOUR, own=False):
     """(lines, warnings) of a Balance. Nothing here is an error: the id maps
     themselves run short on the curves (see THRESHOLDS), so these are flags to
-    look at, judged against the IWAD."""
+    look at, judged against the IWAD. own: one of our maps, held to
+    OWN_DETOUR_FLOOR on the detour curve."""
     if not bal.legs:
         return [], []
     low_detour, high_hitscan = THRESHOLDS[game]
+    floor = max(low_detour, OWN_DETOUR_FLOOR) if own else low_detour
     lines = [f"resource curve (UV, pistol start; ammo as damage)    thorough            detour D={detour}",
              f" #  {'phase':<36} {'path':>5} {'eng.HP':>6}  {'ammo left':>9} {'ratio':>5}  "
              f"{'ammo left':>9} {'ratio':>5} {'health':>6}  long hitscan"]
     warnings = []
     for k, leg in enumerate(bal.legs, 1):
         (tl, tr, _, _), (dl, dr, dh, _) = leg.thorough, leg.detour
-        flag = "  !! short even taking everything" if tl < 0 else "  !! detour" if dr < low_detour else ""
+        flag = "  !! short even taking everything" if tl < 0 else "  !! detour" if dr < floor else ""
         ratio = lambda r: "-" if r == math.inf else f"{r:.2f}"   # noqa: E731
         lines.append(f"{k:>2}  {(leg.label + ' @ ' + leg.site)[:36]:<36} {leg.length:>5.0f} {leg.engaged_hp:>6}  "
                      f"{tl:>9.0f} {ratio(tr):>5}  {dl:>9.0f} {ratio(dr):>5} {dh:>6.0f}  "
@@ -411,9 +420,15 @@ def report(bal, game="doom2", detour=DETOUR):
     if short := [k for k, leg in enumerate(bal.legs, 1) if leg.thorough[0] < 0]:
         warnings.append(f"resource curve: even taking every reachable item the route runs short of ammo on leg(s) "
                         f"{', '.join(map(str, short))} (a quarter of the id maps do; check those fights)")
-    if low := [k for k, leg in enumerate(bal.legs, 1) if leg.thorough[0] >= 0 and leg.detour[1] < low_detour]:
-        warnings.append(f"resource curve: near the route, ammo is scarcer than on 90% of the id maps on leg(s) "
-                        f"{', '.join(map(str, low))} (detour ratio below {low_detour}); the ammo is off the way")
+    if low := [k for k, leg in enumerate(bal.legs, 1) if leg.thorough[0] >= 0 and leg.detour[1] < floor]:
+        legs = ", ".join(map(str, low))
+        warnings.append(
+            f"resource curve: near the route, ammo is under {floor}x the monster HP on leg(s) {legs} (detour "
+            f"ratio): the curve counts every shot as a hit, so a player who misses runs dry. Put ammo on the way "
+            f"to those legs' fights (the id maps' 10th percentile is {low_detour}; our maps' floor is {floor})"
+            if own else
+            f"resource curve: near the route, ammo is scarcer than on 90% of the id maps on leg(s) {legs} "
+            f"(detour ratio below {low_detour}); the ammo is off the way")
     if snipe := [k for k, leg in enumerate(bal.legs, 1) if leg.long_hitscan > high_hitscan]:
         warnings.append(f"long-range hitscan above {high_hitscan}/s (the id maps' 90th percentile) on leg(s) "
                         f"{', '.join(map(str, snipe))}")

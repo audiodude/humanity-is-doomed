@@ -36,6 +36,8 @@ DOOM2 = {
     "top_wall_tex_share": (0.1961, 0.2955, 0.4505),
     "r2_border_frac_collinear": (0.1295, 0.313, 0.6276),
     "sym_max": (0.4349, 0.5367, 0.642),
+    "off_axis_frac": (0.1077, 0.2341, 0.3888),
+    "axis_sector_frac": (0.2729, 0.389, 0.5),
     "optional_area_share": (0.3285, 0.497, 0.7077),
     "n_secrets": (2, 4, 6.75),
     "monsters_hard": (80, 111.5, 158),
@@ -62,6 +64,8 @@ ULTIMATE = {
     "top_wall_tex_share": (0.1812, 0.3089, 0.5327),
     "r2_border_frac_collinear": (0.4444, 0.64, 0.7748),
     "sym_max": (0.4617, 0.5495, 0.64),
+    "off_axis_frac": (0.2326, 0.2909, 0.3598),
+    "axis_sector_frac": (0.2087, 0.2927, 0.4099),
     "optional_area_share": (0.3553, 0.4395, 0.587),
     "n_secrets": (2, 3.5, 6),
     "monsters_hard": (60.75, 90.5, 124.5),
@@ -88,6 +92,8 @@ LABELS = {
     "top_wall_tex_share": "most-used wall texture",
     "r2_border_frac_collinear": "rule-2 seams with a border texture",
     "sym_max": "whole-map symmetry",
+    "off_axis_frac": "off-axis share of line length",
+    "axis_sector_frac": "axis-aligned share of rooms >= 128x128",
     "optional_area_share": "optional share of area",
     "n_secrets": "secrets",
     "monsters_hard": "monsters (UV)",
@@ -208,7 +214,7 @@ def measure(level, lines, found):
             continue
         flag = "  below" if v < q1 else "  above" if v > q3 else ""
         out.append(f"{LABELS[k]:<44} {fmt(v):>9}   {fmt(med)} [{fmt(q1)}-{fmt(q3)}]{flag}")
-    lines, warnings = report(bal, level.game)
+    lines, warnings = report(bal, level.game, own=not level.imported)
     sw_lines, sw_warnings = switch_report(md, route["switches"], list(level.sectors))
     return out + lines + sw_lines, warnings + sw_warnings
 

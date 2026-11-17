@@ -37,7 +37,7 @@ Build the map (the `doom-build` command) and read what it prints after the measu
 
 - **Resource curve**, one row per leg of the critical path (start → each required key or trigger → exit), at UV, pistol start, ammo counted as damage. Columns: path length, engaged monster HP, then `ammo left` and `ratio` (cumulative supply / engaged HP) on two curves, then `health` and the leg's long-range hitscan.
   - *thorough*: every reachable item, secrets and side rooms included. Negative `ammo left` (`!! short even taking everything`) means fights the map's items can't pay for.
-  - *detour* (D=1024): only items within a 1024-unit round trip off the path, no secrets. This is the normal player. `!! detour` marks a leg below the id maps' 10th percentile (0.147 DOOM II, 0.402 Ultimate): the ammo is there but off the way.
+  - *detour* (D=1024): only items within a 1024-unit round trip off the path, no secrets. This is the normal player. On our maps `!! detour` marks a leg whose ratio is below 1.2: the curve counts every shot as a hit, so a player who misses runs dry near 1 (Cursed Altar starved a person twice on UV at 0.85; the bot played through). Imported maps are flagged only below the id maps' 10th percentile (0.147 DOOM II, 0.402 Ultimate).
   - *health*: health left if fights cost what the median id map's route affords (17.3 per 1000 HP).
 - **Side rooms**: monsters never engaged by the route, with their HP and the ammo and health there. Listed, not warned; id's maps often have closets that cost more than they hold.
 - **Traps**: each trigger on the route, the HP it releases against ammo carried then (an optimistic figure), the nearest monster's distance, and `no way back` when the retreat is gone.
@@ -47,7 +47,7 @@ Build the map (the `doom-build` command) and read what it prints after the measu
 
 Nothing here is an error: a quarter of the DOOM II maps run short on the thorough curve and 9 of 32 have a start under fire. Judge each warning against the doc's targets and the map's intent. Fix starvation near the route with pickups on the way, not ammo in a side room; fix sniping with cover or by moving the hitscanner within 768; fix a start under fire by turning the monster, adding a wall or moving it to a higher skill; fix an unseen, unheard switch with a window onto what it moves, by moving the two closer, or by showing the change on the way back (a lit doorway, monsters coming out of it).
 
-Done when every warning is fixed or written into the doc's Targets section with why it stays, and the detour curve's low point is no lower than the doc's ammo target allows.
+Done when every warning is fixed or written into the doc's Targets section with why it stays, and the detour curve's low point is no lower than the doc's ammo target allows. Read the curve again after any change to the route, the sound zones or monster placement, not only after changing pickups: moving where monsters engage moves their HP between legs.
 
 ## 5. Fight runs
 

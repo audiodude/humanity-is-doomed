@@ -23,6 +23,10 @@ Method notes (full definitions in research/facets/10-quant-space.md):
   two-sided line where one side is not walkable, the opening is < 56 (doors
   exempt), or the floor step is > 24 (lift/platform sectors exempt). Ledges
   count as walls in both directions (a drop still bounds dodging room).
+* Plan geometry: `off_axis_frac` is the share of line length that is
+  neither horizontal nor vertical; `axis_sector_frac` the share of walkable
+  sectors of at least 128x128 none of whose lines is off the axes (boxes and
+  other axis-aligned polygons, holes included).
 * Clearance = exact Euclidean distance from a walkable cell centre to the
   nearest movement-wall segment. Local width = diameter of the largest
   wall-free disk containing the cell ("local thickness"), computed by
@@ -713,6 +717,20 @@ def analyse(args):
     r["liquid_floor_frac"] = sum(areas[i] for i in wl if LIQUID.match(S[i].ftex)) / walk_area
     r["liquid_floor_frac_all"] = (sum(areas[i] for i in range(len(S)) if LIQUID.match(S[i].ftex))
                                   / sum(areas))
+
+    # 12. plan geometry --------------------------------------------------------
+    len_all = len_off = 0.0
+    angled = set()   # sectors with an off-axis line
+    for ln in m.lines:
+        (ax, ay), (bx, by) = m.verts[ln.v1], m.verts[ln.v2]
+        L = m.length(ln)
+        len_all += L
+        if ax != bx and ay != by:
+            len_off += L
+            angled.update(s for s in m.line_sectors(ln) if s is not None)
+    r["off_axis_frac"] = len_off / len_all if len_all else 0.0
+    big = [i for i in wl if areas[i] >= 128 * 128]
+    r["axis_sector_frac"] = sum(1 for i in big if i not in angled) / len(big) if big else 0.0
     return r
 
 
@@ -736,7 +754,7 @@ KEY = ["walkable_area", "frac_width_le96", "frac_width_le128", "width_median", "
        "dark_area_frac", "light_delta_mean", "r1_floor_viol_nodoor", "r1_ceil_viol_nodoor",
        "r2_border_frac_collinear", "r3_h_aligned_frac", "r3_v_aligned_frac", "r3_v_fix_rate",
        "distinct_wall_textures", "wall_tex_entropy", "top_wall_tex_share", "sym_max", "sym_edge_max",
-       "damage_floor_frac", "liquid_floor_frac"]
+       "damage_floor_frac", "liquid_floor_frac", "off_axis_frac", "axis_sector_frac"]
 
 
 def summary():
