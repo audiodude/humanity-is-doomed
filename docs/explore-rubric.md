@@ -141,8 +141,17 @@ simply worse everywhere.
 ```sh
 uv run --with vizdoom scripts/tools/compare.py ~/.local/share/playtest/plays/<folder>
 uv run --with vizdoom scripts/tools/compare.py ~/.local/share/playtest/plays/<folder> --choice 2:10-2:55
-uv run --with vizdoom scripts/tools/compare.py --pool        # S3 and S5 over every scored play, this commit
+uv run --with vizdoom scripts/tools/compare.py --pool        # the plan's gates over the blind plays, this commit
+uv run --with vizdoom scripts/tools/compare.py --pool --commit 9d0db0a,03b22ba   # commits with the same explorer code
 ```
+
+`--pool` reads each play's `meta.json`: `pool` (its number in the blind pool;
+every third is holdout), `source` (obsidian, slige or community), `spoiled`
+(dropped) and `verdict_override` (`Bot-limited`: listed, not counted). It adds
+up the cause codes in `compare-<commit>/codes.json` by stall time: a list of
+`{"code", "time": "M:SS", "mismatch", "why"}`, where `time` is the stall time
+behind the mismatch (a bot stall's, averaged over the seeds that had it).
+Holdout scores stay hidden until `--gate-c`, which runs only once gate B passes.
 
 It runs the explorer on the play's own copy of the WAD for each seed, plays
 every demo (the person's and the seeds') back through the `--play` report's

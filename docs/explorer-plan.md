@@ -107,9 +107,9 @@ Precision is the guard against overtuning. A bot that stalls everywhere would sc
 ## 6. Work list
 
 - [x] Score the canyon play again at the current commit under rubric v3.
-- [ ] `compare.py`: read `codes.json`, add the codes up by stall time in `--pool`, and mark plays as tuning or holdout (from the every-third rule, stored in the play's `meta.json`). `--pool` reports the two sets separately, and holdout scores stay hidden until a gate C check.
-- [ ] `compare.py --pool` reports gates B, C and D.
-- [ ] Play the first wave (plays #2–#9; the canyon is #1).
+- [x] `compare.py`: read `codes.json`, add the codes up by stall time in `--pool`, and mark plays as tuning or holdout (from the every-third rule, stored in the play's `meta.json`). `--pool` reports the two sets separately, and holdout scores stay hidden until a gate C check.
+- [x] `compare.py --pool` reports gates B, C and D.
+- [x] Play the first wave (plays #2–#9; the canyon is #1). #5 (CHORD_NG) is Bot-limited; SJS2 was spoiled (interrupted) and dropped.
 - [ ] A cloud batch that scores every play again at a new commit (the AWS Spot setup from the acceptance batch).
 - [ ] Tuning rounds until gate B passes, then gate C, then gate D.
 - [ ] At readiness: `metrics_explore.csv` for the id maps and the community reference set, then the doom-test, doom-design and builder.md changes.

@@ -2,7 +2,7 @@
 by the rubric in docs/explore-rubric.md.
 
     uv run --with vizdoom scripts/tools/compare.py PLAY_DIR [--seeds 1,2,3] [--choice M:SS-M:SS ...]
-    uv run --with vizdoom scripts/tools/compare.py --pool [--commit HASH]
+    uv run --with vizdoom scripts/tools/compare.py --pool [--commit HASH[,HASH...]] [--gate-c]
 
 It runs --explore on the play's own copy of the WAD for each seed, then plays
 every demo back (the person's and each seed's) through the --play report's
@@ -10,8 +10,9 @@ bookkeeping, so a milestone means the same thing on both sides, and scores
 them. It writes compare-<commit>/ in the play folder: each seed's explore
 report, report.txt (milestone times, the scores, the verdict, and the
 mismatches to give a cause code) and scores.json. --choice drops stretches of
-the person's run coded H-choice. --pool adds up S3 and S5 over every play
-scored at a commit and says whether the explorer has passed the rubric's bar.
+the person's run coded H-choice. --pool reports the gates of
+docs/explorer-plan.md over the blind plays (tuning and holdout, from each
+play's meta.json) and adds up their cause codes (codes.json) by stall time.
 """
 import argparse
 import concurrent.futures as cf
@@ -332,24 +333,112 @@ def tics(clock):
     return (int(m) * 60 + int(s)) * TIC
 
 
-def pool(at):
-    files = sorted(glob.glob(os.path.join(PLAYS, "*", f"compare-{at}", "scores.json")))
-    if not files:
-        print(f"no plays scored at {at}")
-        return 2
-    s3, s5 = [0, 0], [0, 0]
-    for p in files:
-        with open(p) as f:
-            sc = json.load(f)
-        print(f"{sc['play']}: {sc['verdict']}  S3 {sc['S3'][0]}/{sc['S3'][1]}  S5 {sc['S5'][0]}/{sc['S5'][1]}")
-        s3 = [a + b for a, b in zip(s3, sc["S3"])]
-        s5 = [a + b for a, b in zip(s5, sc["S5"])]
+def clock_s(clock):
+    m, s = clock.split(":")
+    return int(m) * 60 + int(s)
+
+
+def gate(name, plays, maps, lost, recall, precision):
+    """Print one gate's line over `plays` (scored, counted); True if it holds."""
+    s3 = [sum(p["sc"]["S3"][k] for p in plays) for k in (0, 1)]
+    s5 = [sum(p["sc"]["S5"][k] for p in plays) for k in (0, 1)]
     r3 = s3[0] / s3[1] if s3[1] else 0
-    r5 = s5[0] / s5[1] if s5[1] else 1
-    met = len(files) >= 5 and s3[1] >= 10 and r3 >= 0.6 and r5 >= 0.5
-    print(f"pooled over {len(files)} maps at {at}: lost recall {s3[0]}/{s3[1]}, stall precision {s5[0]}/{s5[1]}")
-    print("the explorer's stalls are evidence for map review" if met else
-          "not yet evidence (needs 5 maps, 10 lost stretches, lost recall 60%, precision 50%): hints only")
+    r5 = s5[0] / s5[1] if s5[1] else None   # no recurring stalls: precision n/a, passes
+    ok = len(plays) >= maps and s3[1] >= lost and r3 >= recall and (r5 is None or r5 >= precision)
+    print(f"gate {name}: {len(plays)} maps (needs {maps}), {s3[1]} lost stretches (needs {lost}), "
+          f"lost recall {s3[0]}/{s3[1]} (needs {recall:.0%}), stall precision {s5[0]}/{s5[1]}"
+          + ("" if s5[1] else " n/a") + f" (needs {precision:.0%}): {'PASS' if ok else 'not yet'}")
+    return ok
+
+
+def pool(commits, check_c):
+    """The plan's gates (docs/explorer-plan.md) over the blind plays: each
+    play's meta.json has its number in the pool ("pool": every third is
+    holdout) and its "source"; a "spoiled" play and one with no number don't
+    count, and a "verdict_override" of Bot-limited is listed but not counted.
+    A play's scores are those at the first of `commits` it has been scored
+    at (commits with the same explorer code), its cause codes the
+    codes.json beside them. Holdout scores stay hidden until --gate-c."""
+    plays = []
+    for path in glob.glob(os.path.join(PLAYS, "*", "meta.json")):
+        with open(path) as f:
+            meta = json.load(f)
+        if "pool" not in meta or meta.get("spoiled"):
+            continue
+        folder = os.path.dirname(path)
+        at = next((c for c in commits if os.path.exists(os.path.join(folder, f"compare-{c}", "scores.json"))), None)
+        sc = codes = None
+        if at:
+            with open(os.path.join(folder, f"compare-{at}", "scores.json")) as f:
+                sc = json.load(f)
+            cp = os.path.join(folder, f"compare-{at}", "codes.json")
+            if os.path.exists(cp):
+                with open(cp) as f:
+                    codes = json.load(f)
+        plays.append(dict(n=meta["pool"], source=meta["source"], name=os.path.basename(folder), at=at, sc=sc,
+                          codes=codes, holdout=meta["pool"] % 3 == 0,
+                          limited=meta.get("verdict_override") == "Bot-limited"))
+    plays.sort(key=lambda p: p["n"])
+    tuning = [p for p in plays if not p["holdout"]]
+    holdout = [p for p in plays if p["holdout"]]
+    print(f"pooled at {', '.join(commits)}\n\ntuning plays:")
+    for p in tuning:
+        head = f"  #{p['n']:<3}{p['source']:<10}{p['name']}"
+        if p["limited"]:
+            print(f"{head}: Bot-limited, not counted")
+        elif not p["sc"]:
+            print(f"{head}: not scored at {', '.join(commits)}")
+        else:
+            sc = p["sc"]
+            print(f"{head}: {sc['verdict']}  S3 {sc['S3'][0]}/{sc['S3'][1]}  S5 {sc['S5'][0]}/{sc['S5'][1]}"
+                  + ("" if p["codes"] is not None else "  (no codes.json)"))
+    counted = [p for p in tuning if p["sc"] and not p["limited"]]
+    unscored = [p for p in tuning if not p["sc"] and not p["limited"]]
+    print()
+    b = gate("B (tuning)", counted, 5, 10, 0.6, 0.5) and not unscored
+    if unscored:
+        print(f"  {len(unscored)} tuning play(s) not scored at this commit: score them before reading gate B")
+    # The cause codes, by the stall time behind them: a round works on the
+    # biggest bot-side cause that shows up in 2 maps or more.
+    time, maps = Counter(), {}
+    for p in counted:
+        for c in p["codes"] or ():
+            time[c["code"]] += clock_s(c["time"])
+            maps.setdefault(c["code"], set()).add(p["n"])
+    print("\ncause codes over the tuning plays, by stall time:")
+    for code, t in time.most_common():
+        n = len(maps[code])
+        print(f"  {code:<13}{pt.clock(t * TIC):>7}  {n} map{'s' if n > 1 else ''}"
+              + ("  <- can be a tuning target" if n >= 2 and code.startswith("B-") else ""))
+    if not time:
+        print("  none yet")
+    print(f"\n{len(holdout)} holdout play(s) recorded: " + ", ".join(f"#{p['n']}" for p in holdout))
+    if not check_c:
+        print("their scores stay hidden until gate B passes (then --gate-c, once)")
+        return 0
+    if not b:
+        print("gate C is checked only once gate B passes, at that commit")
+        return 1
+    hc = [p for p in holdout if p["sc"] and not p["limited"]]
+    missing = [p for p in holdout if not p["sc"] and not p["limited"]]
+    if missing:
+        print(f"score the holdout plays first: {', '.join(p['name'] for p in missing)}")
+        return 1
+    for p in holdout:
+        sc = p["sc"]
+        print(f"  #{p['n']:<3}{p['source']:<10}{p['name']}: "
+              + ("Bot-limited, not counted" if p["limited"] else
+                 f"{sc['verdict']}  S3 {sc['S3'][0]}/{sc['S3'][1]}  S5 {sc['S5'][0]}/{sc['S5'][1]}"))
+    c = gate("C (holdout)", hc, 3, 5, 0.5, 0.5)
+    print("gate D (per source, tuning and holdout; a source with 3+ lost stretches needs lost recall 40%):")
+    d = True
+    for src in sorted({p["source"] for p in counted + hc}):
+        s3 = [sum(p["sc"]["S3"][k] for p in counted + hc if p["source"] == src) for k in (0, 1)]
+        ok = s3[1] < 3 or s3[0] / s3[1] >= 0.4
+        d &= ok
+        print(f"  {src:<10} lost recall {s3[0]}/{s3[1]}: "
+              + ("too few to judge" if s3[1] < 3 else "pass" if ok else "fail: 'not for this style' in the skills"))
+    print("ready: freeze this commit" if c and d else "not ready")
     return 0
 
 
@@ -360,12 +449,14 @@ def main():
     p.add_argument("--choice", action="append", default=[], metavar="M:SS-M:SS",
                    help="a stretch of your run coded H-choice, left out of the scores (repeatable)")
     p.add_argument("--iwad", default=pt.DEFAULT_IWAD, help="the IWAD, if the play's is gone (default: DOOM2_WAD)")
-    p.add_argument("--pool", action="store_true", help="pool the scores of every play scored at --commit")
-    p.add_argument("--commit", help="with --pool: the explorer commit (default: this checkout's)")
+    p.add_argument("--pool", action="store_true", help="the plan's gates over the blind plays scored at --commit")
+    p.add_argument("--commit", help="with --pool: the explorer commit, or several with the same explorer code, "
+                   "comma-separated (default: this checkout's)")
+    p.add_argument("--gate-c", action="store_true", help="with --pool: check gate C (holdout), once gate B passes")
     args = p.parse_args()
     at = commit()
     if args.pool:
-        return pool(args.commit or at)
+        return pool((args.commit or at).split(","), args.gate_c)
     if not args.play:
         p.error("give a --play folder, or --pool")
     folder = os.path.abspath(args.play)
