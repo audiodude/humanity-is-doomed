@@ -19,6 +19,9 @@ by walking distance over floor it has seen:
     ("shot" in the report)
   - a door it hasn't opened, if it has the key (a locked one a third: having
     the key, that door is what it's after)
+  - a shut door with no use action (it has a door's texture, and a
+    walk-over line in front of it opens it): it walks up to it and uses it,
+    once, as a wall search does ("found" in the report if it opened)
   - a teleporter it has seen and not been through (a player knows a pad),
     if the pad has room to stand on: it steps on from the side that works,
     from a floor level with it
@@ -131,8 +134,8 @@ VISITED = 6            # cells round where it has been that count as visited
 STALL = 30 * 35        # a stretch this long with no progress is reported
 RETRY = 60 * 35        # tics before a key or switch it gave up on is tried again
 MOVES = 10             # times between progress that something it saw moving makes it look again
-WEIGHT = {"exit": 0.25, "key": 1 / 3, "switch": 2 / 3, "door": 1.0, "teleport": 1.0, "frontier": 1.0,
-          "unvisited": 1.0, "again": 1.0}
+WEIGHT = {"exit": 0.25, "key": 1 / 3, "switch": 2 / 3, "door": 1.0, "doorway": 1.0, "teleport": 1.0,
+          "frontier": 1.0, "unvisited": 1.0, "again": 1.0}
 DOORISH = ("DOOR", "BIGDOOR", "SPCDOOR", "EXITDOOR")   # textures that read as a door (but door tracks don't)
 NOT_DOOR = ("DOORTRAK", "DOORSTOP")
 NEARBY = 512          # a floor or ceiling that moves this close to a wall it searched is what it found
@@ -656,6 +659,17 @@ class Explorer(pt.Run):
                     d = dist[c] * (WEIGHT["key"] / WEIGHT["door"] if kind == "door" and spec.key else 1)
                     out.append((d, kind, c, ("line", i, spec, side)))
         closed = {s for s, (f, c) in enumerate(h) if c - f <= 0}
+        # A shut door with no use action (one a walk-over line in front of it
+        # opens): it looks like a door, so it walks up to it and tries it, once.
+        for i in self.seen_lines:
+            if i in self.door_lines or SPECIALS.get(self.geo.lines[i][3]):
+                continue
+            for side in self.wall_sides(i, h):
+                far = self.geo.lines[i][6 - side]
+                if far in closed and (i, side) not in self.searched and self.doorish(i, side):
+                    c = self.near(self.spot(i, side, 32), dist, use=i)
+                    if c:
+                        out.append((dist[c], "doorway", c, ("wall", i, side)))
         for c in dist:
             if c not in self.looked and ("cell", c) not in self.failed and self.lift_of(c) is None \
                     and self.frontier(c, closed):
@@ -1151,12 +1165,16 @@ class Explorer(pt.Run):
                 out.append(side)
         return tuple(out)
 
+    def doorish(self, i, side):
+        """Line i's `side` shows a door's texture (not a door track's)."""
+        return any(t.startswith(DOORISH) and not t.startswith(NOT_DOOR) for t in self.showing(i, side))
+
     def cue(self, i, side):
         """Whether the wall stands out as a player would notice: a switch or
         a door's texture, or a texture none of the faces either side of it in
         the same room has."""
         tex = self.showing(i, side)
-        if is_switch(tex) or any(t.startswith(DOORISH) and not t.startswith(NOT_DOOR) for t in tex):
+        if is_switch(tex) or self.doorish(i, side):
             return True
         a, b, _f, _sp, _t, fs, bs = self.geo.lines[i]
         room = fs if side == 0 else bs
