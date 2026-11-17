@@ -1,6 +1,6 @@
 # The maps
 
-The eight maps in `wads/NUKAGE.WAD`, and Nukage Divided, cut from it, each measured against the DOOM II maps with the research scripts (see the [builder docs](builder.md#what-every-build-checks)). Routes and secrets are in [SPOILERS.md](../SPOILERS.md).
+The eight maps in `wads/NUKAGE.WAD`, Nukage Divided (cut from it), and the maps of Cathedral of Pain (`wads/CATHEDRAL.WAD`, in progress), each measured against the DOOM II maps with the research scripts (see the [builder docs](builder.md#what-every-build-checks)). Routes and secrets are in [SPOILERS.md](../SPOILERS.md).
 
 ## Nukage Outskirts (`nukage_outskirts`)
 MAP01, the easiest map in the set: 104 sectors, 12/22/31 monsters on easy/medium/hard, four secrets, nothing heavier than a demon. Its design doc is `levels/designs/nukage_outskirts.md`, with the playtest results; the route script is `levels/playtests/nukage_outskirts.playtest`.
@@ -184,3 +184,29 @@ From the operations balcony at the start you see the whole map: the plant's outf
 | Whole-map symmetry | 0.78 | 0.54 |
 
 Symmetry is high because the shelves are full-width bands across one canyon; the buildings at their ends alternate sides, and the lake round the dome is open.
+
+# Cathedral of Pain
+
+A DOOM II episode in progress, `wads/CATHEDRAL.WAD` (set `levels/sets/cathedral.py`), and the first maps designed with the geometry atlas and the polygon sketch.
+
+## Cursed Altar (`cursed_altar`)
+
+MAP01: 132 sectors, 23/41/56 monsters on easy/medium/hard, three secrets, hell knights in the fights that matter and a baron on the altar (a hell knight on easy). Its design doc is `levels/designs/cursed_altar.md`, with its exemplar maps and the playtest results; the route script is `levels/playtests/cursed_altar.playtest`. It was designed and first built as The Procession.
+
+You walk the length of a corrupted cathedral. Opening the great doors shows the whole axis: a stair widening down into a nave of octagonal pillars, the rood screen's bars, and the altar under a flesh apse at the far end, with the red skull on it. The way there is a horseshoe off the nave, through the cloister and down into the crypt, coming up into the choir behind the screen, where two curved stairs ring a blood pit up to the altar and the baron waits at the top. Taking the skull sinks every pillar in the nave; what was sealed in them comes up the stairs at you, and the walk back out to the doors is through an open hall.
+
+| Measure | Cursed Altar | DOOM II median |
+|---|---|---|
+| Off-axis share of line length | 0.31 | 0.23 |
+| Axis-aligned share of rooms ≥ 128×128 | 0.29 | 0.39 |
+| Distinct floor heights | 21 | 23 |
+| Light SD / light-effect sectors | 29 / 5 | 23 / 9 |
+| Most-used wall texture | 26% | 30% |
+| Wall material changes with a border texture | 54% | 31% |
+| Optional share of the reachable area | 30% | 50% |
+| UV ammo per monster HP (pistol start) | 2.67 | 1.81 |
+| Lowest ammo ratio near the route (UV) | 1.65 | 0.65 |
+| Health per 1000 monster HP | 34 | 40 |
+| Easy/UV and HMP/UV monster ratios | 0.41 / 0.73 | 0.33 / 0.70 |
+| Deaf monsters | 29% | 42% |
+| Whole-map symmetry | 0.49 | 0.54 |

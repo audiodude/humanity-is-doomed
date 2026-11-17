@@ -1,0 +1,126 @@
+# Cursed Altar wiring test: the narthex and the reveal down the funnel stair,
+# the nave, the optional east side (chapels, graveyard, mausoleum, sacristy
+# secret), the baptistery and the reliquary secret, the cloister and its key
+# trap, the chapter house, the crypt and the ossuary secret, the choir's twin
+# stairs, the altar trap (pillars and gate sink), the recessional, the exit.
+#   uv run --with vizdoom scripts/tools/playtest.py cursed_altar
+
+# Narthex: the great doors ahead, the red exit door behind.
+look 90
+shot start
+look 270
+shot exit_door
+expect ceil 0 -24 == 128             # the red door is shut
+look 90
+open 0 400
+walk 0 464
+look 90 3
+shot reveal
+walk 0 600
+expect has Shotgun
+
+# Nave: the pillars are sealed, the screen's gate block is up.
+killall
+expect floor -340 1136 == 384
+expect floor 340 2160 == 384
+expect floor 0 2416 == 72
+walk 0 1200 0 2200
+look 90 4
+shot screen
+
+# East side: chapel A, the graveyard and the super shotgun in the mausoleum.
+walk 568 1328 816 1328
+open 976 1328
+walk 1136 1300
+look 0
+shot graveyard
+open 1456 1424
+walk 1528 1424
+expect has SuperShotgun
+walk 1136 1300 816 1328 568 1500
+# Chapel B and the sacristy behind its east panel (secret 1).
+walk 816 1968
+open 960 1968
+walk 1104 1968
+expect has Berserk
+expect secrets == 1
+walk 816 1968 568 1968
+
+# West aisle: the baptistery, the reliquary behind the aisle's west wall (secret 2).
+walk -568 1100 -700 1064 -864 976
+expect has Chaingun
+walk -700 1064 -568 1300 -568 2208
+open -640 2208
+walk -720 2208
+expect secrets == 2
+expect has Backpack
+walk -568 2208 -568 1648
+
+# Cloister: the yellow key on the fountain; taking it opens the walk's bays.
+open -688 1648
+walk -800 1648
+look 180
+shot cloister
+expect ceil -1672 1520 == 16          # bays shut
+killall
+walk -1000 1648 -1216 1648
+expect has YellowCard
+wait 105
+expect ceil -1672 1520 > 16
+expect ceil -1672 1776 > 16
+expect ceil -1440 2104 > 16
+expect ceil -992 2104 > 16
+shot bays
+killall
+
+# Chapter house.
+walk -1216 1280
+open -1216 1184
+walk -1216 1000
+expect has GreenArmor
+
+# Crypt: through the yellow door and down; the ossuary behind the satyr face (secret 3).
+walk -1216 1280 -1216 2040
+open -1216 2112
+walk -1216 2300 -1216 2600
+shot crypt
+killall
+walk -1456 2864
+open -1544 2864
+walk -1656 2864
+expect secrets == 3
+expect has Soulsphere
+walk -1456 2864 -1000 2816 -850 2816
+
+# Choir: up out of the crypt, the pit ringed by the twin stairs, the altar above.
+open -704 2816
+walk -600 2816
+look 0
+shot choir
+killall
+walk -480 2600 0 2560
+walk -300 2848 -150 3150 0 3300
+expect floor 0 3300 == 144
+look 270 6
+shot dais
+
+# The altar: the red skull drops every pillar and sinks the screen's gate.
+walk 0 3456
+expect has RedSkull
+wait 420
+expect floor -340 1136 == 0
+expect floor 340 2160 == 0
+expect floor 0 2416 == 0
+look 270 4
+shot trap
+
+# Recessional: down the stairs, through the gate, down the open nave, up the funnel.
+killall
+walk 0 3300 150 3150 300 2848 0 2560 0 2416 0 1648
+look 270
+shot recessional
+walk 0 900 0 464 0 300
+open 0 -16
+walk 0 -200
+shot porch
+exit 0 -304

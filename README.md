@@ -54,6 +54,21 @@ Each map has four secrets (MAP03 has five). Every map's design notes and measure
 
 Every map is checked against vanilla rules (see [Playtests](docs/builder.md#playtests)). Both bossaction gates have been played in a port: Meltdown's exit opened when the Cyberdemon died (the 2024 re-release, played through), and Storage's shutters dropped when the last mancubus died.
 
+## Cathedral of Pain (in progress)
+
+*A corrupted cathedral, walked from its doors to its altar and back.*
+
+`wads/CATHEDRAL.WAD` is a DOOM II episode in progress, the first maps designed from the [geometry atlas](docs/builder.md#agent-skills) instead of on a grid. It has one map so far. Its `UMAPINFO` sets only the level name and the red hell sky (`SKY3`); a port without UMAPINFO plays it fine with DOOM II's MAP01 name and brown sky.
+
+```sh
+dsda-doom -iwad doom2 -file wads/CATHEDRAL.WAD
+gzdoom -iwad doom2.wad -file wads/CATHEDRAL.WAD
+```
+
+| Slot | Map | What happens | Monsters (easy / medium / hard) |
+|---|---|---|---|
+| MAP01 | [Cursed Altar](docs/maps.md#cursed-altar-cursed_altar) | Up a cathedral's axis to a baron on the altar; taking the skull sinks every pillar in the nave, and what was sealed in them comes for you. | 23 / 41 / 56 |
+
 ## The level builder
 
 `levels/` is a DOOM and DOOM II level compiler. You describe a map as a Python module of plain data: rooms as polygons with floor and ceiling heights, plus doors, lifts, stairs, switches, monsters and pickups. The builder works out the lines and texture alignment, checks that the map can be finished (every key, secret and monster reachable, no softlocks), measures it against id's maps, and writes it into a WAD with a top-down preview. A decompiler turns any Doom-format map back into this form, and a ViZDoom runner playtests the routes, fights through them, and explores each map with no route to find where players get lost.
@@ -82,6 +97,8 @@ python3 scripts/metrics/space_metrics.py --set tnt   # any of the four, for an o
 python3 scripts/metrics/flavor_summary.py       # -> data/metrics/flavor_summary.csv, flavor_coverage.csv
 python3 scripts/metrics/era_report.py           # key norms per (game, flavor) and their trend with release year, as markdown
 ```
+
+The geometry atlas is the same corpus read for shape rather than numbers: an agent looked at the top-down plan of 758 maps (every official map that decompiles, and community maps from releases rated 4.25 or higher) and wrote down each one's shape, plan and geometry moves (an octagonal ring round an island, a zigzag walkway over nukage, a curved stair wrapping a tower), with sectors and coordinates. The design skill picks shapes from it, since our own maps had come out as boxes; `python3 scripts/metrics/atlas.py find --move ring` searches it. See [agent skills](docs/builder.md#agent-skills).
 
 ## Special bulletin
 

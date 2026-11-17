@@ -1,6 +1,6 @@
 # Spoilers
 
-Walkthroughs for the maps in `wads/NUKAGE.WAD`. Play them first.
+Walkthroughs for the maps in `wads/NUKAGE.WAD` and `wads/CATHEDRAL.WAD`. Play them first.
 
 ## MAP01: Nukage Outskirts
 
@@ -72,3 +72,10 @@ The original MAP01, Nukage Junction, is kept in `levels/nukage_junction.py` but 
 - **Optional:** the outfall valve room off the deck (green armor); the settling house, a second way down from shelf 3 beside the breach, through a hall of slimed tanks and a drop into the spillway to the crest (a baron; plasma rifle); the sump in the pump station (berserk); the armory off the gatehouse (cells, rockets); the lake's islands (radiation suits, cells, rockets).
 - **Nukage:** every trough and pond, the closet, the settling tanks and the whole lake. The ponds hurt a little, the lake more. The lake has no way back up the dam.
 - **Secrets:** a shifted panel beside a light strip in the outfall valve room's east wall (backpack, megaarmor); a shifted panel inside the valve tower lowers the lit pillar beside it, in view from the start, and carries you up (soulsphere, cells); a shifted panel beside a light strip in the settling house's north wall (green armor); a shifted section of the cooling-tower ring in the lake, beside a light strip, sinks to let you in (soulsphere, in the middle of the boss fight).
+
+## Cathedral of Pain MAP01: Cursed Altar
+
+- **Idea:** a procession up a corrupted cathedral and a recessional back down it. Opening the great doors shows the whole axis: a funnel stair widening into the pillared nave, the rood screen's bars, and the altar under the flesh apse at the far end with the red skull on it. Taking the skull sinks every pillar in the nave, and what was sealed in them comes up the choir's twin stairs at you; the walk back out is through a different hall.
+- **Route:** narthex (shotgun) → great doors → funnel stair → nave (the screen's sill and bars block the choir) → west aisle → cloister door → cloister: the yellow key on the fountain in the garth; taking it opens four closets in the walk's walls → yellow door on the north walk → crypt stair → crypt (spectres in the dark) → stair up and the door into the choir, where the baron wakes → the twin curved stairs round the blood pit → dais → red skull on the altar: the pillars and the sill sink, the pillar monsters come through the screen → back down the stairs, through the screen, the nave and the funnel → narthex → red door → porch → exit switch.
+- **Optional:** the baptistery (chaingun), the chapter house off the cloister's south walk (green armor), the east chapels and, through chapel A, the graveyard with the super shotgun in its mausoleum.
+- **Secrets:** the off-centre gargoyle panel on chapel B's east wall (berserk, shells); the satyr face set back in the crypt's west wall (soulsphere); the skull-banded marble panel near the north end of the west aisle's outer wall (green armor, backpack).
