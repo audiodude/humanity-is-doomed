@@ -2,17 +2,18 @@
 by the rubric in docs/explore-rubric.md.
 
     uv run --with vizdoom scripts/tools/compare.py PLAY_DIR [--seeds 1,2,3] [--choice M:SS-M:SS ...]
-    uv run --with vizdoom scripts/tools/compare.py --pool [--commit HASH[,HASH...]] [--gate-c]
+    uv run --with vizdoom scripts/tools/compare.py --pool [--commit HASH[,HASH...]]
 
 It runs --explore on the play's own copy of the WAD for each seed, then plays
 every demo back (the person's and each seed's) through the --play report's
 bookkeeping, so a milestone means the same thing on both sides, and scores
 them. It writes compare-<commit>/ in the play folder: each seed's explore
 report, report.txt (milestone times, the scores, the verdict, and the
-mismatches to give a cause code) and scores.json. --choice drops stretches of
-the person's run coded H-choice. --pool reports the gates of
-docs/explorer-plan.md over the blind plays (tuning and holdout, from each
-play's meta.json) and adds up their cause codes (codes.json) by stall time.
+mismatches to give a cause code) and scores.json; a blind play's first score
+also goes in its meta.json ("first"). --choice takes an H-choice detour's time
+out of the person's run. --pool reports the gates of docs/explorer-plan.md
+over the blind plays, with 95% ranges, and adds up their cause codes
+(codes.json) by stall time.
 """
 import argparse
 import concurrent.futures as cf
