@@ -83,7 +83,7 @@ def main():
         print(f"nothing left to play in {queue}")
         return 0
     for k, (n, src, m, wad) in enumerate(todo):
-        if input(f"\nplay #{n} ({src}, {k + 1} of {len(todo)}): Enter to start, q to stop: ").strip().lower() == "q":
+        if input(f"\nplay #{n} ({src}, {k + 1} of {len(todo)}): press ENTER to start, or type q to stop: ").strip().lower() == "q":
             break
         before = set(os.listdir(PLAYS))
         subprocess.run([sys.executable, os.path.join(HERE, "playtest.py"), wad.strip(), m, "--play", "--no-report"],
@@ -93,7 +93,10 @@ def main():
             print("no play was recorded; this map stays in the queue")
             continue
         folder = os.path.join(PLAYS, new[-1])
-        note = input("Enter if it was a normal play, or a few words on a detour or what spoiled it: ").strip()
+        note = input("Normal play? Just press ENTER. Otherwise type a few words on a detour, "
+                     "or start with 'spoiled' if something went wrong: ").strip()
+        if note.lower().rstrip(".!") in ("normal", "no", "n", "none", "yes", "y"):
+            note = ""   # meant "a normal play"
         with open(os.path.join(folder, "meta.json")) as f:
             meta = json.load(f)
         meta.update(pool=n, source=src)
