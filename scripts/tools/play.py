@@ -3,6 +3,7 @@
     uv run --with vizdoom scripts/tools/playtest.py WAD... MAP --play [--monsters] [--skill N]
     uv run --with vizdoom scripts/tools/playtest.py LEVEL --play
     uv run --with vizdoom scripts/tools/playtest.py --play --recording DIR    # the report again
+    uv run --with vizdoom scripts/tools/play_queue.py                        # play a queue of maps back to back
 
 The map opens in a window at normal speed, with modern-port controls (as in
 DOOM + DOOM II and dsda-doom): WASD to move and strafe, the mouse to turn
@@ -79,7 +80,7 @@ def run(args, vzd):
         print(f"no recording was written: the game window closed before the play ended ({folder})")
         return 2
     print(f"recorded to {folder}")
-    return report(vzd, folder)
+    return 0 if args.no_report else report(vzd, folder)
 
 
 def play(args, vzd, geo, demo):

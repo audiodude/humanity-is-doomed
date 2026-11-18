@@ -188,7 +188,10 @@ uv run --with vizdoom scripts/tools/playtest.py nukage_tower --replay --explore 
 ```sh
 uv run --with vizdoom scripts/tools/playtest.py ~/maps/slige1.wad MAP01 --play
 uv run --with vizdoom scripts/tools/playtest.py --play --recording ~/.local/share/playtest/plays/<folder>   # the report again
+uv run --with vizdoom scripts/tools/play_queue.py   # the blind pool's queued maps, back to back
 ```
+
+`--no-report` records the play and skips the report, which `--play --recording` makes later. `scripts/tools/play_queue.py` plays the blind pool's next maps one after another that way: one line per map in `~/.local/share/playtest/queue.txt` (`POOL SOURCE MAP WAD`), Enter between maps, and after each one a single question for a detour or what spoiled it, stored with the play's pool number and source. Run it again after a break and it picks up at the first unplayed number.
 
 `scripts/tools/compare.py` scores the explorer against a play by the fixed rules in [docs/explore-rubric.md](explore-rubric.md): does the bot stall where the person stalled and pressed L, in the same phase of the map? It runs seeds 1–3 on the play's copy of the WAD, plays every demo back through the same bookkeeping, and writes `compare-<commit>/` into the play folder with the scores, a verdict, and the mismatches to give a cause code. `--pool` reports the plan's gates (docs/explorer-plan.md) over the blind plays scored at a commit, with their cause codes added up by stall time. It scores the explorer, never the map: stalls and lures in a map can be good design.
 

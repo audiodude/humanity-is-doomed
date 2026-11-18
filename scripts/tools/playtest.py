@@ -1714,6 +1714,8 @@ def main():
     p.add_argument("--play", action="store_true", help="you play the map (L: I'm lost, K: stop); then the explorer's "
                    "report on your play (scripts/tools/play.py)")
     p.add_argument("--monsters", action="store_true", help="with --play: keep the monsters (default: none, god mode)")
+    p.add_argument("--no-report", action="store_true", help="with --play: just record the play; make its report later "
+                   "with --play --recording DIR")
     p.add_argument("--watch", action="store_true", help="show the game in a window, at normal speed")
     p.add_argument("--replay", action="store_true", help="watch the last --fight recording of MAP at --skill and --seed")
     p.add_argument("--recording", metavar="FILE", help="with --replay: the recording to play (default: the last); "
