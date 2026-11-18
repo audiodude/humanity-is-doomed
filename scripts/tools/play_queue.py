@@ -13,15 +13,20 @@ queue can be picked up again after a break. Each map is played with
 --play --no-report. After it, one question: Enter if it was a normal play, or
 a few words on any deliberate detour (a secret, an item, sightseeing) or on
 what spoiled it. A note starting with "spoiled" drops the play; its map is no
-longer blind, so its line stays used. The note goes
-in the play's meta.json and notes.txt, with its number and source; its
-report and scores come later (compare.py, which also stores its first score).
+longer blind, so its line stays used. Any other note is a detour: the play is
+rendered to a video (a minute or two) that opens in your player, and you give
+the detour's times off its clock (M:SS-M:SS, several separated by commas),
+which go in meta.json as "choice" for compare.py. The note goes in the play's
+meta.json and notes.txt, with its number and source; its report and scores
+come later (compare.py, which also stores its first score).
 """
 import glob
 import json
 import os
+import re
 import subprocess
 import sys
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PLAYS = os.path.expanduser("~/.local/share/playtest/plays")
@@ -37,6 +42,27 @@ def played():
         if n is not None:
             out.add(n)
     return out
+
+
+def detour_times(folder, meta):
+    """Render the play to a video, open it, and ask for the detour's times:
+    a list of "M:SS-M:SS" (empty if skipped)."""
+    video = os.path.join(tempfile.gettempdir(), f"{os.path.basename(folder)}.mp4")
+    print("rendering the play so you can time the detour (a minute or two) ...", flush=True)
+    subprocess.run([sys.executable, os.path.join(HERE, "playtest.py"), *[os.path.join(folder, w) for w in meta["wads"]],
+                    meta["map"], "--replay", "--recording", os.path.join(folder, "play.lmp"), "--video", video],
+                   check=False, stdout=subprocess.DEVNULL)
+    if os.path.exists(video):
+        subprocess.Popen(["xdg-open", video], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         start_new_session=True)
+    else:
+        print("the video didn't render; give the times from memory, or Enter to skip")
+    while True:
+        ans = input("detour times off the video's clock, M:SS-M:SS (commas between several; Enter to skip): ").strip()
+        spans = [s.strip() for s in ans.split(",") if s.strip()]
+        if all(re.fullmatch(r"\d+:[0-5]\d-\d+:[0-5]\d", s) for s in spans):
+            return spans
+        print("  like 3:37-4:05, or 3:37-4:05, 6:10-6:40")
 
 
 def main():
@@ -66,8 +92,11 @@ def main():
             meta["note"] = note
             if note.lower().startswith("spoiled"):
                 meta["spoiled"] = note
+            else:
+                meta["choice"] = detour_times(folder, meta)
             with open(os.path.join(folder, "notes.txt"), "w") as f:
-                f.write(f"Play #{n} ({src}), noted right after the play: {note}\n")
+                f.write(f"Play #{n} ({src}), noted right after the play: {note}\n"
+                        + (f"detour times (--choice): {', '.join(meta['choice'])}\n" if meta.get("choice") else ""))
         with open(os.path.join(folder, "meta.json"), "w") as f:
             json.dump(meta, f, indent=1)
     left = [n for n, *_ in todo if n not in played()]

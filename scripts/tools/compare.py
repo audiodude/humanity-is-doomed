@@ -466,6 +466,7 @@ def main():
         print("this play kept the monsters; the rubric scores plays with none (the default --play)")
         return 2
     seeds = [int(s) for s in args.seeds.split(",")]
+    args.choice = args.choice or meta.get("choice", [])   # detours timed by play_queue.py
     choice = [tuple(tics(c) for c in span.split("-")) for span in args.choice]
     iwad = meta["iwad"] if os.path.exists(meta["iwad"]) else args.iwad
     out = os.path.join(folder, f"compare-{at}")
