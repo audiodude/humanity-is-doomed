@@ -15,7 +15,7 @@ Versions: **v1** (2026-11-15) the plan as first written. **v2** (2026-11-17) SLI
 | Explorer | Exits 36 of 61 id maps on seed 1, 32 on all three seeds (`main` before it: 34 and 31); the 7 maps whose exit needs a boss to die aren't counted. Exits all six NUKAGE maps on every seed. Reads Boom generalized and extended line types. |
 | Known blind spots | Running jumps, gun lines with no switch texture (barrel walls), timed doors and lifts it's too slow for, deliberate death pits, huge open areas it sweeps rather than reads |
 | `--play` | Done: L marks "I'm lost", K stops; the report uses the explorer's own bookkeeping |
-| Rubric and `compare.py` | v3 done: an L press marks the whole stretch it falls in; cause codes include B-perception |
+| Rubric and `compare.py` | v4: an L press marks the whole stretch it falls in; a detour (`--choice`) removes only its own time; cause codes include B-perception. `--pool` reports the gates |
 | Blind plays | First wave of 9 played. Tuning: #1 canyon, #2 SLIGE02, #4 SLIGE03, #7 Grime, #8 OBSIDIAN03 scored; #5 CHORD_NG Bot-limited (perpetual lifts); SJS2 spoiled and dropped. Holdout #3, #6, #9 recorded, unscored. Gate B at `ef2ed9d`: 5 maps, 5 of 10 lost stretches, lost recall 4/5, stall precision 9/10. Grime's 11-minute bot stall (walk-over lines in the middle of rooms) is still uncoded. |
 | Not blind | OBSIDIAN01 MAP01 was analysed with the user, so it can't be in the pool. Its two 11-minute bot stalls are navigation bugs being fixed separately. |
 

@@ -32,7 +32,7 @@ import playtest as pt  # noqa: E402
 from explore import KEYS, line_textures  # noqa: E402
 from play import PLAYS, Observer  # noqa: E402
 
-RUBRIC = 3
+RUBRIC = 4
 TIC = 35
 CAP = 15 * 60 * TIC   # runs are cut off at 15 minutes
 STALL = 30 * TIC      # a stall, and a lure's or a trap's time
@@ -127,12 +127,14 @@ def stalls(run):
     return [(a, b) for a, b in stretches(run) if b - a >= STALL]
 
 
-def area(squares, a, b):
-    """Where tics a to b were spent: square -> share of the time, each tic
-    counted for the 3x3 block of squares around it (so the shares sum to 1)."""
-    n = 9 * (b - a)
+def area(squares, a, b, skip=()):
+    """Where tics a to b were spent, leaving out the spans in `skip`: square ->
+    share of the time, each tic counted for the 3x3 block of squares around it
+    (so the shares sum to 1)."""
+    kept = [squares[i] for i in range(a, b) if not any(x <= i + 1 < y for x, y in skip)] if skip else squares[a:b]
+    n = 9 * (len(kept) if skip else b - a) or 1
     out = Counter()
-    for (x, y), k in Counter(squares[a:b]).items():
+    for (x, y), k in Counter(kept).items():
         for dx in (-1, 0, 1):
             for dy in (-1, 0, 1):
                 out[x + dx, y + dy] += k / n
@@ -165,18 +167,20 @@ def score(human, bots, choice=()):
     common = {m for _t, m in human["milestones"]} & {m for b in bots.values() for _t, m in b["milestones"]}
     # The human's stalls and lost stretches (any stretch with an L press in it:
     # a person presses L after wandering, so the press marks the whole stretch,
-    # not where they stood), H-choice dropped.
+    # not where they stood). An H-choice detour takes out only its own time:
+    # the rest of the stretch, and the presses outside it, still count.
     presses = [t for t, _x, _y in human["lost"] if not chosen(t)]
     spans = stretches(human)
     items = []
     for k, (a, b) in enumerate(spans):
-        if any(a < y and x < b for x, y in choice):
+        kept = (b - a) - sum(max(0, min(b, y) - max(a, x)) for x, y in choice)
+        if kept <= 0:
             continue
         last = k == len(spans) - 1
         mine = [t for t in presses if a <= t < b or (last and t == b)]
-        if b - a >= STALL or mine:
-            items.append(dict(span=(a, b), phase=phase(human, common, a), area=area(human["squares"], a, b),
-                              stall=b - a >= STALL, presses=mine))
+        if kept >= STALL or mine:
+            items.append(dict(span=(a, b), phase=phase(human, common, a), area=area(human["squares"], a, b, choice),
+                              stall=kept >= STALL, presses=mine))
     hst = [i for i in items if i["stall"]]
     lost = [i for i in items if i["presses"]]
     bst = {s: [dict(seed=s, span=(a, b), phase=phase(bots[s], common, a), area=area(bots[s]["squares"], a, b))

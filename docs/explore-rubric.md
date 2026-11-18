@@ -1,4 +1,4 @@
-# Explorer vs human rubric, v3
+# Explorer vs human rubric, v4
 
 How well the `--explore` bot's stalls predict where a person gets lost, scored
 by fixed rules. `scripts/tools/compare.py` applies every rule except the cause
@@ -106,8 +106,10 @@ that time and place and give it one code:
   the line's action however small, dark or out of the way it is, or a key it
   saw on screen that a person didn't make out.
 - **H-choice:** the human chose to detour (a secret, an item, sightseeing).
-  These come out of the scores: rerun `compare.py` with `--choice M:SS-M:SS`
-  for each such stretch of the human run.
+  The detour's own time comes out of the scores: rerun `compare.py` with
+  `--choice M:SS-M:SS` for each detour. The stretch it falls in keeps the
+  rest of its time, its place is measured without the detour, it's a stall
+  only if 30 s or more remain, and L presses outside the detour still count.
 
 Each bot code points to a different kind of fix:
 
@@ -162,6 +164,9 @@ code) and `scores.json`.
 
 ## 9. Versions
 
+- **v4:** an H-choice detour removes only its own time from the stretch it
+  falls in, not the whole stretch: an L press before or after a detour is
+  still a lost stretch. Only plays with `--choice` score differently.
 - **v3:** a new cause code, B-perception, for things the bot notices that a
   person misses. Scores are unchanged from v2.
 - **v2:** an L press marks the whole stretch it falls in (lost stretches),
