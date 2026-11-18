@@ -358,7 +358,8 @@ def gate(name, plays, maps, lost, recall, precision):
 def pool(commits, check_c):
     """The plan's gates (docs/explorer-plan.md) over the blind plays: each
     play's meta.json has its number in the pool ("pool": every third is
-    holdout) and its "source"; a "spoiled" play and one with no number don't
+    holdout, unless "spent": a holdout seen at a failed gate C check, now
+    tuning) and its "source"; a "spoiled" play and one with no number don't
     count, and a "verdict_override" of Bot-limited is listed but not counted.
     A play's scores are those at the first of `commits` it has been scored
     at (commits with the same explorer code), its cause codes the
@@ -380,7 +381,7 @@ def pool(commits, check_c):
                 with open(cp) as f:
                     codes = json.load(f)
         plays.append(dict(n=meta["pool"], source=meta["source"], name=os.path.basename(folder), at=at, sc=sc,
-                          codes=codes, holdout=meta["pool"] % 3 == 0,
+                          codes=codes, holdout=meta["pool"] % 3 == 0 and not meta.get("spent"),
                           limited=meta.get("verdict_override") == "Bot-limited"))
     plays.sort(key=lambda p: p["n"])
     tuning = [p for p in plays if not p["holdout"]]

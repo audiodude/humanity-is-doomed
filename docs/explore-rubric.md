@@ -148,8 +148,9 @@ uv run --with vizdoom scripts/tools/compare.py --pool --commit 9d0db0a,03b22ba  
 ```
 
 `--pool` reads each play's `meta.json`: `pool` (its number in the blind pool;
-every third is holdout), `source` (obsidian, slige or community), `spoiled`
-(dropped) and `verdict_override` (`Bot-limited`: listed, not counted). It adds
+every third is holdout), `spent` (a holdout whose scores were seen at a failed
+gate C check: tuning from then on), `source` (obsidian, slige or community),
+`spoiled` (dropped) and `verdict_override` (`Bot-limited`: listed, not counted). It adds
 up the cause codes in `compare-<commit>/codes.json` by stall time: a list of
 `{"code", "time": "M:SS", "mismatch", "why"}`, where `time` is the stall time
 behind the mismatch (a bot stall's, averaged over the seeds that had it).

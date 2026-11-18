@@ -8,7 +8,7 @@ Scoring rules: [explore-rubric.md](explore-rubric.md). Tool: `scripts/tools/comp
 
 Versions: **v1** (2026-11-15) the plan as first written. **v2** (2026-11-17) SLIGE's share of the pool from play #14 on (section 1); gates, thresholds and rules unchanged.
 
-## Where it stands (2026-11-17, `ef2ed9d`)
+## Where it stands (2026-11-17, `26675f0`)
 
 | Piece | State |
 |---|---|
@@ -16,7 +16,7 @@ Versions: **v1** (2026-11-15) the plan as first written. **v2** (2026-11-17) SLI
 | Known blind spots | Running jumps, gun lines with no switch texture (barrel walls), timed doors and lifts it's too slow for, deliberate death pits, huge open areas it sweeps rather than reads |
 | `--play` | Done: L marks "I'm lost", K stops; the report uses the explorer's own bookkeeping |
 | Rubric and `compare.py` | v4: an L press marks the whole stretch it falls in; a detour (`--choice`) removes only its own time; cause codes include B-perception. `--pool` reports the gates |
-| Blind plays | First wave of 9 played. Tuning: #1 canyon, #2 SLIGE02, #4 SLIGE03, #7 Grime, #8 OBSIDIAN03 scored; #5 CHORD_NG Bot-limited (perpetual lifts); SJS2 spoiled and dropped. Holdout #3, #6, #9 recorded, unscored. Gate B at `ef2ed9d`: 5 maps, 5 of 10 lost stretches, lost recall 4/5, stall precision 9/10. Grime's 11-minute bot stall (walk-over lines in the middle of rooms) is still uncoded. |
+| Blind plays | 16 played (#1–#16; SJS2 spoiled, #5 CHORD_NG Bot-limited). Gate B passed at `26675f0` (10 maps, 13 lost stretches, lost recall 9/13, precision 17/24); gate C then **failed** there: holdout lost recall 1/6 (#3, #6, #9, #12, #15), precision 6/12. Gate D passed (community 5/12, Obsidian 4/6). The five holdouts are spent and now tuning: gate B over all 15 is lost recall 10/19, precision 23/36, so it fails until a tuning round lifts recall. New holdouts come from #18 on, by the every-third rule. |
 | Not blind | OBSIDIAN01 MAP01 was analysed with the user, so it can't be in the pool. Its two 11-minute bot stalls are navigation bugs being fixed separately. |
 
 ## Ready means
