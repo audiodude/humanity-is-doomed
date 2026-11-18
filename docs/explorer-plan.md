@@ -6,15 +6,15 @@ The explorer's stalls describe a map; they don't grade it. Some getting lost is 
 
 Scoring rules: [explore-rubric.md](explore-rubric.md). Tool: `scripts/tools/compare.py`.
 
-## Where it stands (2026-11-15, `6a964b7`)
+## Where it stands (2026-11-17, `ef2ed9d`)
 
 | Piece | State |
 |---|---|
-| Explorer | Exits 34 of 61 id maps on seed 1, 30 on all three seeds; the 7 maps whose exit needs a boss to die aren't counted. Exits all six NUKAGE maps on every seed. Reads Boom generalized and extended line types. |
+| Explorer | Exits 36 of 61 id maps on seed 1, 32 on all three seeds (`main` before it: 34 and 31); the 7 maps whose exit needs a boss to die aren't counted. Exits all six NUKAGE maps on every seed. Reads Boom generalized and extended line types. |
 | Known blind spots | Running jumps, gun lines with no switch texture (barrel walls), timed doors and lifts it's too slow for, deliberate death pits, huge open areas it sweeps rather than reads |
 | `--play` | Done: L marks "I'm lost", K stops; the report uses the explorer's own bookkeeping |
 | Rubric and `compare.py` | v3 done: an L press marks the whole stretch it falls in; cause codes include B-perception |
-| Blind plays | 1 so far: Flames at the Canyon (Obsidian), Partial at `9d0db0a` under v3 (`compare-9d0db0a`). Lost recall 1/2, stall recall 2/3, precision 3/3. Left to code: the 3:30–6:08 north-east stretch (3 L presses), predicted on 1 of 3 seeds. |
+| Blind plays | First wave of 9 played. Tuning: #1 canyon, #2 SLIGE02, #4 SLIGE03, #7 Grime, #8 OBSIDIAN03 scored; #5 CHORD_NG Bot-limited (perpetual lifts); SJS2 spoiled and dropped. Holdout #3, #6, #9 recorded, unscored. Gate B at `ef2ed9d`: 5 maps, 5 of 10 lost stretches, lost recall 4/5, stall precision 9/10. Grime's 11-minute bot stall (walk-over lines in the middle of rooms) is still uncoded. |
 | Not blind | OBSIDIAN01 MAP01 was analysed with the user, so it can't be in the pool. Its two 11-minute bot stalls are navigation bugs being fixed separately. |
 
 ## Ready means
@@ -77,7 +77,7 @@ A round is one explorer change, aimed at the biggest bot-side cause.
 3. **Check it:**
    - Score every tuning play again at the new commit.
    - Pooled lost recall and pooled stall precision must not drop.
-   - The id-map acceptance batch is a navigation sanity check: the all-three-seeds exit count must not fall below 28 (it's 30 now). It runs on an AWS Spot instance, about $0.50 a run.
+   - The id-map acceptance batch is a navigation sanity check: the all-three-seeds exit count must not fall below 28 (it's 32 now). It runs on an AWS Spot instance, about $0.50 a run.
    - All six NUKAGE maps must still exit on every seed.
 4. **Merge it, or drop it.** Every commit's scores stay in their own `compare-<commit>/` folders, so the history shows which changes helped.
 
