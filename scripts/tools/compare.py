@@ -342,28 +342,44 @@ def clock_s(clock):
     return int(m) * 60 + int(s)
 
 
-def gate(name, plays, maps, lost, recall, precision):
-    """Print one gate's line over `plays` (scored, counted); True if it holds."""
-    s3 = [sum(p["sc"]["S3"][k] for p in plays) for k in (0, 1)]
-    s5 = [sum(p["sc"]["S5"][k] for p in plays) for k in (0, 1)]
+def wilson(k, n):
+    """The 95% Wilson range of k successes in n, as (low, high)."""
+    if not n:
+        return 0.0, 1.0
+    z, p = 1.96, k / n
+    mid = (p + z * z / (2 * n)) / (1 + z * z / n)
+    half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / (1 + z * z / n)
+    return max(0.0, mid - half), min(1.0, mid + half)
+
+
+def frac(f):
+    """k/n with its 95% range."""
+    lo, hi = wilson(*f)
+    return f"{f[0]}/{f[1]}" + (f" = {f[0] / f[1]:.0%} ({lo:.0%}-{hi:.0%})" if f[1] else " n/a")
+
+
+def gate(name, scores, maps, lost, recall, precision):
+    """Print one gate's line over `scores` (one per counted play); True if it holds."""
+    s3 = [sum(s["S3"][k] for s in scores) for k in (0, 1)]
+    s5 = [sum(s["S5"][k] for s in scores) for k in (0, 1)]
     r3 = s3[0] / s3[1] if s3[1] else 0
     r5 = s5[0] / s5[1] if s5[1] else None   # no recurring stalls: precision n/a, passes
-    ok = len(plays) >= maps and s3[1] >= lost and r3 >= recall and (r5 is None or r5 >= precision)
-    print(f"gate {name}: {len(plays)} maps (needs {maps}), {s3[1]} lost stretches (needs {lost}), "
-          f"lost recall {s3[0]}/{s3[1]} (needs {recall:.0%}), stall precision {s5[0]}/{s5[1]}"
-          + ("" if s5[1] else " n/a") + f" (needs {precision:.0%}): {'PASS' if ok else 'not yet'}")
+    ok = len(scores) >= maps and s3[1] >= lost and r3 >= recall and (r5 is None or r5 >= precision)
+    print(f"gate {name}: {len(scores)} maps (needs {maps}), {s3[1]} lost stretches (needs {lost})\n"
+          f"  lost recall {frac(s3)} (needs {recall:.0%}), stall precision {frac(s5)} (needs {precision:.0%}): "
+          f"{'PASS' if ok else 'not yet'}")
     return ok
 
 
-def pool(commits, check_c):
+def pool(commits):
     """The plan's gates (docs/explorer-plan.md) over the blind plays: each
-    play's meta.json has its number in the pool ("pool": every third is
-    holdout, unless "spent": a holdout seen at a failed gate C check, now
-    tuning) and its "source"; a "spoiled" play and one with no number don't
+    play's meta.json has its number in the pool ("pool"), its "source" and
+    its "first" score (the scores compare.py gave it the first time, before
+    anyone tuned on it); a "spoiled" play and one with no number don't
     count, and a "verdict_override" of Bot-limited is listed but not counted.
-    A play's scores are those at the first of `commits` it has been scored
-    at (commits with the same explorer code), its cause codes the
-    codes.json beside them. Holdout scores stay hidden until --gate-c."""
+    Gates B and D use each play's scores at the first of `commits` it has
+    been scored at (commits with the same explorer code), and its cause
+    codes the codes.json beside them; gate C uses the first scores."""
     plays = []
     for path in glob.glob(os.path.join(PLAYS, "*", "meta.json")):
         with open(path) as f:
@@ -380,70 +396,49 @@ def pool(commits, check_c):
             if os.path.exists(cp):
                 with open(cp) as f:
                     codes = json.load(f)
-        plays.append(dict(n=meta["pool"], source=meta["source"], name=os.path.basename(folder), at=at, sc=sc,
-                          codes=codes, holdout=meta["pool"] % 3 == 0 and not meta.get("spent"),
+        plays.append(dict(n=meta["pool"], source=meta["source"], name=os.path.basename(folder), sc=sc,
+                          first=meta.get("first"), codes=codes,
                           limited=meta.get("verdict_override") == "Bot-limited"))
     plays.sort(key=lambda p: p["n"])
-    tuning = [p for p in plays if not p["holdout"]]
-    holdout = [p for p in plays if p["holdout"]]
-    print(f"pooled at {', '.join(commits)}\n\ntuning plays:")
-    for p in tuning:
-        head = f"  #{p['n']:<3}{p['source']:<10}{p['name']}"
-        if p["limited"]:
-            print(f"{head}: Bot-limited, not counted")
-        elif not p["sc"]:
-            print(f"{head}: not scored at {', '.join(commits)}")
-        else:
-            sc = p["sc"]
-            print(f"{head}: {sc['verdict']}  S3 {sc['S3'][0]}/{sc['S3'][1]}  S5 {sc['S5'][0]}/{sc['S5'][1]}"
-                  + ("" if p["codes"] is not None else "  (no codes.json)"))
-    counted = [p for p in tuning if p["sc"] and not p["limited"]]
-    unscored = [p for p in tuning if not p["sc"] and not p["limited"]]
+    print(f"pooled at {', '.join(commits)}\n\n{'':<5}{'source':<10}{'now':<26}{'first score':<16}play")
+    for p in plays:
+        sc, fs = p["sc"], p["first"]
+        now = ("Bot-limited" if p["limited"] else "not scored here" if not sc else
+               f"{sc['verdict']} S3 {sc['S3'][0]}/{sc['S3'][1]} S5 {sc['S5'][0]}/{sc['S5'][1]}")
+        first = "" if p["limited"] or not fs else f"S3 {fs['S3'][0]}/{fs['S3'][1]} S5 {fs['S5'][0]}/{fs['S5'][1]}"
+        print(f"  #{p['n']:<3}{p['source']:<10}{now:<26}{first:<16}{p['name']}"
+              + ("" if p["limited"] or not sc or p["codes"] is not None else "  (no codes.json)"))
+    counted = [p for p in plays if not p["limited"]]
+    unscored = [p for p in counted if not p["sc"]]
+    now = [p for p in counted if p["sc"]]
     print()
-    b = gate("B (tuning)", counted, 5, 10, 0.6, 0.5) and not unscored
+    b = gate("B (every play, scored now)", [p["sc"] for p in now], 5, 10, 0.6, 0.5) and not unscored
     if unscored:
-        print(f"  {len(unscored)} tuning play(s) not scored at this commit: score them before reading gate B")
+        print(f"  {len(unscored)} play(s) not scored at this commit: score them before reading gate B")
+    c = gate("C (every play's first score)", [p["first"] for p in counted if p["first"]], 1, 15, 0.5, 0.5)
+    print("gate D (per source, scored now; a source with 3+ lost stretches needs lost recall 40%):")
+    d = True
+    for src in sorted({p["source"] for p in now}):
+        s3 = [sum(p["sc"]["S3"][k] for p in now if p["source"] == src) for k in (0, 1)]
+        ok = s3[1] < 3 or s3[0] / s3[1] >= 0.4
+        d &= ok
+        print(f"  {src:<10} lost recall {frac(s3)}: "
+              + ("too few to judge" if s3[1] < 3 else "pass" if ok else "fail: 'not for this style' in the skills"))
+    print("ready: freeze this commit" if b and c and d else "not ready")
     # The cause codes, by the stall time behind them: a round works on the
     # biggest bot-side cause that shows up in 2 maps or more.
     time, maps = Counter(), {}
-    for p in counted:
-        for c in p["codes"] or ():
-            time[c["code"]] += clock_s(c["time"])
-            maps.setdefault(c["code"], set()).add(p["n"])
-    print("\ncause codes over the tuning plays, by stall time:")
+    for p in now:
+        for code in p["codes"] or ():
+            time[code["code"]] += clock_s(code["time"])
+            maps.setdefault(code["code"], set()).add(p["n"])
+    print("\ncause codes, by stall time:")
     for code, t in time.most_common():
         n = len(maps[code])
         print(f"  {code:<13}{pt.clock(t * TIC):>7}  {n} map{'s' if n > 1 else ''}"
               + ("  <- can be a tuning target" if n >= 2 and code.startswith("B-") else ""))
     if not time:
         print("  none yet")
-    print(f"\n{len(holdout)} holdout play(s) recorded: " + ", ".join(f"#{p['n']}" for p in holdout))
-    if not check_c:
-        print("their scores stay hidden until gate B passes (then --gate-c, once)")
-        return 0
-    if not b:
-        print("gate C is checked only once gate B passes, at that commit")
-        return 1
-    hc = [p for p in holdout if p["sc"] and not p["limited"]]
-    missing = [p for p in holdout if not p["sc"] and not p["limited"]]
-    if missing:
-        print(f"score the holdout plays first: {', '.join(p['name'] for p in missing)}")
-        return 1
-    for p in holdout:
-        sc = p["sc"]
-        print(f"  #{p['n']:<3}{p['source']:<10}{p['name']}: "
-              + ("Bot-limited, not counted" if p["limited"] else
-                 f"{sc['verdict']}  S3 {sc['S3'][0]}/{sc['S3'][1]}  S5 {sc['S5'][0]}/{sc['S5'][1]}"))
-    c = gate("C (holdout)", hc, 3, 5, 0.5, 0.5)
-    print("gate D (per source, tuning and holdout; a source with 3+ lost stretches needs lost recall 40%):")
-    d = True
-    for src in sorted({p["source"] for p in counted + hc}):
-        s3 = [sum(p["sc"]["S3"][k] for p in counted + hc if p["source"] == src) for k in (0, 1)]
-        ok = s3[1] < 3 or s3[0] / s3[1] >= 0.4
-        d &= ok
-        print(f"  {src:<10} lost recall {s3[0]}/{s3[1]}: "
-              + ("too few to judge" if s3[1] < 3 else "pass" if ok else "fail: 'not for this style' in the skills"))
-    print("ready: freeze this commit" if c and d else "not ready")
     return 0
 
 
@@ -457,11 +452,10 @@ def main():
     p.add_argument("--pool", action="store_true", help="the plan's gates over the blind plays scored at --commit")
     p.add_argument("--commit", help="with --pool: the explorer commit, or several with the same explorer code, "
                    "comma-separated (default: this checkout's)")
-    p.add_argument("--gate-c", action="store_true", help="with --pool: check gate C (holdout), once gate B passes")
     args = p.parse_args()
     at = commit()
     if args.pool:
-        return pool((args.commit or at).split(","), args.gate_c)
+        return pool((args.commit or at).split(","))
     if not args.play:
         p.error("give a --play folder, or --pool")
     folder = os.path.abspath(args.play)
@@ -499,11 +493,17 @@ def main():
     print("\n".join(lines))
     with open(os.path.join(out, "report.txt"), "w") as f:
         f.write("\n".join(lines) + "\n")
+    scores = dict(rubric=RUBRIC, commit=at, play=os.path.basename(folder), map=meta["map"],
+                  wad_hash=meta.get("wad_hash"), seeds=seeds, choice=args.choice, verdict=sc["verdict"],
+                  S1=sc["S1"], S2=sc["S2"], S3=sc["S3"], S4=sc["S4"], S5=sc["S5"],
+                  lures=len(sc["lures"]), traps=len(sc["traps"]))
     with open(os.path.join(out, "scores.json"), "w") as f:
-        json.dump(dict(rubric=RUBRIC, commit=at, play=os.path.basename(folder), map=meta["map"],
-                       wad_hash=meta.get("wad_hash"), seeds=seeds, choice=args.choice, verdict=sc["verdict"],
-                       S1=sc["S1"], S2=sc["S2"], S3=sc["S3"], S4=sc["S4"], S5=sc["S5"],
-                       lures=len(sc["lures"]), traps=len(sc["traps"])), f, indent=1)
+        json.dump(scores, f, indent=1)
+    if "pool" in meta and "first" not in meta:
+        # A blind play's first score is out of sample: nobody has tuned on it yet.
+        meta["first"] = {k: scores[k] for k in ("commit", "rubric", "S3", "S5", "verdict")}
+        with open(os.path.join(folder, "meta.json"), "w") as f:
+            json.dump(meta, f, indent=1)
     print(f"written to {out}")
     return 0
 
