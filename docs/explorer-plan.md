@@ -1,10 +1,12 @@
-# Plan: the explorer bot, tested against blind human play
+# Plan: the explorer bot, tested against blind human play (v2)
 
 The `--explore` bot finds its own way through a map and reports where it stalls. The aim is for those stalls to stand in for where a first-time player searches, so the map-building skills can use them on every build without a person playing it. This plan covers how we test that against people playing maps blind, and the fixed bar that says when the explorer is ready to report to the skills.
 
 The explorer's stalls describe a map; they don't grade it. Some getting lost is good, lure areas add fun and dimension, and a map with no wrong turns is one strangely shaped corridor. So the goal is not a bot that gets lost a lot, and not maps with no stalls. It's a bot that gets lost where people do, and only there.
 
 Scoring rules: [explore-rubric.md](explore-rubric.md). Tool: `scripts/tools/compare.py`.
+
+Versions: **v1** (2026-11-15) the plan as first written. **v2** (2026-11-17) SLIGE's share of the pool from play #14 on (section 1); gates, thresholds and rules unchanged.
 
 ## Where it stands (2026-11-17, `ef2ed9d`)
 
@@ -57,6 +59,8 @@ The pool comes from three sources, because each has a style and we can't let the
 - **Community:** single-map PWADs from idgames (`research/fetch_idgames.py`). These are closest to hand-built maps like ours. The user picks from a list showing only title, author and year. The top-down SVGs in `research/maps/community/` are spoilers; agents don't open the SVG of a candidate map.
 
 **First wave: 9 plays.** They're played in this source order: Obsidian, SLIGE, community, SLIGE, community, Obsidian, community, Obsidian, SLIGE. The canyon play is #1. **Every third play (#3, #6, #9 and so on) is holdout.** That's fixed before anyone sees a score, and it puts one map from each source in the holdout. The wave continues in the same pattern until gate B has its 10 lost stretches, or the stopping rule above is reached.
+
+**From play #14 (plan v2, 2026-11-17):** SLIGE maps rarely lose this player (1 lost stretch in plays #2, #4, #9 and #11, each under 2 minutes), so SLIGE drops from 1 play in 3 to 1 in 6. The order from #14 repeats: community, Obsidian, community, SLIGE, community, Obsidian. Every third play is still holdout, so #15, #18, … are Obsidian and community. Plays #1–#13 keep their numbers and sets. #13 should have been SLIGE under the first-wave pattern but was played as Obsidian (an agent's slip, made before its score was seen); it stays as played. Nothing scored or thresholded changes, so no play is rescored.
 
 **Agents keep pool maps blind.** For a pool map, no agent runs `--explore`, `check_wad.py` or `--describe`, and none renders a preview or shows any of the map's contents until its play is recorded. Generating the WAD and starting `--play` is all an agent does before the play.
 
