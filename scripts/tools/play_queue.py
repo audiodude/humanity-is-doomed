@@ -34,14 +34,15 @@ QUEUE = os.path.expanduser("~/.local/share/playtest/queue.txt")
 
 
 def played():
-    """Pool numbers that already have a play."""
-    out = set()
+    """Pool numbers that already have a play, and every WAD any play loaded."""
+    numbers, wads = set(), set()
     for path in glob.glob(os.path.join(PLAYS, "*", "meta.json")):
         with open(path) as f:
-            n = json.load(f).get("pool")
-        if n is not None:
-            out.add(n)
-    return out
+            meta = json.load(f)
+        if meta.get("pool") is not None:
+            numbers.add(meta["pool"])
+        wads |= {os.path.realpath(w) for w in meta.get("sources", ())}
+    return numbers, wads
 
 
 def detour_times(folder, meta):
@@ -69,7 +70,15 @@ def main():
     queue = sys.argv[1] if len(sys.argv) > 1 else QUEUE
     with open(queue) as f:
         lines = [ln.split(None, 3) for ln in f if ln.strip() and not ln.startswith("#")]
-    todo = [(int(n), src, m, w) for n, src, m, w in lines if int(n) not in played()]
+    numbers, wads = played()
+    todo = []
+    for n, src, m, w in lines:
+        if int(n) in numbers:
+            continue
+        if os.path.realpath(w.strip()) in wads:
+            print(f"#{n}: {w.strip()} has been played before, so it isn't blind; skipped (give #{n} another map)")
+            continue
+        todo.append((int(n), src, m, w))
     if not todo:
         print(f"nothing left to play in {queue}")
         return 0
@@ -99,7 +108,7 @@ def main():
                         + (f"detour times (--choice): {', '.join(meta['choice'])}\n" if meta.get("choice") else ""))
         with open(os.path.join(folder, "meta.json"), "w") as f:
             json.dump(meta, f, indent=1)
-    left = [n for n, *_ in todo if n not in played()]
+    left = [n for n, *_ in todo if n not in played()[0]]
     print(f"\n{len(todo) - len(left)} played; {len(left)} left in the queue" + (f": #{left[0]} next" if left else ""))
     return 0
 
