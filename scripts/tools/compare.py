@@ -377,7 +377,9 @@ def pool(commits):
     play's meta.json has its number in the pool ("pool"), its "source" and
     its "first" score (the scores compare.py gave it the first time, before
     anyone tuned on it); a "spoiled" play and one with no number don't
-    count, and a "verdict_override" of Bot-limited is listed but not counted.
+    count. "bot_limited" lists the commits at which a play is Bot-limited
+    (rubric section 5): it doesn't count toward gate C if its first score's
+    commit is listed, nor toward B and D if the commit it's scored at now is.
     Gates B and D use each play's scores at the first of `commits` it has
     been scored at (commits with the same explorer code), and its cause
     codes the codes.json beside them; gate C uses the first scores."""
@@ -397,16 +399,19 @@ def pool(commits):
             if os.path.exists(cp):
                 with open(cp) as f:
                     codes = json.load(f)
+        limited = set(meta.get("bot_limited", ()))
+        first = meta.get("first")
         plays.append(dict(n=meta["pool"], source=meta["source"], name=os.path.basename(folder), sc=sc,
-                          first=meta.get("first"), codes=codes,
-                          limited=meta.get("verdict_override") == "Bot-limited"))
+                          first=first, codes=codes, limited=at in limited,
+                          first_limited=bool(first) and first["commit"] in limited))
     plays.sort(key=lambda p: p["n"])
     print(f"pooled at {', '.join(commits)}\n\n{'':<5}{'source':<10}{'now':<26}{'first score':<16}play")
     for p in plays:
         sc, fs = p["sc"], p["first"]
         now = ("Bot-limited" if p["limited"] else "not scored here" if not sc else
                f"{sc['verdict']} S3 {sc['S3'][0]}/{sc['S3'][1]} S5 {sc['S5'][0]}/{sc['S5'][1]}")
-        first = "" if p["limited"] or not fs else f"S3 {fs['S3'][0]}/{fs['S3'][1]} S5 {fs['S5'][0]}/{fs['S5'][1]}"
+        first = ("Bot-limited" if p["first_limited"] else "" if not fs
+                 else f"S3 {fs['S3'][0]}/{fs['S3'][1]} S5 {fs['S5'][0]}/{fs['S5'][1]}")
         print(f"  #{p['n']:<3}{p['source']:<10}{now:<26}{first:<16}{p['name']}"
               + ("" if p["limited"] or not sc or p["codes"] is not None else "  (no codes.json)"))
     counted = [p for p in plays if not p["limited"]]
@@ -416,7 +421,8 @@ def pool(commits):
     b = gate("B (every play, scored now)", [p["sc"] for p in now], 5, 10, 0.6, 0.5) and not unscored
     if unscored:
         print(f"  {len(unscored)} play(s) not scored at this commit: score them before reading gate B")
-    c = gate("C (every play's first score)", [p["first"] for p in counted if p["first"]], 1, 15, 0.5, 0.5)
+    c = gate("C (every play's first score)", [p["first"] for p in plays if p["first"] and not p["first_limited"]],
+             1, 15, 0.5, 0.5)
     print("gate D (per source, scored now; a source with 3+ lost stretches needs lost recall 40%):")
     d = True
     for src in sorted({p["source"] for p in now}):

@@ -87,7 +87,9 @@ stalls, S5 is n/a and passes.
   jumps, gun lines with no switch texture, timed doors and lifts, unread line
   types) before the human's first L press. That takes a B-blind code (section
   6), so `compare.py` gives the verdict as if the map weren't bot-limited, and
-  the person coding the mismatches overrules it.
+  the person coding the mismatches overrules it. It's judged per explorer
+  commit: once a fix gets the seeds past the blind spot, the play is scored
+  again from that commit on (its first score stays Bot-limited).
 
 ## 6. A cause for every mismatch
 
@@ -150,8 +152,8 @@ uv run --with vizdoom scripts/tools/compare.py --pool --commit 9d0db0a,03b22ba  
 `--pool` reads each play's `meta.json`: `pool` (its number in the blind pool),
 `source` (obsidian, slige or community), `first` (the scores `compare.py` gave
 the play the first time it was scored, written then and never changed),
-`spoiled` (dropped) and `verdict_override` (`Bot-limited`: listed, not
-counted). It reports the gates of [explorer-plan.md](explorer-plan.md) with
+`spoiled` (dropped) and `bot_limited` (the commits at which it's Bot-limited:
+listed, not counted, there). It reports the gates of [explorer-plan.md](explorer-plan.md) with
 each rate's 95% range, and adds up the cause codes in
 `compare-<commit>/codes.json` by stall time: a list of
 `{"code", "time": "M:SS", "mismatch", "why"}`, where `time` is the stall time
