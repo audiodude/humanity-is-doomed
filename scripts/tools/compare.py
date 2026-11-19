@@ -386,7 +386,9 @@ def pool(commits):
     play's meta.json has its number in the pool ("pool"), its "source" and
     its "first" score (the scores compare.py gave it the first time, before
     anyone tuned on it); a "spoiled" play and one with no number don't
-    count. "bot_limited" lists the commits at which a play is Bot-limited
+    count, nor one "out_of_scope" (a map unlike the ones the pool stands
+    for; the gates are also printed with those counted, to show the effect).
+    "bot_limited" lists the commits at which a play is Bot-limited
     (rubric section 5): it doesn't count toward gate C if its first score's
     commit is listed, nor toward B and D if the commit it's scored at now is.
     Gates B and D use each play's scores at the first of `commits` it has
@@ -412,26 +414,35 @@ def pool(commits):
         first = meta.get("first")
         plays.append(dict(n=meta["pool"], source=meta["source"], name=os.path.basename(folder), sc=sc,
                           first=first, codes=codes, limited=at in limited,
-                          first_limited=bool(first) and first["commit"] in limited))
+                          first_limited=bool(first) and first["commit"] in limited,
+                          out=bool(meta.get("out_of_scope"))))
     plays.sort(key=lambda p: p["n"])
-    print(f"pooled at {', '.join(commits)}\n\n{'':<5}{'source':<10}{'now':<26}{'first score':<16}play")
+    print(f"pooled at {', '.join(commits)}\n\n{'':<5}{'source':<10}{'now':<26} {'first score':<16}play")
     for p in plays:
         sc, fs = p["sc"], p["first"]
         now = ("Bot-limited" if p["limited"] else "not scored here" if not sc else
                f"{sc['verdict']} S3 {sc['S3'][0]}/{sc['S3'][1]} S5 {sc['S5'][0]}/{sc['S5'][1]}")
+        now = f"out of scope: {now}" if p["out"] else now
         first = ("Bot-limited" if p["first_limited"] else "" if not fs
                  else f"S3 {fs['S3'][0]}/{fs['S3'][1]} S5 {fs['S5'][0]}/{fs['S5'][1]}")
-        print(f"  #{p['n']:<3}{p['source']:<10}{now:<26}{first:<16}{p['name']}"
+        print(f"  #{p['n']:<3}{p['source']:<10}{now:<26} {first:<16}{p['name']}"
               + ("" if p["limited"] or not sc or p["codes"] is not None else "  (no codes.json)"))
-    counted = [p for p in plays if not p["limited"]]
+    counted = [p for p in plays if not p["limited"] and not p["out"]]
     unscored = [p for p in counted if not p["sc"]]
     now = [p for p in counted if p["sc"]]
     print()
     b = gate("B (every play, scored now)", [p["sc"] for p in now], 5, 10, 0.6, 0.5) and not unscored
     if unscored:
         print(f"  {len(unscored)} play(s) not scored at this commit: score them before reading gate B")
-    c = gate("C (every play's first score)", [p["first"] for p in plays if p["first"] and not p["first_limited"]],
-             1, 15, 0.5, 0.5)
+    firsts = [p for p in plays if p["first"] and not p["first_limited"]]
+    c = gate("C (every play's first score)", [p["first"] for p in firsts if not p["out"]], 1, 15, 0.5, 0.5)
+    out = [p for p in plays if p["out"]]
+    if out:
+        def recall(scores):
+            return frac([sum(s["S3"][k] for s in scores) for k in (0, 1)])
+        b_all = [p["sc"] for p in plays if not p["limited"] and p["sc"]]
+        print(f"  with the out-of-scope play(s) counted ({', '.join('#' + str(p['n']) for p in out)}): "
+              f"B lost recall {recall(b_all)}, C lost recall {recall([p['first'] for p in firsts])}")
     print("gate D (per source, scored now; a source with 3+ lost stretches needs lost recall 40%):")
     d = True
     for src in sorted({p["source"] for p in now}):
