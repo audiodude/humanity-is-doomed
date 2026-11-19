@@ -85,8 +85,9 @@ A round is one explorer change, aimed at the biggest bot-side cause.
 3. **Check it:**
    - Score every play again at the new commit (its first score stays as it was).
    - Pooled lost recall and pooled stall precision must not drop.
-   - The id-map acceptance batch is a navigation sanity check: the all-three-seeds exit count must not fall below 28 (it's 32 now). It runs on an AWS Spot instance, about $0.50 a run.
+   - The id-map acceptance batch is a navigation sanity check: the all-three-seeds exit count must not fall below 28 (it's 32 now).
    - All six NUKAGE maps must still exit on every seed.
+   - All of these run on one AWS Spot instance, about $1 an hour, not on the local machine: `python3 scripts/tools/cloud.py run NAME --commit C --rescore --idmaps --nukage` uploads the repo and the plays, runs them, copies each play's `compare-C/` folder back, deletes the instance and prints the exits. `cloud.py resume NAME` picks it up after this machine stops; the instance shuts itself down after `--hours` regardless.
 4. **Merge it, or drop it.** Every commit's scores stay in their own `compare-<commit>/` folders, so the history shows which changes helped.
 
 Precision is the guard against overtuning. A bot that stalls everywhere would score well on lost recall and badly on precision.
