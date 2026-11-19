@@ -1,4 +1,4 @@
-# Plan: the explorer bot, tested against blind human play (v3)
+# Plan: the explorer bot, tested against blind human play (v4)
 
 The `--explore` bot finds its own way through a map and reports where it stalls. The aim is for those stalls to stand in for where a first-time player searches, so the map-building skills can use them on every build without a person playing it. This plan covers how we test that against people playing maps blind, and the fixed bar that says when the explorer is ready to report to the skills.
 
@@ -6,7 +6,7 @@ The explorer's stalls describe a map; they don't grade it. Some getting lost is 
 
 Scoring rules: [explore-rubric.md](explore-rubric.md). Tool: `scripts/tools/compare.py`.
 
-Versions: **v1** (2026-11-15) the plan as first written. **v2** (2026-11-17) SLIGE's share of the pool from play #14 on (section 1). **v3** (2026-11-17) every play's first score is out of sample, so gate C is taken over those instead of a holdout third; `--pool` shows 95% ranges (section "Ready means").
+Versions: **v1** (2026-11-15) the plan as first written. **v2** (2026-11-17) SLIGE's share of the pool from play #14 on (section 1). **v3** (2026-11-17) every play's first score is out of sample, so gate C is taken over those instead of a holdout third; `--pool` shows 95% ranges (section "Ready means"). **v4** (2026-11-19) a map that isn't representative of DOOM maps in general can be ruled out of scope; #16 is (section 1).
 
 ## Where it stands (2026-11-18, `1ed823f`)
 
@@ -44,7 +44,7 @@ The numbers below are fixed now, before the data. Changing one is a new version 
 | **C** first scores | every counted play's first score (`meta.json` "first") | ≥ 15 lost stretches; lost recall ≥ 50%; stall precision ≥ 50% |
 | **D** sources | every counted play, scored at the candidate commit, per source (Obsidian, SLIGE, community) | for every source with ≥ 3 lost stretches: lost recall ≥ 40%. A source that fails gets "not for this style" in the skills, rather than blocking the rest. |
 
-Bot-limited plays (rubric section 5) don't count toward any gate.
+Bot-limited plays (rubric section 5) and out-of-scope plays (section 1) don't count toward any gate.
 
 The lost-stretch minimums are the evidence each gate needs, not a quota for the player. A play where the user never gets lost still counts: toward the map minimums, toward order, and toward stall precision, since a recurring bot stall on a map they breezed through is a false alarm. The minimums can't be dropped, though. A bot that never stalls has no recurring stalls, so its precision passes as n/a, and only lost recall catches it.
 
@@ -53,6 +53,8 @@ The lost-stretch minimums are the evidence each gate needs, not a quota for the 
 ## 1. The blind pool
 
 A pool map must be one the user has never played or seen. That rules out their own levels, the id maps, OBSIDIAN01, and anything whose explorer report, `--describe` output, check output or top-down preview they've seen. The map must be a single map in Doom format (vanilla or Boom), since the explorer's map reader takes nothing else.
+
+**Out of scope (v4).** The pool stands for DOOM maps in general: levels to explore and fight through. An avant-garde map that isn't representative of them is out of scope, and its play counts toward no gate (`meta.json` "out_of_scope", with the reason). The user rules on it, before its scores are seen where possible. One play so far: **#16, The transport tycoon's epic fall**, which opens with a plane crash and then runs down a highway. That ruling came on 2026-11-19, after its scores had been seen (lost recall 1/4, every seed stuck at lift 564 from about 2:14), so `--pool` also prints gates B and C with it counted. At `1ed823f`: B lost recall 14/25 = 56% without it, 15/29 = 52% with it; C 13/23 = 57% without, 14/27 = 52% with. No gate changes between the two.
 
 The pool comes from three sources, because each has a style and we can't let the bot learn one:
 
