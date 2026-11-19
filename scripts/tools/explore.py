@@ -1060,13 +1060,15 @@ class Explorer(pt.Run):
 
     def lift_switches(self, s):
         """Switches it has seen that move lift s: S1 or SR lift lines with its
-        tag (a one-shot one only till it has used it)."""
+        tag that look like switches (a switch texture: a plain lift face it
+        can't tell from a wall), a one-shot one only till it has used it."""
         tag = self.geo.sectors[s][6]
         out = []
         for i in self.seen_lines:
             _a, _b, _f, sp, t, _fs, _bs = self.geo.lines[i]
             spec = SPECIALS.get(sp)
             if tag and t == tag and spec and spec.kind == "lift" and spec.trigger in ("S1", "SR") \
+                    and is_switch(self.textures[i][0] or ()) \
                     and ("line", i) not in self.failed and not (spec.trigger == "S1" and ("line", i) in self.done):
                 out.append(i)
         return out
