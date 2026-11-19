@@ -45,12 +45,23 @@ door it opened may have shut behind it: logged as "switch ... again", not
 progress). Before giving up it waits for anything it can see moving to stop.
 
 Lifts: it walks over a lift it can step or drop onto and off as it stands;
-otherwise it calls it, or (standing on it, going down) uses a lift switch on
-the lift's own edge and rides it. A switch it uses that sends a lift it has
-seen down (one it isn't standing on) has it run for that lift and ride it up
-before it goes back ("lift" in the report, not progress); a lift out of reach
-that a repeatable switch sent down before, it goes and calls with that switch
-(twice between progress, "switch ... again, to call ..."). After a switch that
+otherwise it calls it with a switch that moves it: one it has seen tagged to
+it (on the lift's edge, on the wall of a lift booth, across the room), or one
+that sent it down before (twice between progress, "switch ... to call ...").
+Going down from beside a lift booth, it steps in by the booth's switch, uses
+it and rides down. A lift's own switch that looks like one (a switch
+texture) is also a target of its own while the lift leads somewhere it hasn't
+been: a sector beside it, or the lift, it has never come near, or a teleport
+pad on it it hasn't been through (a plain lift face it leaves to its wall
+search, as a player would). Using such
+a switch isn't progress. When a switch it uses sends lifts down (the one it
+stands on too), it goes at once, before they come back, for the cheapest
+unexplored target they opened: an edge it hasn't seen past, a pad it hasn't
+been through, a switch, door or key it couldn't get to with the lifts where
+they were ("lift ... goes for" in the report). If they opened none, it rides
+one up that leads somewhere it hasn't been, or leaves them. A teleport pad up
+on a lift (a pedestal) is a target only if it has seen a switch that lowers
+it, which it uses first. After a switch that
 sets off a lift it hasn't seen, within earshot, it doesn't stand and look
 round but goes on at once: a lift waits only a few seconds. A lift it got
 stuck riding counts as a plain floor at its height until the next progress.
@@ -254,6 +265,11 @@ class Explorer(pt.Run):
         self.lift_switch = {}
         self.calls = Counter()    # times it went back to such a switch per lift since the last progress
         self._calling = False
+        self.sector_cells = {}    # sector -> its cells (by the cell's centre)
+        for j, row in enumerate(geo.cell_sector):
+            for i, s in enumerate(row):
+                if s is not None:
+                    self.sector_cells.setdefault(s, []).append((i, j))
 
     # -- seeing --------------------------------------------------------------
     def watch(self):
@@ -633,9 +649,13 @@ class Explorer(pt.Run):
                     continue
                 kind, sides = "door", (0, 1)
             elif spec.trigger in ("S1", "SR") and not (spec.kind == "lift" and bs is not None and h[bs][1] > h[bs][0]
-                                                       and {fs, bs} & self.tagged(_tag)):
-                # (a switch on the lift's own side calls it, which ride() does,
-                # unless the lift is up against its ceiling, shut like a door)
+                                                       and {fs, bs} & self.tagged(_tag)
+                                                       and not (self.lift_worth(_tag, h)
+                                                                and is_switch(self.textures[i][0] or ()))):
+                # (a switch on the lift's own side calls it, which ride() does
+                # when a way it plans goes over the lift; it's a target of its
+                # own only if it looks like a switch and the lift leads
+                # somewhere it hasn't been)
                 kind, sides = ("exit" if spec.kind in EXITS else "switch"), (0,)
             elif spec.trigger == "W1" and spec.kind in EXITS:
                 kind, sides = "exit", (0, 1)
@@ -662,6 +682,8 @@ class Explorer(pt.Run):
                 c = self.near(p, dist) if spec.trigger in ("G1", "GR") else \
                     self.near(p, dist, lv) if spec.trigger.startswith("W") else \
                     self.near(p, dist, lv, line=i, use=use)
+                if c and kind == "teleport" and not self.pad_ok(i, c, lv):
+                    continue
                 if c:
                     # A locked door it has the key for now is what it's after, as a key is.
                     d = dist[c] * (WEIGHT["key"] / WEIGHT["door"] if kind == "door" and spec.key else 1)
@@ -878,10 +900,11 @@ class Explorer(pt.Run):
             self.walk(self.plan.centre(after), False)
             return
         if abs(lift() - z()) > 24:            # up (or down) out of reach: call it
-            if s in self.lift_switch and not self._calling and self.calls[s] < 2:
-                # from the switch it saw send it down before (twice between progress)
+            if not self._calling and self.calls[s] < 2 and (s in self.lift_switch or self.lift_switches(s)):
+                # with a switch that moves it: one that sent it down before, or
+                # one it has seen tagged to it (twice between progress)
                 self.calls[s] += 1
-                self.call_from_switch(s)
+                self.call_lift(s)
                 raise Replan()
             self.face(on)
             self.press()
@@ -897,15 +920,14 @@ class Explorer(pt.Run):
                     self.dead[s] = self.heights()[s]
                 raise pt.Abort("the lift didn't come")
         elif want < z() - 24:                 # level with the player, going down: set it off
-            # A lift switch it has seen on the lift's own edge (a switch in the
-            # room that is the lift): use it from where it is, and ride down.
-            switch = min((i for i in self.seen_lines if self.geo.lines[i][5] == s
-                          and self.geo.lines[i][3] in SPECIALS
-                          and SPECIALS[self.geo.lines[i][3]].kind == "lift"
-                          and SPECIALS[self.geo.lines[i][3]].trigger in ("S1", "SR")),
-                         key=lambda i: pt.seg_dist(self.pos(), *self.geo.lines[i][:2]), default=None)
-            if self.geo.sector_at(self.pos()) == s and switch is not None:
-                (x1, y1), (x2, y2) = self.geo.lines[switch][:2]
+            # A lift switch it has seen in the lift itself (on its own edge, or
+            # on the wall of a lift booth): stand on the lift by it, use it,
+            # and ride down.
+            group = self.tagged(g.sectors[s][6]) | {s}
+            switch = min((i for i in self.lift_switches(s) if g.lines[i][5] in group),
+                         key=lambda i: pt.seg_dist(self.pos(), *g.lines[i][:2]), default=None)
+            if switch is not None:
+                (x1, y1), (x2, y2) = g.lines[switch][:2]
                 try:
                     self.drive(self.spot(switch, 0, 24), 0, True)
                 except pt.Abort:
@@ -953,6 +975,12 @@ class Explorer(pt.Run):
         mid = ((x1 + x2) / 2, (y1 + y2) / 2)
         if kind == "teleport":
             self.go_to(c, prev, lv)
+            pad = self.geo.lines[i][6]
+            if pad is not None and self.heights()[pad][0] - self.var("POSITION_Z") > pt.STEP:
+                # A pad up on a lift (a pedestal): lower it with its switch;
+                # what it does then is what that opened (catch).
+                self.call_lift(pad)
+                raise Replan()
             self.through(i)
             self.look_round()   # where is this?
             return
@@ -975,6 +1003,8 @@ class Explorer(pt.Run):
             self.face(mid)
             if pt.seg_dist(self.pos(), (x1, y1), (x2, y2)) > pt.USE_RANGE:
                 raise pt.Abort("couldn't get within reach of the line")
+            if spec.trigger in ("S1", "SR") and self.use_blocked(i):
+                raise pt.Abort("a wall is in the way of the switch from here")
             pressed = self.heights()
             self.press()
         a, b, _flags, _sp, tag, fs, bs = self.geo.lines[i]
@@ -989,8 +1019,9 @@ class Explorer(pt.Run):
             self.event("shot" if spec.trigger in ("G1", "GR") else "switch" if kind == "again" else kind,
                        f"{spec.trigger} {spec.kind} by {self.name(fs)}"
                        + (f" -> {'/'.join(moved[:3])}{'...' if len(moved) > 3 else ''}" if moved else "")
-                       + (" again" if kind == "again" else ""), False if kind == "again" else None)
-        lifts = self.lifts_off() if kind in ("switch", "again") else set()
+                       + (" again" if kind == "again" else ""),
+                       False if kind == "again" or spec.kind == "lift" else None)
+        lifts = self.seen_lifts() if kind in ("switch", "again") else set()
         lowered, heard = [], False
         for t in range(70 if kind != "exit" else 35):
             self.tic()
@@ -1012,7 +1043,7 @@ class Explorer(pt.Run):
         if lowered:
             if spec.trigger == "SR":
                 self.lift_switch.update((s, (i, side)) for s in lowered)
-            self.catch_lift(lowered, pressed)
+            self.catch(lowered, pressed)
         far = (bs, fs)[side] if kind in ("switch", "again") and spec.trigger == "SR" else None
         if far is not None and pressed[far][1] - pressed[far][0] < pt.HEIGHT_P \
                 and self.heights()[far][1] > pressed[far][1]:
@@ -1027,59 +1058,157 @@ class Explorer(pt.Run):
         """Lifts it has seen (a side of a line it has seen)."""
         return {s for i in self.seen_lines for s in self.geo.lines[i][5:7] if s in self.geo.lifts}
 
-    def lifts_off(self):
-        """Lifts it has seen, but not one it's standing on."""
-        here = self.plan.cell(self.pos())
-        return self.seen_lifts() - set(self.plan.under[here[1]][here[0]] or ())
+    def lift_switches(self, s):
+        """Switches it has seen that move lift s: S1 or SR lift lines with its
+        tag that look like switches (a switch texture: a plain lift face it
+        can't tell from a wall), a one-shot one only till it has used it."""
+        tag = self.geo.sectors[s][6]
+        out = []
+        for i in self.seen_lines:
+            _a, _b, _f, sp, t, _fs, _bs = self.geo.lines[i]
+            spec = SPECIALS.get(sp)
+            if tag and t == tag and spec and spec.kind == "lift" and spec.trigger in ("S1", "SR") \
+                    and is_switch(self.textures[i][0] or ()) \
+                    and ("line", i) not in self.failed and not (spec.trigger == "S1" and ("line", i) in self.done):
+                out.append(i)
+        return out
 
-    def call_from_switch(self, s):
-        """Lift s is out of reach and a repeatable switch it has used sent it
-        down before: go and use that switch again, and catch the lift."""
-        i, side = self.lift_switch[s]
+    def unvisited(self, s, h):
+        """It has never come near sector s, and there's room to stand in it."""
+        cells = self.sector_cells.get(s, ())
+        return bool(cells) and h[s][1] - h[s][0] >= pt.HEIGHT_P and not any(c in self.visited for c in cells)
+
+    def lift_worth(self, tag, h):
+        """The lifts tagged `tag` are worth calling for themselves: one is shut
+        like a door, or one leads somewhere it hasn't been (it, or a sector
+        beside it, it has never come near), or carries a pad it hasn't been
+        through."""
+        lifts = self.tagged(tag) & self.geo.lifts
+        if any(h[s][1] <= h[s][0] for s in lifts):
+            return True
+        if any(set(self.geo.lines[i][5:7]) & lifts for i in self.teleports & self.seen_lines if i not in self.links):
+            return True
+        return any(self.unvisited(n, h) for s in lifts for n in self.geo.neighbours(s) | {s})
+
+    def pad_ok(self, i, c, lv):
+        """Teleport line i's pad can be stepped onto from cell c (levels lv):
+        it's no more than a step up, or it's a lift (one lv doesn't hold
+        still) that it has seen a switch for, to lower it first."""
+        pc = self.plan.cell(self.spot(i, 1, 24))
+        g = self.geo
+        if not (0 <= pc[0] < g.nx and 0 <= pc[1] < g.ny):
+            return False
+        a, p = lv[c[1]][c[0]], lv[pc[1]][pc[0]]
+        if a is None or p is None:
+            return False
+        bs = g.lines[i][6]
+        return p[0] - a[0] <= pt.STEP or (p[2] and bs is not None and bool(self.lift_switches(bs)))
+
+    def use_blocked(self, i):
+        """Using line i from here would hit a wall first, as Doom's use does:
+        a line between with no action and no opening there (a one-sided wall,
+        a ledge or a shut door in the way)."""
+        p = self.pos()
+        (x1, y1), (x2, y2) = self.geo.lines[i][:2]
+        mid = ((x1 + x2) / 2, (y1 + y2) / 2)
+        n = max(1, int(math.dist(p, mid) / 4))
+        cells = {self.plan.cell((p[0] + (mid[0] - p[0]) * k / n, p[1] + (mid[1] - p[1]) * k / n)) for k in range(n + 1)}
+        h = self.heights()
+        for k in {k for c in cells for k in self.cell_lines.get(c, ())} - {i}:
+            a, b, _f, sp, _t, fs, bs = self.geo.lines[k]
+            if sp in SPECIALS or cross(p, mid, a, b) is None:
+                continue
+            if bs is None or min(h[fs][1], h[bs][1]) - max(h[fs][0], h[bs][0]) <= 0:
+                return True
+        return False
+
+    def call_lift(self, s):
+        """Lift s is out of reach: go and use a switch that moves it (the one
+        that sent it down before, or the nearest it has seen tagged to it),
+        then go for what that opened (catch)."""
+        doors = self.doors()
+        lv = self.plan.levels(self.route_heights(doors), self.solid(), frozenset(self.static | self.dead.keys()))
+        dist, prev = self.reach(lv, doors)
+        cands = [self.lift_switch[s]] if s in self.lift_switch else [(i, 0) for i in self.lift_switches(s)]
+        best = None
+        for i, side in cands:
+            c = self.near(self.spot(i, side), dist, lv, line=i, use=i)
+            if c is not None and (best is None or dist[c] < dist[best[0]]):
+                best = (c, i, side)
+        if best is None:
+            raise pt.Abort("can't get to a switch that calls the lift")
+        c, i, side = best
         a, b, _flags, sp, _tag, fs, _bs = self.geo.lines[i]
         spec = SPECIALS[sp]
         self._calling = True
         try:
-            doors = self.doors()
-            lv = self.plan.levels(self.route_heights(doors), self.solid(), frozenset(self.static | self.dead.keys()))
-            dist, prev = self.reach(lv, doors)
-            c = self.near(self.spot(i, side), dist)
-            if c is None:
-                raise pt.Abort("can't get to the switch that calls the lift")
             self.go_to(c, prev, lv)
             try:
                 self.drive(self.spot(i, side, 24), 0, True)
             except pt.Abort:
                 pass
             self.face(((a[0] + b[0]) / 2, (a[1] + b[1]) / 2))
-            if pt.seg_dist(self.pos(), a, b) > pt.USE_RANGE:
+            if pt.seg_dist(self.pos(), a, b) > pt.USE_RANGE or self.use_blocked(i):
                 raise pt.Abort("couldn't get within reach of the switch that calls the lift")
-            pressed, lifts = self.heights(), self.lifts_off()
+            pressed, lifts = self.heights(), self.seen_lifts()
             self.press()
-            self.event("switch", f"{spec.trigger} {spec.kind} by {self.name(fs)} again, to call {self.name(s)}",
-                       False)
+            if spec.trigger == "S1":
+                self.done.add(("line", i))
+            self.event("switch", f"{spec.trigger} {spec.kind} by {self.name(fs)}, to call {self.name(s)}", False)
             for _ in range(40):
                 self.tic()
                 lowered = [t for t in lifts if self.heights()[t][0] < pressed[t][0] - pt.STEP]
                 if lowered:
-                    self.catch_lift(lowered, pressed)
+                    if spec.trigger == "SR":
+                        self.lift_switch.update((t, (i, side)) for t in lowered)
+                    self.catch(lowered, pressed)
                     break
             else:
                 self.note("lift", f"{self.name(s)} didn't go down")
         finally:
             self._calling = False
 
-    def catch_lift(self, lowered, was):
-        """A switch it used sent a lift it has seen down (heights `was`
-        before): as a player does, run and get on it before it goes back up,
-        and ride it up."""
+    def catch(self, moved, was):
+        """Lifts it set off went down (heights `was` before): as a player does,
+        go at once, before they come back, for something new they opened: the
+        cheapest unexplored target (an edge it hasn't seen past, a pad it
+        hasn't been through, a switch, door or key) it can get to now and
+        couldn't with the lifts where they were. Failing that, ride up one that
+        leads somewhere it hasn't been. Otherwise it leaves them."""
+        for _ in range(40):
+            h = [self.heights()[s] for s in moved]
+            self.tic()
+            if [self.heights()[s] for s in moved] == h:
+                break
+        doors = self.doors()
+        now = self.route_heights(doors)
+        old = list(now)
+        for s in moved:
+            old[s] = was[s]
+        frozen = self.static | self.dead.keys()
+        lv_old = self.plan.levels(old, self.solid(), frozenset(frozen | set(moved)))
+        dist_old, _ = self.reach(lv_old, doors)
+        had = {(k, w[:2]) for _d, k, _c, w in self.options(lv_old, dist_old)}
+        lv = self.plan.levels(now, self.solid(), frozenset(frozen))
+        dist, prev = self.reach(lv, doors)
+        new = [o for o in self.options(lv, dist) if o[1] != "again" and (o[1], o[3][:2]) not in had]
+        if new:
+            _d, kind, c, what = min(new, key=lambda o: o[0])
+            self.note("lift", f"goes for a {kind} that {'/'.join(self.name(s) for s in moved[:3])} opened")
+            try:
+                self.act(kind, c, what, lv, prev)
+            except pt.Abort as e:
+                self.note("lift", f"missed it: {e}")
+            return
+        h = self.heights()
+        up = [s for s in moved if self.lift_worth(self.geo.sectors[s][6], h)]
+        if up:
+            self.ride_up(up, was)
+
+    def ride_up(self, lowered, was):
+        """Run onto one of the lowered lifts before it goes back up, and ride it up."""
         # Once it's down, the lift is a floor like any other: plan a way onto
         # it that doesn't clip the ledges round it.
-        for _ in range(40):
-            h = [self.heights()[s] for s in lowered]
-            self.tic()
-            if [self.heights()[s] for s in lowered] == h:
-                break
         added = set(lowered) - self.static
         self.static |= added
         try:
@@ -1405,7 +1534,8 @@ class Explorer(pt.Run):
                 pass
             except Teleported:
                 if kind == "teleport":
-                    self.learn(what[1], self._landed[1])   # it stepped on the pad it was making for
+                    if self._landed[0] is None:   # (teleported() learnt the pad it crossed)
+                        self.learn(what[1], self._landed[1])
                 else:
                     # It stepped on a teleporter on the way. It knows that one now
                     # and keeps off it, but if the only way there is over pads
