@@ -249,22 +249,21 @@ def wait_and_fetch(d, state):
         return
     sh("scp", "-q", *ssh_args(d, state), f"ubuntu@{state['host']}:batch/out.tgz", os.path.join(d, "out.tgz"),
        timeout=1800)
-    res = os.path.join(d, "results")
+    res = os.path.join(d, "results")   # the archive holds results/ and plays/
     shutil.rmtree(res, ignore_errors=True)
-    os.makedirs(res)
     with tarfile.open(os.path.join(d, "out.tgz")) as t:
-        t.extractall(res, filter="data")
+        t.extractall(d, filter="data")
     os.remove(os.path.join(d, "out.tgz"))
-    merge_plays(res)
+    merge_plays(d)
     state["fetched"] = True
     save(d, state)
     print(f"results in {res}", flush=True)
 
 
-def merge_plays(res):
+def merge_plays(d):
     """Copy the instance's compare-<commit>/ folders into the local plays, and
     a first score into a play's meta.json that had none."""
-    for folder in glob.glob(os.path.join(res, "plays", "*")):
+    for folder in glob.glob(os.path.join(d, "plays", "*")):
         name = os.path.basename(folder)
         here = os.path.join(PLAYS, name)
         if not os.path.isdir(here):
@@ -282,7 +281,7 @@ def merge_plays(res):
             ours["first"] = theirs["first"]
             with open(os.path.join(here, "meta.json"), "w") as f:
                 json.dump(ours, f, indent=1)
-    shutil.rmtree(os.path.join(res, "plays"), ignore_errors=True)
+    shutil.rmtree(os.path.join(d, "plays"), ignore_errors=True)
 
 
 def cleanup(d, state):
