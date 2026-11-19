@@ -8,15 +8,15 @@ Scoring rules: [explore-rubric.md](explore-rubric.md). Tool: `scripts/tools/comp
 
 Versions: **v1** (2026-11-15) the plan as first written. **v2** (2026-11-17) SLIGE's share of the pool from play #14 on (section 1). **v3** (2026-11-17) every play's first score is out of sample, so gate C is taken over those instead of a holdout third; `--pool` shows 95% ranges (section "Ready means").
 
-## Where it stands (2026-11-17, `26675f0`)
+## Where it stands (2026-11-18, `1ed823f`)
 
 | Piece | State |
 |---|---|
-| Explorer | Exits 36 of 61 id maps on seed 1, 32 on all three seeds (`main` before it: 34 and 31); the 7 maps whose exit needs a boss to die aren't counted. Exits all six NUKAGE maps on every seed. Reads Boom generalized and extended line types. |
-| Known blind spots | Running jumps, gun lines with no switch texture (barrel walls), timed doors and lifts it's too slow for, deliberate death pits, huge open areas it sweeps rather than reads |
+| Explorer | Exits 36 of 61 id maps on seed 1, 32 on all three seeds; the 7 maps whose exit needs a boss to die aren't counted. Exits all six NUKAGE maps on every seed. Reads Boom generalized and extended line types, and since `1ed823f` treats Boom generalized lifts as lifts (OBSIDIAN02 and 10 now exit). |
+| Known blind spots | Running jumps, gun lines with no switch texture (barrel walls), timed doors and lifts it's too slow for, deliberate death pits, huge open areas it sweeps rather than reads. Diagnosed, not fixed (one note per map in [explorer-notes/](explorer-notes/)): a lift's own switch off every route (a lift booth, a switch plate under a lift, a ring of teleport pedestals; a first fix, branch `explorer-liftsw`, was dropped: it fixed none of SELFISH5, OBSIDIAN04, Marbellous and slowed NUKAGE); a short gap from a crate onto a ledge (monlth04); raised teleport pads it walks into (Marbellous); lift 564 on The transport tycoon's epic fall. |
 | `--play` | Done: L marks "I'm lost", K stops; the report uses the explorer's own bookkeeping |
 | Rubric and `compare.py` | v4: an L press marks the whole stretch it falls in; a detour (`--choice`) removes only its own time; cause codes include B-perception. `--pool` reports the gates |
-| Blind plays | 16 played (#1–#16; SJS2 spoiled, #5 CHORD_NG Bot-limited). Under v1/v2, gate B passed at `26675f0` (lost recall 9/13) and gate C failed on the holdout third (1/6), which led to v3. Under v3, at `26675f0`: gate B lost recall 10/19 = 53% (32–73%), precision 23/36; gate C (first scores) 9/19 = 47% (27–68%), precision 23/36; gate D passes. Neither B nor C passes. |
+| Blind plays | 28 played (#1–#28; SJS2 spoiled; #17–#28 from the play queue). Bot-limited (rubric section 5, per commit in `meta.json` "bot_limited"): #5 CHORD_NG, #18 Tantrum 2, #22 DeathBelow, and #6 OBSIDIAN02 until `1ed823f`. At `1ed823f`: gate B lost recall 15/29 = 52% (34–69%), precision 43/68 = 63%; on the same 24 plays as before it, recall 15/27 both times and precision 41 → 42 of 66. Gate C (first scores) 14/27 = 52% (34–69%), precision 41/66: passes. Gate D passes. B doesn't. The largest causes by stall time: B-weak (lift switches, the crate gap) and B-perception (4 maps each). |
 | Not blind | OBSIDIAN01 MAP01 was analysed with the user, so it can't be in the pool. Its two 11-minute bot stalls are navigation bugs being fixed separately. |
 
 ## Ready means
