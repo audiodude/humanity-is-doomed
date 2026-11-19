@@ -23,7 +23,7 @@ import sys
 from importlib.util import find_spec
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from playtest import CACHE, DEFAULT_IWAD, ROOT, VANILLA_ARGS, place  # noqa: E402
+from playtest import CACHE, DEFAULT_IWAD, ROOT, VANILLA_ARGS, new_game, place  # noqa: E402
 
 MONSTERS = {"Zombieman", "ShotgunGuy", "ChaingunGuy", "WolfensteinSS", "DoomImp", "Demon", "Spectre", "LostSoul",
             "Cacodemon", "HellKnight", "BaronOfHell", "Arachnotron", "PainElemental", "Revenant", "Fatso",
@@ -32,7 +32,7 @@ MONSTERS = {"Zombieman", "ShotgunGuy", "ChaingunGuy", "WolfensteinSS", "DoomImp"
 
 def woken(vzd, args, spot):
     """(moved, total): the monsters that moved after a shot from spot (None: the start)."""
-    g = vzd.DoomGame()
+    g = new_game(vzd)
     g.set_doom_game_path(args.iwad)
     g.set_doom_scenario_path(args.wad)
     os.makedirs(CACHE, exist_ok=True)

@@ -711,6 +711,27 @@ def clock(tics):
     return f"{secs // 60}:{secs % 60:02d}"
 
 
+def new_game(vzd):
+    """A DoomGame whose engine dies with the Python process that started it.
+    ViZDoom's engine is a process of its own, stopped only by close(): if
+    Python dies first (a timeout, a kill), the engine is left waiting forever,
+    and it ignores SIGTERM while it waits. On Linux it's started through
+    `setpriv --pdeathsig KILL`, so the kernel kills it when its parent dies."""
+    g = vzd.DoomGame()
+    if shutil.which("setpriv"):
+        engine = os.path.join(os.path.dirname(vzd.__file__), "vizdoom")
+        wrapper = os.path.join(CACHE, f"vizdoom-{hashlib.sha1(engine.encode()).hexdigest()[:10]}.sh")
+        if not os.path.exists(wrapper):
+            os.makedirs(CACHE, exist_ok=True)
+            fd, tmp = tempfile.mkstemp(dir=CACHE)
+            with os.fdopen(fd, "w") as f:
+                f.write(f'#!/bin/sh\nexec setpriv --pdeathsig KILL -- "{engine}" "$@"\n')
+            os.chmod(tmp, 0o755)
+            os.replace(tmp, wrapper)   # atomic: many runs start at once
+        g.set_vizdoom_path(wrapper)
+    return g
+
+
 def short_demo_path():
     """A demo path short enough to record to. ViZDoom hangs, with no error,
     when asked to record to a path much over 100 characters (long WAD file
@@ -817,7 +838,7 @@ class Run:
         self._state = None
         self.shots = args.shots or os.path.join("/tmp", "playtest-shots", args.map.upper())
         os.makedirs(self.shots, exist_ok=True)
-        g = self.game = vzd.DoomGame()
+        g = self.game = new_game(vzd)
         g.set_doom_game_path(args.iwad)
         os.makedirs(CACHE, exist_ok=True)
         live = getattr(args, "play", False) and not args.recording   # a person plays (--play)
@@ -1601,7 +1622,7 @@ def replay(args, vzd):
     meta = json.load(open(path + ".json")) if os.path.exists(path + ".json") else {}
     if meta and meta.get("wad") != wad_hash(args.wad):
         print("note: the WAD has changed since this was recorded, so the replay will drift from what happened")
-    g = vzd.DoomGame()
+    g = new_game(vzd)
     os.makedirs(CACHE, exist_ok=True)
     g.set_doom_game_path(args.iwad)
     g.set_doom_config_path(os.path.join(CACHE, "vizdoom.ini"))
