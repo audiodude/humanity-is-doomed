@@ -40,6 +40,7 @@ RUBRIC = 4
 # whenever explore.py, playtest.py's planner or movement, or levels/ change.
 SAME_EXPLORER = [
     "2830ed5",   # round 3c: lifts by their switches, only ones that look like switches
+    "7bf3395",   # the merge into main: plan status and SAME_EXPLORER only
 ]
 TIC = 35
 CAP = 15 * 60 * TIC   # runs are cut off at 15 minutes
