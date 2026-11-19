@@ -49,9 +49,11 @@ otherwise it calls it with a switch that moves it: one it has seen tagged to
 it (on the lift's edge, on the wall of a lift booth, across the room), or one
 that sent it down before (twice between progress, "switch ... to call ...").
 Going down from beside a lift booth, it steps in by the booth's switch, uses
-it and rides down. A lift's own switch is also a target of its own while the
-lift leads somewhere it hasn't been: a sector beside it, or the lift, it has
-never come near, or a teleport pad on it it hasn't been through. Using such
+it and rides down. A lift's own switch that looks like one (a switch
+texture) is also a target of its own while the lift leads somewhere it hasn't
+been: a sector beside it, or the lift, it has never come near, or a teleport
+pad on it it hasn't been through (a plain lift face it leaves to its wall
+search, as a player would). Using such
 a switch isn't progress. When a switch it uses sends lifts down (the one it
 stands on too), it goes at once, before they come back, for the cheapest
 unexplored target they opened: an edge it hasn't seen past, a pad it hasn't
@@ -648,10 +650,12 @@ class Explorer(pt.Run):
                 kind, sides = "door", (0, 1)
             elif spec.trigger in ("S1", "SR") and not (spec.kind == "lift" and bs is not None and h[bs][1] > h[bs][0]
                                                        and {fs, bs} & self.tagged(_tag)
-                                                       and not self.lift_worth(_tag, h)):
+                                                       and not (self.lift_worth(_tag, h)
+                                                                and is_switch(self.textures[i][0] or ()))):
                 # (a switch on the lift's own side calls it, which ride() does
                 # when a way it plans goes over the lift; it's a target of its
-                # own only while the lift leads somewhere it hasn't been)
+                # own only if it looks like a switch and the lift leads
+                # somewhere it hasn't been)
                 kind, sides = ("exit" if spec.kind in EXITS else "switch"), (0,)
             elif spec.trigger == "W1" and spec.kind in EXITS:
                 kind, sides = "exit", (0, 1)
