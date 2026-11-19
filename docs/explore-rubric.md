@@ -153,7 +153,7 @@ uv run --with vizdoom scripts/tools/compare.py --pool --commit 9d0db0a,03b22ba  
 `source` (obsidian, slige or community), `first` (the scores `compare.py` gave
 the play the first time it was scored, written then and never changed),
 `spoiled` (dropped), `out_of_scope` (not representative of DOOM maps in
-general: not counted, and the gates are printed with it counted too) and
+general: not counted) and
 `bot_limited` (the commits at which it's Bot-limited: listed, not counted,
 there). It reports the gates of [explorer-plan.md](explorer-plan.md) with
 each rate's 95% range, and adds up the cause codes in

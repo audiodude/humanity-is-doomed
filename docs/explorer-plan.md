@@ -54,7 +54,7 @@ The lost-stretch minimums are the evidence each gate needs, not a quota for the 
 
 A pool map must be one the user has never played or seen. That rules out their own levels, the id maps, OBSIDIAN01, and anything whose explorer report, `--describe` output, check output or top-down preview they've seen. The map must be a single map in Doom format (vanilla or Boom), since the explorer's map reader takes nothing else.
 
-**Out of scope (v4).** The pool stands for DOOM maps in general: levels to explore and fight through. An avant-garde map that isn't representative of them is out of scope, and its play counts toward no gate (`meta.json` "out_of_scope", with the reason). The user rules on it, before its scores are seen where possible. One play so far: **#16, The transport tycoon's epic fall**, which opens with a plane crash and then runs down a highway. That ruling came on 2026-11-19, after its scores had been seen (lost recall 1/4, every seed stuck at lift 564 from about 2:14), so `--pool` also prints gates B and C with it counted. At `1ed823f`: B lost recall 14/25 = 56% without it, 15/29 = 52% with it; C 13/23 = 57% without, 14/27 = 52% with. No gate changes between the two.
+**Out of scope (v4).** The pool stands for DOOM maps in general. A map the user rules isn't representative of them (an avant-garde one) counts toward no gate; its play is kept, with the reason in `meta.json` "out_of_scope". So far: #16, The transport tycoon's epic fall, which opens with a plane crash and then runs down a highway.
 
 The pool comes from three sources, because each has a style and we can't let the bot learn one:
 

@@ -386,8 +386,7 @@ def pool(commits):
     play's meta.json has its number in the pool ("pool"), its "source" and
     its "first" score (the scores compare.py gave it the first time, before
     anyone tuned on it); a "spoiled" play and one with no number don't
-    count, nor one "out_of_scope" (a map unlike the ones the pool stands
-    for; the gates are also printed with those counted, to show the effect).
+    count, nor one "out_of_scope" (not representative of DOOM maps).
     "bot_limited" lists the commits at which a play is Bot-limited
     (rubric section 5): it doesn't count toward gate C if its first score's
     commit is listed, nor toward B and D if the commit it's scored at now is.
@@ -434,15 +433,8 @@ def pool(commits):
     b = gate("B (every play, scored now)", [p["sc"] for p in now], 5, 10, 0.6, 0.5) and not unscored
     if unscored:
         print(f"  {len(unscored)} play(s) not scored at this commit: score them before reading gate B")
-    firsts = [p for p in plays if p["first"] and not p["first_limited"]]
-    c = gate("C (every play's first score)", [p["first"] for p in firsts if not p["out"]], 1, 15, 0.5, 0.5)
-    out = [p for p in plays if p["out"]]
-    if out:
-        def recall(scores):
-            return frac([sum(s["S3"][k] for s in scores) for k in (0, 1)])
-        b_all = [p["sc"] for p in plays if not p["limited"] and p["sc"]]
-        print(f"  with the out-of-scope play(s) counted ({', '.join('#' + str(p['n']) for p in out)}): "
-              f"B lost recall {recall(b_all)}, C lost recall {recall([p['first'] for p in firsts])}")
+    c = gate("C (every play's first score)",
+             [p["first"] for p in plays if p["first"] and not p["first_limited"] and not p["out"]], 1, 15, 0.5, 0.5)
     print("gate D (per source, scored now; a source with 3+ lost stretches needs lost recall 40%):")
     d = True
     for src in sorted({p["source"] for p in now}):
