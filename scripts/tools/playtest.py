@@ -128,6 +128,7 @@ LEVELS = os.path.join(ROOT, "levels")
 sys.path.insert(0, ROOT)
 from levels.sets import place  # noqa: E402
 from levels.wad import IWAD as DEFAULT_IWAD  # noqa: E402  DOOM2_WAD from .env or the environment
+from levels.doom2 import BOOM_SPECIALS  # noqa: E402
 CACHE = os.path.expanduser("~/.cache/playtest")
 WIDTH, HEIGHT = 640, 480
 # ZDoom's "Doom (strict)" compatibility (compatmode 2), flag by flag: `+compatmode 2`
@@ -146,7 +147,6 @@ RADIUS, HEIGHT_P, STEP, USE_RANGE = 16, 56, 24, 64
 GRID = 16
 SHIFT = 7.5   # how far off a cell's centre the planner may stand the player's box, to fit a gap
 DAMAGING = {4, 5, 7, 11, 16}
-LIFTS = {10, 21, 62, 88, 120, 121, 122, 123}   # lift specials: their tagged sectors move up and down
 USE_DOORS = {1, 26, 27, 28, 31, 32, 33, 34, 117, 118}   # doors the player opens by using them
 STUCK_TICS, ARRIVE, PASS_BY = 70, 3, 24
 LOOP_DEATHS, LOOP_RADIUS, LOOP_TICS = 3, 128, 30 * 35   # this many deaths this close together is a loop
@@ -247,7 +247,9 @@ class Geometry:
             self.sector_lines[fs].append(i)
             if bs is not None and bs != fs:
                 self.sector_lines[bs].append(i)
-        lift_tags = {tag for _, _, _, sp, tag, _, _ in self.lines if sp in LIFTS and tag}
+        # Lifts: sectors a lift special (vanilla, Boom or Boom generalized) is tagged to.
+        lift_tags = {tag for _, _, _, sp, tag, _, _ in self.lines
+                     if tag and (spec := BOOM_SPECIALS.get(sp)) and spec.kind == "lift"}
         self.doors = {bs for _, _, _, sp, _, _, bs in self.lines if sp in USE_DOORS and bs is not None}
         self.lifts = {i for i, s in enumerate(self.sectors) if s[6] in lift_tags}
         self.damaging = {i for i, s in enumerate(self.sectors) if s[5] in DAMAGING}
