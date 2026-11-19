@@ -38,11 +38,7 @@ RUBRIC = 4
 # docs or engine plumbing changed between them. Plain --pool pools the scores
 # filed under any of them and this checkout's commit. Empty it, and rescore,
 # whenever explore.py, playtest.py's planner or movement, or levels/ change.
-# 1ed823f generalized lifts are lifts (the explorer change)
-# 4c60690 compare.py: Bot-limited per commit
-# 2b8cf45 playtest: engines die with their Python parent
-# 77aaa4e docs: plan status, explorer-notes/
-SAME_EXPLORER = ["1ed823f", "4c60690", "2b8cf45", "77aaa4e"]
+SAME_EXPLORER = []
 TIC = 35
 CAP = 15 * 60 * TIC   # runs are cut off at 15 minutes
 STALL = 30 * TIC      # a stall, and a lure's or a trap's time
