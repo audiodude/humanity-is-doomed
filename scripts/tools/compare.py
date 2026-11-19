@@ -34,6 +34,15 @@ from explore import KEYS, line_textures  # noqa: E402
 from play import PLAYS, Observer  # noqa: E402
 
 RUBRIC = 4
+# Commits whose explorer plays exactly as this checkout's does: only compare.py,
+# docs or engine plumbing changed between them. Plain --pool pools the scores
+# filed under any of them and this checkout's commit. Empty it, and rescore,
+# whenever explore.py, playtest.py's planner or movement, or levels/ change.
+# 1ed823f generalized lifts are lifts (the explorer change)
+# 4c60690 compare.py: Bot-limited per commit
+# 2b8cf45 playtest: engines die with their Python parent
+# 77aaa4e docs: plan status, explorer-notes/
+SAME_EXPLORER = ["1ed823f", "4c60690", "2b8cf45", "77aaa4e"]
 TIC = 35
 CAP = 15 * 60 * TIC   # runs are cut off at 15 minutes
 STALL = 30 * TIC      # a stall, and a lure's or a trap's time
@@ -458,11 +467,11 @@ def main():
     p.add_argument("--iwad", default=pt.DEFAULT_IWAD, help="the IWAD, if the play's is gone (default: DOOM2_WAD)")
     p.add_argument("--pool", action="store_true", help="the plan's gates over the blind plays scored at --commit")
     p.add_argument("--commit", help="with --pool: the explorer commit, or several with the same explorer code, "
-                   "comma-separated (default: this checkout's)")
+                   "comma-separated (default: this checkout's and SAME_EXPLORER's)")
     args = p.parse_args()
     at = commit()
     if args.pool:
-        return pool((args.commit or at).split(","))
+        return pool(args.commit.split(",") if args.commit else [at, *SAME_EXPLORER])
     if not args.play:
         p.error("give a --play folder, or --pool")
     folder = os.path.abspath(args.play)
